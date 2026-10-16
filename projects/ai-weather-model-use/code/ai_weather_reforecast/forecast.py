@@ -28,7 +28,7 @@ print('MODEL_READY',round(time.monotonic()-t0,2),flush=True)
 t1=time.monotonic()
 io=ZarrBackend(out)
 variables=np.array([v for v in model.output_coords(model.input_coords())['variable'] if v.startswith(('t','q','r','u','v','z')) or v in ('sp','msl')])
-# Retain all model variables over the small region; no large field lands on p14.
+# Retain all model variables over the small region; no large field lands on 工作站.
 coords=OrderedDict(lat=lat,lon=lon,variable=variables)
 class ERA5WithRH:
  def __init__(self):self.source=ARCO(verbose=False)

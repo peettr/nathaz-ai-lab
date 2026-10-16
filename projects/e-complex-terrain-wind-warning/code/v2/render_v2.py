@@ -1,0 +1,23 @@
+"""Render v2 result narrative from actual scored metrics only; never invent missing methods."""
+import json,csv,math
+from pathlib import Path
+r=Path('./22_Lab/06_Logs/e_terrain');v=r/'v2';m=json.loads((v/'metrics_v2.json').read_text());terrain=json.loads((v/'gfs_terrain_v2.json').read_text())
+score=m['strong'];allscore=m['all'];gate=m['gates'];other=m['other_baselines_only']
+fmt=lambda x:'—' if x is None or not math.isfinite(x) else f'{x:.2f}'
+lines=['# E 瑞士冷季最小示范 v2','',f"v2 主判：{'过' if m['pass'] else '不过' if m['pass'] is False else '未判定'}；只涵盖所选站点 00/12 UTC 有效时刻的平均风速误差，不是阵风预报或工程预警效能。旧版 results.md/metrics.json 未改动。",'', '## 预先冻结的主判据（FOUR_v200_GFS +24h）',f"训练配对 {m['training_n']}，检验配对 {m['test_n']}，其中训练期 P90 强风 {m['strong_n']} 条；WindNinja 成功 {m['main_windninja_success_n']}/{m['main_expected_n']}，失败 {len(m['failures'])}。",'', '|口径|双线性|WindNinja|双线性 MOS|WindNinja MOS|','|---|---:|---:|---:|---:|']
+for k,s in [('强风合并 MAE (m/s)',score),('全时次合并 MAE (m/s)',allscore),('强风合并偏差 (m/s)',{k:{'mae_ms':v['bias_ms']} for k,v in score.items()}),('训练 P99 命中率', {k:{'mae_ms':v.get('p99_hit_rate')} for k,v in allscore.items()}),('训练 P99 误报率', {k:{'mae_ms':v.get('p99_false_alarm_rate')} for k,v in allscore.items()})]:
+ lines.append('|'+k+'|'+'|'.join(fmt(s[x]['mae_ms']) for x in ('bilinear','windninja','mos','windninja_mos'))+'|')
+red=100*(1-score['windninja']['mae_ms']/score['bilinear']['mae_ms'])
+lines += ['',f"强风降幅 {red:.2f}%（要求≥15%）；胜出 {m['station_wins']}/12 站（要求≥8）；WindNinja+MOS < MOS：{gate['windninja_mos_increment']}；全时次 WindNinja ≤ 双线性：{gate['all_time_guardrail']}。四个布尔位依次为 {gate}。",'', '## 逐站主判强风：MAE/偏差 m/s','|站|地形|n|双线性|WindNinja|双线性 MOS|WindNinja MOS|','|---|---|---:|---:|---:|---:|---:|']
+sites={x['station']:x for x in csv.DictReader((r/'stations_frozen.csv').open())}
+for sid,x in m['by_station'].items():
+ values=[f"{fmt(x['strong'][k]['mae_ms'])}/{fmt(x['strong'][k]['bias_ms'])}" for k in ('bilinear','windninja','mos','windninja_mos')]
+ lines.append('|'+ '|'.join([sid,sites[sid]['terrain'],str(x['n_strong']),*values])+'|')
+lines += ['','## 地形类别主判强风：MAE/偏差 m/s','|地形|n|双线性|WindNinja|双线性 MOS|WindNinja MOS|','|---|---:|---:|---:|---:|---:|']
+for cat,x in m['by_terrain'].items():
+ values=[f"{fmt(x['strong'][k]['mae_ms'])}/{fmt(x['strong'][k]['bias_ms'])}" for k in ('bilinear','windninja','mos','windninja_mos')]
+ lines.append('|'+ '|'.join([cat,str(x['n_strong']),*values])+'|')
+lines += ['','## 其他预报源与提前量（只报双线性及其 MOS；WindNinja 与 FuXi-CFD 未跑，不进入主判）','每站×源×提前量详见 other_sources_v2.csv（强风 MAE 与偏差，同站 P90）。不可拿旧版 WindNinja 样本换算 v2。', '', '## 地形高度（站海拔 − GFS 0.25° 表面地形，m）','FOUR 等 AI 源没有原生静态地形可核，此表明确是 NOAA GFS 0.25° 地形代理，不假装是 FOUR 原生模式高度。', '|站|真实海拔 m|GFS 双线性地形 m|差 m|','|---|---:|---:|---:|']
+for t in terrain['rows']:lines.append(f"|{t['station']}|{t['station_elevation_m']:.0f}|{t['gfs_surface_hgt_bilinear_m']:.1f}|{t['station_minus_gfs_m']:.1f}|")
+lines += ['','## 参数来源、时间与许可','|参数|值、来源或假设|','|---|---|','|站点|旧版 stations_frozen.csv 10-14 15:46 美东冻结，早于首次预报误差计算；12 站四类，完整率≥90%；逐站风速计高度未核实（不擅自填 10m）。高原为 plain 代理。|','|验证时窗|MeteoSwiss 10 分钟时间戳为 UTC 区间结束；有效时刻 t 配六条 t−20、t−10、t、t+10、t+20、t+30，覆盖 (t−30,t+30]；六条齐全才取标量均值，来源 https://opendatadocs.meteoswiss.ch/general/download#time-stamps-and-time-intervals 。|','|阈值|10–12 月同配对时刻六值均风 P90/P99，1–3 月检验；每站阈值与样本数在 metrics_v2.json。假设：由 v2 冻结口径指定。|','|WindNinja|USFS [地址]，质量守恒 domainAverageInitialization；各站 UTM32N 10 km×10 km SRTM 1 arc-second DEM，30 m 重采样；100 m 求解格、10m 输入输出；初风=站点 0.25° 双线性 U/V。grass 粗糙度是假设（未有逐站地被），来源 https://github.com/firelab/windninja 。|','|MOS|每站×源×提前量×风向四扇区，训练期 OLS 风速线性订正并非负截断；WindNinja 的输出方向另分扇区并单独拟合。不以检验期拟合。少数扇区训练样本很小，请见 mos_coefficients_v2.json。|','|模型训练截止|NOAA/CIRA 归档文献 Radford 等 2025 BAMS 表1：FOUR v2-small 2015 年训练、2016–17 验证；Pangu 2017 训练、2019 验证；GraphCast Operational 2017 训练、2016–21 微调。GFS 非固定训练模型，训练截止不适用。https://doi.org/10.1175/BAMS-D-24-0057.1 。|','|FuXi-CFD|只报不判：Zenodo DOI 10.5281/zenodo.18770845 官方记录说明权重实际放在外部 HF；本轮没有从 Zenodo 记录直接取得权重，因此未做瑞士站 ONNX 推理；禁止以第三方转载权重或 10m 风代 100m。作者说明 100m、9×9、1km，GraphCast/Pangu 无 100m 不进入 FuXi。|','|GFS 地形|2023-10-01 00Z f24 HGT:surface，.idx byte-range 取 0.25° GRIB2，双线性到站；来源 https://registry.opendata.aws/noaa-gfs-bdp-pds/ 。|','|数据与许可|Source: MeteoSwiss（开放数据可再分发并须注明来源）；NOAA AIWP/GFS 开放归档；NASA/USGS SRTM；WindNinja 公有领域。只留 12 站所选期间序列及小文件，未整包下载 7–9GB AIWP。|','',f"缺失对象 {len(m['missing_forecast_objects'])} 个：{', '.join(m['missing_forecast_objects'])}。原始拉取脚本 run_forecasts_v2.py 复用 A1；完整配对样本和 MOS 系数见同目录。图注明 Source: MeteoSwiss; NOAA AIWP; NOAA GFS。",'', '## 下一步','核逐站传感器高度、地表覆盖，若需评 FuXi 先确定 Zenodo 直供权重及输入地形/粗糙度规格；只在另一次预设试验中扩展。']
+(v/'results_v2.md').write_text('\n'.join(lines)+'\n');print('RENDERED',len(lines),m['pass'])

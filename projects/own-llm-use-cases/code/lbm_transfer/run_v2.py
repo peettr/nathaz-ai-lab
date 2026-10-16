@@ -153,7 +153,7 @@ def main():
     lines+=['','逐点 RMSE、相关、标准差比、检验段局部最小/最大 Cp 有符号峰误差，以及验证选择见 `metrics_v2.json`。时间图 `timeseries_v2.png`，Welch 0.1–5 Hz 谱 `spectrum_v2.png`；频谱高频拟合差时，不应仅凭 RMSE 宣称重建脉动。',
        '先前 `lead_lag_check.md` 的 +4 s/+1.2 s 是 seg2 低通互相关线索，并非本试验测试段选取的时滞；这里所有时滞/模型选择仅用验证段。',
        '数据限制：`21_Digital_Wind_Tunnel/04_Decisions/LBMPV_v7_Acceptance_Verdict_20261013.md:9–19`；2 s 参考平滑：`21_Digital_Wind_Tunnel/04_Decisions/LBMPV_Diag_r1_Verdict_20261013.md:11–24,39–40`。文献评价口径：`16_PETW/05_Literature_Wiki/wiki/liang2_shared_library/sources/NF6S3H9N.md` PDF pp.1–3（LES 输出并非实验真值）。本试验比较结论无文献依据，基于本线数据。',
-       f'运行耗时 {out["runtime_s"]:.1f} s；p14 本地 CPU，无 Colab/超算，Colab 消耗 0 CU。','']
+       f'运行耗时 {out["runtime_s"]:.1f} s；工作站 本地 CPU，无 Colab/超算，Colab 消耗 0 CU。','']
     (a.out/'results_v2.md').write_text('\n'.join(lines))
     print('DONE',json.dumps({k:v['decision'] for k,v in data.items()}),'runtime_s',out['runtime_s'],flush=True)
 if __name__=='__main__':main()

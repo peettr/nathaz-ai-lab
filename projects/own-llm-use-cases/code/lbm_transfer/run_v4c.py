@@ -84,7 +84,7 @@ def main():
         lines.append(f"{k}：FIR 加 z12 后 RMSE {m4['mean_tap_rmse']-m3['mean_tap_rmse']:+.4f} Cp，相关 {m4['mean_tap_corr']-m3['mean_tap_corr']:+.3f}，脉动标准差比 {m4['mean_tap_std_ratio']-m3['mean_tap_std_ratio']:+.3f}；CNN 相对四点 FIR 改善 {d['CNN_gain_vs_FIR']:.1%}、胜 {d['CNN_tap_wins']}/11；准定常验证滞后 {b['qs_lag_s']:.1f} s、FIR 岭 {b['fir_ridge_alpha']:.0f}、CNN epoch {b['cnn_best_epoch']}。")
     lines+=['','图 `distance_v4c.png`：实线四高度，虚线原三高度；逐测点 RMSE、相关、脉动比及极值误差见 `metrics_v4c.json`，运行原始输出见 `run_v4c.log`。',
          '文献评价口径：`16_PETW/05_Literature_Wiki/wiki/liang2_shared_library/sources/NF6S3H9N.md` PDF pp.1–3；试验比较无文献依据，基于本线数据。现场核验限制：`21_Digital_Wind_Tunnel/04_Decisions/LBMPV_v7_Acceptance_Verdict_20261013.md:9–19`；REF 平滑：`21_Digital_Wind_Tunnel/04_Decisions/LBMPV_Diag_r1_Verdict_20261013.md:11–24,39–40`。',
-         f'本地 p14 CPU 耗时 {result["runtime_s"]:.1f} s；未使用 Colab/超算，Colab 消耗 0 CU。','']
+         f'本地 工作站 CPU 耗时 {result["runtime_s"]:.1f} s；未使用 Colab/超算，Colab 消耗 0 CU。','']
     (a.out/FILES[0]).write_text('\n'.join(lines))
     print('DONE runtime_s',result['runtime_s'],flush=True)
 if __name__=='__main__':main()
