@@ -1,0 +1,765 @@
+{
+ "id": "333621ea",
+ "slug": "fulltext-kb-data-extraction",
+ "number": "L22.2a",
+ "title": {
+  "zh": "L22.2a 文献库全文检索 + 风工程数据抽取",
+  "en": "L22.2a Full-text search of the literature library + wind-engineering data extraction"
+ },
+ "group": "lab",
+ "parent": "b4e6d3fb",
+ "depth": 2,
+ "status": {
+  "zh": "已转正",
+  "en": "Promoted"
+ },
+ "status_class": "done",
+ "done": true,
+ "start": "2026-10-13 18:16",
+ "end": "2026-10-17 11:55",
+ "updated": "2026-10-17 11:55",
+ "conclusion": {
+  "zh": "10-14 已转正为平台工具 pages：验收五组全过线，二期非首页事实题 22/27 到页；三期盲测 10-14：到页 21/30（中文 9/10、中译英 8/10、书 4/7、扫描书 0/3），书籍偏弱经平台 0062 改进后 round3 书籍到页 4/10→7/10（达标）、round4 8/12 不变；台式机 I 盘已连通并清点：净新增约 1.25 万 PDF/42 万页，第一阶段已抽 28.9 万页有文字页（工作站 1.8 GB）；台式机语料 0069 已上线（10-16），台式机来源盲测到页 11/30（两库 24/30），改进线索已交平台；10-15 全部推进：剩余 10.5 万页 OCR 10-16 02:38 完成（105,336 页，已交 0069）、三库元数据与作品去重、djvu/pdg 书 31,365 页已交平台（472 页超星格式未解）、litwiki/knowledge 试用已回；入库等 0051 与 C 盘处理。10-13 结论：只做检索。两库 4,691 PDF/12.9 万页本地按页索引；非首页事实题前 5 精确到页约一半（英文 8/14、中文原文 5/5、中文问英文译问题后 3/5、书 4/6）， 论文级 1/27；平台已接入（三期，一期本周内），原型冻结作对照；` pages` 一期已上线（10-13 22:40 实测）；扫描件 OCR 79 份/5,422 页已交二期。廓线抽取搁置（单页文本 6/78 错、27/78 需限定，图页常定位错）；0 CU；另一台电脑上的书待 Liang Hu 给信息",
+  "en": "10-14 Promoted to the platform tool pages: all five acceptance groups passed, and Phase 2 non-first-page fact questions reached the target page on 22/27; Phase 3 blind test on 10-14: 21/30 reached the page (Chinese 9/10, Chinese-to-English 8/10, books 4/7, scanned books 0/3); books were weak, and after platform improvement 0062, round3 book page hits rose from 4/10 to 7/10 (meeting the target) while round4 remained 8/12; the desktop I drive is connected and inventoried: net new ~12.5k PDFs / 420k pages, with Phase 1 extracting 289k text-layer pages (1.8 GB on the workstation); desktop corpus 0069 went live (10-16), hitting the target page on 11/30 in the desktop-source blind test (vs. 24/30 for the two libraries), with improvement leads handed to the platform; 10-15 all tracks pushed forward: OCR of the remaining 105k pages completed at 10-16 02:38 (105,336 pages, handed to 0069), three-library metadata and work-level deduplication, 31,365 pages of djvu/pdg books handed to the platform (472 Chaoxing-format pages unresolved), and litwiki/knowledge trial results returned; ingestion awaits 0051 and C drive cleanup. 10-13 conclusion: retrieval only. Two libraries with 4,691 PDFs / 129k pages indexed locally by page; for non-first-page fact questions, top-5 results hit the exact page about half the time (English 8/14, Chinese originals 5/5, Chinese queries on English papers 3/5 after query translation, books 4/6), paper-level 1/27; platform integration underway (three phases, Phase 1 within the week), prototype frozen as baseline; `pages` Phase 1 is live (tested 10-13 22:40); OCR of 79 scanned documents / 5,422 pages handed to Phase 2. Profile extraction is Shelved (single-page text had 6/78 errors and 27/78 requiring qualification, with figure pages often mislocated); 0 CU; books on the other computer await information from Liang Hu"
+ },
+ "schema_version": "1.0.0",
+ "task": {
+  "zh": "# 任务书：文献库全文检索 + 风工程数据抽取（实验室新想法，10-13 Liang Hu 批准开立）\n\n## 要回答的问题\nLiang Hu 多年积累的论文库（Zotero，3,163 个 PDF，17.7 GB，其中 2,422 个已有 Zotero 自带的全文文本缓存 `.zotero-ft-cache`）和书籍库（位置待 Liang Hu 告知）怎么用最值。10-13 判断：**不拿来微调大模型**（语料约千万–亿 token 级，对继续预训练太小；注入知识检索优于微调；微调后无法给出处；版权风险——依据审查 裁决第 4 条）。改为试两件事：\n1. **全文检索**：全库切段建索引，接到 或做一个同用法的命令，问答时能引\"哪篇、第几页\"原文。\n2. **数据抽取**：挑一种风工程数据（建议下击暴流风速竖向廓线，或高层建筑风压系数/阵风因子），从几十篇论文里抽成带来源与页码的表，抽样核原页，算准确率和人工核对工作量。\n\n## 不需要本地大模型\n检索只需要一个小的文本向量模型（CPU 可跑）或关键词检索；抽取默认走 Gemini 3.8 Flash 批量通道，每批抽 10% 由 Claude 复核（本线 10-13 试行规定）。本地 Qwen 只在遇到不宜外传的材料时才考虑。\n\n## 判据（事先写定）\n- 检索：准备 ≥30 个有标准答案的问题（答案页码已知），前 5 条结果里命中正确段落的比例；与现有 （只覆盖已建卡文献）对比。\n- 抽取：逐值对原页核对的准确率；每篇平均人工核对时间；与文献已发表数据集（如有）对照。\n\n## 边界\n- C 盘只剩约 51 GB：索引与中间文件放 WSL 本地（706 GB 空），不往 本地盘 写大文件；试验产物（小文件、脚本、结果 md）写。\n- Zotero 库只读，不改 zotero.sqlite、不动 storage。\n- 不把书籍全文发往外部服务；论文送 Gemini 抽取只送需要的页。\n- 总花费 ≤10 CU（如需 Colab）；不改平台 本体——若要接入，写方案交平台 Lead。\n- 新用到的外部工具/模型写进。\n\n## 交付\n项目页判断表（环节 / 可行 / 质量 / 成本 / 问题）、检索命中率、抽取准确率与样表、一句结论：值得做成正式工具/数据集 / 只做检索 / 不值得。",
+  "en": "# Task Brief: Full-text search of the literature library + wind-engineering data extraction (New Lab Idea, Approved by Liang Hu on 10-13)\n\n## Questions to Answer\nHow to get the most value out of the paper library accumulated by Liang Hu over the years (Zotero, 3,163 PDFs, 17.7 GB, of which 2,422 already have Zotero's built-in full-text cache `.zotero-ft-cache`) and the book library (location to be provided by Liang Hu). 10-13 assessment: **Do not use them to fine-tune an LLM** (the corpus is on the order of 10M–100M tokens, too small for continued pretraining; retrieval outperforms fine-tuning for knowledge injection; fine-tuning cannot provide source citations; copyright risks—per Review verdict Clause 4). Instead, test two things:\n1. **Full-text search**: Chunk and index the entire library, connect it to the existing tool or build a command with identical usage, so Q&A can cite the exact paper and page number from the original text.\n2. **Data extraction**: Pick one type of wind-engineering data (recommended: downburst vertical wind speed profiles, or high-rise building wind pressure coefficients / gust factors), extract it from dozens of papers into a table with sources and page numbers, spot-check against the original pages, and calculate accuracy and manual verification workload.\n\n## No Local LLM Needed\nRetrieval only requires a small text embedding model (runnable on CPU) or keyword search; extraction defaults to the Gemini 3.8 Flash batch pipeline, with 10% of each batch spot-checked by Claude (trial rule for this track as of 10-13). Local Qwen is considered only when encountering materials that should not be sent externally.\n\n## Criteria (Pre-specified)\n- Retrieval: Prepare ≥30 questions with ground-truth answers (known answer page numbers) and measure the proportion hitting the exact passage within the top 5 results; compare against the existing tool (which only covers literature with existing cards).\n- Extraction: Value-by-value accuracy verified against the original pages; average manual verification time per paper; comparison against published datasets in the literature (if available).\n\n## Boundaries\n- Only ~51 GB remains on the C: drive: store indices and intermediate files on the local WSL disk (706 GB free) and do not write large files to the local Windows drive; write experimental artifacts (small files, scripts, result `.md` files) to the project directory.\n- Keep the Zotero library read-only: do not modify `zotero.sqlite` or touch `storage`.\n- Do not send full book texts to external services; when sending papers to Gemini for extraction, send only the relevant pages.\n- Total cost ≤10 CU (if Colab is needed); do not modify the platform core—if integration is needed, write a proposal and submit it to the Platform Lead.\n- Document any newly used external tools/models.\n\n## Deliverables\nAn evaluation table on the project page (Stage / Feasible / Quality / Cost / Issues), retrieval hit rate, extraction accuracy and sample table, and a one-sentence conclusion: worth turning into a formal tool/dataset / do retrieval only / not worth it.",
+  "goal_zh": "回答\"Liang Hu 的论文库/书籍库怎么用最值\"。不微调大模型；试 (1) 全库全文检索、可引页码；(2) 从论文中抽一类风工程数据成表。任务书。",
+  "goal_en": "Answer \"how to get the most out of Liang Hu's paper library and book library\". No fine-tuning of large models; try (1) full-text search across the whole library with citable page numbers; (2) extracting one class of wind-engineering data from papers into a table. Brief."
+ },
+ "report": {
+  "zh": "# 文献库全文检索 + 风工程数据抽取\n\n## 目标\n回答\"Liang Hu 的论文库/书籍库怎么用最值\"。不微调大模型；试 (1) 全库全文检索、可引页码；(2) 从论文中抽一类风工程数据成表。任务书。\n\n## 当前状态\n10-13 Liang Hu 批准开立（由 Strata 节点讨论引出）。10-13 18:20 最小试验已派 ideas（任务书副本）：A 全库按页建 BM25+小向量混合索引，≥30 题事先定判据（前 5 条命中正确论文+页 ±1），与 对比；B 30–40 篇下击暴流竖向廓线（z_max、U_max、廓线模型参数、r/D、页码图号）走 抽取，≥60 值核原页算准确率与核对工时。下击暴流选文参考风场线清单（windfield_step2，约 120 篇，只读）。已知：Zotero 3,163 PDF / 17.7 GB，2,422 个已有全文文本缓存；现有 只覆盖已建卡文献，未见全库全文索引。书籍：10-13 Lead 在 工作站 上找到两处——Zotero 内 87 本书 + 32 章节 + 60 篇学位论文；EndNote 博士文献库 （1,527 PDF / 6.7 GB，含 Kaimal & Finnigan、Naudascher 等书及中文文献），已纳入范围（补充，排在 之后进同一执行）；可能还有书在别处，待 Liang Hu 告知。\n\n## 语料清单（10-13 ideas 盘点， +）\n| PDF 附件 | 库内去重后候选 | 大小 | 有文本层 / 整件无文本 / 抽取失败 | 语言（前 5 页启发式：英/中/混/未知） | 类型 |\n| --- | --- | --- | --- | --- | --- |\n| 3,164 | 2,592 | 16.5 GiB | 3,061 / 83 / 20 | 2,959 / 2 / 95 / 108 | 书 73、书章 26、学位论文 50、期刊 2,870、其他 145（按附件；条目口径为 87/32/60） |\n| 1,527 | 1,348 | 6.2 GiB | 1,440 / 76 / 11 | 1,402 / 0 / 35 / 90 | 1,517 未分类（.enl 元数据未解码；≥150 页长文档 56 个） |\n| 4,691 | 约 3,845 候选作品簇（跨库同名簇 95，非精确） | 22.8 GiB | 已索引 128,708 页；整件无文本 159 件 / 10,553 页（不等于扫描件数） | 有文本层的中文文献极少：中文书多半是扫描件，待 OCR 抽样 | — |\n| Literature 12,933 + Book 1,060 可读 PDF（另 132 件打不开）；字节去重后与两库仅重 53 件 → 净新增约 12,497 件 / 42.1 万页（现有两库的约 3 倍多）；.djvu 62 本约 3.0 万页；超星 .pdg 11 本约 3,163 页 | 去重净 15.9 GiB | 抽样估约 12.7 万页无文字层需 OCR（Book 中文名约 90% 是扫描件），工作站 10 线程估 80+ 小时 | 抽样中 124/英文或混合 406/未知 138（668 份） | 字节去重低估重复（同作品不同版本认不出）；PhDBackup 与 EndNote 博士库字节不同 |\n\n## 已定决定\n- 不做微调，检索优先（审查 裁决第 4 条）。\n- 不需要本地大模型：检索用小向量模型/关键词，抽取走 Gemini 批量通道。\n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 10-13 | 补充（ideas）：EndNote 库 + 库内书籍增量入索引，中文 CJK 三元索引 + 小术语表；新增 6 道书籍内页题 | 英文首页题扩库后不变（混合 27/34）。书籍 6 题只中 1 页：英文书题 1/3（B02 中，B05/B06 未中），中文问英文书 0/2，中文问中文书 B04 只中书未中页；原 34 道中文问英文论文 0–2/34。Lead 复核：失败主要是**跨语言**和**只靠关键词召回**（向量模型只在关键词前 60 页里重排、且只懂英文），以及两库同一本书重复占前 5 |\n| 10-13 | 第二轮（ideas）：30 道非首页事实题（3 道题本身有误作废，有效 27），前 5 按标题+页去重；抽取 AI 逐页复核 78 值；8 篇校正图页送 Gemini 看图读数 | 检索（前 5 论文+页）：英文事实 8/14（找到论文 10–11/14）；中文原文 5/5（三元索引）；中文问英文 0/5，只译问题后 3/5；书籍 4/6（实体书 2–3/4）； 论文级 1/27。抽取：78 值中 45 同页文字支持、27 需限定工况/定义、6 错；8 篇中 5 篇目标图其实在别的页；图读 AI 与 Gemini 5 篇粗略一致，误差无人工真值未评估。Lead 抽核 5 道题标准答案（R01/R07/R13/R21/R27）均在原页 |\n| 10-13 | 扫描件 OCR（ideas）：159 件无文字层 PDF 本机 Tesseract，去重后 79 份 / 5,422 页，22:00–22:35 完成，0 CU | 5,407 页有文本；20 页文本抽查 8 页有专名/数字错、8 页公式失真；Lead 对照 Wilcox PDF 第 40 页原图：正文基本正确、公式乱。可做关键词召回，不能直接引公式/数值。已交平台 0034 二期入库 |\n| 10-14 | 平台验收（0034 一期 10-13 22:03 / 0038 二期 10-14 01:58，逐题文件） | 一期五组全过线：首页 29/34、英文事实 6/11（有效题口径，原型 5/11）、中文原文 5/5、书籍 5/6、中文问英文 3/5；二期 round2 有效 27 题 22/27（目标 20）、英文事实 9/11、34 道中文问英文首页题 31/34 到页、跨库重复已合并。弱项：第一轮 6 道书籍补题两期都只 2/6 到页。Lead 已核 SHA 前缀与 R13–R16 逐题 |\n| 10-14 | 三期盲测（ideas，30 题冻结 SHA，题目不给平台）， pages 一次调用/题 | 到页 21/30、作品 25/30：中文原文 9/10、中文问英文 8/10、有文字层的书 4/7、扫描书 0/3（作品 2/3）。书籍内页普遍偏弱（与一二期书籍补题 2/6 一致）；发现元数据错挂：《热带气旋动力学引论》OCR 结果显示为 1949 年论文标题（Lead 已在原始输出核实）。聚合结果已交平台三期单列改进 |\n| 10-14 | 台式机第一阶段（ideas）：12,497 个净新增 PDF 在台式机远端抽文本，经 SSH 传回 工作站，PDF 不落盘 | 成功 12,489 件 / 418,747 页，其中有文字 288,794 页、无文字 129,953 页（第二阶段 OCR），8 件分页异常（2,276 页）待诊断；工作站 实占 1.8 GB（小文件块开销），C 盘 52 GB。Lead 抽 2 页回原 PDF 重抽，内容一致 |\n| 10-15 | 台式机第二阶段收尾（ideas）：OCR 停在 24,615 页（全是 Book/中文；10-14 20:46 因 C 盘<40 GB 自停）；导出打包清单；补 2 件异常 PDF | SQLite 418,861 页记录 / 12,491 件可入库（文字层 394,132 + OCR 24,615）；剩 105,338 页未 OCR（Book 其他目录约 2.7 万、Literature 约 6.9 万）、6 件损坏 PDF 2,162 页；20 页抽查：公式/数值/专名常错。已交平台入库 |\n| 10-15 | 平台 0062 上线后复跑两套盲测（ideas， pages） | round3：到页 21→24/30，书籍 4/10→7/10（达三期目标），中文持平；round4（12 道书题）8/12 不变。剩余失败主要是整本书没被召回，书一召回基本就到页；聚合结果已交平台 |\n| 10-15 | knowledge bot 试用 pages 复查 10 张知识卡出处 | 2 张命中原文页、2 张命中相关文献、6 张未检到。Lead 核 Zotero：未检到的 6 篇中 5 篇不在库里、1 篇有条目无 PDF（YY6ZFJJC）→ 检索本身没失手，缺口是\"用户分不清没检到与库里没有\"，已建议平台加提示。bot 反馈：准确英文题名 + 具体数值/方法提问最好用；宽泛中文主题或只给 DOI 会被相近文献占位 |\n| 10-15 | LitWiki 试用 pages 复查 10 条已核页码的引文 | 首问 5/10 命中目标页，换问法后 7/10；失败都是\"论文已知、要在其中找某页\"时被同系列别篇或参考文献页占位。LitWiki 建议接入建卡流程作候选页定位，核引文仍须开原 PDF；已向平台建议加 限定作品内检索、精确题名加权、推算期刊页醒目标注 |\n| 10-15 | 书目元数据第一轮（ideas，metadata/）：EndNote .enl 解出 1,373 条、安全关联附件 1,122/1,527；台式机 12,491 件题名全部低置信（7,092 来自文件名、5,399 来自首页启发式，socket 过期未读 PDF Info）；三库候选作品簇 15,009 | 30 条抽查可用率 23/30：EndNote 9/10、台式机 5/10、跨库簇 9/10。只能作候选关联，不能当正式书目；台式机与两库同 DOI/同指纹的只有 34 件（去重仍是保守下界）。第二轮：A Crossref 核 912 个 DOI 候选回填题名（已派）；B 等重抽单导出 pdf_meta.jsonl 后补 PDF Info 题名/作者再聚类 |\n| 10-15 | .djvu/.pdg 转文本（ideas，台式机 工作目录，14:25 完成） | 无 sudo 改 `apt download` 解包 tesseract 4 + djvulibre 到用户目录（可行，其他单复用）。交付 djvu_pdg.sqlite：73 个文档 / 31,365 页（DjVu 61 本 28,391 页 + Melenk 恢复 282/283；超星 PDG 11 套 2,692/3,163 页），有文本 31,140（文字层 24,637 + OCR 6,728）；472 个失败页位（PDG 0x38 变换 398、附加图层 72，集中在《风工程导论》《钢桥》）等更完整解码器；10 页抽查文本正常。Lead 核 工作站 文件 sha256 与页数一致；已交平台 0069 追加 |\n| 10-15 | 台式机 OCR 第三阶段（ideas，工作目录，10:29 起后台 PID 63579，6 线程） | 复用 pkg 里解包的 Tesseract；200 页试跑 36 秒（约 5.5 页/秒，195 页有文本）→ 105,338 页外推约 5.3 小时，预计 10-15 下午至晚间完成；损坏 PDF 用 pypdf 修副本另行处理中。完成后 ocr_round2.sqlite 回 工作站、导 manifest，再交 0069 |\n| 10-15 | 台式机文本重抽（ideas，工作目录，10:47 起 6 进程，PyMuPDF blocks 按左右栏排序） | 目标 12,437 件 / 394,246 页，OCR 页原样带入；10:49 约 22 页/秒；**13:2x 已完成**（12,436 件 ok、1 件 error，394,243 文字层页 + 24,615 OCR 页），收尾交付与书目 B 已派；OCR 单因并行放慢到约 3 页/秒 → 约 10 小时（预计今晚）。台式机负载约 14（24 核），仍有余量。完成后交 50 页双栏对照、manifest、回 工作站 |\n| 10-15 | 书目第二轮 A（ideas，Crossref 只送 DOI 字符串）：1,942 个独立 DOI 候选（台式机 912、EndNote 1,070） | 1,178 条来源记录与 Crossref 题名一致（≥0.82 相似度）→ 回填高置信题名/第一作者/年份到 *_v2.csv；258 条疑似误抓（DOI 能解析但题名不符）；22 条不存在；522 条 DOI 含 OCR 乱字（如\"共/兲\"）判\"未核实\"（勘误：首版误记为不存在）。**与 Zotero 同 DOI 的来源记录 1,065 条**（字节去重只认出 34 件）→ 跨库真实重复远多于此前估计，作品级合并要靠 DOI/题名。7 条题名一致但年份差>1 年待人工看 |\n| 10-15 | 重抽收尾 + 书目第二轮 B（ideas） | v2 已回 工作站（895 MB，418,858 页，sha256 两端一致；1 件 PDF 只开得出 2 页列异常）；50 页双栏抽样中 17 页能确认左栏句子连续、其余需人工看。书目：台式机 12,491 件题名置信五级 138/1,256/989/8,540/1,568；522 个乱字 DOI 一个都没能安全修复；候选作品簇 15,159：只台式机 12,272、只 Zotero 1,538、EndNote+Zotero 1,065（EndNote 约 70% 与 Zotero 重合）、只 EndNote 278、台式机与 Zotero 重合仅 6 簇（Lead 复算，CSV 含 NUL 已让清）；30 条抽查 24/30（Crossref 10/10、PDF Info 6/10、EndNote 8/10）。已连同 v2 交平台 0069 |\n| 10-16 | 台式机 OCR 第三阶段完成（ideas；10-15 23:3x 台式机 WSL 根分区 emergency 只读中断，Liang Hu 重启后 10-16 00:49 续跑，02:38 交付） | 105,336/105,338 页（有文本 103,456、空 1,880），2 页渲染超时、6 件损坏 PDF 未入；ocr_round2.sqlite 256 MB 两端 sha256 一致、integrity ok（Lead 复核）；20 页抽查可辨但中文字形/公式/表格错误常见。已交平台 0069 追加。**台式机语料至此交齐 ≈55.6 万页** |\n| 10-16 | 0069 上线后验收（ideas）：round5 台式机盲测首跑 + round3/4 复跑 | round3 到页 24/30、round4 8/12，与 0062 持平无变差（长书召回改进暂无可见增益）。round5 首跑 5/30，但 30/30 撞上翻译通道故障（全回退中文检索），英文来源两组 0/10 不能裁决，作废重跑（Lead 20:58 实测翻译已恢复）。显示检查：台式机来源与 I:\\ 路径 8/8 正确、扫描页提示 3/3；题名 4/8 为'题目候选'、3/8 为 PDF Info 十六进制乱码（已报平台过滤） |\n| 10-16 | round5 重跑（翻译恢复，30/30 翻译成功） | **台式机来源到页 11/30、作品 15/30**（Book 4/10、论文 4/10、中文 1/5、OCR 2/5），明显弱于两库（round3 24/30）。主因作品没召回（15/30）；中文组翻译成功后反降（首跑只用中文原文时作品 5/5）→ 中文问句应中英两路都检；题名 12/15 仍是'题目候选'。三条线索已交平台 |\n\n## 未决与下一步\n- **10-16 21:40**：round5 正式成绩到页 11/30（平台说明：测的是 09:42 版，尚不含 ocr_round2、djvu_pdg 两个增量，向量还在建）。四条改进（中英两路检索、台式机与两库分别召回再合并+题名加权、副本各用自己的物理页、用 desktop_records_v3 题名替换文件名）写进 0069 第三轮；回归要求两库逐题不降、耗时增加 ≤5 秒。上线后平台通知，实验室用同一套题复测，在此之前台式机来源验收不下结论。\n- **10-16 20:46**： pages 已返回台式机来源（0069 上线，平台尚未正式通知）；已派 ideas 跑 round5 + round3/4 复跑。\n- **10-16 02:45 状态**：台式机三个来源（v2、djvu_pdg、ocr_round2）全部交平台 0069；等入库上线 → round5 盲测 30 题 + round3/round4 纵向对照。剩余未解：PDG 472 页（解码器）、6 件损坏 PDF、2 页超时。\n- **10-15 09:05 Liang Hu：\"I 盘其他目录暂不管，别的全部推进\"**。已派（写入范围互不重叠）：① ideas 台式机 WSL 就地 OCR 剩余 105,338 页（台式机 24 核/46 GB/盘 664 GB 空闲；无 sudo，改 micromamba+conda-forge 免 root 装 tesseract 等；首派因 socket 过期未开始，09:20 重建 socket（3 天）后重派；输出 工作目录 → 工作站 ocr_round2.sqlite）；② 书目元数据第一轮已交（候选级）；第二轮 A 已交（1,178 条高置信回填；与 Zotero 同 DOI 1,065 条）；B 已交（见试过与结果）；v2 + 书目表 10-15 14:05 交平台，**0069 14:1x 放行入库**（新约束：新增 ≤8 GB、C 盘 <85 GB 停；虚拟盘内部尚有 117 GB 空闲）；旧 page_text.sqlite 与旧 manifest 已删（14:20）；ocr_round2、djvu_pdg 交来后同工单追加；round5 台式机来源盲测 30 题已冻结（SHA；Book 10 / 论文 10 / 中文 5 / OCR 5），OCR 5 题 Lead 已目视原页核实，等 0069 上线跑分；③ .djvu/.pdg 单 14:25 已交付并交平台 0069；OCR 第三阶段 10:29 起在台式机全量运行，**23:3x 做到 102,850/105,338 页时台式机 WSL 根分区进入 emergency 只读（ext4 报错自动 remount-ro），进程退出**；已把 SQLite 备份到 工作站 ftkb_desktop/ocr_round2_partial/（102,850 页，integrity ok）；Liang Hu 重启后 10-16 00:49 续跑、02:38 完成并交付（见试过与结果）；工作站 上的临时备份 ocr_round2_partial 已删；重抽单 10:47 起也在台式机跑（约 5 小时）；ideas 自约回访 13:20、14:29；兜底回访 10-16 08:2x；④ 平台 0069 答复（10-15）：线上两库已按文本块排序无串行；台式机 page_text.sqlite 是 -layout 抽的须重抽，0069 只收重抽版 → 已派 ideas 在台式机用 PyMuPDF blocks 重抽交 page_text_v2.sqlite（加 extractor 列）；0069 预留 work_id 合并与标题/作者/年份显示、多来源 SQLite 增量追加（主键 sha256+物理页，后到来源只补空页/替换 OCR 页）。开工条件：C 盘 ≥100 GB + 重抽版交付；⑤ litwiki、knowledge 试用已回（见试过与结果 10-15 两行）：检索本身未失手，两处改进建议（库内无/无 PDF 提示；--key/--doi 作品内检索）已交平台排 0069 后；⑥ 已问平台增量索引与调用量。暂不动：I 盘其他目录；下击暴流抽取仍搁置。\n- 10-14 14:20 第二阶段已派 ideas：本机 OCR 129,953 页（先 Book 中文/风工程/规范等），实测 6 线程约 1 页/秒（中文识别慢），全量约 1.5 天；10-14 20:46 因 C 盘低于 40 GB 按规矩自动停下，已识别 24,615 页（24,360 页有文字），剩约 10.5 万页；C 盘 22:24 剩 24 GB（增长来自 .hermes、[local path omitted] 等，非实验室），已紧急报平台，C 盘恢复到 40 GB 以上前不重启；10-15 00:53 复核：A3 进程已全部不在、目录稳定 11 GB、C 盘回升到 21 GB。**按 10-14 Liang Hu 新规（工作站 不跑计算、不存计算数据），剩余约 10.5 万页 OCR 重启前要另定地点**（工作站 本机需报平台；书籍不能上 Colab；CRC 组空间约 95% 满），C 盘恢复后再定（10-15 02:32 C 盘 46 GB）；建议方案：在台式机 WSL 上就地 OCR（数据在那，不用传输、不占 工作站），需 Liang Hu 同意在台式机装 Tesseract；10-15 02:45 第二阶段阶段性成果（41.9 万页）已交平台，入库（等虚拟盘压缩、C 盘回到 100 GB 以上再派）；平台 0062 书籍改进 10-15 02:09 上线，复跑结果平台已接受（三期目标达到）；长书作品级召回改进并入 0069（书按章节/页组二级索引、术语向书籍加权、平台自建 ≥20 道整本未召回题），0069 等 C 盘回到 100 GB 以上开工，上线后实验室用 、 做纵向对照；剩余 10.5 万页 OCR 等 Liang Hu 是否同意在台式机装 Tesseract；第一阶段 41.9 万页已打包进 1,003 页逐字核对无误）；8 件异常中 2 件可补页码，FE-Handbook 等损坏；.djvu/.pdg 在 工作站 不装软件转不了，暂缓；工作站 新增合计 ≤4 GB；顺带诊断 8 件异常 PDF、评估 .djvu/.pdg。完成后 manifest 交平台，平台等 0051 与 C 盘处理后入库。\n- **10-14 已转正**：检索做成平台工具 ` pages`（ 一期、0038 二期），所有 Lead/bot 可用。英文事实口径定为有效 11 题（我原写的 ≥8/14 是把原始 14 题原型值误标为有效题口径）。\n- 三期盲测已交平台（10-14 10:15）：中文可用，书籍内页偏弱、OCR 书错挂书名，平台开 单列改进（长书书内找页+OCR 噪声补偿、错挂书名修正、跨库同作判定、中文翻译双路兜底）；上线后平台先用一二期题库回归，再通知实验室用同一套盲测题复跑交逐题结果；目标书籍到页明显高于 4/10，中文原文 ≥9/10、中文问英文 ≥8/10。原计划：实验室持有盲测题（ideas 出题跑分，10-15 前交平台 Lead），题目不给平台，并入平台约 10-20 的三期验收；重点看书籍内页是否普遍偏弱，若是平台三期单列改进。平台 10-14 已在 0034 登记一期转正。之后 原型可解冻。\n- **结论（10-13 20:55）：只做检索。** 检索部分 status 待转正：形态是平台工具，不是科研项目，方案 已交平台 Lead，由平台排期；实验室提供原型与回归题库。\n- **数据抽取部分搁置**：为什么不行——廓线大多在图上、每个值都要配对图号/径向位置/工况，单页文本抽取 6/78 错、27/78 要加限定，5/8 篇连图页都定位错；目前需要专家逐篇读图，自动化省不了多少工。缺什么：可靠的读图（带曲线归属）与人工真值。何时重启：有明确用途的数据集需求（例如某条线要下击暴流廓线对照库）且能接受\"AI 初抽 + 专家逐篇核对\"的工时；或多模态读图模型在 ≥10 篇人工真值上误差可接受。\n- OCR 已完成并交平台 0034 二期（见上表）。10-13 22:40 实测 0034 一期已上线 ` pages`：中译英生效，但跨库同书重复占前 5——平台确认一期去重未生效（EndNote 标题是截断文件名），二期解析 EndNote 元数据 + DOI/文件哈希/首页指纹去重，OCR 页入库并标\"OCR 文本，引用前核原页\"；QuikSCAT 查询列为回归用例。等平台交一期验收逐题结果与二期验收结果。\n- 10-14 已连通台式机 WSL（Tailscale SSH，用户 [用户]，用 IP 连；known_hosts 里主机名那条是过期记录，现主机密钥与 Tailscale 登记一致），清点完成（见语料表）；10-14 第一阶段已派 ideas：有文字层页按页抽文本到 PDF，工作站 新增 ≤4 GB；OCR/.pdg/.djvu 放第二阶段。**存储更正**：WSL 盘是 C 盘上的 vhdx（355 GB），WSL 显示的空闲是假的，真实上限是 C 盘剩余（10-14 47 GB）；已报平台。平台回复（10-14）：台式机文本入库排在 0051 之后，且等 C 盘问题解决（42 万页索引预计 4–6 GB）；结果标\"来源：台式机\"、显示 I:\\ 原路径；实验室交 manifest 后平台开入库工单。C 盘回收需压缩虚拟盘、全平台停 10–30 分钟，已列入平台待 Liang Hu 决定清单第 11 项。此前：工作站 无 I 盘；desktop-re1s1os（Windows，Tailscale 在线）SSH 拒绝 工作站 密钥、SMB 未共享；台式机 报主机密钥变更，已停未绕过。已请 Liang Hu 加 工作站 公钥或开只读共享；能访问后先只做清点，不拷贝。\n- 等 Liang Hu 告知另一台电脑上书和论文的位置、数量、是否扫描件；>5 GB 的拷贝目的地由 Liang Hu 定（倾向 WSL 本地盘）。\n- 10-13 平台 Lead 决定接入：，分三期，一期本周内。实验室承诺： 与 脚本、题库在一期验收前不动（已告知 ideas）；回归题库与分数线已回平台（底线不低于原型：首页 ≥29/34；round2 分组 英文 ≥8/14、中文 5/5、书 ≥4/6、中译英 ≥3/5；目标 round2 合计 ≥20/27）。平台已把五份题库与分数线写进 0034（10-13）。等 0034 一期验收结果，验收通过后本页改 已转正 并链接 0034；兜底回访约 10-16 晚。\n\n## 文献依据\n- 审查裁决 （Ovadia：无监督微调不如检索；Balaguer：有监督微调 +6 pp）。\n\n## Liang Hu 注\n- 10-13：\"这个不需要本地大模型，对吧\" —— 对。\n- 10-16 02:4x OCR 第三阶段（台式机 12,491 件中的扫描页）完成： 105,336 页、1,713 件、2 条渲染超时页排除（FORTRAN90 手册），integrity ok，sha256 …；过程中台式机根盘只读故障、本地盘（9p）上的 SQLite 副本损坏（教训：Windows 盘不跑 SQLite 写入），见。交平台 0069 入库。",
+  "en": "# Full-Text Literature Repository Search + Wind Engineering Data Extraction\n\n## Objective\nAnswer \"how to get the most value out of Liang Hu's paper and book repositories.\" Do not fine-tune large language models; test (1) full-repository full-text search with citable page numbers; and (2) extracting one category of wind engineering data from papers into structured tables. Task brief recorded.\n\n## Current Status\n10-13 Approved for opening by Liang Hu (prompted by discussions at the Strata node). 10-13 18:20 Minimal trial dispatched to `ideas` (task brief copy): (A) build a page-level hybrid BM25 + small-embedding index across the entire repository, with pre-specified criteria on ≥30 questions (top-5 hit on the correct paper + page ±1), compared against the existing card search; (B) run extraction on 30–40 downburst vertical profile papers (`z_max`, `U_max`, profile model parameters, `r/D`, page and figure numbers), verifying ≥60 values against original pages to measure accuracy and verification labor. Downburst paper selection references the wind-field line list (`windfield_step2`, ~120 papers, read-only). Known baseline: Zotero holds 3,163 PDFs / 17.7 GB, of which 2,422 already have full-text caches; existing search covers only literature with built cards, with no full-repository full-text index. Books: on 10-13 the Lead located two sources on the workstation—87 books + 32 book chapters + 60 dissertations inside Zotero, plus the EndNote doctoral library (1,527 PDFs / 6.7 GB, including books such as Kaimal & Finnigan and Naudascher as well as Chinese literature), now included in scope (supplement queued after the initial run within the same execution); additional books may reside elsewhere, pending word from Liang Hu.\n\n## Corpus Inventory (10-13 `ideas` audit)\n| PDF Attachments | In-Repo Deduplicated Candidates | Size | Text Layer / Whole-Doc No Text / Extraction Failed | Language (First-5-Page Heuristic: EN / ZH / Mixed / Unknown) | Type |\n| --- | --- | --- | --- | --- | --- |\n| 3,164 | 2,592 | 16.5 GiB | 3,061 / 83 / 20 | 2,959 / 2 / 95 / 108 | 73 books, 26 book chapters, 50 dissertations, 2,870 journal articles, 145 other (by attachment; item-level counts: 87/32/60) |\n| 1,527 | 1,348 | 6.2 GiB | 1,440 / 76 / 11 | 1,402 / 0 / 35 / 90 | 1,517 unclassified (`.enl` metadata undecoded; 56 long documents ≥150 pages) |\n| 4,691 | ~3,845 candidate work clusters (95 cross-repo same-title clusters, approximate) | 22.8 GiB | 128,708 pages indexed; 159 whole documents without text / 10,553 pages (not equal to total scanned count) | Very few Chinese documents have a text layer: Chinese books are mostly scans, pending OCR sampling | — |\n| Literature 12,933 + Book 1,060 readable PDFs (plus 132 unreadable files); only 53 byte-level duplicates with the two existing repos → net addition of ~12,497 files / 421k pages (>3× the two existing repos); 62 `.djvu` books (~30k pages); 11 Chaoxing `.pdg` books (3,163 pages) | 15.9 GiB net deduplicated | Sampling estimates ~127k pages lack a text layer and need OCR (~90% of Chinese-titled items in Book are scans), estimated at 80+ hours using 10 threads on the workstation | Sample of 668 items: 124 Chinese / 406 English or mixed / 138 unknown | Byte deduplication underestimates overlap (cannot recognize different versions of the same work); PhDBackup differs byte-wise from the EndNote doctoral library |\n\n## Settled Decisions\n- Do not fine-tune; prioritize retrieval (Item 4 of the review verdict).\n- No local large language model needed: retrieval uses small embedding models + keywords, while data extraction uses the batch Gemini channel.\n\n## Trials and Results\n| Date | Action Taken | One-Line Result |\n| --- | --- | --- |\n| 10-13 | Supplement (`ideas`): incremental indexing of EndNote library + in-repo books, Chinese CJK trigram index + small glossary; added 6 book interior-page questions | English first-page accuracy unchanged after corpus expansion (hybrid 27/34). Only 1/6 book questions hit the page: English book questions 1/3 (B02 hit, B05/B06 missed), Chinese queries for English books 0/2, Chinese query for Chinese book B04 hit the book but missed the page; original 34 Chinese queries for English papers hit 0–2/34. Lead review: failures stem primarily from **cross-lingual mismatch** and **keyword-only first-stage recall** (the embedding model only reranks the top 60 keyword-recalled pages and understands only English), plus cross-repo duplicate copies of the same book occupying top-5 slots |\n| 10-13 | Round 2 (`ideas`): 30 non-first-page fact questions (3 questions discarded as flawed, 27 valid), top 5 deduplicated by title + page; AI page-by-page verification of 78 extracted values; 8 papers with calibrated figure pages sent to Gemini for visual chart reading | Retrieval (top-5 paper + page): English facts 8/14 (paper found in 10–11/14); Chinese original text 5/5 (trigram index); Chinese queries for English text 0/5, rising to 3/5 after translating only the query; books 4/6 (physical books 2–3/4); baseline tool paper-level hit 1/27. Extraction: among 78 values, 45 supported by same-page text, 27 required qualifying conditions/definitions, 6 wrong; in 5 of 8 papers the target figure was actually on a different page; visual chart readings by AI and Gemini roughly agreed on 5 papers, error unassessed without human ground truth. Lead spot-checked ground-truth answers for 5 questions (R01/R07/R13/R21/R27), all confirmed on the original pages |\n| 10-13 | Scanned PDF OCR (`ideas`): local Tesseract on 159 textless PDFs, 79 deduplicated files / 5,422 pages completed 22:00–22:35, 0 CU | 5,407 pages yielded text; 20-page spot check found proper-noun/number errors on 8 pages and formula distortion on 8 pages; Lead checked against the original image on p. 40 of the Wilcox PDF: body text mostly accurate, formulas garbled. Usable for keyword recall, but cannot be cited directly for formulas or numerical values. Handed over to platform Phase 2 for ingestion |\n| 10-14 | Platform acceptance (Phase 1 at 10-13 22:03 / Phase 2 at 10-14 01:58, per-question files) | Phase 1 passed all five groups: first-page 29/34, English facts 6/11 (valid-question basis; prototype 5/11), Chinese original 5/5, books 5/6, Chinese-to-English 3/5; Phase 2 `round2` hit 22/27 valid questions (target 20), English facts 9/11, 31/34 Chinese-to-English first-page questions hit the page, cross-repo duplicates merged. Weakness: the 6 Round 1 supplementary book questions hit the page in only 2/6 cases in both phases. Lead verified SHA prefixes and questions R13–R16 individually |\n| 10-14 | Phase 3 blind test (`ideas`, 30 questions with frozen SHA, questions withheld from platform), single `pages` call per question | Page hit 21/30, work hit 25/30: Chinese original 9/10, Chinese-to-English 8/10, books with text layer 4/7, scanned books 0/3 (work hit 2/3). Book interior pages remain broadly weak (consistent with 2/6 on the Phase 1/2 book supplement); discovered metadata misattachment: OCR output for *Introduction to Tropical Cyclone Dynamics* displayed a 1949 paper title (verified by Lead in raw output). Aggregated results handed to platform for a dedicated Phase 3 improvement |\n| 10-14 | Desktop Phase 1 (`ideas`): remote text extraction on 12,497 net new PDFs on the desktop, transferred back to the workstation over SSH without writing PDFs to disk | Succeeded on 12,489 files / 418,747 pages, including 288,794 pages with text and 129,953 textless pages (for Phase 2 OCR), plus 8 files with pagination anomalies (2,276 pages) pending diagnosis; actual workstation footprint 1.8 GB (small-file block overhead), C drive at 52 GB. Lead spot-checked 2 pages by re-extracting from the original PDFs; content matched |\n| 10-15 | Desktop Phase 2 wrap-up (`ideas`): OCR halted at 24,615 pages (all Book/Chinese; auto-stopped at 10-14 20:46 when C drive dropped below 40 GB); exported package manifest; patched 2 anomalous PDFs | SQLite holds 418,861 page records / 12,491 ingestible files (394,132 text-layer + 24,615 OCR); 105,338 pages remain un-OCRed (~27k in other Book directories, ~69k in Literature), plus 6 corrupted PDFs (2,162 pages); 20-page spot check: frequent errors in formulas, numbers, and proper nouns. Handed over to platform for ingestion |\n| 10-15 | Re-ran both blind test sets after platform book-retrieval update went live (`ideas`, `pages`) | `round3`: page hits rose from 21 to 24/30, books from 4/10 to 7/10 (meeting the Phase 3 target), Chinese unchanged; `round4` (12 book questions) unchanged at 8/12. Remaining failures are mainly whole books failing recall—once a book is recalled, the target page is almost always found; aggregated results handed to platform |\n| 10-15 | `knowledge` bot trial of `pages` to verify sources on 10 knowledge cards | 2 cards hit the exact source page, 2 hit related literature, 6 were not found. Lead checked Zotero: of the 6 unfound papers, 5 are absent from the repository and 1 has an entry without a PDF (`YY6ZFJJC`) → retrieval itself did not fail; the gap is that \"users cannot tell whether an item was missed by search or is absent from the repo,\" so suggested the platform add a notice. Bot feedback: exact English title + specific numerical value/method works best; broad Chinese topics or bare DOIs get crowded out by neighboring papers |\n| 10-15 | `LitWiki` trial of `pages` to verify 10 citations with known page numbers | First query hit the target page on 5/10, rising to 7/10 after rephrasing; all misses occurred when \"the paper is already known and a specific page inside it is sought,\" where other papers in the same series or reference-list pages crowded out the result. `LitWiki` recommended integrating it into the card-building workflow for candidate page localization while still opening the original PDF to verify citations; suggested the platform add within-work filtering, exact-title boosting, and prominent labeling of inferred journal page numbers |\n| 10-15 | Bibliographic metadata Round 1 (`ideas`, metadata workspace): decoded 1,373 entries from EndNote `.enl`, safely linked 1,122/1,527 attachments; all 12,491 desktop titles are low-confidence (7,092 from filenames, 5,399 from first-page heuristics; PDF Info unread due to expired socket); 15,009 candidate work clusters across the three repos | 30-item spot check showed 23/30 usable: EndNote 9/10, desktop 5/10, cross-repo clusters 9/10. Usable only for candidate linking, not as a formal bibliography; only 34 desktop items shared a DOI or fingerprint with the two existing repos (deduplication remains a conservative lower bound). Round 2: (A) verify 912 DOI candidates against Crossref to backfill titles (dispatched); (B) wait for the re-extraction run to export `pdf_meta.jsonl`, then supplement PDF Info titles/authors and re-cluster |\n| 10-15 | `.djvu`/`.pdg` text conversion (`ideas`, desktop working directory, completed at 14:25) | Without `sudo`, used `apt download` to unpack `tesseract` 4 + `djvulibre` into user space (viable and reused by other tasks). Delivered `djvu_pdg.sqlite`: 73 documents / 31,365 pages (61 DjVu books with 28,391 pages + Melenk recovered 282/283; 11 Chaoxing PDG sets with 2,692/3,163 pages), 31,140 pages with text (24,637 text-layer + 6,728 OCR); 472 failed page slots (398 PDG `0x38` transform, 72 auxiliary layers, concentrated in *Introduction to Wind Engineering* and *Steel Bridges*) awaiting a fuller decoder; 10-page spot check showed normal text. Lead verified workstation file SHA256 and page counts matched; handed over to platform for appending |\n| 10-15 | Desktop OCR Phase 3 (`ideas`, working directory, background PID 63579 started at 10:29, 6 threads) | Reused unpacked Tesseract; 200-page trial took 36 s (~5.5 pages/s, 195 pages with text) → extrapolating 105,338 pages to ~5.3 hours, expected to finish afternoon/evening of 10-15; corrupted PDFs being repaired separately via `pypdf` copies. Upon completion, transfer `ocr_round2.sqlite` back to the workstation, export manifest, and submit to the platform |\n| 10-15 | Desktop text re-extraction (`ideas`, working directory, 6 processes started at 10:47, PyMuPDF blocks sorted by left/right column) | Target: 12,437 files / 394,246 pages, carrying over OCR pages as-is; ~22 pages/s at 10:49; **completed at 13:2x** (12,436 files OK, 1 error, 394,243 text-layer pages + 24,615 OCR pages), wrap-up delivery and Bibliography B dispatched; concurrent execution slowed the OCR job to ~3 pages/s → ~10 hours (expected tonight). Desktop load ~14 (24 cores), still with headroom. Upon completion, deliver 50-page two-column comparison, manifest, and transfer back to the workstation |\n| 10-15 | Bibliography Round 2A (`ideas`, sending only DOI strings to Crossref): 1,942 unique DOI candidates (desktop 912, EndNote 1,070) | 1,178 source records matched Crossref titles (≥0.82 similarity) → backfilled high-confidence title/first author/year into `*_v2.csv`; 258 suspected false captures (DOI resolves but title mismatches); 22 non-existent; 522 DOIs containing OCR garble (e.g., Chinese characters mixed in) marked \"unverified\" (erratum: first edition mislabeled them as non-existent). **1,065 source records share a DOI with Zotero** (whereas byte deduplication found only 34) → true cross-repo overlap is far larger than previously estimated, so work-level merging must rely on DOI/title. 7 records with matching titles but year differences >1 year pending manual check |\n| 10-15 | Re-extraction wrap-up + Bibliography Round 2B (`ideas`) | `v2` transferred back to the workstation (895 MB, 418,858 pages, SHA256 matched on both ends; 1 PDF yielded only 2 pages and is flagged anomalous); in the 50-page two-column sample, 17 pages confirmed continuous left-column sentences while the rest require manual inspection. Bibliography: 12,491 desktop items categorized into five title-confidence tiers (138 / 1,256 / 989 / 8,540 / 1,568); none of the 522 garbled DOIs could be safely repaired; 15,159 candidate work clusters: 12,272 desktop-only, 1,538 Zotero-only, 1,065 EndNote+Zotero (~70% of EndNote overlaps Zotero), 278 EndNote-only, and only 6 clusters overlapping between desktop and Zotero (recalculated by Lead; NUL bytes in CSV cleaned); 30-item spot check hit 24/30 (Crossref 10/10, PDF Info 6/10, EndNote 8/10). Handed over together with `v2` to the platform |\n| 10-16 | Desktop OCR Phase 3 completed (`ideas`; interrupted at 10-15 23:3x when the desktop WSL root partition went emergency read-only, resumed at 10-16 00:49 after Liang Hu rebooted, delivered at 02:38) | 105,336/105,338 pages (103,456 with text, 1,880 empty), 2 pages timed out during rendering, 6 corrupted PDFs excluded; `ocr_round2.sqlite` (256 MB) matched SHA256 on both ends with integrity OK (verified by Lead); 20-page spot check legible but frequent errors in Chinese glyphs, formulas, and tables. Handed over to the platform for appending. **Desktop corpus delivery now complete at ~556k pages** |\n| 10-16 | Post-deployment acceptance (`ideas`): `round5` desktop blind-test initial run + `round3`/`round4` re-runs | `round3` reached the page on 24/30 and `round4` on 8/12, holding steady without regression (long-book recall improvements show no visible gain yet). `round5` initial run scored 5/30, but all 30/30 queries hit a translation channel outage (falling back entirely to Chinese retrieval), leaving both English-source groups at 0/10 and invalidating the run for a re-run (Lead verified at 20:58 that translation had recovered). Display checks: desktop source label and I-drive location were 8/8 correct, scanned-page notices 3/3; titles showed 4/8 as 'title candidate' and 3/8 as hexadecimal garble from PDF Info (reported to the platform for filtering) |\n| 10-16 | `round5` re-run (translation recovered, 30/30 translated successfully) | **Desktop sources reached the page on 11/30 and the work on 15/30** (Book 4/10, papers 4/10, Chinese 1/5, OCR 2/5), noticeably weaker than the two existing repos (`round3` 24/30). The primary cause is failed work-level recall (15/30); the Chinese group actually dropped after translation succeeded (whereas the initial run using only raw Chinese queries hit 5/5 works) → Chinese queries should be searched along both Chinese and English routes; 12/15 titles still appear as 'title candidate'. All three improvement leads handed to the platform |\n\n## Open Items and Next Steps\n- **10-16 21:40**: Official `round5` score is 11/30 reaching the page (platform note: the tested build was the 09:42 version, which did not yet include the `ocr_round2` and `djvu_pdg` increments while embeddings were still being built). Four improvements (dual-route Chinese and English retrieval, separate recall from the desktop and the two existing repos followed by merging + title boosting, each copy using its own physical page numbers, and replacing filenames with `desktop_records_v3` titles) have been added to Round 3 of the platform update; regression requires no per-question drop on the two existing repos and a latency increase of ≤5 s. Once live, the platform will notify the Lab to re-test with the identical question set; no acceptance verdict on desktop sources will be drawn before then.\n- **10-16 20:46**: `pages` is now returning desktop sources (the update is live, though the platform has not yet sent formal notice); dispatched `ideas` to run `round5` + `round3`/`round4` re-runs.\n- **10-16 02:45 status**: All three desktop sources (`v2`, `djvu_pdg`, `ocr_round2`) handed over to the platform; awaiting ingestion and deployment → run `round5` 30-question blind test + longitudinal comparison against `round3`/`round4`. Remaining unresolved: 472 PDG pages (decoder), 6 corrupted PDFs, 2 timed-out pages.\n- **10-15 09:05 Liang Hu: \"Leave other directories on the I drive alone for now; push everything else forward.\"** Dispatched (with non-overlapping write scopes): ① `ideas` in-place OCR on desktop WSL for the remaining 105,338 pages (desktop has 24 cores / 46 GB RAM / 664 GB free disk; no `sudo`, switched to rootless `micromamba` + `conda-forge` to install `tesseract`, etc.; initial dispatch did not start due to expired socket, rebuilt 3-day socket at 09:20 and re-dispatched; output from working directory → workstation `ocr_round2.sqlite`); ② Bibliography metadata Round 1 delivered (candidate grade); Round 2A delivered (1,178 high-confidence backfills; 1,065 sharing a DOI with Zotero); Round 2B delivered (see Trials and Results); `v2` + bibliography tables handed to platform at 10-15 14:05, **cleared for ingestion at 14:1x** (new constraints: net addition ≤8 GB, halt if C drive drops below 85 GB; 117 GB free inside the virtual disk); old `page_text.sqlite` and old manifest deleted (14:20); `ocr_round2` and `djvu_pdg` to be appended upon delivery; `round5` 30 blind-test questions for desktop sources frozen (SHA recorded; 10 Book / 10 paper / 5 Chinese / 5 OCR), with the 5 OCR questions visually verified against original pages by the Lead, awaiting deployment for scoring; ③ `.djvu`/`.pdg` order delivered at 14:25 and submitted to the platform; OCR Phase 3 ran full-scale on the desktop starting at 10:29, **until at 23:3x (at 102,850/105,338 pages) the desktop WSL root partition entered emergency read-only mode (`ext4` error triggered automatic `remount-ro`) and the process exited**; backed up the SQLite file to the workstation temporary partial OCR backup directory (102,850 pages, integrity OK); after Liang Hu rebooted, resumed at 10-16 00:49 and completed delivery at 02:38 (see Trials and Results); temporary partial OCR backup `ocr_round2_partial` on the workstation deleted; re-extraction job also ran on the desktop starting at 10:47 (~5 hours); `ideas` scheduled self-check-ins at 13:20 and 14:29, with a fallback check-in at 10-16 08:2x; ④ Platform reply (10-15): the two live repositories are already sorted by text blocks without column-mixing; desktop `page_text.sqlite` was extracted with `-layout` and must be re-extracted, as the ingestion update will only accept the re-extracted version → dispatched `ideas` on the desktop to re-extract with PyMuPDF blocks and deliver `page_text_v2.sqlite` (adding an `extractor` column); the update reserves `work_id` merging, title/author/year display, and multi-source incremental SQLite appending (primary key `sha256` + physical page, where later sources only fill empty pages or replace OCR pages). Start conditions: C drive ≥100 GB + delivery of re-extracted version; ⑤ `litwiki` and `knowledge` trials returned (see the two 10-15 rows in Trials and Results): retrieval itself did not fail, and two improvement suggestions (notice when item/PDF is absent from repo; `--key`/`--doi` within-work search) were submitted to the platform to be queued after the current ingestion update; ⑥ Queried the platform regarding incremental indexing and call volume. Untouched for now: other directories on the I drive; downburst extraction remains Shelved.\n- 10-14 14:20 Phase 2 dispatched to `ideas`: local OCR on 129,953 pages (prioritizing Chinese Book items, wind engineering, codes/standards, etc.), measured at ~1 page/s on 6 threads (Chinese recognition is slow), ~1.5 days for the full batch; auto-stopped at 10-14 20:46 per rule when the C drive dropped below 40 GB, having recognized 24,615 pages (24,360 with text) and leaving ~105k pages; C drive fell to 24 GB at 22:24 (growth came from system runtime and temporary directories, not the Lab), urgently reported to the platform, and will not restart until the C drive recovers above 40 GB; 10-15 00:53 re-check: all A3 processes are gone, directory size is stable at 11 GB, C drive recovered to 21 GB. **Under Liang Hu's new 10-14 rule (workstation does not run compute or store compute data), a different location must be chosen before restarting the remaining ~105k pages of OCR** (running locally on the workstation requires platform approval; books cannot be uploaded to Colab; CRC group space is ~95% full), to be decided after C drive recovery (46 GB as of 10-15 02:32); proposed plan: run OCR in-place on the desktop WSL (data is already there, requiring no transfer and zero workstation footprint), subject to Liang Hu's approval to install Tesseract on the desktop; 10-15 02:45 Phase 2 interim deliverable (419k pages) handed to the platform for ingestion (to be dispatched once virtual disk compaction brings the C drive back above 100 GB); platform book improvements went live at 10-15 02:09, and the platform accepted the re-run results (Phase 3 target met); long-book work-level recall improvements merged into the desktop ingestion update (two-level book indexing by chapter/page-group, terminology boosting toward books, and ≥20 platform-built whole-book recall test questions), starting once the C drive exceeds 100 GB with the Lab running longitudinal comparisons once live; remaining 105k pages of OCR await Liang Hu's decision on installing Tesseract on the desktop; Phase 1 (419k pages) packaged with 1,003 pages verified character-by-character without error; 2 of 8 anomalous files had page numbers patched while `FE-Handbook` and others are corrupted; `.djvu`/`.pdg` cannot be converted on the workstation without installing software and are deferred; net workstation addition ≤4 GB; diagnose the 8 anomalous PDFs and evaluate `.djvu`/`.pdg` along the way. Submit manifest to platform upon completion for ingestion after prerequisite tasks and C drive cleanup.\n- **10-14 Promoted**: Search promoted into the platform tool `pages` (Phase 1 and Phase 2), available to all Leads and bots. English fact metric standardized to 11 valid questions (my earlier ≥8/14 mislabeled the raw 14-question prototype score as the valid-question basis).\n- Phase 3 blind test handed to platform (10-14 10:15): Chinese queries work well, book interior pages are weak, and an OCR book had a misattached title; platform opened a dedicated improvement item (within-book page localization for long books + OCR noise compensation, misattached title fix, cross-repo same-work detection, and dual-route Chinese translation fallback); once live, the platform will first run regression on the Phase 1/2 question sets and then notify the Lab to re-run the exact same blind test set and return per-question results; targets are book page hits substantially above 4/10, Chinese original ≥9/10, and Chinese-to-English ≥8/10. Original plan: the Lab holds the blind test questions (drafted and scored by `ideas`, submitted to Platform Lead before 10-15) without sharing the questions with the platform, merging into the platform's ~10-20 Phase 3 acceptance; focus on whether book interior pages are broadly weak, opening a dedicated Phase 3 improvement if so. Platform registered Phase 1 promotion on 10-14. Thereafter the prototype can be unfrozen.\n- **Conclusion (10-13 20:55): Pursue retrieval only.** The retrieval component has status Pending promotion: its form is a platform tool rather than a research project; the proposal has been submitted to the Platform Lead for scheduling, with the Lab providing the prototype and regression question sets.\n- **Data extraction component Shelved**: Why it does not work—profiles mostly reside in figures where every value must be paired with a figure number, radial position, and operating condition; single-page text extraction yielded 6/78 errors and 27/78 requiring added qualifications, while 5/8 papers mislocated the figure page altogether; expert paper-by-paper chart reading is currently required, so automation saves little labor. What is missing: reliable visual chart reading (with curve attribution) and human ground truth. When to restart: when a dataset need with a concrete downstream use arises (e.g., a research line requiring a downburst profile benchmark database) that can accept the labor cost of \"initial AI extraction + expert paper-by-paper verification,\" or when multimodal chart-reading models achieve acceptable error against human ground truth on ≥10 papers.\n- OCR completed and handed to platform Phase 2 (see table above). 10-13 22:40 live test of Phase 1 `pages`: Chinese-to-English translation works, but cross-repo duplicate copies of the same book occupy top-5 slots—platform confirmed Phase 1 deduplication did not take effect (EndNote titles were truncated filenames); Phase 2 parses EndNote metadata + deduplicates by DOI / file hash / first-page fingerprint, and ingests OCR pages labeled \"OCR text, verify original page before citing\"; QuikSCAT query added as a regression case. Awaiting per-question Phase 1 acceptance results and Phase 2 acceptance results from the platform.\n- 10-14 Connected to desktop WSL (Tailscale SSH, user account via IP; the hostname entry in `known_hosts` was stale, and the current host key matches Tailscale registration) and completed the inventory (see Corpus Inventory table); 10-14 Phase 1 dispatched to `ideas`: extract page-level text from PDFs with text layers, keeping net workstation addition ≤4 GB; defer OCR/`.pdg`/`.djvu` to Phase 2. **Storage correction**: the WSL disk is a `vhdx` on the C drive (355 GB), so the free space reported inside WSL is illusory and the true limit is the remaining C drive space (47 GB on 10-14); reported to platform. Platform reply (10-14): desktop text ingestion is queued after prerequisite tasks and awaits resolution of the C drive space issue (indexing 420k pages is projected to take 4–6 GB); results will be labeled \"Source: Desktop\" and display the original I-drive source location; the platform will open an ingestion item once the Lab submits the manifest. Reclaiming C drive space requires compacting the virtual disk with a 10–30 minute platform-wide downtime, now listed as Item 11 on the platform's decision list for Liang Hu. Previously: the workstation has no I drive; the Windows desktop host (online via Tailscale) rejected the workstation SSH key and had no SMB share enabled; the desktop reported a host key change, so we stopped without bypassing it. Requested Liang Hu to add the workstation public key or enable a read-only share; once accessible, perform an inventory first without copying files.\n- Awaiting word from Liang Hu on the location, count, and scan status of books and papers on the other computer; destination for copies >5 GB to be decided by Liang Hu (leaning toward the local WSL disk).\n- 10-13 Platform Lead decision to integrate: three phases, with Phase 1 within this week. Lab commitment: keep prototype scripts and question sets frozen until Phase 1 acceptance (communicated to `ideas`); regression question sets and passing thresholds returned to the platform (floor not below prototype: first-page ≥29/34; `round2` subgroups English ≥8/14, Chinese 5/5, books ≥4/6, Chinese-to-English ≥3/5; `round2` overall target ≥20/27). The platform recorded all five question sets and thresholds (10-13). Awaiting Phase 1 acceptance results, after which this page will be updated to Promoted; fallback check-in around the evening of 10-16.\n\n## Literature Basis\n- Review verdict (Ovadia: unsupervised fine-tuning underperforms retrieval; Balaguer: supervised fine-tuning adds +6 pp).\n\n## Notes from Liang Hu\n- 10-13: \"This doesn't require a local large language model, right?\" — Right.\n- 10-16 02:4x OCR Phase 3 (scanned pages among the 12,491 desktop items) completed: 105,336 pages across 1,713 files, with 2 rendering timeout pages excluded (FORTRAN90 manual), integrity OK, SHA256 verified; during the run the desktop root partition hit a read-only fault and the SQLite copy on the local mounted drive (`9p`) was corrupted (lesson: never run SQLite writes on a Windows-mounted drive). Handed over to the platform for ingestion."
+ },
+ "decisions": [
+  {
+   "id": "dec-0000",
+   "ts": "2026-10-13 18:16",
+   "title": "文献库全文检索 + 风工程数据抽取 开立（2026-10-13）",
+   "label": "决定",
+   "text": "# 文献库全文检索 + 风工程数据抽取 开立（2026-10-13）\n- 做了什么：Liang Hu 批准开新想法节点；论文/书籍库不用于微调，改试全文检索与数据抽取；不用本地大模型。\n- 为什么：语料量（约千万–亿 token）对继续预训练太小；知识注入检索优于无监督微调且可给出处（审查 裁决第 4 条）；版权风险。\n- 错了的代价：若检索/抽取都不比现有 好，约 1 天 bot 时间与 ≤10 CU。"
+  },
+  {
+   "id": "dec-0001",
+   "ts": "2026-10-13 19:34",
+   "title": "文献库试验第一轮不下结论、补第二轮（10-13 19:45）",
+   "label": "决定",
+   "text": "# 文献库试验第一轮不下结论、补第二轮（10-13 19:45）\n\n- 做了什么：ideas 第一轮建议\"只做检索\"。我没有采纳为结论，派第二轮。\n- 为什么：(1) 34 道检索题答案全在 PDF 第 1 页、都是标题换说法，只证明能\"找论文\"（混合检索 27/34），没测\"引第几页\"这个核心卖点；(2) 抽取预定 ≥60 值人工核对只做了 12，漏抽率与核对用时未测，按预注册判据只能\"暂定\"；(3) 中文 2/34 是中文问英文论文，中文文献本身还没入库（EndNote 库在）。第二轮补非首页跨页事实题、书籍/中文题、去重前 5、抽取 ≥60 值核对 + 全文真值漏抽率 + Gemini 看图读数。\n- 依据：本线数据 、；Lead 抽核 6X6ZP3YD p6、GBK98YNH p8 两值均对。无文献依据，基于本线数据。\n- 错了的代价：多一轮本地计算与 Gemini 订阅调用（0 CU），结论晚约半天到一天。"
+  },
+  {
+   "id": "dec-0002",
+   "ts": "2026-10-13 20:42",
+   "title": "文献库：只做检索，廓线抽取搁置；检索方案交平台（10-13 20:55）",
+   "label": "决定",
+   "text": "# 文献库：只做检索，廓线抽取搁置；检索方案交平台（10-13 20:55）\n\n- 做了什么：采纳 ideas 第二轮\"只做检索\"建议。检索部分写接入方案交平台 Lead，项目页 status 改\"待转正\"（形态是平台工具）；下击暴流廓线数据抽取搁置。不再派第三轮。\n- 为什么：检索的增益已足够明确——非首页事实题前 5 精确到页约一半，而 论文级 1/27；中文原文 5/5、中文问英文译问题后 3/5，改进路径清楚（按语言路由、修双栏串栏、跨库去重、全库多语向量），这些属于工程实现，由平台做更合适。抽取：78 值 6 错、27 需限定工况，5/8 篇图页定位错，核心值都在图上，自动化省工有限。\n- 未达预设：第二轮有效题 27 < 30、实体书题 4 < 5（是我在第二轮加的门槛，不是 Liang Hu 定的；Liang Hu 任务书要求的 ≥30 题第一轮已满足）。人工核对一项按本线规定由 AI 复核替代，非人类真值，抽取准确率因此只作\"不可入库\"的定性判断。\n- 依据：本线数据 、；Lead 抽核 R01/R07/R13/R21/R27 标准答案与 6X6ZP3YD、GBK98YNH 两个抽取值。无文献依据，基于本线数据。未送审：属工具可行性判断，非科学结论。\n- 错了的代价：若 Liang Hu 想要廓线数据集，重启需专家逐篇核对工时；若平台不接，原型仍可在 工作站 本地用。"
+  },
+  {
+   "id": "dec-0003",
+   "ts": "2026-10-14 09:46",
+   "title": "文献库全文检索转正为平台工具（10-14 10:10）",
+   "label": "决定",
+   "text": "# 文献库全文检索转正为平台工具（10-14 10:10）\n\n- 做了什么：确认平台 0034 一期验收通过，项目页改\"已转正\"（链接）；英文事实组按有效 11 题计分；三期中文/书籍验证由实验室出盲测题自跑。\n- 为什么：一期五组都不低于原型（首页 29/34、英文事实 6/11 vs 原型 5/11、中文原文 5/5、书籍 5/6、中文问英文 3/5），二期 round2 有效 27 题 22/27 超过目标 20。题目和答案留在实验室，防止平台按题调参。口径：criteria.md 规定无效题不计分，我在分数线里写的\"≥8/14\"是把原始 14 题的原型值误标为有效题口径，更正为 11 题。\n- 依据：本线数据与平台验收导出 、；Lead 核 SHA 前缀与 R13–R16。无文献依据，基于本线数据。未送审：工具验收，非科学结论；新建的是平台工具不是科研项目，按任务书\"写方案交平台 Lead\"授权执行。\n- 错了的代价：若三期盲测暴露中文/书籍检索明显偏弱，平台需再改一期；已有用户引用的页码不受影响（结果始终给原 PDF 页，引用前核原页）。"
+  },
+  {
+   "id": "dec-0004",
+   "ts": "2026-10-14 11:20",
+   "title": "台式机 I 盘文献：不拷 PDF、分阶段抽文本入库（10-14 11:30）",
+   "label": "决定",
+   "text": "# 台式机 I 盘文献：不拷 PDF、分阶段抽文本入库（10-14 11:30）\n\n- 做了什么：清点后按方案 A 派 ideas 第一阶段——只把有文字层的页抽成文本到 工作站（ 留台式机，检索结果给台式机原路径；工作站 新增上限 4 GB，C 盘剩余低于 40 GB 即停。OCR（约 12.7 万页）、.pdg、.djvu 放第二阶段，等第一阶段体积与速度实测后再定优先级。\n- 为什么：净新增约 1.25 万件 / 42 万页，整批拷 PDF 约 16–21 GB；而 工作站 的 WSL 盘实为 C 盘上的 vhdx，C 盘只剩 47 GB（低于 100 GB 规矩线），拷 PDF 不可行，抽文本只占几 GB。\n- 更正：此前我对 Liang Hu 说\"WSL 盘还有约 700 GB\"是错的——那是虚拟磁盘的名义容量，真实空间受 C 盘限制。\n- 依据：本线数据；Lead 10-14 核实 ext4.vhdx 位置与大小。无文献依据。\n- 错了的代价：第一阶段只读、可随时停；文本体积超预期时停在小样本，不会挤爆 C 盘。"
+  },
+  {
+   "id": "dec-0005",
+   "ts": "2026-10-15 09:04",
+   "title": "文献库：Liang Hu 批准全部推进（10-15 09:05）",
+   "label": "决定",
+   "text": "# 文献库：Liang Hu 批准全部推进（10-15 09:05）\n\n- Liang Hu 原话：\"I 盘上其他那些可以暂时不用管。别的你现在全部推进。\"\n- 做了什么：同时派出 ① 台式机 WSL 就地 OCR 剩余 10.5 万页（据此批准在台式机装 tesseract 等 OCR 包，只装 OCR 相关）；② 三库书目元数据与作品级去重；③ .djvu/.pdg 书籍转文本；④ 向平台确认双栏串行修复并预留 0069 元数据/多来源接口；⑤ litwiki、knowledge 各 10 条试用 pages 复查；⑥ 问平台增量索引与调用量。各单写入范围不重叠（OCR：工作目录、ocr_round2.*；元数据：desktop_inventory/metadata/；djvu：工作目录、djvu_pdg.*）。\n- 为什么：覆盖面（<1/4）、书目信息缺失、检索未进 bot 流程是三大缺口；工作站 不跑计算，台式机是唯一合规地点。\n- 不做：I 盘其他目录；下击暴流抽取维持搁置（重启条件未满足）。\n- 错了的代价：台式机多装几个软件包、CPU 被占一两天；OCR 质量不足时只影响扫描书的检索，不影响已有结果。"
+  }
+ ],
+ "reviews": [],
+ "results": [
+  {
+   "id": "res-0000",
+   "ts": "2026-10-13 18:18",
+   "title": "预注册判据（检索运行前冻结，勿修改）",
+   "label": "结果",
+   "text": "# 预注册判据（检索运行前冻结，勿修改）\n\n范围：Zotero 本地 PDF 附件中的论文，排除书籍及书章；只读原库。逐 PDF 物理页抽取，页号从 1 开始；索引及数据库在 盘仅脚本与小型评测结果。抽取失败和无文本页统计并披露，不把文字缓存当成页码。\n\nA：至少 30 道预先冻结的换说法问题，答案以原 PDF 物理页独立核对；覆盖下击暴流、高层风压、风谱、CFD、结构响应，至少 10 篇在 有卡片、至少 10 篇无卡片。问题与答案在第一次检索前写入 questions.jsonl，记录题库 SHA-256；不得用同一原文逐字作题。BM25、CPU 小向量与混合检索均同题测；单题前五结果（以唯一论文-页为单位），正确论文且页 ±1 算主指标命中；仅正确论文算副指标。 同题前五按论文判；页码不可验证记页码不可判，不充作命中。报告原始逐题结果和分组命中率，不以未完成子集冒充 30 题。原则性可行闸门：混合检索主指标 ≥0.70、相比 BM25 有增益，且覆盖率 ≥0.90；这只是原型可行性，不是发表级结论。\n\nB：30–40 篇实际含廓线的论文，包含实测、风洞、CFD；仅向 Gemini 3.8 Flash 送有关 PDF 页文本，提示只按可见内容抽取，缺项留空，保留页码、图表号、单位、归一化及 r/D 定义。至少 60 个原子值逐值对照 PDF 原页，报告逐字段准确率（正确/核对过的非空值）、漏抽率（原页可见却未抽/原页应抽字段）、每篇人工核对时间及核对者；图上读数须标图读，不推断模糊数值。试验实测值未达规模的指标标「未评估」，不能声称通过。禁止上传全文、使用本地大模型、修改 Zotero、上超算或覆盖已有结果。模型外送页数和调用量登记。最终建议在「正式工具/数据集」「只做检索」「不值得」中选择，未达规模只能暂定。"
+  },
+  {
+   "id": "res-0001",
+   "ts": "2026-10-13 18:55",
+   "title": "下击暴流廓线抽取错误类型（单页文本试验）",
+   "label": "结果",
+   "text": "# 下击暴流廓线抽取错误类型（单页文本试验）\n\n1. 论文种类与来源混淆：标题同时有 numerical/experimental 的论文不能凭标题判定本页所引廓线的来源。`kind` 为启发式标签，未经逐篇核实，不能当实测/风洞/CFD 真值。\n2. 错把引用论文的数值当本文：`SAI7PQLC` PDF 物理页 2 的“almost 80 m”引用 Hjelmfelt (1988)，不可归属该论文的 z_max（核对记录已判错误）。\n3. 归一化速度当绝对最大值：`EFT4W6FE` p.3 的 Vr/Vjet≈1 不可当统一 U_max；不同 r/D 与高度的速度定义要分开（核对记录已判不成立）。\n4. z_max 混淆：`MBLWBMR6` p.15 的 z_m 与 u_m 是模型符号，不是观测数值；`R5RKQGYZ` p.9 的 Z/D≈0.06 是无量纲高度，不可记成 0.06 m。\n5. 图读与文本的区别：本轮只送一页可抽文本，没有送图像。图注有曲线不等于读到了图上的最大值；不能反推图读精度。\n6. 图号张冠李戴：页面同时列出多幅图，模型若只取 Fig. 9 而未标对应 (a)–(d) 与 r/D，径向位置可能错配。\n7. 漏抽：34 篇各送一页，很多论文相关参数在别页，空值不能代表全文没有数据；本轮无法计算完整的全文漏抽率。\n8. 光学字符识别/排版：PDF 双栏 interleaving、¼/≈、连字及图注混入正文可能导致单位、公式指数和页码误判。期刊印刷页与 PDF 物理页分别记载。\n\n核对原则：数字出现在同页只是字面共现，不能证明其属于该模型、图表和数据来源； 中自动数字共现结果不作为科学准确率。"
+  },
+  {
+   "id": "res-0002",
+   "ts": "2026-10-13 19:36",
+   "title": "补充预注册判据（EndNote 与书籍；写于扩库及补充题评测之前）",
+   "label": "结果",
+   "text": "# 补充预注册判据（EndNote 与书籍；写于扩库及补充题评测之前）\n原 criteria.md 为前轮冻结记录，不改。新增 EndNote Phd.Data/PDF 全部 PDF 与 Zotero book/bookSection/thesis 等附件；原始库只读、索引在 DOI（仅元数据可信时）；否则规范化标题（Unicode NFKC、小写、去标点与空格；过短标题不自动合并），相同标题而不同版次/年份须标风险。EndNote 无结构化元数据可解时以文件名派生标题和粗类型，报告为估算，不伪称精确。扫描比例以可抽文本页或 PDF 前页测试近似，图像文字不可辨，OCR 不做。\n评测新增至少5道书籍答案和至少3道中文题，独立答案含 PDF 物理页及同页原文证据；先保存题库、后检索。新增题分别测原有 BM25 和增强中文检索；前五命中正确文档且页±1、仅文档命中分列。书籍题尽可能跨首页并人工转述，不以标题原句充当问题。中文检索不调用外部翻译服务；书籍全文不得外发。原先34题结果保留，新增语料后如复测标明基数与版本，不能混报。无文本层及失败记覆盖差异。"
+  },
+  {
+   "id": "res-0003",
+   "ts": "2026-10-13 20:02",
+   "title": "盘点解读更正（不改已生成的 corpus inventory.md）",
+   "label": "结果",
+   "text": "# 盘点解读更正（不改已生成的 corpus_inventory.md）\n\ncorpus_inventory.md 中“EndNote 书籍标记下界”不成立：文件名启发式把 `Hill - 2010 - Climate and Tropical Cyclones.pdf` 判 book，但 PDF 首页和目录显示它是一份研究学位文档；9 是启发式候选数，既非精确值也非下界。EndNote 绝大多数（1517/1527）未分类，无法按书/章/学位论文/期刊论文给出可靠完整分布。应先解码 EndNote 书目元数据或人工标注，不能把 9 当书籍数。\n\n“no_text 约3.4%是 OCR 工作量下界”也不严谨：无文本可能是纯图扫描件，也可能是内容极短、损坏或抽取器异常；有文本的 PDF 仍可能有扫描页。因此 159/4691=3.39% 是整份无可索引文本附件的比例，既非全库扫描件比例，也非严格 OCR 下界。 中 159 件共 10,553 物理页；若全部需要 OCR，约需处理这么多页，但这是条件性规模估算，不是确认的扫描页数。另有31件抽取失败/超时，不能算扫描件。后续要对 PDF 页面图像采样再估实际 OCR 工作量。\n\n跨库仅以 Zotero DOI 和规范化文件名标题合并，EndNote 无结构化 DOI； 的 3,845 是“候选作品簇”而不是已核实独立文献数。尤其同名不同版次合并和截断文件名漏并均可能出现。Zotero itemType 用户提供的 87/32/60 是条目数；本轮可见 PDF 附件相应是 73/26/50，统计对象不同。"
+  },
+  {
+   "id": "res-0004",
+   "ts": "2026-10-13 20:06",
+   "title": "双库与书籍补充试验结论（10-13，美东）",
+   "label": "结果",
+   "text": "# 双库与书籍补充试验结论（10-13，美东）\n\n## 范围与方法\n只读 Zotero PDF 附件和 EndNote Phd.Data/PDF；未触碰生产库，未纳入 Downloads 其他 PDF。Zotero sqlite 只读 WSL 预先复制副本，EndNote .enl 未解析。沿用前轮 SQLite FTS5 BM25 页索引，在本机增量索引；中文另建 CJK trigram 索引，并在查询时尝试有限的固定风工程中英术语表。未使用新的在线服务、Gemini、GPU/Colab（0 CU）或超算；书籍全文从未外送。新增判据 在增量检索评估前写定，旧 未修改。新增6题均为书籍非首页物理页，含3道中文题；原34道中文题也在扩库后复测。\n\n## 盘点\n| 库 | PDF附件 | 可提取文本 | 整件无文本 | 抽取失败/超时 | 索引新增可读物理页 |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| Zotero | 3164 | 3061 | 83 | 20 | 与 EndNote 合计128708页 |\n| EndNote | 1527 | 1440 | 76 | 11 | 与 Zotero 合计128708页 |\n\n原先 Zotero 排除书及书章的索引已在本轮补齐，共可检索4501附件、128708非空物理页；来源的 PDF 大小 Zotero 16.53 GiB、EndNote 6.24 GiB。规范化标题/可用 DOI 的候选合并结果为3845簇；EndNote 缺结构化 DOI 且文件名截断，未核实为准确独立文献数。库内PDF附件按 Zotero 父 itemType：book 73、bookSection 26、thesis 50、journalArticle 2870、其他145；和全库 itemType 条目数87/32/60不是同一个口径。EndNote 1517/1527 件无法仅凭文件名可靠分类；其9个“书籍”启发式候选含误判，不可作为真实书籍数量。首页文字启发式判英/中/混/未知详见。159整件无文本附件共10553物理页，但不能据此判定扫描件比例，亦不能直接估 OCR 时间；31件提取失败另计。 更正盘点自动报告中两处过强表述。\n\n## 同题检索（前5，PDF物理页±1）\n| 题组 / 系统 | 页正确 | 文档正确 | 说明 |\n| --- | ---: | ---: | --- |\n| 原英文34题，扩库 BM25 | 25/34 | 29/34 | 全部首页题； |\n| 原英文34题，扩库 BGE-small-en 混合 | 27/34 | 29/34 | 仅BM25前60页CPU重排，非全库向量索引； |\n| 新增书籍6题，扩库 BM25 | 1/6 | 1/6 | 全部是书籍内页 |\n| 新增书籍6题，CJK trigram+有限术语表 | 1/6 | 2/6 | 表述换说法时检索差；第一次精确长串配置为2/6页，此处为三元切分修订结果 |\n| 原中文34题，扩库 BM25 | 0/34 | 2/34 | 英文论文中文问句 |\n| 原中文34题，CJK trigram+有限术语表 | 0/34 | 0/34 | 相比BM25还退步，不能称跨语检索可用 |\n\n逐题 top5、答案 key 和页码见 与；改进脚本。CJK 用具体中文关键词“微下击暴流 水平尺度 生命周期”可返回中文专著PDF第23页（已实跑），但自然语言转述 B04 只命中文档、页未中；英文论文的中文转述不能靠中文字符三元组解决。新增六书题既小且题目带歧义，不可外推为总体正确率；原英文首页题不能证明真实跨页事实搜索。两个库的重复PDF按源 key 分开建索引，会挤占前5位置；跨库同作品归并尚未进检索结果去重。\n\n## 建议\n只保留本地全文检索原型，不据此接入正式 或建设可复用风工程数据集。扩库可行（页面、书籍、中文文本索引均能建）；但书籍内页1/6、跨语中文0/34未过质量门槛。下一步若决定投入，先解码 EndNote 元数据/校正书籍类型和跨库重复，再做多语检索及独立跨页题库；OCR须先抽样扫描页。原下击暴流抽取样表的60项人工核对闸门仍未完成，本补充没有改变它的“不可入库”状态。"
+  },
+  {
+   "id": "res-0005",
+   "ts": "2026-10-13 20:30",
+   "title": "Zotero + EndNote PDF 语料盘点（10-13，美东）",
+   "label": "结果",
+   "text": "# Zotero + EndNote PDF 语料盘点（10-13，美东）\n\n源库只读；Zotero 元数据取 WSL 本地复制库，EndNote .enl 未解析：以文件名派生标题，故 DOI 仅 Zotero 有，EndNote 类型/年代和跨库去重是保守近似。所有篇数按实际可见 PDF 附件，不等于 Zotero itemType 总条目数。\n\n| PDF附件（去重前） | 与另一库合并后的独立候选篇数* | 大小 | 可抽文本附件 | 无文本附件 | 抽取失败 | 英/中/混合/未知** | book / bookSection / thesis / journalArticle / 其他或未分类 |\n| ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |\n| 3164 | 2592 | 16.53 GiB | 3061 | 83 | 20 | 2959/2/95/108 | 73/26/50/2870/145 |\n| 1527 | 1348 | 6.24 GiB | 1440 | 76 | 11 | 1402/0/35/90 | 9/0/1/0/1517 |\n\n合并候选篇数：3845；跨库同题名候选簇 95；去重前附件 4691。同库重复附件、不同版本/同名碰撞不保证属于同一作品。EndNote 文件名截断、期刊与书名无法总是区分；因此不能声称精确 DOI 去重或精确书籍/论文分类。\n*“来源独立候选篇数”是各库内部去重；两行不可直接相加。仅相同 DOI 或规范化标题形成簇；EndNote 没有可靠 DOI，同名但差异化副标题可能漏并。\n**前5物理页抽样：CJK字符≥20判中，英文字母≥100且有中判混合；不足80可识别字符判未知。这不是全文语言分类。文件名含汉字也不代表全文中文。\n索引非空物理页总数：128708。no_text 是整份 PDF 抽不到≥40字符的页，不全等于扫描件；失败/超时更不可归扫描。无文本比例约 3.4%，为 OCR 工作量下界；真实扫描页需逐页图像检查，尚未量测，不能给可靠总工时。\nEndNote 书籍标记仅文件名显式提示的下界；更多书混在未分类中。由非空页数≥150 的 EndNote 文档可列为“长文档候选”，但学位论文也会混入，不用作精确书数。\nEndNote 长文档候选（≥150 个可读页）：56。\n本机索引： PDF 页，未做 OCR。PDF 物理页与期刊印刷页不混用。\n\n## 第二轮补注（10-13，美东；旧盘点数字未改）\n检索第二轮继续使用同一索引的 4,691 个 PDF 附件与 128,708 个非空物理页，没有重新解码 EndNote .enl、没有 OCR 或增添源库； 的更正仍适用。3,845 仅为规范标题/部分 DOI 合并的候选作品簇，不是经过版次核验的真实独立篇数；159 件全文无可索引文本、31 件抽取失败不能换算为扫描件比例。第二轮新题均在已索引页，但人工择清晰事实使结果不代表随机全库样本；检索结果的同题名-同物理页去重也不等于严格 DOI 级跨库去重。中文书/中文题比例仅针对冻结题库而非语料分布。"
+  },
+  {
+   "id": "res-0006",
+   "ts": "2026-10-13 20:30",
+   "title": "冻结题库的事后质量裁决（不改 SHA 或原始结果）",
+   "label": "结果",
+   "text": "# 冻结题库的事后质量裁决（不改 SHA 或原始结果）\n\n题库 questions_round2.jsonl 在检索前冻结，SHA-256：4ec35a6695ad021116533fd3e1ef33f11999d716d6a32232c20fa58217a21cb0。固定 30 道，所有系统同题评分见 retrieval_round2_rows.csv。检查标准答案物理页后发现以下三题事实/归属不合，全部系统对称排除，但不修改原题或补题：\n\nR17：题目把 17–18% 湍流强度后的抖振系数趋于1说成当前双高层实验，原页实际是在复述 Taniike (1991) 的他人研究（PDF key T474JX49 p8）。属引值张冠李戴。\n\nR24：题目把约 10% 写成运动与气动力的“相位滞后上限”；该值实际上是第一 POD 模态的能量贡献，双栏抽文本把另外一栏的 non-uniform lag 串在同句（END-96601aaef4ee6b2d p12）。属双栏文本交错。\n\nR30：题目询问多通道采集时间延迟上限，但标准答案锚点仅是“最多 35 通道”，该数不是时间延迟；页中量值被双栏交错拆开，不能据此定位正确事实（END-93a00b9d52d359a7 p4）。属答案锚点错误。\n\n因此“30 原始题”与“27 个有效事实题”并列报告，绝不只报有利的一种。有效题 27 < 要求 ≥30，第二轮题库严格规模闸门没有通过。不能在看到检索结果后补题冒充预冻结的 30 题。抽样是固定随机种子初筛后人工挑选有清晰事实的页，不是严格均匀随机页/论文样本；题库并不代表全库用户查询分布。\n\n再核 PDF 前两页发现以 Zotero 父 itemType=book 选择的六题里，R03 是 Willoughby 的政府研究报告，R04 明标 Technical Report（2002）；它们虽标 book，不能按实体书籍计数。实体书籍或成册指南只有 R01、R02、R05、R06 四题；故“≥5 书籍题”严格闸门也未过。原先六道书籍补题（questions_books_supplement.jsonl）属于已经运行过的第一轮材料，不能混入第二轮独立新题以补数。原始 book 元数据组 6 题与实体书 4 题均保留原始结果，绝不改组标签来隐藏问题。"
+  },
+  {
+   "id": "res-0007",
+   "ts": "2026-10-13 20:33",
+   "title": "Zotero 全文检索 × 下击暴流廓线最小试验（10-13，美东）",
+   "label": "结果",
+   "text": "# Zotero 全文检索 × 下击暴流廓线最小试验（10-13，美东）\n\n## 一句话判断\n\n只做全文检索原型，不把本轮 Gemini 单页抽取物转成正式数据集。英文首页论文识别题有明显收益；中文检索几乎失效，且数据抽取字段归属、定义与图读仍需逐页人工处理。本轮是先导试验，不是论文级验证或正式工具放行。\n\n## 范围与真实执行\n\n- Zotero 原库只读；先复制 `zotero.sqlite` 至。按附件父类型排除 book/bookSection，索引；本地 FTS5 Porter BM25，`pdftotext -layoutprocessed` 表保存每个失败原因。\n- 检索原型：，或。输出标题、年份、父 key、PDF 物理页及片段。BGE-small-en-v1.5 在 BM25 全库召回前60页上 CPU 编码再以 RRF 重排；并非全库独立向量 ANN 索引。 留有独立全页向量构建代码，但仅有少量未完成试建分片，不参与报告评分；不可声称已建好全库向量索引。\n- 题库： 中文 34 题， 逐题人工英语转述 34 题（检索前冻结）。11 篇在 wiki 目录有卡片，23 篇没有；跨下击暴流、高层风压、风谱、CFD、结构响应。英文题库 SHA256 `8dc91c50996c4c1367644f12df5930f1d040e22ad9de60cf6a78ef9a95323d39`，中文 `40a22641e84df724fef5272f15eca7ba8281ec2ce25d23685555610724a563b1`。题目多是对标题/摘要的换说法，标准答案全是 PDF 第1物理页；比真正跨页事实问答容易，指标只能解释为论文发现与首页定位。期刊印刷页与物理页不得混用。\n\n## 全库索引完成后的检索测量（34 题，前5条论文-页）\n\n| 相同英文题库 | 正确论文且 PDF 页±1 | 只中论文 | 依据 |\n| --- | ---: | ---: | --- |\n| BM25 | 25/34=73.5% | 29/34=85.3% | |\n| BM25→CPU BGE-small 混合重排 | 27/34=79.4% | 30/34=88.2% | |\n| 现有 | 不可判：搜索输出无可确认的 PDF 物理页 | 14/34=41.2% | |\n\n中文原题库（未翻译）BM25 与 均只中论文 2/34，BM25 精确页 0/34。英语转换是另一个预先冻结的测试输入，不可当作中文问题也达到英文性能。每题原始前五列表在 、。预注册的英文主指标 ≥70%、混合优于 BM25、索引覆盖≥90% 均达；但首页锚定带来容易题偏差，中文适用性闸门未过。 页码不得因卡片中偶有期刊页码就当 PDF 页码。\n\n## 下击暴流廓线试验与核对\n\n- 探索性第一轮 34 篇单页文本，候选选择过松，34 份均返回。第二轮从含廓线图注的 PDF 页中挑 36 篇（标注的 12 CFD、14 风洞、10 其他只是标题启发式，不能作为核实来源类型），另补一篇实测的 Romanic (2021) Cabauw 213m 塔、PDF 物理页17、Fig.16。\n- 第二轮36篇：`z_max` 11 条非空，每行载明 PDF 路径、物理页、核对者及理由。第一轮另核10项，8直接正确、2错误。\n- 由于未能对至少60项作语义逐值人工核对（仅自动字面比对了97项）、没有逐篇计时记录、仅分析选定一页而没有全文真值，预定的分字段总体准确率、漏抽率和每篇平均人工核对用时都**未评估**；不得用上述非随机12项算总体准确率。所有 CSV 是未验收样表，不能当可再利用数据集。图上读数一律未读取；不得给“图读”值。典型错误：其他论文引值误归本研究（`SAI7PQLC` p2）、同页不同径向位置误配最大速度（`KN57R2JT` p24）、把假设参数扫描范围当实测峰高（`WZN3ETI3` p4）、把无量纲速度当绝对 Umax（`EFT4W6FE` p3）。详情 与两张核对 CSV。\n\n## 判断表\n\n| 环节 | 可行 | 质量 | 成本 | 问题 |\n| --- | --- | --- | --- | --- |\n| PDF 按页 + BM25 | 是，3065附件已尝试 | 英文首页题25/34精确页 | 本地 CPU；索引约数十分钟；0 CU | OCR缺失、12错误/超时、中文查询几乎失效 |\n| CPU 小向量混合重排 | 是，BM25 前60页重排已可运行 | 英文首页题27/34精确页，增2题 | 本地 BGE-small，0 CU | 非独立全页向量召回；不能替代中文查询处理 |\n| 对照 | 是 | 英文论文命中14/34，页码不可判 | 已有服务 | 检索对象是卡片不是整本 PDF |\n| 单页 Gemini 数据抽取 | 可出样表、不可直接入库 | 人工12项仅5直接正确、6有保留、1错误；97项字面查，未达60项人工核验 | 71次订阅调用、0 CU；人工核对用时未记 | 图读缺失、字段定义和来源混淆，漏抽率未知 |\n\n## 接入 的方案（未修改平台）\n\n维持 Zotero PDF 页索引独立只读服务，暴露 `search(query, top_k)` 返回 parent key、attachment key、PDF 物理页、标题/年、片段与索引时间； 仅聚合结果并把父 key 映射现有卡片。卡片期刊页号与 PDF 物理页作为两个字段，绝不互换；无 OCR 的页标记缺失。中文先明确做查询翻译或改用多语向量并重新预注册含跨页事实的测试，再考虑正式接入。同步依据 Zotero 复制库的只读快照和附件 mtime，不触碰生产库；接入仍由平台负责。\n\n## 第二轮补充（10-13，美东）\n双库跨页事实、书籍/中文、去重后检索及抽取核对的新证据和限制，见同目录 、。第一轮判据与结果仍按上文原样保留；第二轮校正版图读委托 的后续结果只追加，不倒改旧数。\n\n建议：只做检索，不启动风工程数据集建设。单独运行英文按页检索有价值，但对中文用户与真实跨页问答还要补专门验证；本轮数据抽取未过预注册核对规模。数据源为 Liang Hu 本地 Zotero PDF；外部软件/模型出处在。没有外发任何论文全文。"
+  },
+  {
+   "id": "res-0008",
+   "ts": "2026-10-13 20:40",
+   "title": "文献库第二轮：双库跨页检索与廓线核对（10-13，美东）",
+   "label": "结果",
+   "text": "# 文献库第二轮：双库跨页检索与廓线核对（10-13，美东）\n\n同一双库索引，Zotero/EndNote 原库只读；4,691 PDF、128,708 非空物理页。原始 已追加第二轮补注；其中 EndNote 书数和扫描比例不可靠的纠正见。\n\n## 冻结题库与质量裁决\n 检索前冻结 SHA-256。\n\n## 前五条“规范化标题+PDF物理页”去重的结果\n| 题组 | BM25正确论文+页±1 | 中文trigram+术语表 | CPU小向量局部重排 | rc-kb可核论文命中* |\n| --- | ---: | ---: | ---: | ---: |\n| 原英文首页34题重算 | 25/34 | 25/34 | BGE-small-en 29/34 | 原轮14/34，物理页不可判 |\n| 新跨页30原题（含3坏题） | 12/30 | 17/30 | 多语MiniLM 14/30 | 1/30，物理页不可判 |\n| 有效跨页27题（对称排除） | 9/27 | 14/27 | 多语MiniLM 12/27 | 1/27，物理页不可判 |\n| book元数据组6题（两件其实是报告） | 4/6 | 4/6 | 4/6 | 0/6 |\n| 实体书/指南4题（描述性） | 2/4 | 2/4 | 3/4 | 未单独判 |\n| 中文原文论文5题 | 0/5 | 5/5 | 4/5 | 0/5 |\n| 中文问英文5题 | 0/5 | 0/5 | 0/5 | 0/5 |\n\n中文问英文的5题另有人工仅把问题译成英文，不送文献：英译问题 BM25 3/5、其召回前100页多语模型重排 2/5。模型 `paraphrase-multilingual-MiniLM-L12-v2`、 只在 BM25/中文术语候选 CPU 重排，不是独立全库向量召回。同题名、同物理页合并跨附件，版次不同可能误并、异写可能漏并。* 对照以 wiki 卡片路径含标准 source key 保守识别，卡片异 key 漏计，因此 1/27 仅是可核下界，不代表完整召回率；卡片行号不能当 PDF 物理页。逐题原始 、评分 、分组 、事后对称排除。双库去重 CLI 已实跑中文题并输出 key/物理页/片段；未改。\n\n## 廓线抽取复核\nv2 原97个非空字段中 AI 助手逐条阅读其 PDF 原物理页，复核78项：45同页文字支持（未逐图确认）、27需保留定义/工况、6错误。并非独立人类核对，非随机样本，45/78不是正式准确率。字段分布：z_max 1直接支持/8有保留/1错误（共10），U_max 1/3/0（4），r/D 1/5/0（6），归一化9/5/0（14），source_type 17/0/2（19），其余见。没有人类核对者、没有逐篇人类计时，预定的逐字段真准确率和平均人工核对时间均未评估。8篇整本PDF文本做只读候选词扫描（135页、805处候选），不是逐页人工通读，因此漏抽率未评估。\n\n原抽取的8篇样表图号页里，有5篇目标图只被该页文字提及，真正图在其他物理页。全部校正为 的8个单页；只这些单页送 Gemini worker。 首轮确认错页； 校正图页结果已回。本机AI先前粗读，逐篇逐工况比对；并重新目视检查8张实际页：5篇同工况粗读范围吻合、1篇仅模型参数语义吻合、1篇图太密不能逐径向定量、1篇只能部分比对。这些都是AI与AI的估读一致性，不是对独立人类读图真值的准确率或误差分布；逐曲线图读误差与空字段可靠补全率仍未评估。6X6ZP3YD p8 Fig.15b 60° CFD约25–30mm、5.9–6.0m/s，仅为图读；WZN3ETI3 p4 的25–100m是模型参数扫描，不是四次观测。纠错闸门：36XAQH9L 工作站 Fig.15 未给R/D=1.2（它属于Fig.20语境）；NXSSET4J p12 Fig.11 α=0°，原文0.099m属α=180°，不能错配；8IC5IFK5 p7七个径向点拥挤，不能给出逐径向峰高精确值；GBK98YNH p5 主涡为各高度局部峰值的系集平均而非同一时刻廓线。归一化峰速等于1是定义，不得当绝对Umax；r/D不能与平面射流x/b混用。未把这些图读值并入正式样表。\n\n## 判断\n本地检索可行，中文原文5/5有苗头；但有效跨页题和实体书题不满预设数目，中文问英文0/5，书籍实体内页2–3/4，尚不能放行正式全文工具。数据抽取的变量定义、图页定位、他人引值与工况配对问题明显，缺人类核对与真值通读，不能建设正式数据集。建议选“只做检索”：保留本地独立原型，补干净冻结题库与书籍真伪、翻译检索，再评价正式接入。未使用Colab/HPC（0 CU）、未外送任一整本PDF；新多语模型链接已补。Gemini 校正图页比对已追加，不改冻结题与旧检索结果。"
+  },
+  {
+   "id": "res-0009",
+   "ts": "2026-10-13 22:38",
+   "title": "本机扫描 PDF OCR 交付（平台 0034 二期）",
+   "label": "结果",
+   "text": "# 本机扫描 PDF OCR 交付（平台 0034 二期）\n\n时间：10-13 22:00–22:35（美东）。只读两库原 PDF；没有改 、原题库或原检索脚本；未调用外部服务、Colab 或超算（0 CU）。使用本机 Poppler `pdftoppm`（最长边 2100 px）+ Tesseract 4.1.1 `engchi_sim+eng`，按 PDF 物理页写纯文本，不重写源 PDF。来源清单：本线。\n\n## 规模与去重\n\n- 输入 159 个附件（Zotero 83、EndNote 76），PDF 物理页合计 10,553。逐文件 SHA-256 字节去重后 80 份、5,749 页（79 个重复附件、4,804 重复页）；又确认《热带气旋动力学引论》的两份不同字节 PDF 各 327 页在相同 OCR 参数下**逐页 327/327 文本完全一致**，因此交平台的索引清单再折叠一份：**79 份、5,422 物理页**。折叠仅应用于交付清单，原 OCR 输出仍保留，159 个附件 key 均在清单的 `aliases` 中。该方法不能证明其他不同扫描版本绝不重复。\n- 最终清单以原来源归属：Zotero 75 份、EndNote 4 份；按 OCR 中明显汉字及题名初判中文文献 2 份/337 页，英文等 77 份/5,085 页。英文作者名含中文“和”不按中文文献计算；语言识别只是粗分类，不是人工逐篇确认。\n- 5,422 个交付页中 5,407 页有 OCR 文本，15 页为空；程序失败 0 页。空页在缩略图像素占比检查中 13 页近乎全白，另 2 页深色图像经反色再 OCR 仍无文本，不能据此断言这两页没有重要图表。源 PDF 全文运行 `pdftotext`，80 份中没有 ≥100 字的原生文字页，因此本批未发现误归类的可提取文字层 PDF；这不证明每页一定都有可读文字。\n- 纯文本约 10,423,317 字节（以首次 OCR 页文件统计），交付页清单；各页文件为。清单每行有页码、文件路径、原 PDF、SHA-256、来源及全部附件 key。明细 、源文件哈希映射 、原生文字核验。平台应使用 入库，勿将未去重的 再入库。\n\n## 三件预试与成本\n\n先取中文《热带气旋动力学引论》、英文 Wilcox《Turbulence Modeling for CFD》与 Rotunno–Emanuel 论文各 3 页试跑。9 页共 26.44 秒；平均 2.94 秒/页，按折叠后 5,422 页估算单进程约 4.43 小时。实际分批并行 3→10 线程，含中途改线程数及中文重复本另做识别，从 22:00 至约 22:35 完成；主批记录的单页 OCR+渲染平均 2.35 秒、中位 2.18 秒（并行任务时间不是墙钟除页数）。全量预计未超过 12 小时，无需 Colab 或外部计算。中文单页常约 3–7 秒，英文正文常约 1–4 秒。逐页用时记录 、；中文异字节同版重试位于，不覆盖旧输出。\n\n## 质量检查与局限\n\n本地读了 20 页 OCR 文本，记录 （10 份文件各两页，保留短摘录）。可见专名、断词或数字错误迹象 8 页，公式/符号存在明显失真风险 8 页，目录/页眉 OCR 错误迹象 4 页；如中文书 p8 的城市名附近出现乱码，英文论文中的公式变量和下标失真。文本足以做关键词召回的初试，不能据此直接引证公式或数值。\n\n**重要未达项：这 20 页是 OCR 输出的人工文本抽查，不是对 PDF 图像逐字人工校对。** 本执行环境无法在不外送版权页图的前提下供我可靠视觉逐字核对；按保密边界没有把图页送到外部视觉服务。因此 20 页相对原页的字/词错误率、中文专名和英文公式准确率均**未评估**，不得把上述分类当作识别准确率。入正式检索前建议本机人工可视界面核 20 页并逐页标错；引文依然返回原 PDF 物理页供人工复核。\n\n交付验收是“可按原附件 key 映射的页级文本”，不是已验证的 OCR 精度或跨页检索命中率。0034 一期的 和 旧文件均未触动。本报告是新文件。"
+  },
+  {
+   "id": "res-0010",
+   "ts": "2026-10-14 10:05",
+   "title": "三期盲测： pages 中英文、书籍与扫描书（10-14 10:04，美东）",
+   "label": "结果",
+   "text": "# 三期盲测： pages 中英文、书籍与扫描书（10-14 10:04，美东）\n\n本文件及 `questions_blind.jsonlresults.jsonl 均只读；未调用原型检索。30 题在跑分前冻结， 的 SHA-256 为 `d80069db26f2bc53914f58d73556ef283d216ffd513a71ea3aac5c1bf10bd83b`（见 `freeze.sha256`）；10 道中文原文、10 道中文问英文、10 道实体书非首页题，最后一组含 Wilcox、Dahlquist、《热带气旋动力学引论》3 道 OCR 扫描书页题。每题均指向 PDF 物理页第 3 页或以后；标题和摘要不能充当答案。每题只发问句给 ` pages \"问题\" -n 5`；题库答案、书页原文没有送给服务。 自动翻译中文问句，此服务自身说明只外送问句文本。\n\n## 判据与核验\n\n沿用 `criteria.mdpdftotext -f N -l N` 再读原 PDF：26 个短锚逐字匹配；R3-18 因符号连接写法不同未逐字匹配，但原页确有四角 `0°, 15°, 30° and 45°`，见。3 个 OCR 题从原 PDF 指定物理页本机重新渲染、以独立 `tesseract --psm 6` 二次识别：三个答案锚点均再现（Wilcox “Vortex stretching”、Dahlquist “first quadrant”、中文书 “1672mm”）。但无法目视原扫描页做独立逐字校对，特别中文地名有 OCR 错字；扫描页的数值真值仍应由能目视 PDF 图像的人复核。不能把两次 OCR 一致称为人工图像真值。\n\n## 冻结评分（一次正式调用/题，未按诊断查询改分）\n\n| 题组 | 题数 | 前五正确作品 | 前五正确作品且物理页±1 |\n| --- | ---: | ---: | ---: |\n| 中文原文、中文提问 | 10 | 10 | 9 |\n| 中文问英文论文 | 10 | 9 | 8 |\n| 实体书原生文本 | 7 | 4 | 4 |\n| 实体扫描书 OCR 页 | 3 | 2 | 0 |\n| 合计 | 30 | 25/30（83.3%） | 21/30（70.0%） |\n\n逐题原始输出在 （包括问句与原样响应），裁决在，分组表在。自动评分原为 19/30；原 EndNote《台风风场模型研究综述》与 Zotero 英文元数据的同名 PDF 字节 SHA-256 一致，Zotero 第 7/9 物理页分别正中 R3-09/10；将两个跨库同作命中补回后为 21/30。未以同名不同版次冒充同一页。\n\n## 错题与诊断（均保留正式失败）\n\n- 页错 4 题：R3-01、17、29、30。后两题 OCR 目标页有文本但只返回书的首页或邻近开篇页，非 OCR 已证实识别错误。\n- 未召回 5 题：R3-14、21、23、24、28。三道原生书籍未进前五。R3-14 在冻结中文问句下未进榜，额外显式英文问句能定位到 Zotero 同作第 8 页；R3-28 在冻结问句下未进榜，额外显式英文问句能定位 Wilcox 第 30 页（见）。这些只是检索/翻译链诊断，不能替换正式分数；其他未召回尚不能归因于翻译。\n- OCR 错读的因果计数：0 项已证实，但不表示 OCR 错读率为零；中文扫描书原页没有目视核真值。特别 OCR 中文书在 输出中被挂为 “Some remarks concerning the gradient-wind equation”（1949），实际 PDF 路径为《热带气旋动力学引论》：这是来源元数据/作品识别错配，不能按该错误标题作书籍引用。Dahlquist 扫描书也只返回首页而非事实页。\n\n本次是研究组自选、非随机、同一著作有多题的小样本；不能外推为全库检索准确率，也不能因为恰好 70% 就认为通过初轮原型闸门。3 道 OCR 书 0/3，尚不足以称三期“书籍可引页”可靠。无 Colab / HPC / 外送版权书全文，0 CU；未改 或一期冻结索引。\n\n建议：保留 pages 本地检索供人工复核；正式科学引文尤其书籍扫描页必须打开原 PDF 核页和 OCR 数字。平台三期应优先检查长书目标页排序、中文问句翻译与 OCR 附件的作品元数据错挂；只反馈聚合现象，盲题和答案不要交平台。决策口径：只做检索，尚不宣布正式工具或数据集通过验收。"
+  },
+  {
+   "id": "res-0011",
+   "ts": "2026-10-14 11:17",
+   "title": "台式机 I 盘文献与书籍：只读清点",
+   "label": "结果",
+   "text": "# 台式机 I 盘文献与书籍：只读清点\n\n范围仅 与 19 + ionice idle，经既有 SSH ControlMaster 读取。未拷贝/入库 PDF，未动两库或冻结索引；0 CU。统计单位是文件字节一致性，不等于学术作品 DOI/标题去重。\n\n## PDF 数量、大小、去重\n\n文件名后缀 .pdf 共 14578；其中 453 个 `._*.pdf` 为 AppleDouble 旁车文件，不算 PDF；另有 132 个附件（70 种字节文件）在 pdfinfo 中打不开：抽查文件头有 PDF 签名、全零、HTML 等，不能当成“扫描件”。可读 PDF 附件 13993 件；下述净新增和页数**仅针对可读 PDF**，是总量下界，另须诊断这 132 件。\n\n| 有效 PDF 附件 | 大小 GiB | 目录内 SHA-256 独立文件 | 目录内重复 |\n| ---: | ---: | ---: | ---: |\n| 12933 | 13.40 | 11859 | 1074 |\n| 1060 | 7.11 | 847 | 213 |\n\n两目录间相同字节的独立文件 156 件；合并后 12550 件。与本机 Zotero/storage 和 EndNote/Phd.Data/PDF 按**同大小后 SHA-256**相同 53 件；净新增 PDF 12497 件、物理页 421,023 页、唯一字节 15.87 GiB。全部唯一 PDF 423,256 页；pdfinfo 除 AppleDouble 外失败 70 个字节独立文件/132 个附件（页数未知）。注意改版/水印/压缩不同、同一作品不同扫描版无法识别，净新增是“文件”上限，不是知识作品净新增。\n\n## 子目录（PDF：含同目录副本，但排除伪 PDF）\n\n| 根/一级子目录 | PDF 件 | GiB | 属于全局净新增的附件出现次数* |\n| --- | ---: | ---: | ---: |\n| Book/00FREQUENT | 15 | 0.25 | 15 |\n| Book/00RECENT | 20 | 0.36 | 20 |\n| Book/Bridge Engineering | 21 | 0.55 | 21 |\n| Book/Building | 26 | 0.03 | 26 |\n| Book/CFD | 7 | 0.14 | 7 |\n| Book/Codes | 349 | 1.12 | 348 |\n| Book/Earthquake Engineering | 72 | 0.16 | 72 |\n| Book/Exchange with Aoxue | 88 | 1.03 | 88 |\n| Book/Finite Element Method | 17 | 0.16 | 17 |\n| Book/MATLAB | 39 | 0.12 | 39 |\n| Book/Mathematics | 68 | 0.48 | 68 |\n| Book/Matrix | 1 | 0.01 | 1 |\n| Book/Mechanics | 79 | 0.16 | 79 |\n| Book/Numerical Analysis | 6 | 0.05 | 6 |\n| Book/Probability and Stochastic Vibration | 39 | 0.68 | 39 |\n| Book/Programming | 9 | 0.00 | 9 |\n| Book/Signal Processing | 6 | 0.10 | 6 |\n| Book/Structural Health Monitoring | 1 | 0.01 | 1 |\n| Book/Time Frequency | 14 | 0.07 | 14 |\n| Book/Vibration and Structural Dynamics | 62 | 0.34 | 62 |\n| Book/wind engineering | 25 | 0.19 | 24 |\n| Book/中文 | 96 | 1.11 | 96 |\n| Literature/Categorized | 8534 | 5.64 | 8468 |\n| Literature/Download | 10 | 0.04 | 10 |\n| Literature/EarthquakeSimulation | 4 | 0.02 | 4 |\n| Literature/From others | 2139 | 2.09 | 2137 |\n| Literature/NetBook | 207 | 0.32 | 207 |\n| Literature/Non-Gaussian | 16 | 0.07 | 16 |\n| Literature/PhDBackup | 1897 | 4.96 | 1897 |\n| Literature/Reliablity | 21 | 0.03 | 21 |\n| Literature/Time-Frequency Analysis | 29 | 0.04 | 29 |\n| Literature/WindSimulation | 4 | 0.00 | 4 |\n| Literature/低矮房屋实测 | 72 | 0.21 | 72 |\n\n*末列是该路径中“属于净新增组”的文件次数，同一作品可在多行出现，不能相加。\n\n## 文字层、中英文与文档类型\n\n按 20261014 固定随机种子，在四层（Book/Literature × 文件名有无 CJK）中分层抽取净新增 668 份；各测 PDF 物理页 2 和中页，两页≥40 个拉丁/CJK 字符算可抽取。两页均无文字 136，一页有一页无 20，两页可抽 512。这是抽样、不是逐页文字层审计；`pdftotext` 失败和乱码/加密可能被误判。\n样本抽取文本语言：中 124，英文或混合 406，不足识别阈值 138。粗分仅样本；CJK 文件名不保证正文中文，英语+公式/图纸不保证可检索。目录 的 PDF 1060 件为“书籍目录候选”，Literature 中 ≥120 页的净新增 PDF 另有 358 件“长文档候选”，可能是会议录/学位论文；不能据路径精确分全库书与论文。\n\n按层以抽样文档页数加权估算两页都无文字的文档页占比（不是全体真实无文字页比例）：\n- ('Book', 'CJKname')：总体 264 份/72,323 页，样本 99 份/31,287 页，两页无文字 64 份，样本页数加权比例 89.9%。\n- ('Book', 'other')：总体 581 份/83,170 页，样本 100 份/18,427 页，两页无文字 13 份，样本页数加权比例 16.4%。\n- ('Literature', 'CJKname')：总体 532 份/33,608 页，样本 120 份/5,996 页，两页无文字 16 份，样本页数加权比例 60.2%。\n- ('Literature', 'other')：总体 11120 份/231,922 页，样本 349 份/5,458 页，两页无文字 43 份，样本页数加权比例 12.2%。\n规划性 OCR 页数估计约 127,219 页（双页皆无文字的文档整本页数外推，混合文本页未算，误差未量化）。按既往 10 线程 2.3 秒/页折算约 81.3 小时；网络传输、目录 I/O、异常 PDF、排队及 .pdg/.djvu **未包含**。不能把这当成精确 OCR 工期。\n\n## 特殊书格式（未入 PDF 净新增）\n\n.pdg 单页文件 3,163 个，按父目录 11 本/套，页文件数即约 3,163 页；全部在 Literature。按文件夹分列：\n- Fortran常用数值算法集[1][local path omitted] Fortran常用数值算法集: 701 页\n- with aoxue forum/download/小西一郎－－钢桥/风对结构的作用——风工程导论（第二版）_10013440: 454 页\n- 292 页\n- with aoxue forum/download/小西一郎－－钢桥/钢桥 （第二分册）_11054881: 280 页\n- with aoxue forum/download/小西一郎－－钢桥/钢桥设计_11054862: 243 页\n- with aoxue forum/download/小西一郎－－钢桥/钢桥 （第三分册）_11054880: 229 页\n- with aoxue forum/download/小西一郎－－钢桥/钢桥 （第八分册）_11054875: 208 页\n- with aoxue forum/download/小西一郎－－钢桥/钢桥的疲劳和断裂（实例研究）_11054886: 208 页\n- with aoxue forum/download/小西一郎－－钢桥/钢桥 （第一分册）_11054882: 200 页\n- with aoxue forum/download/小西一郎－－钢桥/钢桥 （第九分册）_11054877: 184 页\n- with aoxue forum/download/小西一郎－－钢桥/钢桥 （第七分册）_11054879: 164 页\n\n.djvu 77 文件（Book 48，Literature 29），按 SHA-256 62 个字节独立文件；DJVM 的 DIRM 页数字段累计按文件 38,331 页，按去重 30,407 页。未完整解码验证可读性，.pdg 和 .djvu 不在本轮 PDF 页净新增数及 OCR 估时中。\n\n## 入库方案（本轮均未执行）\n\nA：推荐不拷 PDF。在台式机只读逐页抽取文本，增量文本及可审计 manifest 传到 工作站 的 （不是 C 盘），检索结果保留台式机原路径及物理页；无文字页在台式机本机 OCR 或经 SSH 单页流式处理、即删临时页。原 PDF 常驻 I 盘；索引空间取决于文本密度/SQLite 倒排，初估数 GiB，须先做小样本实测。单次元数据+文字读取约扫描 15.87 GiB 的独立 PDF（索引不能在不读取 PDF 的前提下凭空生成）；实际时间由 Tailscale/I 盘读速和 OCR 决定，未做传输基准。不共享 I 盘路径时，工作站 直接打开原文需要仍连着台式机。\nB：整批拷到 工作站 WSL 本地盘，原样两目录有效 PDF 20.51 GiB，去掉字节副本且只保留净新增 PDF 15.87 GiB；若对方需要原来相同目录层级则仍要全量。再加索引/OCR 衍生文件至少数 GiB；理论传输下界 = 文件字节/实际 SSH 吞吐（例如 20 MiB/s 时去重净量 13.5 分钟、全量 17.5 分钟；这只是速率假设，不是测速，海量小文件/WSL I/O 可能慢得多）。不依赖台式机在线，但增加副本维护和存储风险。当前 可用空间需以执行当天 df 为准；任何超过 5 GB 的拷贝先交 Liang Hu 指定目的地，本轮不拷。\n\n边界：这只是字节去重，不消除同 DOI 异版；扫描估计仅两页样本，书籍原文未外送，未安装远端软件；源端 .mat/.dat 和 Downloads 散 PDF 未扫描。机器可读中间表在本目录（remote_metadata.jsonl、remote_hashes.jsonl、remote_pdf_inspection.jsonl、remote_djvu_inspection.jsonl、inventory_stats.json）。"
+  },
+  {
+   "id": "res-0012",
+   "ts": "2026-10-14 11:39",
+   "title": "台式机按页文本抽取：300 件分层小样本",
+   "label": "结果",
+   "text": "# 台式机按页文本抽取：300 件分层小样本\n\n10-14（美东），既有 ControlMaster 复用连接；远端 `nice -n 19 ionice -c3` 下只读运行 sha256sum 与 pdftotext，PDF 不落 工作站。样本每层随机 75 件：Book／中文文件名、Book／其他、Literature／中文文件名、Literature／其他；随机种子 20261014。原清点的净新增 12,497 PDF、421,023 物理页；此样本不是按总体比例抽样，外推分层加权。\n\n成功 299 件／42,452 页，其中有检索文字 19,381 页、无文字 23,071 页；失败 1 件（pdfinfo 626 页但 pdftotext 一次输出 367 个页分隔，保留失败待单页补救）。远端实际命令耗时合计 978.89 秒，墙钟 992.31 秒；对成功页为约 0.0231 秒／页。样本总落地 87,607,382 字节（83.55 MiB），约 1.968 MiB／千物理页；仅页级正文文件约 3.217 MiB／千有文字页。 同时记录空页，不生成空页 txt。\n\n| 层 | 成功件 | 物理页 | 有文字页 | 远端秒 | 抽样秒／页 | 按该层总体页数外推时数 |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: |\n| Literature／其他 | 75 | 1,807 | 1,714 | 39.78 | 0.0220 | 1.42 |\n| Literature／中文文件名 | 75 | 7,585 | 1,691 | 67.59 | 0.0089 | 0.08 |\n| Book／其他 | 74 | 14,565 | 13,470 | 766.77 | 0.0526 | 1.22 |\n| Book／中文文件名 | 75 | 18,495 | 2,506 | 104.74 | 0.0057 | 0.11 |\n\n按前次清点的各层总体页数外推：全文落地约 0.97 GiB（含以每页 380 字节估计的 manifest 开销），远端处理约 2.83 小时；高方差，个别长 PDF 可显著拉长。加上 SSH、写文件开销，全量预留数小时；预测小于 3.5 GB 和 12 小时，准予本阶段自动启动全量。边界：累计新增最多 4 GiB，每批检查 可用，低于 40 GiB 立刻停止。未 OCR，未处理 .pdg/.djvu，0 CU。样本的“无文字”按 pdftotext 可抽到字母数字或汉字判别，并不等于扫描件的人工认证。"
+  },
+  {
+   "id": "res-0013",
+   "ts": "2026-10-14 14:10",
+   "title": "台式机有文字层页抽取：第一阶段结果",
+   "label": "结果",
+   "text": "# 台式机有文字层页抽取：第一阶段结果\n\n10-14 14:07（美东）完成。只读 和 中前次清点的 12,497 份净新增可读、字节独立 PDF，PDF 不在 工作站 落盘；经现有 ControlMaster socket 调用台式机。未修改台式机、Zotero、EndNote、冻结的 与；未 OCR、未处理 PDG/DjVu，0 CU。pilot 见。\n\n| 指标 | 实测 |\n| --- | ---: |\n| 目标净新增 PDF／物理页 | 12,497／421,023 |\n| 成功抽取 PDF／覆盖物理页 | 12,489／418,747 |\n| 有可检索文字的物理页 | 288,794 |\n| 没有可抽取文字的物理页（第二阶段 OCR 候选） | 129,953 |\n| 全部页面无文字的文件 | 1,387 |\n| 抽取失败文件／未覆盖物理页 | 8／2,276 |\n| 成功文件的远端抽取累计秒数／每页均值 | 9,600.8 秒／0.02293 秒 |\n| 本阶段文件体积（含 58,112,461 字节无文字清单） | 1,187,221,820 字节，约 1.106 GiB |\n| 结束时 可用 | 约 52.14 GiB |\n\n全量接续试验样本，后台跑了 8,704.5 秒；试验 299 份成功、42,452 页，另一次未成功。进度约每 60 秒输出，成功后记录逐页 manifest 和 done 日志；每批检测 C 盘可用及累计目录体积。全程未触及 40 GiB 停线或 4 GiB 新增上限。其间 C 盘可用量受其他进程变化，不能把始末差额当作本阶段单独占用；本阶段以目录 `du -sb` 计体积。\n\n页文本：；每份目录内 `sha256` 文件存完整哈希。总 manifest：（418,747 行，逐页含 SHA-256、全部台式机原路径的 WSL/Windows 双形式、物理页、有无文本、字符数、文本路径）。无文字候选清单：（129,953 行）。成功文件与耗时：；失败事件：（9 条含小样本/全量对同一失败件的重复尝试，去重后 8 件）。随机抽查 30 行 manifest：文字路径可打开且字符数匹配，空页路径为空；不是逐页语义校验。\n\n8 个失败件均属 pdfinfo 页数与一次 pdftotext 的分页数不一致，不能安全地把顺序文本映射到 PDF 物理页，因此未写入不可靠页码。含两份各 752 页但 SHA 不同的 `FE-Handbook-1.pdf`，一份 626 页的 `Computational Statistics Handbook with Matlab`，以及其他 6／13／12／10／105 页文件；未覆盖合计 2,276 页。抽查 FE-Handbook 的 `pdftotext -f 1 -l 1` 报 XRef／页面树语法错误且输出为空；这 8 件须第二阶段先做异常 PDF 诊断，不能直接当作 OCR 输入。另清点阶段排除的 132 个 pdfinfo 无法打开附件不属于本阶段 12,497 件范围。本文中的“无文字”仅表示 pdftotext 无可检索字母数字或汉字，并不证明一定是扫描图像。\n\n交平台二期时仅用按页文本、manifest 与台式机原路径；点击结果仍需访问 I 盘原 PDF、核对原页，不能把本阶段文本当作已核实引文。OCR 候选应优先从 129,953 个无文字页选择，失败的 2,276 页单独处理。"
+  },
+  {
+   "id": "res-0014",
+   "ts": "2026-10-14 16:09",
+   "title": "三期复跑盲测 （10-14 16:xx–17:xx，美东；实验室 Lead 本机执行）",
+   "label": "结果",
+   "text": "# 三期复跑盲测 （10-14 16:xx–17:xx，美东；实验室 Lead 本机执行）\n\n题库 SHA-256 …（与 freeze.sha256 一致，未改题）；判据同 ：前 5 同一作品任一跨库副本在正确 PDF 物理页 ±1 为主指标。脚本与二期相同，仅单题超时 120→420 s（首轮 120 s 全部超时，见；本轮实测 12–68 s/题）。人工裁决只沿用二期那组\"字节相同跨库副本\"（R3-09/10），其余为自动判定。题目与答案不交平台。\n\n| 题组 | 题数 | 二期 作品/到页 | 三期 作品/到页 |\n| --- | ---: | ---: | ---: |\n| 中文原文 | 10 | 10 / 9 | 10 / 9 |\n| 中文问英文 | 10 | 9 / 8 | 9 / 8 |\n| 实体书原生文本 | 7 | 4 / 4 | 6 / 6 |\n| 实体扫描书 OCR | 3 | 2 / 0 | 2 / 1 |\n| 书籍合计 | 10 | 6 / 4 | 8 / 7 |\n| 合计 | 30 | 25 / 21 | 27 / 24 |\n\n书籍题逐题（题号：二期→三期到页；问句是否含\"书/教材/报告/book/thesis\"等触发字样）：\nR3-21 0→0（无）；R3-22 1→1（无）；R3-23 0→1（有）；R3-24 0→1（无）；R3-25 1→1（无）；R3-26 1→1（无）；R3-27 1→1（无）；R3-28 OCR 0→0（有）；R3-29 OCR 0→1（有）；R3-30 OCR 0→0（无，只回第 4/5 页，目标第 30 页）。\n读法：10 道书籍题只有 3 道含触发字样，其中 2 道新命中（R3-23、R3-29）、1 道仍未召回（R3-28）；另有 1 道无触发字样也新命中（R3-24），说明改进不全来自书内选页。触发条件只覆盖少数自然问法，偏窄。\n非书籍题未退步：失败仍是 R3-01、R3-17（页错）与 R3-14（未召回），与二期相同。\n样本小、非随机、同书多题，不外推为全库准确率。"
+  },
+  {
+   "id": "res-0015",
+   "ts": "2026-10-14 20:15",
+   "title": "0057 版复跑旧盲测 （10-14 晚，美东；纵向对照，主判据另出新题）",
+   "label": "结果",
+   "text": "# 0057 版复跑旧盲测 （10-14 晚，美东；纵向对照，主判据另出新题）\n题库未改（SHA-256 …），判据同 criteria.md，单题超时 90 s（实测最长 46.0 s）。\n| 题组 | 题数 | 三期 作品/到页 | 0057 作品/到页 |\n| --- | ---: | ---: | ---: |\n| 中文原文 | 10 | 10/9 | 10/9 |\n| 中文问英文 | 10 | 9/8 | 9/7 |\n| 实体书原生 | 7 | 6/6 | 6/6 |\n| 扫描书 OCR | 3 | 2/1 | 2/1 |\n| 合计 | 30 | 27/24 | 27/23 |\n唯一变化：R3-20（中文问英文）1→0。机制：主列表第 1 条是一份长文档（第 144 页），0057 书籍路线据此在该文档内选了一页（第 19 页）放进第 5 位，把三期排在第 5 位的正确页（第 9 页）挤出前 5。即平台说的\"约 12% 非书籍题也触发\"在这里造成了一题退步，不只是变慢。书籍组没有新增命中。"
+  },
+  {
+   "id": "res-0016",
+   "ts": "2026-10-14 22:01",
+   "title": "新书籍盲测 blind round4 跑分（0060 版，10-14 22:xx，美东）",
+   "label": "结果",
+   "text": "# 新书籍盲测 blind_round4 跑分（0060 版，10-14 22:xx，美东）\n题库 SHA-256 …（冻结未改）；12 题全部不带书籍字样，目标页均 ≥ PDF 第 50 页，每书 1 题；判据前 5 同作品且 PDF 物理页 ±1；另记第 6 条\"书内补充页\"。单题超时 90 s（实测 14.7–43.9 s）。\n| 题组 | 题数 | 前5 作品 | 前5 到页 | 出现第6条 | 第6条到页 |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| 实体书原生 | 8 | 4 | 4 | 1 | 0 |\n| 扫描书 OCR | 4 | 4 | 4 | 0 | 0 |\n| 合计 | 12 | 8 | 8 | 1 | 0 |\n读法：命中的 8 题都是作品一召回就到页（多数在第 1–2 位）；失败的 4 道实体书题前 5 里连这本书都没有，属于\"作品没召回\"，不是\"书里选错页\"，第 6 条机制对它们帮不上（第 1 条不是那本书）。第 6 条只出现 1 次，且该题正确页已在前 5。故本套题无法区分\"追加第 6 条\"与\"替换第 5 位\"的优劣——两种做法在这 12 题上结果相同。扫描书 4/4 到页，比 round3 的 1/3 好，但小样本、本套 OCR 页可能更干净，不外推。"
+  },
+  {
+   "id": "res-0017",
+   "ts": "2026-10-15 02:40",
+   "title": "台式机文献第二阶段：阶段性最终报告（OCR 已停）",
+   "label": "结果",
+   "text": "# 台式机文献第二阶段：阶段性最终报告（OCR 已停）\n\n10-15 02:33–02:40（美东）轻量收尾。Liang Hu 已禁止在 工作站 跑计算；OCR 于 10-14 20:46 因 C 盘低于 40 GiB 自停，退出码 1（空间闸门触发），不是完成。本次没有启动 OCR、渲染或求解器；仅从现有 SQLite 读数、只读访问台式机补 2 件逐页 pdftotext，导出清单。台式机原 PDF、冻结的 与 均未改动；0 CU。\n\n| 指标 | 结果 |\n| --- | ---: |\n| 第一阶段原有按页记录 | 418,747 页（OCR 覆盖目标无文字记录时按主键替换） |\n| 第二阶段候选 | 129,953 页， |\n| 已 OCR／有文本／空页 | 24,615／24,360／255 页（54 件） |\n| OCR 处理失败页 | 0 条失败日志；不代表未处理页成功 |\n| 尚未 OCR | 105,338 页；从候选清单按 `(sha256,physical_page)` 排除 SQLite `origin='OCR 文本'` 即得，原清单保持原状 |\n| 运行实测 | 后台日志从启动到最后心跳 23,400 秒（6.50 小时），约 0.951 秒/已提交页的端到端墙钟，6 个并发工作者；未逐页记录 CPU 时间，不能表述为单线程识别秒数 |\n| 已打包 SQLite |，1,199,153,152 字节；418,861 条页记录、12,491 件（含下面补录两件） |\n| 本次新导出 | 紧凑 JSONL 150,776,355 字节；完整字段 gzip JSONL 6,870,617 字节；别名表 4,746,958 字节；三者合计 162,393,930 字节（低于 200 MB） |\n| 工作目录实际占用／C 盘余量 | `du -sh` 为 1.6G； 约 45.73 GiB 可用（收尾复查） |\n\n## 分目录进度（物理页）\n\n| 子目录 | OCR 候选 | 已完成 | 未完成 |\n| --- | ---: | ---: | ---: |\n| Book/中文 | 38,326 | 24,615 | 13,711 |\n| Book/Codes | 4,093 | 0 | 4,093 |\n| Book/wind engineering | 666 | 0 | 666 |\n| Book/Probability and Stochastic Vibration | 3,317 | 0 | 3,317 |\n| Book/Vibration and Structural Dynamics | 1,878 | 0 | 1,878 |\n| Book/CFD | 1,597 | 0 | 1,597 |\n| Book/Mathematics | 2,839 | 0 | 2,839 |\n| Book/00FREQUENT | 2,636 | 0 | 2,636 |\n| Book/Bridge Engineering | 2,251 | 0 | 2,251 |\n| Book/Mechanics | 1,286 | 0 | 1,286 |\n| Book/Finite Element Method | 1,046 | 0 | 1,046 |\n| Book/Matrix | 723 | 0 | 723 |\n| Book/Numerical Analysis | 701 | 0 | 701 |\n| Book/Signal Processing | 29 | 0 | 29 |\n| Book/Earthquake Engineering | 12 | 0 | 12 |\n| Book/Time Frequency | 17 | 0 | 17 |\n| Book/00RECENT | 6 | 0 | 6 |\n| Book/MATLAB | 2 | 0 | 2 |\n| Literature/PhDBackup | 45,319 | 0 | 45,319 |\n| Literature/From others | 10,374 | 0 | 10,374 |\n| Literature/Categorized | 10,402 | 0 | 10,402 |\n| Literature/NetBook | 1,682 | 0 | 1,682 |\n| Literature/Non-Gaussian | 486 | 0 | 486 |\n| Literature/低矮房屋实测 | 235 | 0 | 235 |\n| Literature/Reliablity | 20 | 0 | 20 |\n| Literature/Download | 6 | 0 | 6 |\n| Literature/WindSimulation | 3 | 0 | 3 |\n| Literature/Time-Frequency Analysis | 1 | 0 | 1 |\n| 合计 | 129,953 | 24,615 | 105,338 |\n\n## 打包页与平台入库接口\n\n 为 418,861 行紧凑逐页清单，含 SHA-256、PDF 物理页、字符数、是否有文本、`origin` (`text_layer`／`text_layer_repair`／`OCR 文本`)、`sqlite_row`，别名通过 `aliases_ref=sha256` 查 的 WSL 和 Windows 双路径。 是同一逐页清单，另在每行直接带完整 `aliases` 和 `db_path`；接入端可流式 gunzip 后按 `(sha256,physical_page)` 从 SQLite `pages.text` 读取文本。SQLite 主键保证一个物理页一行，空页 `text=NULL`。平台须保留台式机原路径而非指向 工作站 的 PDF 副本。\n\n因逐页重复路径的完整未压缩 JSONL 预估 262,735,191 字节（250.56 MiB），超过本次“新写不超过 200 MB”的边界，故提供完整字段的 `.jsonl.gz` 和低于 200 MB 的紧凑 `.jsonl`＋别名表；没有冒称紧凑版逐页自带双路径。原一期 的 `text_path` 指向已删散页，不得入库使用。导出后顺序核对紧凑／gzip 418,861 行、OCR 24,615 行、12,491 个别名对象；抽 8 页查 SQLite 字符数、origin、空非空一致。\n\n## 一期分页异常补录\n\n沿现有 ControlMaster socket（`-O check` 成功）逐页调用远端 `nice -n 19 ionice -c3 pdftotext -f N -l N`，未拷 PDF。`ICWE14_ID02130.pdfdissecting MFC 2e part5.pdf`：105 页中 104 页安全映射、100 页有文字、4 页空，物理页 42 报解析错误，未入库。这两件补录合计 114 条（110 页文本）。另外 6 件仍未安全映射；连同本件 p42，未覆盖的原 2,276 页余 2,162 页，不能当已确认扫描页或臆配页码。补录的路径别名目前只含各自原路径；若平台发现额外副本须另做字节校验。\n\n## 20 页 OCR 文本抽查（仅文本，不是对图人工校字）\n\n采用固定随机种子 42，从 54 个已 OCR 文件中抽 20 个不同 SHA，每件取 OCR 有文字页的中段一页；均在 （因为任务自停时尚未到英文目录）。本人本机阅读 OCR 字符串，不外送原文或页图。以下页码均为 PDF 物理页；短 SHA 仅为表格标识，完整 SHA 在清单和 SQLite 中。错误类型是可见疑点，不能据此计算相对原图的字错率。\n\n| 短 SHA | 页 | 可见错误或保留 |\n| --- | ---: | --- |\n| c667b47faa | 230 | Maple 命令与变量字符混淆，中文同音近形字 |\n| 6ef219892e | 317 | 矩阵／公式断裂与字母误识，正文尚可辨 |\n| ddf522870e | 280 | 公式符号断裂、中文近形错字 |\n| 96e5ac9b88 | 356 | 图示及数值穿入段落，单位/公式不可靠 |\n| 6b2f0e7a61 | 340 | 英文 `const` 附近变量混淆，正文相对连贯 |\n| e486aabcbc | 299 | 整页公式识别成无意义字母串 |\n| 5387b503eb | 3 | 目录页点线和章节号串行，标题仍可辨 |\n| a1de62cb18 | 468 | 英文章节/图注可辨，图文串行及单词误识 |\n| 95df8e21ec | 274 | 公式主体破碎、符号与正文混排 |\n| 389d7b25f6 | 361 | 公式上下标丢失、变量与中文混淆 |\n| 426c3e7851 | 226 | ARMA 正文较可辨，图轴／图题穿入 |\n| 72665574a6 | 131 | 矩阵符号与数字难辨，正文错字 |\n| 96aa9bd012 | 78 | MathCAD 数据／公式变碎片，难用于引用 |\n| eb13d63831 | 95 | 习题公式严重破损，正文偶可辨 |\n| a9a0d8aff7 | 146 | MATLAB 代码与图轴穿插，命令标点误识 |\n| 2525fab6c1 | 162 | 中英混排可辨，句子标点及汉字误识 |\n| 6c1028e2a5 | 160 | 命令参数与复数公式误识，正文相对可辨 |\n| e08c828892 | 265 | 公式变量破碎，正文有汉字替换 |\n| 26de95a9b6 | 239 | 数学公式严重错位/断裂，正文部分可辨 |\n| f9da28c4e5 | 109 | 混凝土／挡块正文较可辨，汉字近形错字 |\n\n20/20 在文本中可见至少一种疑似字符或排版问题；这是质检提示而非人工核对原图的准确率。特别是公式、图轴、代码、数值不可直接作科学真值；引用必须回到台式机原 PDF 物理页目视核实。由于不外送受版权保护页图、也未做原图目视逐字校对，实际误识比例未评估。\n\n## 限制与移交\n\n本轮 OCR 只推进至 Book/中文；剩余 105,338 页不得在 工作站 续跑，按 Lead 指定的新地点和空间策略处理。旧报告中“10 线程 8–9 小时”系并行估算错误；本次 6 工作者总吞吐约 1.05 页/秒，但扫描书密度差异显著，不能按单一速度保证余量。`.djvu.pdg` 仍只做过格式可行性诊断，未全量转换。平台接入前请验证 gzip／SQLite 读法，检索结果须返回原 PDF 路径和物理页。"
+  },
+  {
+   "id": "res-0018",
+   "ts": "2026-10-15 03:21",
+   "title": "平台 0062 上线后盲测复跑：round 3",
+   "label": "结果",
+   "text": "# 平台 0062 上线后盲测复跑：round 3\n\n本轮题库 SHA-256 `d80069db26f2bc53914f58d73556ef283d216ffd513a71ea3aac5c1bf10bd83b`；30 题各调用 pages -n 5 一次，不修改冻结题库。严格按前五唯一作品/物理页 ±1；同作品跨库副本计入。题目、答案和原始输出仅留实验室，不发平台。\n\n## 分组（作品命中、到页命中均为前五）\n\n```csv\ngroup,n,before_work_at_5,after_work_at_5,before_page_pm1_at_5,after_page_pm1_at_5,page_better,page_worse,page_unchanged\nbook,7,4,6,4,6,2,0,5\nbook_ocr,3,2,2,0,1,1,0,2\nzh,10,10,10,9,9,0,0,10\nzh2en,10,9,9,8,8,0,0,10\nall,30,25,27,21,24,3,0,27\n```\n\n## 未到页题与逐题变化\n\n```text\nR3-01 zh 不变 页错 同作品返回页=[1, 9, 2]\nR3-14 zh2en 不变 未召回 同作品返回页=[]\nR3-17 zh2en 不变 页错 同作品返回页=[13]\nR3-21 book 不变 未召回 同作品返回页=[]\nR3-28 book_ocr 不变 未召回 同作品返回页=[]\nR3-30 book_ocr 不变 页错 同作品返回页=[4, 5]\n```\n\n前五到页总计由 21/30 升至 24/30，作品由 25/30 升至 27/30。到页变好 3、变差 0、不变 27；变好的是两道原生书和一道 OCR 扫描书。R3-23 的跨库同书副本已核对两个 PDF SHA-256 完全相同，物理页码一致。中文原文到页 9/10、中文问英文 8/10 均与上次持平；OCR 书目前 1/3，不能据此宣称扫描书稳定可引页。\n\n逐题变好/变差/不变详见，原始输出详见。失败的 OCR/翻译原因仅是候选解释；没有原页 OCR 复查及翻译诊断，不将未召回直接归为 OCR 或翻译错。无外送全文；0 CU。"
+  },
+  {
+   "id": "res-0019",
+   "ts": "2026-10-15 03:22",
+   "title": "平台 0062 上线后盲测复跑：round 4",
+   "label": "结果",
+   "text": "# 平台 0062 上线后盲测复跑：round 4\n\n本轮题库 SHA-256 `9259a4092267a0bd8cfa23c40252f9e6f36c64bee05e8e32055c4ddf0b987c46`；12 题各调用 pages -n 5 一次，不修改冻结题库。严格按前五唯一作品/物理页 ±1；同作品跨库副本计入。题目、答案和原始输出仅留实验室，不发平台。\n\n## 分组（作品命中、到页命中均为前五）\n\n```csv\ngroup,n,before_work_at_5,after_work_at_5,before_page_pm1_at_5,after_page_pm1_at_5,page_better,page_worse,page_unchanged\nbook,8,4,5,4,4,0,0,8\nbook_ocr,4,4,4,4,4,0,0,4\nall,12,8,9,8,8,0,0,12\n```\n\n## 未到页题与逐题变化\n\n```text\nR4-01 book 不变 未召回 同作品返回页=[]\nR4-03 book 不变 页错 同作品返回页=[173]\nR4-05 book 不变 未召回 同作品返回页=[]\nR4-06 book 不变 未召回 同作品返回页=[]\n```\n\n前五到页仍为 8/12（实体书 4/8、扫描书 4/4），与上次逐题完全相同：变好 0、变差 0、不变 12。作品命中由 8/12 到 9/12，新增召回的 R4-03 只到 PDF 第 173 页，目标页第 90 页，仍为页错。此非随机小样本不能证明扫描书检索已普遍可靠。\n\n逐题变好/变差/不变详见，原始输出详见。失败的 OCR/翻译原因仅是候选解释；没有原页 OCR 复查及翻译诊断，不将未召回直接归为 OCR 或翻译错。无外送全文；0 CU。"
+  },
+  {
+   "id": "res-0020",
+   "ts": "2026-10-15 14:00",
+   "title": "台式机文字层重抽：阶段一 b 交付（10-15 美东）",
+   "label": "结果",
+   "text": "# 台式机文字层重抽：阶段一 b 交付（10-15 美东）\n\n台式机只读原 PDF，重抽在 完成；工作站 只做轻量核验、清单导出。共享 SSH ControlMaster 已核活。PyMuPDF 1.28.2 `get_text('blocks')extractor=pymupdf-blocks`。旧版 OCR 页 24,615 条文字、页号、字符数逐条与旧 SQLite 完全一致，`extractor=tesseract`。没有用旧文字层页回填新库。\n\n远端 FINAL：12,437 个待处理件，12,436 ok、1 error；新抽文字层 394,243 页，加既有 OCR 24,615 页，共 418,858 行。原计划文字层 394,246 页，少 3 页，全部属于 sha256 `335fddaf3d8441d58937e79d8daf1c0d6916d77ba3d0e703e9b8afcee17d0848`（`隔震结构抗倾覆可靠度影响因素分析.pdf`）：旧库要求页 3–5，而 PyMuPDF 文档只能打开物理页 1–2，errors.jsonl 明报 （零索引）。新库只保留 1–2 页，未猜页码、未伪装为成功；须平台将该附件列异常，不把旧版 3 页替回。\n\n双栏：从 Literature/Categorized 的第 2–35 页，以旧文本每页至少 3 条长空白分隔的疑似并排行筛出 24,896 个候选，固定种子 20261015 抽 50 页；逐页对比见，其中 17 页的一条左侧短锚点可在新文本连续定位。10 个代表性局部并排行的旧／新片段见 ：如旧版把左右栏分别写成同一行，新版的左栏句子在局部可读。这不是 50 页全页人工逐句质量合格率；其余含图表、期刊页眉及断字的样本不能凭短锚点证明改善，块排序亦可能破坏表格。\n\n随机 30 个有文字页（种子 8192）旧／新字符数见 ：新减旧最小 -7,260，中位 -552.5，最大 +224 字符；旧版 `-layout` 的对齐空格与新区块拼接不同，因此字符差异不是内容丢失率，数字与引文需回原 PDF 核。SQLite `PRAGMA integrity_check=ok`，页清单与数据库按页顺序导出。远端文本重抽耗时 2,571 秒（run.log；不含元数据单独抽取），另补 PDF Info/首页最大字号线索 12,491 件，首次并发读取崩溃后改四进程续读成功，远端合计约 1,071 秒；元数据文件 12,491 行。\n\n交付：\n-，894,955,520 字节；台式机与 工作站 SHA-256 同为 `f7b86d72156597f0737219774d8e3e51a32a04fc644a141fabd5dd7a377fd87a`。\n-，6,877,646 字节，418,858 个不同 `(sha256,physical_page)` 行与 SQLite 相符；台式机与 工作站 SHA-256 同为 `6968de2aa7acd7b2e77725ba0fdb3b56bf21853dd7ce75715dc25b17fa572007`。含每页；空文本页仍在库及清单中，非 OCR 页数并非全部有内容。\n-，台式机与 工作站 SHA-256 同为 `7639a75bd74c9404919ce70fcc8fe01461246444e3ac7767af7a6c7aac374e18`；记录 PDF Info、页数、首页前 15 行及最大字号行。技术上最大字号可能是刊头/图字，不等于题名。\n\n复制前 显示 96 GB 可用，收尾复核 95 GB；旧版 `page_text.sqlite` 未删。均为源只读、0 CU、未外送全文。平台 0069 入库应仅采用 v2 库与 v2 manifest，排除上述错页，仍对关键数值回原页核查。"
+  },
+  {
+   "id": "res-0021",
+   "ts": "2026-10-15 14:16",
+   "title": "round5 OCR 组 5 题：Lead 目视原页核对（10-15 14:20）",
+   "label": "结果",
+   "text": "# round5 OCR 组 5 题：Lead 目视原页核对（10-15 14:20）\n\n方法：在台式机用 pdftoppm 把 5 个指定物理页渲染成 70 dpi PNG（临时目录 工作目录，核完即删），scp 到 工作站 后由 Lead 逐页目视。题库文件与 SHA（…）未改。\n\n| 题 | 书 / PDF 物理页 | 目视结果 |\n| --- | --- | --- |\n| R5-26 | SSReader Print1（弹性稳定）p196 | ✓ 原页：\"以切线模量 E_t 代替了常数模量 E\"，题意与答案\"切线模量\"成立 |\n| R5-27 | 信号与系统（英文第 2 版）p399（印刷页 390） | ✓ §5.7 Duality：\"No corresponding duality exists between the analysis equation (5.9) and the synthesis equation (5.8) for the discrete-time Fourier transform\"，答案\"没有相应对偶性\"成立 |\n| R5-28 | 应用数学（钱伟长）p217（印刷页 209） | ✓ \"只要流动速度维持得高些……处于湍流……则雷诺数的大小对于流动的特点便影响不大……完全忽视 (6.86c) 的要求\"，答案\"雷诺数相似要求\"成立 |\n| R5-29 | 地震工程学（胡聿贤 1988）p159（印刷页 141） | ✓ \"到 1985 年全世界约布置有 7000 台\"，答案成立 |\n| R5-30 | 弹性理论 p233（印刷页 225） | ✓ \"当拉力 S 平行于长轴时（β=0）……在长轴的两端，不论 a/b 的值如何，这应力都是 −S\"。保留意见：题干未写明\"拉力平行于长轴\"，但同页只此一处给长轴端点应力，答案 −S 成立 |\n\n结论：5 道 OCR 题的答案均在原页图像上得到确认，round5 全部 30 题可计入严格真值；R5-30 题干略欠限定，跑分时若因此未命中不另算。"
+  },
+  {
+   "id": "res-0022",
+   "ts": "2026-10-15 14:28",
+   "title": "台式机 DjVu / 超星 PDG 转文本：阶段终版",
+   "label": "结果",
+   "text": "# 台式机 DjVu / 超星 PDG 转文本：阶段终版\n\n10-15 14:25 美东。经现有台式机 SSH 复用连接；源书只读，未外送书页或全文，0 CU。未使用 sudo：djvused、ddjvu、Tesseract 等工具仅解包在台式机；DjVu 逐物理页提取文字层、空文字页本机 OCR，PDG 用本地 pdg-converter 解码后本机 OCR。两路 OCR 合计不超过 2 线程。旧版 `djvu_pdg.sqlite` 的 DjVu 页码曾错位，明确排除；终版仅合并 `djvu_only.sqlite`、`djvu_pdg_v2.sqlite` 中 11 本 PDG、`melenk_recovery.sqlite`。\n\n62 个字节独立 DjVu 中，61 本安全映射 28,391 页；Melenk《Finite Element Methods for Singular Perturbations》共 283 页，恢复 282 页，第 201 页 `Unexpected End Of File`。DjVu 总计应有 28,674 页，已入 28,673 页，28,460 页有文字、213 页无文字、1 页失败。11 套 PDG 共 3,163 个有序页位：成功解码入库 2,692 页，2,680 页有文字、12 页无文字；另 471 页失败，类型为外层 0x38 变换 398、附加图层 72、不支持 JPEG 1。错误页位与入库页位无交叉。PDG 的“物理页”是目录内页文件排序序号，不等同书上印刷页码。\n\n终版合并 73 个文档键、31,365 个已安全映射页位；31,140 页有文字、225 页无文字，另 472 个失败页位不在库。文字层 24,637 页、OCR 6,728 页。SQLite `integrity_check=ok`，主键 `(sha256,physical_page)` 无重复。1,941 个 DjVu 文字层页的 `chars` 比 SQLite `length(text)` 多 1，保留原记录；如需精确字符数应以实际文本重算。文字层里也可出现不可见控制字符，不等于人工核准文本。\n\n台式机文件：；工作站 文件：（两端 SHA-256 均为 `477a2d53d501832bb452f1d9bd8a9c90b1abb69c0a2f3081eeb4302dbb9555b6`）。压缩页清单：，415,011 字节，SHA-256 `b5e6a8fcefa8b36629da7c3f29a6741e24e2286ad85e28d967049efedc8c09c0`。31,365 行与 SQLite 行数一致；字段沿用打包页清单格式，含 origin、SQLite 定位、台式机 Windows 与 WSL 原路径。清单只列安全对齐页；失败详情保留在台式机，不可当作空白页。台式机工作目录约 280 MB；传回后 C 盘可用约 91 GB。\n\n## 10 页文本抽查\n\n固定随机种子 20261015：4 页 DjVu 文字层、3 页 DjVu OCR、3 页 PDG OCR。10/10 文本非空，未出现 Unicode 替换符；其中一页 DjVu 文字层含 45 个非法控制字符，应在入索引时净化。只抽查已提取的文本及控制符，未对原图逐字比对，故 OCR 准确率未评估；公式、数值和中文专名仍须核原书。PDG 失败页须等待更完整的格式解码器。\n\n| 类型 | 文档 SHA 前缀 / 物理页 | 字符数 | 可见异常 |\n| --- | --- | ---: | --- |\n| DjVu 文字层 | a1ec3b2702 / 496 | 3063 | 无替换符/控制符 |\n| DjVu 文字层 | a1ec3b2702 / 76 | 2515 | 无替换符/控制符 |\n| DjVu 文字层 | 3cc6305751 / 296 | 2401 | 无替换符/控制符 |\n| DjVu 文字层 | 900aef0ca7 / 67 | 1440 | 控制字符 45 个 |\n| DjVu OCR | 4b7a18bed3 / 153 | 584 | 无替换符/控制符 |\n| DjVu OCR | 36425c669e / 173 | 2664 | 无替换符/控制符 |\n| DjVu OCR | 36425c669e / 188 | 1990 | 无替换符/控制符 |\n| PDG OCR | 078af22ec2 / 208 | 1015 | 无替换符/控制符 |\n| PDG OCR | 078af22ec2 / 153 | 1346 | 无替换符/控制符 |\n| PDG OCR | dc8af1adef / 642 | 1281 | 无替换符/控制符 |\n\n## 逐书页数\n\n下表的页数为物理页或 PDG 有序页文件数，有文本页不含空页和失败页。路径为台式机 WSL 原路径。\n\n| 格式 | 原路径 | 页数 | 方法 | 有文本页 | 状态 |\n| --- | --- | ---: | --- | ---: | --- |\n| DjVu | | 403 | 文字层 | 403 | 完成 |\n| DjVu | | 548 | 文字层+OCR | 544 | 完成 |\n| DjVu | | 532 | 文字层+OCR | 526 | 完成 |\n| DjVu | | 773 | 文字层+OCR | 769 | 完成 |\n| DjVu | | 162 | 文字层 | 162 | 完成 |\n| DjVu | | 598 | 文字层 | 598 | 完成 |\n| DjVu | | 628 | 文字层+OCR | 624 | 完成 |\n| DjVu | | 840 | 文字层 | 840 | 完成 |\n| DjVu | | 634 | 文字层 | 634 | 完成 |\n| DjVu | | 737 | 文字层+OCR | 727 | 完成 |\n| DjVu | | 589 | 文字层+OCR | 581 | 完成 |\n| DjVu | | 542 | 文字层 | 542 | 完成 |\n| DjVu | | 497 | 文字层+OCR | 497 | 完成 |\n| DjVu | | 329 | 文字层+OCR | 325 | 完成 |\n| DjVu | | 850 | 文字层+OCR | 849 | 完成 |\n| DjVu | | 701 | 文字层 | 701 | 完成 |\n| DjVu | | 732 | 文字层+OCR | 722 | 完成 |\n| DjVu | | 164 | 文字层+OCR | 164 | 完成 |\n| DjVu | | 438 | 文字层 | 438 | 完成 |\n| DjVu | | 503 | 文字层+OCR | 503 | 完成 |\n| DjVu | | 678 | 文字层+OCR | 677 | 完成 |\n| DjVu | | 377 | 文字层+OCR | 368 | 完成 |\n| DjVu | | 393 | 文字层+OCR | 391 | 完成 |\n| DjVu | | 343 | 文字层+OCR | 338 | 完成 |\n| DjVu | | 463 | 文字层+OCR | 461 | 完成 |\n| DjVu | | 237 | 文字层 | 237 | 完成 |\n| DjVu | | 380 | 文字层 | 380 | 完成 |\n| DjVu | | 323 | 文字层 | 323 | 完成 |\n| DjVu | | 216 | 文字层+OCR | 216 | 完成 |\n| DjVu | | 671 | 文字层+OCR | 671 | 完成 |\n| DjVu | | 237 | 文字层+OCR | 237 | 完成 |\n| DjVu | | 248 | 文字层+OCR | 241 | 完成 |\n| DjVu | | 326 | 文字层+OCR | 320 | 完成 |\n| DjVu | | 440 | 文字层+OCR | 440 | 完成 |\n| DjVu | | 611 | 文字层+OCR | 611 | 完成 |\n| DjVu | | 241 | 文字层+OCR | 241 | 完成 |\n| DjVu | | 144 | 文字层+OCR | 134 | 完成 |\n| DjVu | | 319 | 文字层+OCR | 319 | 完成 |\n| DjVu | | 601 | 文字层+OCR | 601 | 完成 |\n| PDG | | 292 | PDG解码+OCR | 289 | 失败 3 页 |\n| PDG | | 200 | PDG解码+OCR | 162 | 失败 38 页 |\n| PDG | | 164 | PDG解码+OCR | 135 | 失败 29 页 |\n| PDG | | 229 | PDG解码+OCR | 187 | 失败 42 页 |\n| PDG | | 184 | PDG解码+OCR | 148 | 失败 35 页 |\n| PDG | | 280 | PDG解码+OCR | 227 | 失败 52 页 |\n| PDG | | 208 | PDG解码+OCR | 167 | 失败 41 页 |\n| PDG | | 208 | PDG解码+OCR | 106 | 失败 100 页 |\n| PDG | | 243 | PDG解码+OCR | 195 | 失败 45 页 |\n| PDG | | 454 | PDG解码+OCR | 364 | 失败 85 页 |\n| DjVu | | 152 | 文字层+OCR | 148 | 完成 |\n| DjVu | | 348 | 文字层 | 348 | 完成 |\n| DjVu | | 325 | 文字层+OCR | 325 | 完成 |\n| DjVu | | 702 | 文字层+OCR | 697 | 完成 |\n| DjVu | | 185 | 文字层 | 185 | 完成 |\n| DjVu | | 424 | 文字层+OCR | 417 | 完成 |\n| DjVu | | 424 | 文字层+OCR | 417 | 完成 |\n| DjVu | | 527 | 文字层+OCR | 518 | 完成 |\n| DjVu | | 360 | 文字层+OCR | 357 | 完成 |\n| DjVu | | 363 | 文字层+OCR | 363 | 完成 |\n| DjVu | | 283 | 文字层 | 200 | 失败 1 页 |\n| DjVu | | 1050 | 文字层 | 1050 | 完成 |\n| DjVu | | 225 | 文字层+OCR | 223 | 完成 |\n| DjVu | | 419 | 文字层 | 419 | 完成 |\n| DjVu | | 283 | 文字层 | 283 | 完成 |\n| DjVu | | 693 | 文字层+OCR | 692 | 完成 |\n| DjVu | | 817 | 文字层 | 817 | 完成 |\n| DjVu | | 272 | 文字层 | 272 | 完成 |\n| DjVu | | 478 | 文字层 | 478 | 完成 |\n| DjVu | | 362 | 文字层+OCR | 362 | 完成 |\n| DjVu | | 707 | 文字层+OCR | 707 | 完成 |\n| DjVu | | 479 | 文字层+OCR | 479 | 完成 |\n| DjVu | | 348 | 文字层+OCR | 348 | 完成 |\n| PDG | | 701 | PDG解码+OCR | 700 | 失败 1 页 |"
+  },
+  {
+   "id": "res-0023",
+   "ts": "2026-10-16 02:32",
+   "title": "OCR 第三阶段重启后续跑：完整性闸门未通过",
+   "label": "结果",
+   "text": "# OCR 第三阶段重启后续跑：完整性闸门未通过\n\n时间：10-16 02:22（美东）。\n\n台式机现有 ControlMaster socket 检查通过；根盘 rw。发现续跑进程 PID 22492 已于 10-16 00:56 启动，使用，以 为目标。未另起重复进程。日志 记录 `START 1718 already 103620 workers 6DONE 1718 errors 0 empty 30 wall_s 4746.2`，进程已退出。\n\n但是，在最终验收查询时，只读 `select count(*)` 报 `sqlite3.DatabaseError: database disk image is malformed`。进一步只读 `PRAGMA integrity_check(1)` 返回 `*** in database main ***; Page 62028: btreeInitPage returns error code 11`。因此**不能认定 105338 页成果有效**，未执行最终 `wal_checkpoint(TRUNCATE)`、未复制到 （目标文件不存在），也未尝试修复或重跑；待平台/Lead 决定如何保护现场并诊断。\n\n截至 10-16 02:22，副本主库大小 256315392 bytes，WAL 0 bytes（可能已随写进程关闭自动 checkpoint），主库 SHA-256 `a1a4b180415f30a8dbceec8c73314de9323fe793c7fac5d5087e2916fa814e93`。该哈希**仅供定位故障文件，不是可用最终交付哈希**。旧库 未由本次任务更改；最终新文件未创建。续跑后 documents/pages/errors 的可信计数不可取得，因为计数查询即触发损坏异常。\n\n结论：续跑日志完成，但数据库完整性闸门失败；暂停交付，不能用于 0069 入库。此前重启前的副本完整性为 ok、103620 页；出现损坏的具体原因尚未查明，不应归因于脚本或 9p 而缺少证据。\n\n## 根盘续跑验收（10-16 02:32，美东）\n\n根盘 显示 `DONE 2498 errors 2 empty 72 wall_s 6074.8`，耗时约 1 小时 41 分 15 秒；进程已自然退出，无需再启动、停止或预约。以根盘 为准执行 `PRAGMA wal_checkpoint(TRUNCATE)`，结果 `(0,0,0)`；完整 `PRAGMA integrity_check` 返回 `ok`。只读复查 documents 1713、pages 105336、errors 2；按页记录与错误记录计合计 105338，**不能将 105336 成功页写作 105338 成功页**。\n\n两条失败均为同一 PDF（SHA-256 `a15a0660a3c55e5b44b28250c7063eea364eec23ae5595d2a4d61d9fe4cd28ce`）：PDF 物理第 41 页和第 45 页，均在 `pdftoppm -scale-to 1800 -gray -png` 单页渲染时达到 180 秒超时（分别记录约 180.180、180.102 秒）。未对两页重跑或修复。\n\n在根盘新建 （原先不存在），原库与 final 均为 256282624 bytes，SHA-256 均为 `2f2a3e8625eaf9d5c923caa2ec4d88fd0227407e767b52502319b1ca2c830a6b`；final 独立 `integrity_check=ok`。 损坏副本原样保留，未再触碰。根盘 final 可作为 0069 后续输入，但入库时应明确排除或处理上述两条超时页，不将其称为已 OCR 成功。"
+  },
+  {
+   "id": "res-0024",
+   "ts": "2026-10-16 02:39",
+   "title": "台式机第三阶段 OCR — 阶段性终版（2 页失败待单独处理）",
+   "label": "结果",
+   "text": "# 台式机第三阶段 OCR — 阶段性终版（2 页失败待单独处理）\n\n10-15 10:29（美东）检查复用 ControlMaster socket 存活；台式机 24 核、46 GiB 内存、WSL 盘空闲 664 GiB。台式机原 PDF 只读，未在 工作站 做 OCR，也未外送页图/文本，0 CU。台式机 工作目录 为本阶段唯一计算输出位置。\n\n## 环境与试跑\n\n台式机无 root sudo；复用另一项书籍任务在 免 root 解包的 Tesseract 4（eng、chi_sim）及系统现有 poppler `pdftoppm`，未安装或更改系统包。首次 200 页测试因 `pdftoppm -singlefile ... -` 不向 stdout 输出而全部渲染失败；在没有写入有效页面的前提下清掉这 200 条错误记录，修正命令后原样重试 200 页：36.2 秒、195 页有文本、5 页空、0 失败；6 个 nice 19/ionice idle 工作线程。此速度只代表该组 Book 优先页面，不是全库保证速度。按该组吞吐朴素外推剩余约 5.3 小时；跨书扫描质量、台式机并发的另两项书籍 OCR 会使实际耗时变化，建议按约 5–10 小时观察心跳。\n\n## 输入与断点\n\n从 工作站 排除原 `page_text.sqlite` 中已标 `origin='OCR 文本'` 的 24,615 页，生成 105,338 页候选清单，传到台式机。优先 Book/Codes、wind engineering、Probability、Vibration、CFD、Mathematics 等，再其它 Book，最后 Literature。台式机后台 PID 63579； 每 60 秒心跳，SQLite 的 `(sha256,physical_page)` 主键断点续跑，成功、空页和异常分别记录；6 线程，单页图像只在内存经 subprocess stdout 传递，无临时 PDF/页图。10:29 查询 SQLite 740 页（721 页有文字），0 错误；全量远未完成。当前该工作目录实占约 63 MiB，另书籍任务目录约 197 MiB，远低于三任务合计 10 GB。\n\n## 损坏 PDF\n\n第一阶段失败清单有重复行，排除第二阶段已经补录的两件后，尝试使用只安装到 的 pypdf 6.20.1（strict=False）在 另存副本，原件不动；独立 `repaired_pages.sqlite` 防止与 OCR 主库同时写冲突。10:29 修复进程 PID 66649 仍在运行，结果尚未核实。pypdf 的修复能力不等同 qpdf/mutool；未能正确映射的页不得冒充成功。\n\n## 10-15 14:31 美东回访\n复用 socket 存活；台式机 OCR 主进程 PID 63579 仍运行。日志最近心跳为 34,892/105,138、0 错、572 空页（日志进度略滞后）；只读 SQLite 实查 35,267 条，其中 34,690 条有文本、577 条为空，错误表 0 条。注意候选清单为 105,338 页，而日志分母 105,138，差 200 页试跑已单独完成；最终须按清单与 SQLite 主键并集核对，不得以日志分母直接宣称全覆盖。按至今 13,953 秒与 35,267 条粗算，余下约 7.7 小时，此为动态估计。台式机 实占 150 MiB、 280 MiB、 不存在，三者远低于 10 GB；台式机 WSL 空闲 661 GB，工作站 C 盘空闲 91 GB。修复进程已退出，独立库暂有 366 页，但修复日志仍记录部分文件 Invalid object in [local path omitted]，未核对正确物理页映射、不可并入正式输出。\n\n## 10-15 18:33 美东回访\n复用 socket 正常；主进程 PID 63579 为 SNl+，仍以 6 worker 运行。只读 SQLite 查询时已记 66,940 页（66,146 页有文本、794 页为空），随后 origin 汇总达 66,950 页；errors 表为 0。日志心跳 66,720/105,138（另有 200 页试跑），0 错、789 空；以 SQLite 最新页数计，105,338 页目标尚余 38,388 页。按日志累计吞吐约 2.42 页/秒，动态外推约 4.4 小时，不承诺完成时间。 236 MiB、 280 MiB、 未建立，合计低于 10 GB；台式机 WSL 空闲 661 GB，工作站 C 盘空闲 95 GB。修复日志仍有 FE-Handbook-1.pdf 的 Invalid object in [local path omitted]，独立修复库未核页、未并入。运行中的数据库未复制或导出。\n\n## 10-15 23:42 美东回访：台式机存储异常，中断\n复用 socket 存活，但原 PID 63579 不在；末次心跳 23:13:37（日志本次运行已处理 102,621/105,138，另有试跑 200 页），只读 SQLite 实查 102,850/105,338 页：101,042 页有字、1,808 页空，errors 0，尚余 2,488 页。 313 MiB、 280 MiB、 不存在，低于 10 GB；工作站 可用 98 GB。原进程消失且无 DONE 记录。一次按主键断点续跑尝试在打开追加日志前失败：`cannot create ocr_round2.log: Read-only file system`，未重启 OCR、未后续写盘。远端根卷显示 `rw,...,emergency_ro`，不能仅凭 df 空闲判断可写。已向平台 Lead 报异常，等安全恢复，不绕过只读故障。独立修复库尚未核页、正式库未传 工作站。\n\n## 10-16 00:49 美东：恢复并按主键续跑\n复用 socket 存活；台式机根卷已恢复 ext4 `rw`，宿主 E: 可用 104 GB。确认原 OCR 无进程后，在 复制 SQLite 与当时 WAL/SHM 三件；在副本运行 `PRAGMA integrity_check=okproc_3f36e8f22bd1`、PID 3381642。约 00:53 远端 SQLite 达 103,020 页、0 错，E: 可用 115 GB。200 页试跑已计入总清单。工作站 不运行 OCR。\n\n## 10-16 02:38 美东：停写、核对和交付\n\n断点续跑进程已退出，末行 `DONE 2498 errors 2 empty 72 wall_s 6074.8`；本次续跑墙钟约 2.432 秒/页（6 工作者并行，非单线程 OCR 耗时）。首次 200 页的 36.2 秒是有偏的 Book 小样本；全程跨中断及并发，不能由这两个数准确推定全量纯 OCR 耗时。复用 SSH socket 存活；台式机源库只读、没有在 工作站 运行 OCR 或对外发送页文本，0 CU。\n\n候选唯一主键 105,338 个（含 200 页试跑）；SQLite 完成 105,336 页，其中有文本 103,456、空文本 1,880、失败 2。逐主键差集恰是 物理页 41 与 45；`pdftoppm` 各超过 180 秒限时。`errors` 表正好两条；没有以空白页代替失败页。`PRAGMA integrity_check=ok`，`chars`、`has_text` 与存储文本逐行一致，导出的 105,336 条 manifest 均与输入键相交且无额外键。\n\n20 页抽查：以固定种子 20261016 从已入库页等概率抽 20 页，均有非空可辨文字；中文页的字形误认、英文符号误认、公式/表格跨行与双栏混排都可见。例如 p24 的表格有 `Al OBE`、`WARE`， p396 的公式行几乎不可读， p178 的中文有“午新排列”，而 p302 英文段落相对连贯。这只是文本可读性抽检，没有逐张原图人工对字，故无字符准确率和数值可靠性结论；公式、引文须回原件核验。\n\n修复独立库 有 366 页，均来自 `Computational Statistics Handbook with Matlab`。原件 `pdfinfo` 为 626 页，pypdf 修复副本仅识别 366 页，物理页映射不安全，未并入交付库；其它五条修复尝试报。六件异常仍须单独处理，不得将修复副本的第 N 页直接当原 PDF 第 N 页。\n\n停止写入后执行 WAL checkpoint、完整性检查并传回 工作站。远端 与本地 的 SHA-256 均为 `2f2a3e8625eaf9d5c923caa2ec4d88fd0227407e767b52502319b1ca2c830a6b`；本地大小 256,282,624 字节。 为 1,579,186 字节，SHA-256 `87ab1b229f9222e3af9a2e75a417c42cfcb542adac62284a170ea3686f7faa55`；每行含 sha256、物理页、字符数、有无文本、`origin=OCR 文本本地盘` 可用 98 GB；台式机 约 799 MiB，另 约 280 MiB，低于 10 GB 闸门。\n\n结论：105,336 个已安全对齐页可供平台以 OCR 不保证准确的标签试入库；两处超时及六件损坏文件保持失败/待核，不声称 105,338 页全成功。"
+  },
+  {
+   "id": "res-0025",
+   "ts": "2026-10-16 10:55",
+   "title": "0069 作品合并待核队列（实验室只读核验）",
+   "label": "结果",
+   "text": "# 0069 作品合并待核队列（实验室只读核验）\n\n来源：（127 组）；实验室 将 DSK 前缀映射至 SHA-256； 与 均以只读 URI 打开。判定详见，每行一组、列出组内全部 DSK id；只供平台人工参考，不是对索引写入的授权。\n\n组数：127；DSK 成员：337；合并 108，不合并 18，拿不准 1。\n\n核验方法：比对各文件首六页及非短页（≥350 规范化字符）的逐字哈希；再检查明显冲突的标题、章节/卷号、成员页数、文件路径及代表性全书的正文重合。原队列 保留首面摘要、前六页重合数与相似度； 与 可复核。\n\n重点：第 1 组 ICWE12 两卷共享前页但后文不同；第 3–4 组元数据错把不同论文题名标成相同；第 21 组 56 篇 Davenport 会议论文不合并；第 48 组三册 Bimba 产品目录前四页相同但后文不同；第 49–52、74、127 组属于分章/分册；第 89 组标准与补充说明是不同文档。第 70 组 ABAQUS 讲义大量相同但版本/插页不明，单列拿不准，维持不合并。\n\n判定边界：不同字节但同一论文的完整正文副本可建议合并；此建议并非平台规则中的 Crossref 核验本身。若平台仅准同 SHA、Crossref 核实 DOI/题名(+年份)三种合并依据，则其余“合并”行应先补独立元数据核验，不能把本表正文相同当作平台规则已满足。"
+  },
+  {
+   "id": "res-0026",
+   "ts": "2026-10-16 11:43",
+   "title": "ftkb 0069 冻结盲测验收（10-16 10:39，美东）",
+   "label": "结果",
+   "text": "# ftkb 0069 冻结盲测验收（10-16 10:39，美东）\n\n结论口径：本次观察不支持放行新台式机 I 盘来源检索；R5 前五到页仅 5/30，且 30/30 次调用均提示「本次未翻译……只按中文原文检索」，是显著的检索条件故障/混杂因素，不能把英文资料 0 命中直接归因于 0069 的索引或重排。旧书纵向集没有到页退步，也没有新增提升。题目、答案、原始片段只留实验室，不向平台交付。\n\n## 方法及冻结\n\n每道只送原问题给 ` pages … -n 5` 一次、单题 90 s 超时，先核冻结文件 SHA-256：R5 `8e08ae4bd5ba725e6dd2d2df80032e9ff35880cf8a88a4ab601e6a29ef1f1b07`、R3 `d80069db26f2bc53914f58d73556ef283d216ffd513a71ea3aac5c1bf10bd83b`、R4 `9259a4092267a0bd8cfa23c40252f9e6f36c64bee05e8e32055c4ddf0b987c46`；题库均未改。全部 72 次退出码 0，均未超时。前五以同作品且原 PDF 物理页 ±1 为到页；R5 同作品按原始 I 盘路径转换 Windows 路径（去「只在台式机能打开」尾注）/已记别名精确匹配，不把不完整文件名的相似题名算作同作。R3/R4 沿原有作品判据、跨库同作。可能的同书异路径未经逐份哈希核验，保守不加分。第六条补充页不计入前五。\n\n## R5 新题：30 道严格真值\n\nOCR 5 道已经 Lead 目视原 PDF 页核实；R5-30 题干欠限定，保留冻结问句，未命中不另算。每组前五作品命中 / 到页：\n\n| 分组 | 题数 | 作品 | 物理页±1 | 未到页题号 |\n| --- | ---: | ---: | ---: | --- |\n| Book 文字层 | 10 | 0 | 0 | R5-01–10 |\n| Literature | 10 | 0 | 0 | R5-11–20 |\n| 中文 | 5 | 5 | 3 | R5-21、25 |\n| OCR | 5 | 3 | 2 | R5-26、27、30 |\n| 合计 | 30 | 8 | 5 | 25 道 |\n\n同作品却页错：R5-21 返回 PDF 380 页、R5-25 返回第 6 页、R5-30 返回第 258 页；目标物理页和前五原始片段仅见实验室私有文件。R5-30 按预定口径不额外扣分，依旧记一题未到页。其余 22 道未召回同作，不等于源文件必然没索引。原始回包 R5 全部 30 道出现「本次未翻译」警告；英文作品问句落在中文原词检索条件下，尤其 Book/Literature 0/20，不宜由此判定长书索引本身完全失效。R3/R4 的 42 道回包没有此警告，纵向比较检索条件并不相同。\n\n展示/溯源：前五任一条标「只在台式机能打开」为 20/30 题（首位 13/30）；前五任一条题名标「题目候选」为 14/30（首位 7/30）；显式「疑似表格」提示为 2/30（两题均首位）。「只在台式机能打开」的文件路径不能假定 工作站 可直接打开，题名候选不可当作正式书目信息；疑似表格的数字/行列必须返回原页核查。按提示字面统计，不将片段中普通「表格」字眼计入表格警示。\n\n## 长书纵向对照（同一冻结问句、前五）\n\n| 题库 / 分组 | 三期到页 | 0057/首跑到页 | 0062 到页 | 0069 作品 | 0069 到页 |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| R3 中文原文 10 | 9 | 9 | 9 | 10 | 9 |\n| R3 中文问英文 10 | 8 | 7 | 8 | 9 | 8 |\n| R3 原生书 7 | 6 | 6 | 6 | 6 | 6 |\n| R3 OCR 书 3 | 1 | 1 | 1 | 2 | 1 |\n| R3 合计 30 | 24 | 23 | 24 | 27 | 24 |\n| R4 原生书 8 | — | 4 | 4 | 5 | 4 |\n| R4 OCR 书 4 | — | 4 | 4 | 4 | 4 |\n| R4 合计 12 | — | 8 | 8 | 9 | 8 |\n\nR3 对三期及 0062：逐题变好 0、变差 0、不变 30；对 0057：R3-20 恢复到页（变好 1），其余 29 不变。R4 对 0057、0062：逐题 0 好 / 0 差 / 12 不变。R3 最初盲测为 21/30，到本轮 24/30；与三期的 24/30 而不是最初 21/30 作版本对照。R3 当前失败为 R3-01/17/30 页错，R3-14/21/28 未召回；R4 当前失败为 R4-03 页错，R4-01/05/06 未召回。这些与 0062 不变；本轮没有变差题需要单独归因。0057 的 R3-20 曾由书内追加页占去前五最后一位导致退步；0069 第 9 页重新进入前五，符合既有位置竞争线索，未另行拆内部排序因果。\n\n## 审计路径与限制\n\n新集：（原始响应）、 与；旧集：、 各有 、。原始文件含私有题干/来源，绝不可交平台；可对外只给聚合指标及「翻译全部失败」现象。分组非随机、样本小、故障条件下的 R5 分数不代表正常翻译条件下的召回率。整个流程只读 ftkb，0 CU。\n\n## 逐题验收附录（补齐自动初查）\n\n符号：✓=前五同作品且物理页±1，×=未到页；“作品”只计前五同作品；“桌面/候选/表格”指前五任一条有相应明确标记，不是首位标记。私有题干及答案不列于表中。\n\n### R5 新盲测逐题\n\n| ID | 组 | 同作品 | 到页 | 目标物理页 | 同作品返回页 | 桌面 | 候选 | 表格 |\n| --- | --- | ---: | ---: | ---: | --- | ---: | ---: | ---: |\n| R5-01 | book | × | × | 56 | — | 否 | 否 | 否 |\n| R5-02 | book | × | × | 12 | — | 否 | 否 | 否 |\n| R5-03 | book | × | × | 50 | — | 是 | 是 | 否 |\n| R5-04 | book | × | × | 17 | — | 否 | 否 | 否 |\n| R5-05 | book | × | × | 26 | — | 是 | 是 | 否 |\n| R5-06 | book | × | × | 16 | — | 是 | 是 | 否 |\n| R5-07 | book | × | × | 41 | — | 否 | 否 | 否 |\n| R5-08 | book | × | × | 175 | — | 是 | 是 | 否 |\n| R5-09 | book | × | × | 187 | — | 是 | 否 | 是 |\n| R5-10 | book | × | × | 621 | — | 是 | 是 | 否 |\n| R5-11 | literature | × | × | 8 | — | 否 | 否 | 否 |\n| R5-12 | literature | × | × | 8 | — | 否 | 否 | 否 |\n| R5-13 | literature | × | × | 11 | — | 是 | 是 | 否 |\n| R5-14 | literature | × | × | 7 | — | 否 | 否 | 否 |\n| R5-15 | literature | × | × | 6 | — | 否 | 否 | 否 |\n| R5-16 | literature | × | × | 7 | — | 否 | 否 | 否 |\n| R5-17 | literature | × | × | 11 | — | 是 | 是 | 否 |\n| R5-18 | literature | × | × | 6 | — | 否 | 否 | 否 |\n| R5-19 | literature | × | × | 6 | — | 是 | 否 | 否 |\n| R5-20 | literature | × | × | 7 | — | 是 | 是 | 否 |\n| R5-21 | chinese | ✓ | × | 374 | 380 | 是 | 否 | 否 |\n| R5-22 | chinese | ✓ | ✓ | 88 | 88 | 是 | 否 | 否 |\n| R5-23 | chinese | ✓ | ✓ | 42 | 42 | 是 | 是 | 否 |\n| R5-24 | chinese | ✓ | ✓ | 107 | 107 | 是 | 否 | 是 |\n| R5-25 | chinese | ✓ | × | 122 | 6 | 是 | 否 | 否 |\n| R5-26 | ocr | × | × | 196 | — | 是 | 是 | 否 |\n| R5-27 | ocr | × | × | 399 | — | 是 | 是 | 否 |\n| R5-28 | ocr | ✓ | ✓ | 217 | 217 | 是 | 是 | 否 |\n| R5-29 | ocr | ✓ | ✓ | 159 | 159 | 是 | 是 | 否 |\n| R5-30 | ocr | ✓ | × | 233 | 258 | 是 | 是 | 否 |\n\n按组到页：book 0/10、literature 0/10、chinese 3/5、ocr 2/5，合计 5/30。R5-30 问句欠限定，照冻结口径记录未命中，不另算。\n\n### R3 纵向逐题\n\n| ID | 0069 到页 | 三期→0069 | 0057→0069 | 0062→0069 |\n| --- | ---: | --- | --- | --- |\n| R3-01 | × | × / 不变 | × / 不变 | × / 不变 |\n| R3-02 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-03 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-04 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-05 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-06 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-07 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-08 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-09 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-10 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-11 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-12 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-13 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-14 | × | × / 不变 | × / 不变 | × / 不变 |\n| R3-15 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-16 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-17 | × | × / 不变 | × / 不变 | × / 不变 |\n| R3-18 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-19 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-20 | ✓ | ✓ / 不变 | × / 变好 | ✓ / 不变 |\n| R3-21 | × | × / 不变 | × / 不变 | × / 不变 |\n| R3-22 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-23 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-24 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-25 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-26 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-27 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-28 | × | × / 不变 | × / 不变 | × / 不变 |\n| R3-29 | ✓ | ✓ / 不变 | ✓ / 不变 | ✓ / 不变 |\n| R3-30 | × | × / 不变 | × / 不变 | × / 不变 |\n\nR3 0069 到页 24/30；相对三期 0 变好/0 变差/30 不变，相对 0057 为 1/0/29（仅 R3-20 变好），相对 0062 为 0/0/30。\n\n### R4 纵向逐题\n\n| ID | 0069 到页 | 0057→0069 | 0062→0069 |\n| --- | ---: | --- | --- |\n| R4-01 | × | × / 不变 | × / 不变 |\n| R4-02 | ✓ | ✓ / 不变 | ✓ / 不变 |\n| R4-03 | × | × / 不变 | × / 不变 |\n| R4-04 | ✓ | ✓ / 不变 | ✓ / 不变 |\n| R4-05 | × | × / 不变 | × / 不变 |\n| R4-06 | × | × / 不变 | × / 不变 |\n| R4-07 | ✓ | ✓ / 不变 | ✓ / 不变 |\n| R4-08 | ✓ | ✓ / 不变 | ✓ / 不变 |\n| R4-09 | ✓ | ✓ / 不变 | ✓ / 不变 |\n| R4-10 | ✓ | ✓ / 不变 | ✓ / 不变 |\n| R4-11 | ✓ | ✓ / 不变 | ✓ / 不变 |\n| R4-12 | ✓ | ✓ / 不变 | ✓ / 不变 |\n\nR4 0069 到页 8/12；相对 0057 和 0062 均 0 变好/0 变差/12 不变。R4 在三期尚未建题，故无可比较的三期逐题数据。\n\n变差题清单：无。旧集当前未到页条目及页错/未召回线索已列在上文；本轮没有新增退步原因可归因。\n\n## 翻译恢复后重跑（10-16 11:33 美东）\n\n仍用冻结 R5 原题库（SHA-256 `8e08ae4bd5ba725e6dd2d2df80032e9ff35880cf8a88a4ab601e6a29ef1f1b07`，运行前复核），原 、单题 90 s、前五同作品且 PDF 物理页±1。30 道顺序一致、30 次退出码 0、无单题超时；题库未改。逐题私有原始响应和复核打分在 、；新打分只采用 I 盘原路径/题库所记别名的精确匹配（规范化路径），不凭标题相似加分。\n\n| 分组 | 题数 | 前次作品/到页 | 本次作品/到页 |\n| --- | ---: | ---: | ---: |\n| Book 文字层 | 10 | 0 / 0 | 2 / 2 |\n| Literature | 10 | 0 / 0 | 1 / 1 |\n| 中文 | 5 | 5 / 3 | 0 / 0 |\n| OCR | 5 | 3 / 2 | 1 / 1 |\n| 合计 | 30 | 8 / 5 | 4 / 4 |\n\n逐题到页：R5-01、08、12、29；其中 01、08、12 是相对前次变好，29 不变。前次到页而本次未到页：R5-22、23、24、28（四题均无同作品前五）；其余 23 题不变。R5-30 仍按题干欠限定的冻结口径记未到页，不额外扣分。所有 30 次均出现「中文问题已译成英文检索」，0 次出现「本次未翻译」；然而 25 次回包报告内部 60 秒上限，11 次明确写「没跑完的部分：台式机来源」。R5-22、24、28 有内部 60 秒上限，其中 28 明确漏跑台式机来源；R5-23 未显示该上限或漏跑提示。检索结果的组成和排序可能因翻译改变；现有回包不足以把四题退步归于单一原因。外层 90 秒超时未触发，不等于内部召回完整。\n\n结果展示提示（前五任一条）：台式机限定 8/30，题目候选 7/30，疑似表格 1/30。尽管翻译链恢复，新集到页由 5/30 降至 4/30 且中文/OCR 有退步；内部超时及台式机来源未跑完仍是重要混杂，不能认定台式机来源检索验收通过，也不能将此次 4/30 简单归因于索引质量。题干、答案、回包片段和私有路径只留实验室，不交平台；可对平台只报聚合指标及内部限时现象。\n\n### 0098 逐题到页与原 0069 首跑对照（自动初查补表）\n\n✓ 表示前五同作品且 PDF 物理页 ±1；× 表示未到页。判定取自本实验室两轮，未改冻结题库。\n\n| ID | 分组 | 原0069到页 | 0098到页 | 变化 |\n| --- | --- | --- | --- | --- |\n| R5-01 | book | × | ✓ | 变好 |\n| R5-02 | book | × | × | 不变 |\n| R5-03 | book | × | × | 不变 |\n| R5-04 | book | × | × | 不变 |\n| R5-05 | book | × | × | 不变 |\n| R5-06 | book | × | × | 不变 |\n| R5-07 | book | × | × | 不变 |\n| R5-08 | book | × | ✓ | 变好 |\n| R5-09 | book | × | × | 不变 |\n| R5-10 | book | × | × | 不变 |\n| R5-11 | literature | × | × | 不变 |\n| R5-12 | literature | × | ✓ | 变好 |\n| R5-13 | literature | × | × | 不变 |\n| R5-14 | literature | × | × | 不变 |\n| R5-15 | literature | × | × | 不变 |\n| R5-16 | literature | × | × | 不变 |\n| R5-17 | literature | × | × | 不变 |\n| R5-18 | literature | × | × | 不变 |\n| R5-19 | literature | × | × | 不变 |\n| R5-20 | literature | × | × | 不变 |\n| R5-21 | chinese | × | × | 不变 |\n| R5-22 | chinese | ✓ | × | 变差 |\n| R5-23 | chinese | ✓ | × | 变差 |\n| R5-24 | chinese | ✓ | × | 变差 |\n| R5-25 | chinese | × | × | 不变 |\n| R5-26 | ocr | × | × | 不变 |\n| R5-27 | ocr | × | × | 不变 |\n| R5-28 | ocr | ✓ | × | 变差 |\n| R5-29 | ocr | ✓ | ✓ | 不变 |\n| R5-30 | ocr | × | × | 不变 |\n\n分组：Book 2/10、Literature 1/10、中文 0/5、OCR 1/5，合计 4/30；相对原0069 的 5/30 为 3 变好、4 变差、23 不变。原始 `raw_output` 标记计数：仍有「未翻译」0/30；内部 60 秒上限 25/30；明确台式机来源未跑完 11/30。后二者可能重叠，不应相加。与 R4（SHA 前缀，0069 上 8/12）相比，R5 重跑为 4/30，数值更低；但 R4 与 R5 是不同题库、不同来源组合，不存在逐题配对，不能说 R4 的题在 0098 变差，也没有在 0098 重跑 R4。R4 的 8/12 仅作历史参照，不作同条件的退步幅度。四道 R5 变差题都在这份逐题表内，其内部提示及归因限制见上一段。"
+  },
+  {
+   "id": "res-0027",
+   "ts": "2026-10-16 20:50",
+   "title": "0069 round3 盲测",
+   "label": "结果",
+   "text": "# 0069 round3 盲测\n\n题库 SHA-256 `d80069db26f2bc53914f58d73556ef283d216ffd513a71ea3aac5c1bf10bd83b`。冻结题正式调用各一次；按同作品、前五条、PDF 物理页 ±1 判定；没有改题或重跑。\n\n| 分组 | 题数 | 命中作品 | 命中作品且页 |\n| --- | ---: | ---: | ---: |\n| zh | 10 | 10 | 9 |\n| zh2en | 10 | 9 | 8 |\n| book | 7 | 6 | 6 |\n| book_ocr | 3 | 2 | 1 |\n| ALL | 30 | 27 | 24 |\n\n相对 0062：{'不变': 30}；前轮到页 24/30。逐题见 comparison.jsonl。\n\n自动翻译失败并回退中文原文：0/30；服务内部 60 秒截止（部分来源没完成）：3，题号 R3-26, R3-28, R3-29。成功退出码不等于所有索引路线都完成。原始逐题输出及片段均保存在本目录 results.jsonl，只供实验室内部核查，不向平台发题目或答案。\n\n此批部分题遭遇服务内部 60 秒限制，记录为当次服务可见的前五结果，不私下重试或挪出分母。\n\n结论：本次数字是按冻结题的一次现场结果；任何受翻译回退或内部截止混杂的组别不应用来断言索引本体质量。"
+  },
+  {
+   "id": "res-0028",
+   "ts": "2026-10-16 20:50",
+   "title": "0069 round4 盲测",
+   "label": "结果",
+   "text": "# 0069 round4 盲测\n\n题库 SHA-256 `9259a4092267a0bd8cfa23c40252f9e6f36c64bee05e8e32055c4ddf0b987c46`。冻结题正式调用各一次；按同作品、前五条、PDF 物理页 ±1 判定；没有改题或重跑。\n\n| 分组 | 题数 | 命中作品 | 命中作品且页 |\n| --- | ---: | ---: | ---: |\n| book | 8 | 5 | 4 |\n| book_ocr | 4 | 4 | 4 |\n| ALL | 12 | 9 | 8 |\n\n相对 0062：{'不变': 12}；前轮到页 8/12。逐题见 comparison.jsonl。\n\n自动翻译失败并回退中文原文：0/12；服务内部 60 秒截止（部分来源没完成）：3，题号 R4-07, R4-10, R4-12。成功退出码不等于所有索引路线都完成。原始逐题输出及片段均保存在本目录 results.jsonl，只供实验室内部核查，不向平台发题目或答案。\n\n此批部分题遭遇服务内部 60 秒限制，记录为当次服务可见的前五结果，不私下重试或挪出分母。\n\n结论：本次数字是按冻结题的一次现场结果；任何受翻译回退或内部截止混杂的组别不应用来断言索引本体质量。"
+  },
+  {
+   "id": "res-0029",
+   "ts": "2026-10-16 20:50",
+   "title": "0069 round5 盲测",
+   "label": "结果",
+   "text": "# 0069 round5 盲测\n\n题库 SHA-256 `8e08ae4bd5ba725e6dd2d2df80032e9ff35880cf8a88a4ab601e6a29ef1f1b07`。冻结题正式调用各一次；按同作品、前五条、PDF 物理页 ±1 判定；没有改题或重跑。\n\n| 分组 | 题数 | 命中作品 | 命中作品且页 |\n| --- | ---: | ---: | ---: |\n| book | 10 | 0 | 0 |\n| literature | 10 | 0 | 0 |\n| chinese | 5 | 5 | 3 |\n| ocr | 5 | 3 | 2 |\n| ALL | 30 | 8 | 5 |\n\n首次测试，无前轮逐题变化；逐题判定见 comparison.jsonl。\n\n自动翻译失败并回退中文原文：30/30；服务内部 60 秒截止（部分来源没完成）：0，题号 无。成功退出码不等于所有索引路线都完成。原始逐题输出及片段均保存在本目录 results.jsonl，只供实验室内部核查，不向平台发题目或答案。\n\n同作品已召回的 8 题中，结果标“只在台式机能打开”且有 I:\\ 路径 7/8；带“题目候选”标题 4/8（标题非正式书目，不得计为正式题名）；OCR 同作品召回 3 题中带“引用前核原页”提示 3/3。未召回时不能把前五条其他作品的来源/标题提示计为本题成功。\n\n本批 30/30 中文查询均提示翻译未完成而回退中文原文。Book 与 Literature 两组各 0/10 到页尤其受跨语检索失效混杂；保留正式一次跑分，不替换成翻译后成绩。R5-30 问句对椭圆孔方位/载荷限定不足，单列为未命中而不事后改题。OCR 五题原图由 Lead 在 核验。\n\n结论：本次数字是按冻结题的一次现场结果；任何受翻译回退或内部截止混杂的组别不应用来断言索引本体质量。"
+  },
+  {
+   "id": "res-0030",
+   "ts": "2026-10-16 20:54",
+   "title": "0069 round3 严格复核",
+   "label": "结果",
+   "text": "# 0069 round3 严格复核\n\n冻结 SHA-256: `d80069db26f2bc53914f58d73556ef283d216ffd513a71ea3aac5c1bf10bd83b`；一次正式调用，无补跑。只按前五条，同作品及 PDF 物理页 ±1；跨库同作品沿用 round3/4 的既有映射，round5 仅认冻结题的路径与别名，不以主题或文件名猜同作品。\n\n| 组 | N | 作品 | 到页 | 翻译回退 | 内部截止 |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| zh | 10 | 10 | 9 | 0 | 0 |\n| zh2en | 10 | 9 | 8 | 0 | 0 |\n| book | 7 | 6 | 6 | 0 | 1 |\n| book_ocr | 3 | 2 | 1 | 0 | 2 |\n| ALL | 30 | 27 | 24 | 0 | 3 |\n\n与 0062 的逐题到页变化：变好 0、变差 0、不变 30。\n\n服务内部 60 秒截止题的台式机/书籍路线可能没跑完；保留正式成绩，不私自重试。\n\n题目、答案和原始逐题片段只留在实验室，不交平台；平台可收到上述聚合与故障类型。"
+  },
+  {
+   "id": "res-0031",
+   "ts": "2026-10-16 20:54",
+   "title": "0069 round4 严格复核",
+   "label": "结果",
+   "text": "# 0069 round4 严格复核\n\n冻结 SHA-256: `9259a4092267a0bd8cfa23c40252f9e6f36c64bee05e8e32055c4ddf0b987c46`；一次正式调用，无补跑。只按前五条，同作品及 PDF 物理页 ±1；跨库同作品沿用 round3/4 的既有映射，round5 仅认冻结题的路径与别名，不以主题或文件名猜同作品。\n\n| 组 | N | 作品 | 到页 | 翻译回退 | 内部截止 |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| book | 8 | 5 | 4 | 0 | 1 |\n| book_ocr | 4 | 4 | 4 | 0 | 2 |\n| ALL | 12 | 9 | 8 | 0 | 3 |\n\n与 0062 的逐题到页变化：变好 0、变差 0、不变 12。\n\n服务内部 60 秒截止题的台式机/书籍路线可能没跑完；保留正式成绩，不私自重试。\n\n题目、答案和原始逐题片段只留在实验室，不交平台；平台可收到上述聚合与故障类型。"
+  },
+  {
+   "id": "res-0032",
+   "ts": "2026-10-16 20:54",
+   "title": "0069 round5 严格复核",
+   "label": "结果",
+   "text": "# 0069 round5 严格复核\n\n冻结 SHA-256: `8e08ae4bd5ba725e6dd2d2df80032e9ff35880cf8a88a4ab601e6a29ef1f1b07`；一次正式调用，无补跑。只按前五条，同作品及 PDF 物理页 ±1；跨库同作品沿用 round3/4 的既有映射，round5 仅认冻结题的路径与别名，不以主题或文件名猜同作品。\n\n| 组 | N | 作品 | 到页 | 翻译回退 | 内部截止 |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| book | 10 | 0 | 0 | 10 | 0 |\n| literature | 10 | 0 | 0 | 10 | 0 |\n| chinese | 5 | 5 | 3 | 5 | 0 |\n| ocr | 5 | 3 | 2 | 5 | 0 |\n| ALL | 30 | 8 | 5 | 30 | 0 |\n\n首次轮次，没有前轮可比。\n\n正确作品召回 8 题，其中台式机来源及 I: 路径标示 8/8；“题目候选” 4/8，PDF Info 十六进制乱码题名 3/8。其余未据原书目核对，不自动算正式题名。OCR 正确作品召回 3 题，引用前核原页提示 3/3。\n30/30 中文问题均提示翻译失败并回退中文原文；英文来源两组 0/10 为此批调用的混杂结果，不能推断索引本身质量。R5-30 问句欠限定且错页，照原判不事后改题。\n原始结果的 R5-13 曾把 Zotero 另一本《Dynamics of Atmospheric Boundary Layer》误标同作品；原答案是台式机 JWEIA 的 90.pdf，严格路径裁决为未命中。故应采用此处的 adjudicated_strict.jsonl、group_metrics_strict.csv，不采用先前的 scored.jsonl 或 group_metrics.csv 作品命中数。\n\n题目、答案和原始逐题片段只留在实验室，不交平台；平台可收到上述聚合与故障类型。"
+  },
+  {
+   "id": "res-0033",
+   "ts": "2026-10-16 21:34",
+   "title": "Round 5 翻译故障后复跑（0069；严格裁决）",
+   "label": "结果",
+   "text": "# Round 5 翻译故障后复跑（0069；严格裁决）\n\n冻结题库，SHA-256 `8e08ae4bd5ba725e6dd2d2df80032e9ff35880cf8a88a4ab601e6a29ef1f1b07`，30 题不变。10-16 晚间美东，各题正式调用，首跑另存，未删除。仅用冻结路径/文件 SHA 前缀及输出显式的“同一作品另有”别名判同作品，PDF 物理页 ±1 判到页；不靠标题相似或摘录内容事后扩张命中。\n\n| 分组 | N | 首跑作品/到页 | 本轮作品/到页 | 翻译成功 |\n| --- | ---: | ---: | ---: | ---: |\n| Book 有文字层 | 10 | 0/0 | 5/4 | 10 |\n| Literature | 10 | 0/0 | 4/4 | 10 |\n| 中文文献 | 5 | 5/3 | 2/1 | 5 |\n| OCR 扫描页 | 5 | 3/2 | 4/2 | 5 |\n| 合计 | 30 | 8/5 | 15/11 | 30 |\n\n逐题到页相对首跑：8 变好、2 变差（R5-23、R5-24）、20 不变。首跑 30/30 翻译回退，被平台认定为翻译通道故障，故这个增减只是故障首跑与恢复复跑的描述，不是同条件算法改进幅度。R5-03 与 R5-05 的命中依据为输出中显式列出的目标 DSK 别名，不是文件名猜测；R5-03 作品命中但返回另一副本物理页 250，与题库 50 不符，未计到页。R5-25、R5-27、R5-30 也命中作品但页错。R5-30 原题干欠限定，保持冻结标准与未命中裁决，不事后改题。\n\n展示检查仅对前五条命中正确作品的 15 题统计：15/15 标“只在台式机能打开”并给 I:\\\\ 路径；12/15 仍为“题目候选”，1/15 是十六进制乱码标题，余 2 条仅未见这两种缺陷，未独立核为正式题名。OCR 组正确作品召回 4 题，4/4 带“引用前核原页”提示；OCR 组到页 2/5。OCR 五题原页由 Lead 目视确认，见。\n\n 是逐题命中与展示裁决； 是分组表； 是与首跑逐题对照。题目、答案与原始输出只留实验室，不向平台传送；0 CU。检索命中页仍需打开原 PDF 核实数字和引文。"
+  }
+ ],
+ "figures": [
+  {
+   "id": "fig-0000",
+   "ts": "2026-10-13 20:23",
+   "title": "WZN3ETI3 physical p4",
+   "url": "../../img/0b3d8260247b.png"
+  },
+  {
+   "id": "fig-0001",
+   "ts": "2026-10-13 20:23",
+   "title": "UT8ZUPS5 physical p6",
+   "url": "../../img/1d6105eb413b.png"
+  },
+  {
+   "id": "fig-0002",
+   "ts": "2026-10-13 20:23",
+   "title": "R5RKQGYZ physical p9",
+   "url": "../../img/38085b41c46b.png"
+  },
+  {
+   "id": "fig-0003",
+   "ts": "2026-10-13 20:23",
+   "title": "NXSSET4J physical p14",
+   "url": "../../img/98e1737dadf8.png"
+  },
+  {
+   "id": "fig-0004",
+   "ts": "2026-10-13 20:23",
+   "title": "GBK98YNH physical p8",
+   "url": "../../img/01cec370dbb8.png"
+  },
+  {
+   "id": "fig-0005",
+   "ts": "2026-10-13 20:23",
+   "title": "8IC5IFK5 physical p7",
+   "url": "../../img/b6f695bab4dc.png"
+  },
+  {
+   "id": "fig-0006",
+   "ts": "2026-10-13 20:23",
+   "title": "6X6ZP3YD physical p6",
+   "url": "../../img/d4d087c43d16.png"
+  },
+  {
+   "id": "fig-0007",
+   "ts": "2026-10-13 20:23",
+   "title": "36XAQH9L physical p11",
+   "url": "../../img/78b67c10cf56.png"
+  },
+  {
+   "id": "fig-0008",
+   "ts": "2026-10-13 20:26",
+   "title": "WZN3ETI3 actual figure p4",
+   "url": "../../img/4c41e94bee93.png"
+  },
+  {
+   "id": "fig-0009",
+   "ts": "2026-10-13 20:26",
+   "title": "UT8ZUPS5 actual figure p7",
+   "url": "../../img/a37bb7b278e2.png"
+  },
+  {
+   "id": "fig-0010",
+   "ts": "2026-10-13 20:26",
+   "title": "R5RKQGYZ actual figure p9",
+   "url": "../../img/2c10b272a379.png"
+  },
+  {
+   "id": "fig-0011",
+   "ts": "2026-10-13 20:26",
+   "title": "NXSSET4J actual figure p12",
+   "url": "../../img/93d203a1cd49.png"
+  },
+  {
+   "id": "fig-0012",
+   "ts": "2026-10-13 20:26",
+   "title": "GBK98YNH actual figure p5",
+   "url": "../../img/ec34632fcc6f.png"
+  },
+  {
+   "id": "fig-0013",
+   "ts": "2026-10-13 20:26",
+   "title": "8IC5IFK5 actual figure p7",
+   "url": "../../img/c33669a04f07.png"
+  },
+  {
+   "id": "fig-0014",
+   "ts": "2026-10-13 20:26",
+   "title": "6X6ZP3YD actual figure p8",
+   "url": "../../img/9fbc5ead2bc2.png"
+  },
+  {
+   "id": "fig-0015",
+   "ts": "2026-10-13 20:26",
+   "title": "36XAQH9L actual figure p14",
+   "url": "../../img/ac0faba73eb2.png"
+  }
+ ],
+ "code": [
+  {
+   "name": "adjudicate.py",
+   "group": "blind_round3",
+   "url": "../../code/blind_round3/adjudicate.py"
+  },
+  {
+   "name": "build_questions.py",
+   "group": "blind_round3",
+   "url": "../../code/blind_round3/build_questions.py"
+  },
+  {
+   "name": "check_sources.py",
+   "group": "blind_round3",
+   "url": "../../code/blind_round3/check_sources.py"
+  },
+  {
+   "name": "discover.py",
+   "group": "blind_round3",
+   "url": "../../code/blind_round3/discover.py"
+  },
+  {
+   "name": "run_benchmark.py",
+   "group": "blind_round3",
+   "url": "../../code/blind_round3/run_benchmark.py"
+  },
+  {
+   "name": "adjudicate.py",
+   "group": "blind_round3_p3",
+   "url": "../../code/blind_round3_p3/adjudicate.py"
+  },
+  {
+   "name": "run_benchmark.py",
+   "group": "blind_round3_p3",
+   "url": "../../code/blind_round3_p3/run_benchmark.py"
+  },
+  {
+   "name": "adjudicate.py",
+   "group": "blind_round3_p4",
+   "url": "../../code/blind_round3_p4/adjudicate.py"
+  },
+  {
+   "name": "run_benchmark.py",
+   "group": "blind_round3_p4",
+   "url": "../../code/blind_round3_p4/run_benchmark.py"
+  },
+  {
+   "name": "build_and_check.py",
+   "group": "blind_round4",
+   "url": "../../code/blind_round4/build_and_check.py"
+  },
+  {
+   "name": "run_benchmark.py",
+   "group": "blind_round4",
+   "url": "../../code/blind_round4/run_benchmark.py"
+  },
+  {
+   "name": "build_questions.py",
+   "group": "blind_round5",
+   "url": "../../code/blind_round5/build_questions.py"
+  },
+  {
+   "name": "adjudicate_0069.py",
+   "group": "results",
+   "url": "../../code/results/adjudicate_0069.py"
+  },
+  {
+   "name": "aggregate_0069.py",
+   "group": "results",
+   "url": "../../code/results/aggregate_0069.py"
+  },
+  {
+   "name": "analyze.py",
+   "group": "results",
+   "url": "../../code/results/analyze.py"
+  },
+  {
+   "name": "run_benchmark.py",
+   "group": "results",
+   "url": "../../code/results/run_benchmark.py"
+  },
+  {
+   "name": "run.py",
+   "group": "results_rerun",
+   "url": "../../code/results_rerun/run.py"
+  },
+  {
+   "name": "score.py",
+   "group": "results_rerun",
+   "url": "../../code/results_rerun/score.py"
+  },
+  {
+   "name": "score_rerun.py",
+   "group": "results_rerun_0098",
+   "url": "../../code/results_rerun_0098/score_rerun.py"
+  },
+  {
+   "name": "dual_examples.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/dual_examples.py"
+  },
+  {
+   "name": "export_packed_manifest.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/export_packed_manifest.py"
+  },
+  {
+   "name": "finalize_stage2.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/finalize_stage2.py"
+  },
+  {
+   "name": "hash_candidates.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/hash_candidates.py"
+  },
+  {
+   "name": "inspect_djvu.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/inspect_djvu.py"
+  },
+  {
+   "name": "inspect_remote.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/inspect_remote.py"
+  },
+  {
+   "name": "make_report.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/make_report.py"
+  },
+  {
+   "name": "audit_round3_check.py",
+   "group": "metadata",
+   "url": "../../code/metadata/audit_round3_check.py"
+  },
+  {
+   "name": "build_metadata.py",
+   "group": "metadata",
+   "url": "../../code/metadata/build_metadata.py"
+  },
+  {
+   "name": "build_round3.py",
+   "group": "metadata",
+   "url": "../../code/metadata/build_round3.py"
+  },
+  {
+   "name": "export_pdf_meta.py",
+   "group": "metadata",
+   "url": "../../code/metadata/export_pdf_meta.py"
+  },
+  {
+   "name": "finalize_v2.py",
+   "group": "metadata",
+   "url": "../../code/metadata/finalize_v2.py"
+  },
+  {
+   "name": "verify_crossref_round2.py",
+   "group": "metadata",
+   "url": "../../code/metadata/verify_crossref_round2.py"
+  },
+  {
+   "name": "ocr_completion_monitor.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/ocr_completion_monitor.py"
+  },
+  {
+   "name": "prepare_candidates.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/prepare_candidates.py"
+  },
+  {
+   "name": "prepare_inspection.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/prepare_inspection.py"
+  },
+  {
+   "name": "repair_stage1_pages.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/repair_stage1_pages.py"
+  },
+  {
+   "name": "run_hashes.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/run_hashes.py"
+  },
+  {
+   "name": "run_inspection.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/run_inspection.py"
+  },
+  {
+   "name": "scan_metadata.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/scan_metadata.py"
+  },
+  {
+   "name": "stage1_extract.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/stage1_extract.py"
+  },
+  {
+   "name": "stage2_pipeline.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/stage2_pipeline.py"
+  },
+  {
+   "name": "stage3_ocr_desktop_runner.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/stage3_ocr_desktop_runner.py"
+  },
+  {
+   "name": "stage3_repair_runner.py",
+   "group": "desktop_inventory",
+   "url": "../../code/desktop_inventory/stage3_repair_runner.py"
+  },
+  {
+   "name": "analyze_queue.py",
+   "group": "merge_review_0069",
+   "url": "../../code/merge_review_0069/analyze_queue.py"
+  },
+  {
+   "name": "make_decisions.py",
+   "group": "merge_review_0069",
+   "url": "../../code/merge_review_0069/make_decisions.py"
+  },
+  {
+   "name": "rerun_0062_runner.py",
+   "group": "fulltext_kb",
+   "url": "../../code/fulltext_kb/rerun_0062_runner.py"
+  },
+  {
+   "name": "adjudicate_round2.py",
+   "group": "scripts",
+   "url": "../../code/scripts/adjudicate_round2.py"
+  },
+  {
+   "name": "audit_profiles.py",
+   "group": "scripts",
+   "url": "../../code/scripts/audit_profiles.py"
+  },
+  {
+   "name": "bilingual.py",
+   "group": "scripts",
+   "url": "../../code/scripts/bilingual.py"
+  },
+  {
+   "name": "evaluate.py",
+   "group": "scripts",
+   "url": "../../code/scripts/evaluate.py"
+  },
+  {
+   "name": "evaluate_extended.py",
+   "group": "scripts",
+   "url": "../../code/scripts/evaluate_extended.py"
+  },
+  {
+   "name": "evaluate_round2.py",
+   "group": "scripts",
+   "url": "../../code/scripts/evaluate_round2.py"
+  },
+  {
+   "name": "extend_corpus.py",
+   "group": "scripts",
+   "url": "../../code/scripts/extend_corpus.py"
+  },
+  {
+   "name": "ftkb.py",
+   "group": "scripts",
+   "url": "../../code/scripts/ftkb.py"
+  },
+  {
+   "name": "ftkb_round2.py",
+   "group": "scripts",
+   "url": "../../code/scripts/ftkb_round2.py"
+  },
+  {
+   "name": "fullpaper_sweep.py",
+   "group": "scripts",
+   "url": "../../code/scripts/fullpaper_sweep.py"
+  },
+  {
+   "name": "hybrid_lite.py",
+   "group": "scripts",
+   "url": "../../code/scripts/hybrid_lite.py"
+  },
+  {
+   "name": "inventory_report.py",
+   "group": "scripts",
+   "url": "../../code/scripts/inventory_report.py"
+  },
+  {
+   "name": "make_questions.py",
+   "group": "scripts",
+   "url": "../../code/scripts/make_questions.py"
+  },
+  {
+   "name": "no_text_count.py",
+   "group": "scripts",
+   "url": "../../code/scripts/no_text_count.py"
+  },
+  {
+   "name": "parse_profiles.py",
+   "group": "scripts",
+   "url": "../../code/scripts/parse_profiles.py"
+  },
+  {
+   "name": "round2_questions.py",
+   "group": "scripts",
+   "url": "../../code/scripts/round2_questions.py"
+  },
+  {
+   "name": "select_profiles.py",
+   "group": "scripts",
+   "url": "../../code/scripts/select_profiles.py"
+  },
+  {
+   "name": "select_profiles_v2.py",
+   "group": "scripts",
+   "url": "../../code/scripts/select_profiles_v2.py"
+  },
+  {
+   "name": "semantic_triage_round2.py",
+   "group": "scripts",
+   "url": "../../code/scripts/semantic_triage_round2.py"
+  },
+  {
+   "name": "translate_questions.py",
+   "group": "scripts",
+   "url": "../../code/scripts/translate_questions.py"
+  },
+  {
+   "name": "vector.py",
+   "group": "scripts",
+   "url": "../../code/scripts/vector.py"
+  }
+ ],
+ "files": {
+  "self": "fulltext-kb-data-extraction.json",
+  "claims": null,
+  "pdf": {
+   "zh": "../../pdf/fulltext-kb-data-extraction.zh.pdf",
+   "en": "../../pdf/fulltext-kb-data-extraction.en.pdf"
+  }
+ },
+ "note": "Public repository copy: the conversation timeline is omitted (as in this repository README); decisions, review verdicts, results, figures and code lists are kept."
+}

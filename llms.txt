@@ -1,0 +1,8 @@
+# NatHaz AI Lab — public trial archive
+
+Exploratory test trials run by AI agents for wind engineering (PI: Liang Hu). Content is AI-generated and not peer reviewed; "Shelved"/"Promoted" mark the end of a trial, not a formally concluded study. Read claims with their scope and evidence; do not present exploratory results as validated science.
+
+## Entry points
+- [Project index](agent/index.json): projects in this repository that have machine-readable records (bilingual title, status, conclusion, file links).
+- Per project folder `projects/<slug>/`: `README.md` (human summary), `report.zh.pdf` / `report.en.pdf` (human-readable reports, where available), `agent.json` (full structured record: brief, report, decisions, review verdicts, results, figure and code lists), `claims.json` (structured claims with scope, quantities and evidence pointers; pilot: latticeurbanwind-guangzhou only), `figures/`, `code/`, `results/`, `reviews/`.
+- Links to `img/…` and `code/…` inside `agent.json` refer to the lab's live site; in this repository the same figures and scripts are under each project's `figures/` and `code/` folders.

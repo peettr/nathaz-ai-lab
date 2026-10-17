@@ -1,0 +1,425 @@
+{
+  "schema_version": "0.2",
+  "project_id": "84cfbb7e",
+  "claims": [
+    {
+      "id": "claim-01",
+      "statement": {
+        "zh": "公开仓库 HEAD dd438c1 可在 Colab A100 上运行，但它不是论文所称的 LUW-v2.8，且缺少补充材料 S5 所述浸入边界实现；不能据此宣称复现论文代码。",
+        "en": "The public HEAD dd438c1 runs on a Colab A100, but it is not the paper's LUW-v2.8 and lacks the immersed-boundary implementation described in supplement S5; it cannot establish reproduction of the paper's code."
+      },
+      "scope": "公开代码 HEAD dd438c1；Colab A100；论文 Han 2026 LUW-v2.8；S5 浸入边界；非论文同版验证",
+      "quantity": null,
+      "evidence": [
+        {
+          "id": "dec-0007",
+          "excerpt": "公开代码 HEAD dd438c1（不等于论文所称 LUW-v2.8，且缺论文 S5 的浸入边界）"
+        }
+      ],
+      "status": "supported",
+      "review": "六份有效审查后的裁决要求删去“复现”措辞，仅允许有条件的数值相当表述。",
+      "superseded_by": null,
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-02",
+      "statement": {
+        "zh": "第五轮西风 1 m 网格、约 500 m 水平域、改造后 80 测点的 MAE 为 0.1425，与论文 0.143 数值相当；但模拟均值比风洞低约 19%，不等于复现成功。",
+        "en": "For the fifth west-wind run at 1 m resolution in an approximately 500 m horizontal domain, the 80-point post-modification MAE was 0.1425, numerically close to the paper's 0.143; the simulated mean remained about 19% below the wind tunnel, so this is not a successful reproduction claim."
+      },
+      "scope": "AIJ Case E；西风；改造后；80 点、2 m 测高；1 m 网格；公开 HEAD dd438c1；迎风平地 49 m；15.9 m 归一；(+1,+1,0) m 配准；第五轮矢量模口径",
+      "quantity": {
+        "name": "80-point MAE, fifth run",
+        "value": 0.1425,
+        "unit": "dimensionless wind-speed ratio",
+        "compare_to": {
+          "name": "paper MAE",
+          "value": 0.143,
+          "unit": "dimensionless wind-speed ratio"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "dec-0007",
+          "excerpt": "80 点改造后西风 MAE 0.1425，与论文 0.143 数值相当。"
+        },
+        {
+          "id": "dec-0007",
+          "excerpt": "模拟均值/风洞均值 0.81（第五轮）、0.70（第六轮）"
+        }
+      ],
+      "status": "supported",
+      "review": "六人审查裁决：仅数值相当，必须同时报告均值偏低；MAE 接近不代表误差结构相同。",
+      "superseded_by": null,
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-03",
+      "statement": {
+        "zh": "第七轮同一平均场用平均矢量模比较改造后西风 80 点时，MAE 为 0.144、模拟与风洞均值比为 0.81；此口径随后由标量风速近似比较补充。",
+        "en": "For the same mean field in run seven, comparison by mean-vector magnitude at 80 post-modification west-wind points yielded MAE 0.144 and a simulated-to-tunnel mean ratio of 0.81; the scalar-speed approximation subsequently supplemented this comparison."
+      },
+      "scope": "AIJ Case E；西风；改造后；2 m 测高、80 点；500 m 域、1 m 网格；公开 HEAD dd438c1；第七轮同一平均场；15.9 m 归一；(+1,+1,0) m 配准；矢量模",
+      "quantity": {
+        "name": "vector-magnitude MAE, run seven",
+        "value": 0.144,
+        "unit": "dimensionless wind-speed ratio",
+        "compare_to": {
+          "name": "scalar-approximation MAE on same field",
+          "value": 0.111,
+          "unit": "dimensionless wind-speed ratio"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "dec-0009",
+          "excerpt": "按 AIJ 官方近似 S_exp=√(S_CFD²+2k)，80 点 MAE 0.144→0.111"
+        }
+      ],
+      "status": "supported",
+      "review": "第七轮决定记录说明两值来自同场不同风速定义；后者补充而非否定前者。",
+      "superseded_by": "claim-04",
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-04",
+      "statement": {
+        "zh": "第七轮同一平均场改用 AIJ 标量风速近似后，改造后西风 80 点 MAE 从矢量模口径的 0.144 降至 0.111，模拟与风洞均值比约从 0.81 提高至 0.94；两种口径不可混称论文复现。",
+        "en": "Using the AIJ scalar-speed approximation on the same run-seven mean field lowered the post-modification west-wind 80-point MAE from 0.144 (vector magnitude) to 0.111 and raised the simulated-to-tunnel mean ratio from about 0.81 to 0.94; these definitions do not establish reproduction of the paper."
+      },
+      "scope": "AIJ Case E；西风；改造后；2 m 测高、80 点；500 m 域、1 m 网格；公开 HEAD dd438c1；第七轮同场；15.9 m 归一；(+1,+1,0) m 配准；S_exp=√(S_CFD²+2k)，k 仅可解析尺度",
+      "quantity": {
+        "name": "scalar-approximation MAE, run seven",
+        "value": 0.111,
+        "unit": "dimensionless wind-speed ratio",
+        "compare_to": {
+          "name": "vector-magnitude MAE on same field",
+          "value": 0.144,
+          "unit": "dimensionless wind-speed ratio"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "dec-0009",
+          "excerpt": "80 点 MAE 0.144→0.111，模拟/风洞均值比 0.81→0.94，r 0.82"
+        },
+        {
+          "id": "dec-0010",
+          "excerpt": "0.111 与论文 0.143 不是同一口径（论文未写用哪种量）"
+        }
+      ],
+      "status": "supported",
+      "review": "第七轮 Lead 复算四组指标；决策明确不称复现，且不能据异口径数字宣称优于论文。",
+      "superseded_by": null,
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-05",
+      "statement": {
+        "zh": "第七轮标量风速修正后，13 个低速尾流点的模拟值仍仅为风洞的约 39%；其中四个点的插值角触及固体，不能把全部偏差简单归因于取样。",
+        "en": "After the run-seven scalar-speed correction, simulated speeds at 13 low-speed wake points remained about 39% of wind-tunnel values; interpolation corners touch solids at four of them, but sampling alone cannot explain the entire discrepancy."
+      },
+      "scope": "AIJ Case E；西风；改造后；2 m 高度、80 点中的 13 个低速尾流点；500 m 域、1 m 网格；公开 HEAD dd438c1；第七轮标量近似；四点插值触固体",
+      "quantity": {
+        "name": "mean simulated/tunnel speed in 13 low-speed points",
+        "value": 39,
+        "unit": "%",
+        "compare_to": {
+          "name": "wind-tunnel speed",
+          "value": 100,
+          "unit": "%"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "dec-0010",
+          "excerpt": "标量口径下仍只有风洞的 39%（其中 4 点插值角碰到固体）"
+        },
+        {
+          "id": "dec-0015",
+          "excerpt": "贴墙 4 点改善（0.345→0.294），开阔街道 4 点过冲"
+        }
+      ],
+      "status": "supported",
+      "review": "第七轮结论与后续壁律诊断均保留局部残差；具体机制尚未定论。",
+      "superseded_by": null,
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-06",
+      "statement": {
+        "zh": "第六轮迎风平地观测显示，2 m 风速仅为输入的 33%–53%，而 15.9 m 为 99%–104%；地面反弹或粗糙度是否为原因未经单因素验证。",
+        "en": "On the sixth-run upwind flat terrain, speed at 2 m was 33–53% of inlet while speed at 15.9 m was 99–104%; whether ground bounce-back or roughness causes this has not been isolated experimentally."
+      },
+      "scope": "AIJ Case E；西风；改造后；公开 HEAD dd438c1；1 m 网格；第六轮约 509 m 迎风平地、离建筑至少 100 m；2 m 与 15.9 m 高度；平均时段亦变化，非单因素归因",
+      "quantity": {
+        "name": "upwind 2 m speed / inlet",
+        "value": {
+          "min": 33,
+          "max": 53
+        },
+        "unit": "%",
+        "compare_to": {
+          "name": "15.9 m speed / inlet",
+          "value": {
+            "min": 99,
+            "max": 104
+          },
+          "unit": "%"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "dec-0007",
+          "excerpt": "2 m 风速为输入的 33–53%，15.9 m 为 99–104%"
+        },
+        {
+          "id": "dec-0007",
+          "excerpt": "是推测机制，未做对照，不写成原因。"
+        }
+      ],
+      "status": "supported",
+      "review": "六人审查裁决将近地衰减限于本批观测，禁止将未经对照的壁面机制写成确定原因。",
+      "superseded_by": null,
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-07",
+      "statement": {
+        "zh": "AIJ Case A 的 2 m 网格、官方 4 m/40 m 测面试验中，平均风速 FAC2 分别为 0.95 和 0.83，而湍动能 FAC2 分别为 0.35 和 0.66；平均量与湍动能表现不同。",
+        "en": "In the AIJ Case A run on a 2 m grid at the official 4 m and 40 m planes, mean-speed FAC2 was 0.95 and 0.83 respectively, while turbulent-kinetic-energy FAC2 was 0.35 and 0.66; mean speed and turbulence performed differently."
+      },
+      "scope": "AIJ Case A；官方 4 m、40 m 测面；2 m 网格；公开 HEAD dd438c1；第八轮默认 5% 均匀合成入流湍流；西风（angle=270）",
+      "quantity": {
+        "name": "TKE FAC2 at 4 m and 40 m",
+        "value": [
+          0.35,
+          0.66
+        ],
+        "unit": "fraction",
+        "compare_to": {
+          "name": "mean-speed FAC2 at 4 m and 40 m",
+          "value": [
+            0.95,
+            0.83
+          ],
+          "unit": "fraction"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "res-0021",
+          "excerpt": "| z/B=.125，4m (60点；TKE 26点)"
+        },
+        {
+          "id": "res-0021",
+          "excerpt": ".950 / .817 / .814 / .180 / .346 / .240"
+        },
+        {
+          "id": "res-0021",
+          "excerpt": ".833 / .917 / .945 / .122 / .655 / −.014"
+        }
+      ],
+      "status": "reported",
+      "review": null,
+      "superseded_by": "claim-08",
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-08",
+      "statement": {
+        "zh": "AIJ Case A 将入流湍流改为屋顶等效 TI 0.147 并只从迎风面注入后，湍动能 FAC2 在三个测面达到 0.69/0.93/0.97；振幅和注入面同时更改，不能拆分其贡献。",
+        "en": "For AIJ Case A, changing the inflow to roof-equivalent TI 0.147 and injecting only at the upwind face raised turbulent-kinetic-energy FAC2 to 0.69/0.93/0.97 across three measurement planes; intensity and injection face changed together, so their effects cannot be separated."
+      },
+      "scope": "AIJ Case A；官方 4 m、40 m 与竖剖面；2 m 网格；公开 HEAD dd438c1；第九轮，屋顶等效 TI 0.147，仅迎风面注入；西风（angle=270）",
+      "quantity": {
+        "name": "TKE FAC2 after inlet change, three planes",
+        "value": [
+          0.69,
+          0.93,
+          0.97
+        ],
+        "unit": "fraction",
+        "compare_to": {
+          "name": "TKE FAC2 before inlet change",
+          "value": [
+            0.35,
+            0.66,
+            0.77
+          ],
+          "unit": "fraction"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "res-0024",
+          "excerpt": ".692/.371"
+        },
+        {
+          "id": "res-0024",
+          "excerpt": ".931/.447"
+        },
+        {
+          "id": "res-0024",
+          "excerpt": ".967/.356"
+        },
+        {
+          "id": "res-0024",
+          "excerpt": "同时改变 TI 和入流面的单次结果"
+        }
+      ],
+      "status": "reported",
+      "review": null,
+      "superseded_by": null,
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-09",
+      "statement": {
+        "zh": "AIJ Case E 第十轮四项配置变化后，80 点标量近似 MAE 在 0.115–0.119，未低于第七轮 0.111；入流湍流虽缓解局部低速点，整体误差未明显缩小。",
+        "en": "After four configuration variations in AIJ Case E run ten, the 80-point scalar-approximation MAE ranged from 0.115 to 0.119, not below run seven's 0.111; altered inlet turbulence helped some low-speed points without clearly reducing the overall error."
+      },
+      "scope": "AIJ Case E；西风；改造后、2 m 高度、80 点；1 m 网格；公开 HEAD dd438c1；第十轮四项：入流湍流、全局质量通量修正、域高 300 m、平均时段加倍；标量近似",
+      "quantity": {
+        "name": "scalar-approximation MAE under four settings",
+        "value": {
+          "min": 0.115,
+          "max": 0.119
+        },
+        "unit": "dimensionless wind-speed ratio",
+        "compare_to": {
+          "name": "run-seven scalar MAE",
+          "value": 0.111,
+          "unit": "dimensionless wind-speed ratio"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "dec-0012",
+          "excerpt": "标量口径 0.115–0.119（第七轮 0.111）"
+        },
+        {
+          "id": "dec-0012",
+          "excerpt": "没有一项能明显缩小与风洞的差距"
+        }
+      ],
+      "status": "reported",
+      "review": null,
+      "superseded_by": null,
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-10",
+      "statement": {
+        "zh": "地面首层壁律原型在空场中使 2 m 风速比由无模型的 0.56–0.65 提升至 0.75–0.79，但仍未达到 0.85 的检验闸门；加入近壁阻尼仅达到 0.77–0.79。",
+        "en": "The first-layer ground-wall-law prototype raised the empty-domain 2 m speed/inlet ratio from 0.56–0.65 without the model to 0.75–0.79, still below the 0.85 gate; adding near-wall damping yielded only 0.77–0.79."
+      },
+      "scope": "空场（非 Case A/E）；R10a 入流、500×200×270 m 域、1 m 网格；公开 HEAD dd438c1 的内部改版；x=200–400 m、z=2 m；首层壁律/近壁阻尼比较",
+      "quantity": {
+        "name": "2 m speed / inlet with wall law",
+        "value": {
+          "min": 0.75,
+          "max": 0.79
+        },
+        "unit": "ratio",
+        "compare_to": {
+          "name": "without wall law",
+          "value": {
+            "min": 0.56,
+            "max": 0.65
+          },
+          "unit": "ratio"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "dec-0015",
+          "excerpt": "无模型 0.56–0.65，首层壁律 0.75–0.79"
+        },
+        {
+          "id": "dec-0015",
+          "excerpt": "加 Mason–Thomson 型近壁阻尼 0.77–0.79；闸门 0.85 未过"
+        }
+      ],
+      "status": "reported",
+      "review": null,
+      "superseded_by": "claim-11",
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-11",
+      "statement": {
+        "zh": "平衡对数律入流的后续空场检验中，首层壁律仍使 2 m 风速比入口低 20.6%，4 m 以下与 5–20 m 的偏差方向相反；因此原型没有保持目标对数廓线。",
+        "en": "In the later empty-domain test with a balanced log-law inlet, the first-layer wall law left 2 m speed 20.6% below inlet, with opposite-signed deviations below 4 m and at 5–20 m; the prototype therefore did not preserve the target logarithmic profile."
+      },
+      "scope": "空场（非 Case A/E）；κ=0.40、z0=0.024 m、U(15.9 m)=3.93 m/s 对数律入口；1 m 网格；公开 HEAD dd438c1 的内部改版；x=200–400 m；2–20 m 高度",
+      "quantity": {
+        "name": "2 m speed deficit with balanced log-law inlet",
+        "value": -20.6,
+        "unit": "% relative to inlet",
+        "compare_to": {
+          "name": "target deficit",
+          "value": 0,
+          "unit": "% relative to inlet"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "dec-0015",
+          "excerpt": "平均 0.794，低 20.6%；无模型 0.595–0.655"
+        },
+        {
+          "id": "dec-0015",
+          "excerpt": "首层壁律**没有保持住平衡廓线**"
+        }
+      ],
+      "status": "reported",
+      "review": null,
+      "superseded_by": null,
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    },
+    {
+      "id": "claim-12",
+      "statement": {
+        "zh": "地面首层壁律在 AIJ Case E 的诊断中使标量近似 MAE 从 0.116 升至 0.149、均值比从 1.06 升至 1.20；贴墙点有改善但开阔街道过冲，不能据此称壁面模型改善整体复现。",
+        "en": "In the diagnostic AIJ Case E test, the first-layer ground wall law increased scalar-approximation MAE from 0.116 to 0.149 and the mean ratio from 1.06 to 1.20; near-wall points improved but open streets overshot, so it does not support a claim of improved overall reproduction."
+      },
+      "scope": "AIJ Case E；西风；改造后；2 m 高度、80 点；1 m 网格；公开 HEAD dd438c1 的内部首层壁律改版；第十三轮城市诊断，仅诊断非正式验证；标量近似",
+      "quantity": {
+        "name": "scalar-approximation MAE with wall law",
+        "value": 0.149,
+        "unit": "dimensionless wind-speed ratio",
+        "compare_to": {
+          "name": "without wall law",
+          "value": 0.116,
+          "unit": "dimensionless wind-speed ratio"
+        },
+        "uncertainty": null
+      },
+      "evidence": [
+        {
+          "id": "dec-0015",
+          "excerpt": "标量近似 MAE 0.116→0.149、均值比 1.06→1.20"
+        },
+        {
+          "id": "dec-0015",
+          "excerpt": "贴墙 4 点改善（0.345→0.294），开阔街道 4 点过冲"
+        }
+      ],
+      "status": "reported",
+      "review": null,
+      "superseded_by": null,
+      "source": "Lead-requested AI extraction v0.2; Lead-checked 10-17 (all evidence excerpts found in cited records)"
+    }
+  ]
+}
