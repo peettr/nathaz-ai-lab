@@ -1,0 +1,60 @@
+{
+  "id": "9741f50a",
+  "slug": "9741f50a",
+  "number": "R25.1",
+  "title": {
+    "zh": "R25.1 数据与基准（TPU 等）",
+    "en": "R25.1 Data and benchmarks (TPU, etc.)"
+  },
+  "group": "uwp",
+  "parent": "548d771a",
+  "depth": 1,
+  "status": {
+    "zh": "待开工",
+    "en": "Not started"
+  },
+  "status_class": "todo",
+  "done": false,
+  "start": "2026-10-16 20:44",
+  "end": null,
+  "updated": "2026-10-16 20:47",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "整理 TPU 风洞数据库等基准（建筑群中目标建筑表面风压），选定基准算例、测点与对照口径（均压、脉动、峰值），供 CFD 验证与 AI 训练。",
+    "goal_en": "Curate benchmark datasets such as the TPU wind-tunnel database (surface wind pressure on target buildings within building clusters), selecting benchmark cases, pressure taps, and comparison metrics (mean, fluctuating, and peak pressures) for CFD validation and AI training."
+  },
+  "report": {
+    "zh": "# 数据与基准（TPU 等）（UBWP，公开项目（Liang Hu 10-17 撤销保密））\n\n## 目标\n整理 TPU 风洞数据库等基准（建筑群中目标建筑表面风压），选定基准算例、测点与对照口径（均压、脉动、峰值），供 CFD 验证与 AI 训练。\n\n## 当前状态\n待开工：10-16 按 Liang Hu 要求先建好，等开工指令；不做研究、不派 bot、不提交作业。Liang Hu 补文献前不开工。\n\n## 已定决定\n- 2026-10-16 先建不开工 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n\n## 未决与下一步\n- 开工后：等 Liang Hu 文献 → litwiki 建子库 → 盘点 TPU 干扰效应数据库可用算例。\n\n## 文献依据\n- 待建（Liang Hu 补文献后由 litwiki 建卡）\n\n## Liang Hu 注",
+    "en": "# 数据与基准（TPU 等）（UBWP，公开项目（Liang Hu 10-17 撤销保密））\n\n## 目标\n整理 TPU 风洞数据库等基准（建筑群中目标建筑表面风压），选定基准算例、测点与对照口径（均压、脉动、峰值），供 CFD 验证与 AI 训练。\n\n## 当前状态\n待开工：10-16 按 Liang Hu 要求先建好，等开工指令；不做研究、不派 bot、不提交作业。Liang Hu 补文献前不开工。\n\n## 已定决定\n- 2026-10-16 先建不开工 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n\n## 未决与下一步\n- 开工后：等 Liang Hu 文献 → litwiki 建子库 → 盘点 TPU 干扰效应数据库可用算例。\n\n## 文献依据\n- 待建（Liang Hu 补文献后由 litwiki 建卡）\n\n## Liang Hu 注"
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "城市风压 Lead · 开子项目",
+      "ts": "2026-10-16 20:44",
+      "text": "【Liang Hu 让 线况与派活 分出的子对话】UBWP 项目，不对外公开。目标：整理 TPU 风洞数据库等基准数据（建筑群中目标建筑表面风压），定基准算例、测点与对照口径，供高保真 CFD 验证与 AI 训练使用。项目页；父页：。状态：待开工——等开工指令，不做研究、不派 bot、不提交作业。"
+    },
+    {
+      "role": "bot",
+      "who": "城市风压",
+      "ts": "2026-10-16 20:44",
+      "text": "\"数据与基准（TPU 等）\"这个子项目对话已经接上，现在待开工，按你的要求不做研究、不派 bot、不提交作业。\n\n项目页、父页和线况表里都已经有这个子项目，状态都写的是\"待开工\"。对应的决策记录是，这次没有改任何文件。\n\n收到开工指令后，我按这个顺序做：\n1. 等你补的文献到位后，委托 litwiki 建 UBWP 文献子库，卡片带页码。\n2. 盘点 TPU 风洞数据库里建筑群目标建筑的表面风压算例，交一张清单，写明各算例的周边布局、风向、测点布置、采样频率和时长。\n3. 选定基准算例，定下对照口径：均压、脉动风压、峰值风压分开比，峰值怎么算也写清楚。\n4. 交出一份给高保真 CFD 和 AI 两个子项目共用的基准规格。规格要冻结并交给其他子项目时，先送审 3 份。\n\n## 结论\n- 子项目\"数据与基准（TPU 等）\"已经建好，状态是待开工，等你下开工指令。\n- 开工前不做研究、不派 bot、不提交计算，这次也没有改任何文件。"
+    }
+  ],
+  "files": {
+    "self": "9741f50a.json",
+    "claims": null,
+    "pdf": null
+  }
+}

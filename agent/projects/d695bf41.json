@@ -1,0 +1,204 @@
+{
+  "id": "d695bf41",
+  "slug": "d695bf41",
+  "number": "R16.9a",
+  "title": {
+    "zh": "R16.9a UF 联合配置与同步 pilot",
+    "en": "R16.9a UF Joint Configuration and Synchronized Pilot"
+  },
+  "group": "petw9",
+  "parent": "a7029645",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-09 10:51",
+  "end": null,
+  "updated": "2026-10-10 08:43",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "把 v6.7 UP 落成 Liang Hu 可直接转发 UF 的 RFI 包（每项 confirmed/TBC + owner）和一页 pilot 配置表（一个 W_TE 光学简单 UP 工况，压力+固定 Cobra+stereo PIV 同步）。",
+    "goal_en": "Turn the v6.7 UP plan into an RFI package ready for Liang Hu to forward directly to UF (each item marked confirmed/TBC + owner) along with a one-page pilot configuration sheet (one optically simple W_TE UP condition with synchronized pressure + fixed Cobra probe + stereo PIV)."
+  },
+  "report": {
+    "zh": "# UF 联合配置与同步 pilot\n\n## 目标\n把 v6.7 UP 落成 Liang Hu 可直接转发 UF 的 RFI 包（每项 confirmed/TBC + owner）和一页 pilot 配置表（一个 W_TE 光学简单 UP 工况，压力+固定 Cobra+stereo PIV 同步）。\n\n## 当前状态\n等 UF。起点按 Liang Hu 10-09 13:40 定的\"UF 无回音\"。对外包 （SHA …，44 题 + Att-1–6）与催问邮件草稿已交根，由 Liang Hu 亲自发；pilot（M11/0°[local path omitted] UP）数据接收与质检流水线已用合成数据跑通，UF 数据格式确定后换适配器即可用。\n\n## 已定决定\n- 2026-10-09 最终包验收；Lead 脚本生成对外版（不再退回 bot）→ 同一决策记录补记 8–10\n- 2026-10-09 三件套计数验收通过；退回改可转发表述；pilot 表并入同批 → 同一决策记录补记\n- 2026-10-09 RFI 先出三件套、pilot 表后派；confirmed 只限 UF 书面出处；冲突只列不裁 → \n- 2026-10-09 v6.7 UP 唯一基线，DOWN 不激活，旧版只作历史；先出 RFI 再定 owner/期限 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 2026-08-03 | UF 表单与 Excel 技术预填 | 9 sheet/540 行，结构验证过，v5.8 口径，非执行 |\n| 2026-08-12 | v6.7 MATLAB 目标时程 | 12 MAT/12 CSV，原生生成回读通过；zip 44 成员 |\n| 2026-10-09 | RFI 三件套（windtunnel） | 指针+RFI 36 题全 TBC+preflight 218 行（69/126/23）计数核对通过；表述未达可转发（内部路径、中文 owner、内部术语），已退回 |\n| 2026-10-09 | RFI 并入测压孔 H 节 TAP-Q1–Q7 | 全单 43 题全 TBC；附件 SHA 与源文件一致（77856775…/…）；A 组与 TAP-Q 交叉引用不重复；Q3/Q5 写成项目建议、无 pending Liang Hu |\n| 2026-10-09 | RFI 可转发 + pilot 配置表 | 43 题全 TBC；pilot M11/0°[local path omitted] UP，W_TE→W_LE 两窗；五类阈值均工程建议；仍有内部路径/术语残留 |\n| 2026-10-09 | Lead 生成对外版（脚本清理内部字段、重算 SHA） | 残留内部字样 0；43 题、218 行、148 孔不变；已 --report 根对话待 Liang Hu 转 UF |\n| 2026-10-09 | 对外版加 TAP-Q8、改 TAP-Q4（根 Lead） | 44 题全 TBC；Att-6 rev A 图待审查 修订后补入 |\n| 2026-10-09 | 对外最终版（Att-6 入包、Att-3/4 取修订版、图框去内部化） | 44 题、218 行、148 孔、Att-6 三张 PDF、无内部字样；zip SHA 795b996bf852701b32a1a78e363121d1ff08288cc9778fa0e9721475aed17e43[:8]…；已 --report 根对话 |\n| 2026-10-09 | 对外包 A04/Att-5 对齐管路裁决（625 Hz 足够）；催问邮件草稿核对 | 44 题/218 行/148 孔/Att-6 三图/无内部字样；zip SHA …；邮件 SHA 与 D01/D02 已改 |\n| 2026-10-09 | pilot 质检流水线骨架 | Lead 本地重跑通过：pass GO / fail NO_GO，N_p=20，标准库；起坡判据缺陷（目标 t5 比 8 s 晚 0.28–0.67 s）→ 改为与目标同定义相减，Att-5 同步（zip …） |\n| 2026-10-09 | 质检流水线起坡判据修正 | Lead 重跑 5 测试 OK；pass GO（偏差 0.026 s）/ fail NO_GO（+起坡 0.156 s）；目标当实测 PASS |\n\n## 未决与下一步\n- 起点按\"UF 无回音\"（Liang Hu 10-09 13:40）。对外最终版 … 与催问邮件草稿已交根，由 Liang Hu 亲自发 —— 对外动作，Lead 不发\n- 等 UF（10-09 起）：我方可做的已做完（对外包 …、催问邮件草稿、pilot 质检流水线 …）。UF 一回复就转根，按题号填 xlsx \"UF reply\"，据此冻结 pilot 配置、阈值并换真实适配器\n- UF 书面回复（TAP-Q1–Q8 等 44 题）与设施安全审查是硬门；Q7 实物照片待 Liang Hu；M31 物理坐标归兄弟子项目\n\n## 文献依据\n- pilot 阈值（重复数/同步/压力阈值触发）参考卡片：:42（30 次重复系综平均、压力阈值触发）；ML5CFU3G、7EUH5KQ7、GVYFW4XU、GV4BFSA7 的仪器/重复/同步节——页码待 bot 在 pilot 表中逐条引用后核实\n- 无文献依据，基于本线设计资产与 UF Fall 2025 设施文件\n\n## Liang Hu 注",
+    "en": "# UF 联合配置与同步 pilot\n\n## 目标\n把 v6.7 UP 落成 Liang Hu 可直接转发 UF 的 RFI 包（每项 confirmed/TBC + owner）和一页 pilot 配置表（一个 W_TE 光学简单 UP 工况，压力+固定 Cobra+stereo PIV 同步）。\n\n## 当前状态\n等 UF。起点按 Liang Hu 10-09 13:40 定的\"UF 无回音\"。对外包 （SHA …，44 题 + Att-1–6）与催问邮件草稿已交根，由 Liang Hu 亲自发；pilot（M11/0°[local path omitted] UP）数据接收与质检流水线已用合成数据跑通，UF 数据格式确定后换适配器即可用。\n\n## 已定决定\n- 2026-10-09 最终包验收；Lead 脚本生成对外版（不再退回 bot）→ 同一决策记录补记 8–10\n- 2026-10-09 三件套计数验收通过；退回改可转发表述；pilot 表并入同批 → 同一决策记录补记\n- 2026-10-09 RFI 先出三件套、pilot 表后派；confirmed 只限 UF 书面出处；冲突只列不裁 → \n- 2026-10-09 v6.7 UP 唯一基线，DOWN 不激活，旧版只作历史；先出 RFI 再定 owner/期限 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 2026-08-03 | UF 表单与 Excel 技术预填 | 9 sheet/540 行，结构验证过，v5.8 口径，非执行 |\n| 2026-08-12 | v6.7 MATLAB 目标时程 | 12 MAT/12 CSV，原生生成回读通过；zip 44 成员 |\n| 2026-10-09 | RFI 三件套（windtunnel） | 指针+RFI 36 题全 TBC+preflight 218 行（69/126/23）计数核对通过；表述未达可转发（内部路径、中文 owner、内部术语），已退回 |\n| 2026-10-09 | RFI 并入测压孔 H 节 TAP-Q1–Q7 | 全单 43 题全 TBC；附件 SHA 与源文件一致（77856775…/…）；A 组与 TAP-Q 交叉引用不重复；Q3/Q5 写成项目建议、无 pending Liang Hu |\n| 2026-10-09 | RFI 可转发 + pilot 配置表 | 43 题全 TBC；pilot M11/0°[local path omitted] UP，W_TE→W_LE 两窗；五类阈值均工程建议；仍有内部路径/术语残留 |\n| 2026-10-09 | Lead 生成对外版（脚本清理内部字段、重算 SHA） | 残留内部字样 0；43 题、218 行、148 孔不变；已 --report 根对话待 Liang Hu 转 UF |\n| 2026-10-09 | 对外版加 TAP-Q8、改 TAP-Q4（根 Lead） | 44 题全 TBC；Att-6 rev A 图待审查 修订后补入 |\n| 2026-10-09 | 对外最终版（Att-6 入包、Att-3/4 取修订版、图框去内部化） | 44 题、218 行、148 孔、Att-6 三张 PDF、无内部字样；zip SHA 795b996bf852701b32a1a78e363121d1ff08288cc9778fa0e9721475aed17e43[:8]…；已 --report 根对话 |\n| 2026-10-09 | 对外包 A04/Att-5 对齐管路裁决（625 Hz 足够）；催问邮件草稿核对 | 44 题/218 行/148 孔/Att-6 三图/无内部字样；zip SHA …；邮件 SHA 与 D01/D02 已改 |\n| 2026-10-09 | pilot 质检流水线骨架 | Lead 本地重跑通过：pass GO / fail NO_GO，N_p=20，标准库；起坡判据缺陷（目标 t5 比 8 s 晚 0.28–0.67 s）→ 改为与目标同定义相减，Att-5 同步（zip …） |\n| 2026-10-09 | 质检流水线起坡判据修正 | Lead 重跑 5 测试 OK；pass GO（偏差 0.026 s）/ fail NO_GO（+起坡 0.156 s）；目标当实测 PASS |\n\n## 未决与下一步\n- 起点按\"UF 无回音\"（Liang Hu 10-09 13:40）。对外最终版 … 与催问邮件草稿已交根，由 Liang Hu 亲自发 —— 对外动作，Lead 不发\n- 等 UF（10-09 起）：我方可做的已做完（对外包 …、催问邮件草稿、pilot 质检流水线 …）。UF 一回复就转根，按题号填 xlsx \"UF reply\"，据此冻结 pilot 配置、阈值并换真实适配器\n- UF 书面回复（TAP-Q1–Q8 等 44 题）与设施安全审查是硬门；Q7 实物照片待 Liang Hu；M31 物理坐标归兄弟子项目\n\n## 文献依据\n- pilot 阈值（重复数/同步/压力阈值触发）参考卡片：:42（30 次重复系综平均、压力阈值触发）；ML5CFU3G、7EUH5KQ7、GVYFW4XU、GV4BFSA7 的仪器/重复/同步节——页码待 bot 在 pilot 表中逐条引用后核实\n- 无文献依据，基于本线设计资产与 UF Fall 2025 设施文件\n\n## Liang Hu 注"
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 开子项目",
+      "ts": "2026-10-09 10:51",
+      "text": "【Liang Hu 让 线况与派活 分出的子对话】你是本子项目 Lead。目标：把 v6.7 UP 落成 Liang Hu 可直接转发 UF 的 RFI 包 + 一页 pilot 配置表（一个 W_TE 光学简单 UP 工况，压力+固定 Cobra+stereo PIV 同步，附建议阈值：跟踪、同步、ROI、容量、Np 收敛）。\n输入：v6.7 包 44 成员，SHA-256 …6876e）； 行 v5.8 Excel 只作接口历史，不覆盖）； 盘点 §5–§6、§13 G0–G2。\n已知冲突：压力请求 64ch/1200 Hz vs UF 文件 512ch 最大 625 Hz；PIV 400 Hz 是帧/对/矢量 TBC；FOV 100×200 vs ~200×200；固定 Cobra 型号/坐标/时基 TBC。\n第一步立即派 windtunnel（执行对话由你首次派活自动建立）三件套：①当前状态指针（一页）②UF RFI 合并单（压力模块与每通道速率、PIV 帧/对/矢量与有效 ROI、固定 Cobra 型号坐标、共同触发与时基、原始/处理数据交付、模型位置流场指标、安全边界；每项 confirmed/TBC + owner）③从 v6.7 UP 重生成、标 current-design-preflight 的矩阵（可追溯到 Tier1 69 / Tier2 21×6 / PIV 13 核心 23 有符号角）。\n验收：RFI 包无需改动即可转 UF。发不发 UF 属对外，交付后 --report 给根，由 Liang Hu 转发。UF 回复与安全审查是硬门，不能替 UF 回答。\n项目页 已建，你填 lead_topic/exec_topics 并维护。\n\n通用边界（每份任务书照抄）：当前唯一设计基线 v6.7 UP；DOWN 保持 DESIGN_ONLY_NOT_ACTIVE；v5.8–v6.6 只作历史；禁止 bot 生成新版本号（只改内容不改版本号）；bot 不得声称任何设施/安全/科学批准，每个参数标 confirmed/TBC + owner；不得启动批量文献提取或新定时任务；任务书写目标和交付物，附一句''。bot 运行目录 只读（Lead 不写）；Lead 只写；bot 10-09 只读汇报 （无 UF 回复；cron d99defc68055 仍每 30 分钟运行，停不停 Liang Hu 另答，你不要动它）。"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 10:51",
+      "text": "Delegation hit the system-wide limit of 16 concurrent delegations; starting a background retry every 3 minutes.Now updating the project page and writing a decision record while the retry runs.第一步的三件套还没派出去。任务书已经写好，但提交时系统里同时进行的委托满了 16 个上限，被挡了回来。后台在自动重试，每 3 分钟一次，最多试 90 分钟。提交成功后 windtunnel 的执行对话会自动建立，结果回来会叫醒我。90 分钟内还提交不上的话，我会再想办法。\n\n**三件套的内容**（交付到 bot 的）：\n1. **状态指针**，一页：v6.7 UP 是唯一基线，附包路径和 SHA；DOWN 不激活；v5.8–v6.6 只作历史，列一张替代关系表；写明\"没有 UF 回复，也没有实测数据\"。\n2. **UF RFI 合并单**：英文问询，可以直接当邮件附件，另出一份同内容的 Excel。分七组提问：压力、PIV、固定 Cobra、触发与时基、数据交付、模型位置流场指标、安全边界。每题写明我方当前请求值、confirmed 或 TBC、依据文件、owner，以及它挡的是 pilot 还是生产。四个已知冲突（压力 1200 Hz 对 625 Hz、PIV 400 Hz 指什么、FOV、固定 Cobra）都显式列出，我们不替 UF 下结论。\n3. **preflight 矩阵**：从 v6.7 UP 重新生成，表头注明\"不是执行矩阵\"。每行能追溯到 Tier1 69 / Tier2 21×6 / PIV 13 核心 23 有符号角。计数对不上就如实列差值。540 行的 v5.8 Excel 不动。\n4. 另加一份校验 README：每个文件的 SHA、行数核对结果、还没闭合的项。\n\n**Decision I made**\n- **pilot 配置表和建议阈值放到第二步**。为什么：pilot 表里的通道、速率、ROI 取什么值，要看 RFI 里每项是 confirmed 还是 TBC，现在出会返工。错了的代价：多一轮派活，大约半天。\n- **只有 UF 书面文件里有出处（文件名加节或页）的参数才能标 confirmed，设施宣传册上的上限一律算 TBC。** 为什么：07-30 bot 曾把宣传册上限写成\"已确认\"，后来成批降级。错了的代价：个别参数被保守标成 TBC，UF 回复时一句话就能改。\n\n**后续**：三件套回来后，我先核对计数和每个 confirmed 的出处，再派 pilot 配置表。整包做完后上报根，由你转给 UF。转发属于对外，所以要你来做。\n\n项目页已经更新，`exec_topics` 等执行对话建立后再填 ID。这个子项目全部\"新开\"，没有要你挂的 topic。\n\n\n\n\n\n（附件：UF_RFI_threepack_20261009.txt）\n\n（附件：UF_RFI_package_scope_20261009.md）\n\n（附件：UF_Config_and_Sync_Pilot.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 10:57",
+      "text": "【委托结果 · 风洞智能体】UF RFI 三件套：状态指针、RFI 合并单、v6.7 UP preflight 矩阵\n委托失败：Too many concurrent runs (max 10)\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 10:57",
+      "text": "三件套还没做，委托 失败了，bot 根本没启动。原因是 bot 那边同时运行的任务满了 10 个上限，不是任务书的问题。执行对话 `` 里只有我发过去的任务书，bot 没回过一条，它的输出目录里也没有。\n\n我在后台安排了重发：从 11:00 起等 15 分钟，大约 11:15 把同一份任务书发进同一个执行。如果又碰上提交上限，就每 3 分钟重试一次。任务书一字不改，三件套的目标和交付物照旧。\n\n**Decision I made**：等 15 分钟再重发，不立即重发，也不换别的 bot。为什么：并发满是全系统的事，马上重发多半还是失败；换成别的 bot 做，又会脱离这条线的执行记录。错了的代价：最多晚 15 分钟开工。\n\n项目页已经记下这次失败和重发安排。重发提交后我会确认；三件套交回来，我先核对计数和每个 confirmed 的出处，再派 pilot 配置表。\n\n如果 11:15 的重发在 bot 那边又碰上运行上限，我就把重发间隔拉长到 30 分钟再试。\n\n这一步没有要你做的事。"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 11:15",
+      "text": "【委托 · 来自 风洞 Lead】并入测压孔问题 TAP-Q1–Q7 到 UF RFI 合并单\n把 末尾 TAP-Q1–Q7 并入你的 UF RFI 合并单（新建\"测压孔与通道\"一节，保留 TAP-Qn 编号便于交叉引用；对照表 tap_channel_map_M11_M31_M51.csv 148 行、reference_pressure_budget.csv 作为 RFI 附件）。\nowner 处理（根 Lead 已定）：Q1/Q2/Q4/Q6 owner=UF；Q3（展向站位）项目侧建议 600 mm 中展、单环，标\"项目建议，UF 核对与支座/走管冲突\"；Q5（+攻角与坐标变换、符号、DAQ 变量名）项目侧给出建议约定，标\"项目建议，UF 确认设施坐标\"——这两项不是 Liang Hu 科学决定，不要写成待 Liang Hu 批准；Q7 实物照片 owner=Liang Hu（提供资料，根 Lead 已向 Liang Hu 索取），同时问 UF 是否已有模型接收/装配记录。\n如 bot 已在做三件套，排队并入即可，不另开。\n（原因：兄弟子项目「模型与测压布局制造放行」交付了 148 孔对照表，其 UF 侧问题须进同一份 RFI 包）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 11:15",
+      "text": "TAP-Q1–Q7 并入的任务书已经写好，但还没发到 bot。11:19 提交时撞上系统委托数上限（16 个），后台每 3 分钟重试一次，最多重试 90 分钟。提交成功后会进同一个执行对话 ``，排在三件套后面，不另开。\n\n## 结论\n- **状态**：已接收，任务书在，后台重试提交中，还没进 bot 的队列。三件套 在 11:15 重发后提交成功；bot 端是否真的跑起来，要等结果回来才知道。\n- **任务书要求**：\n - RFI 合并单新建 \"H. Pressure taps and channel mapping\" 一节，保留 TAP-Q1…Q7。A 组压力里和 Q1/Q2/Q4 重叠的题目只写 \"see TAP-Qn\"，不重复问。\n - （148 孔）和 列进附件清单，写明路径和 SHA，内容不改。\n- **owner 照你定的写**：\n - Q1/Q2/Q4 owner 是 UF-压力，Q6 是 UF-运行/机加工。\n - Q3 写成项目建议（600 mm 中展、单环），请 UF 核对和支座、走管有没有冲突。\n - Q5 由 bot 给出一套建议约定（+α 方向、坐标变换、各面符号、DAQ 变量名），请 UF 确认设施坐标。\n - Q3、Q5 明确写成\"不是待 Liang Hu 批准\"。\n - Q7 照片 owner 是 ND-Liang Hu；另外对 UF 只问一句：手上有没有 M11/M31/M51 的接收或装配记录、照片。\n- **时序**：如果三件套还没交，bot 做完后连同 H 节一次交齐；如果已经交了，就在同一份合并单里补上 H 节，并重算校验 README。\n- **下一步**：bot 回报后，我核对 H 节题数、Q3/Q5 建议约定的原文和附件 SHA。整包验收后上报根，由 Liang Hu 转给 UF。重试 90 分钟内还提交不上，我会在本对话里报告。"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 11:23",
+      "text": "【委托结果 · 风洞智能体】UF RFI 三件套：状态指针、RFI 合并单、v6.7 UP preflight 矩阵\n状态指针：；合并问询单：同目录 、`.xlsx`；preflight 矩阵：同目录 、`.xlsx`。逐文件哈希、计数核对和未闭合项见。完整包已校验，可一次下载转交：\n\n\n\n（附件：2026-10-.zip）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 11:23",
+      "text": "Updating the project page and decision record with the acceptance result.Clean up the stale next-step lines on the project page.三件套交回来了，数和口径都对得上，但 RFI 正文还不能原样转给 UF，我已经退回去改。修改和 pilot 配置表合成了一份，排在测压孔那一节后面，最后交一份整包。\n\n**核对结果**\n- **数对上了**：我自己读了 preflight 矩阵，一共 218 行，Tier1 69、Tier2 126（21×6）、PIV 23 个有符号角，对应 13 个核心角度。DOWN 不在矩阵里，540 行的旧 Excel 没动。\n- **RFI 共 36 题，全部标 TBC，没有一项 confirmed。** 分组是压力 8、PIV 6、Cobra 4、时基 5、数据 4、流场质量 5、安全 4。四个已知冲突都逐条列出来了，bot 没有替 UF 下结论。\n- **为什么还不能转发**：\n - owner 和\"阻塞什么\"两列混着中文\n - \"依据\"一列写的是我们内部的目录路径，UF 看不到\n - 正文里有 `DESIGN_ONLY_NOT_ACTIVE`、\"Liang Hu release\" 这类内部用语\n - 缺开头说明和附件清单\n - v6.7 那个 ZIP 里带着 DOWN 文件，正文没说明这部分不在这次请求范围内。\n\n**现在派出去的（都在执行对话 ``，按顺序排队）**\n1. 测压孔与通道一节，TAP-Q1–Q7（根对话交下来的）。\n2. RFI 改成能原样转发：正文全英文；依据只引 UF 自己的设施文件和本包附件，内部路径挪到 xlsx 里单独一页，转发前删掉；加开头说明和带 SHA 的附件清单；xlsx 加一列留给 UF 填回复。\n3. 同一委托里出一页 pilot 配置表：一个 W_TE 的 UP 工况，模型、角度、profile 由 bot 按可见性文件挑并写理由。五类建议阈值（跟踪、同步、ROI、容量、Np 收敛）都要给数值和定义，全部标\"项目建议、待与 UF 商定\"。依据要引用 wiki 卡片和页码，主要是 Yang & Mason 2019 的卡片 `UUXI8ZDE`，库里找不到的写明是工程建议。\n\n**Decision I made**\n- **接受矩阵里的角度沿用 v5.8 计划文件。** 为什么：v6.7 的 ZIP 里没有角度矩阵，v6.7 只改了时间窗，bot 也如实披露了出处。错了的代价：如果角度集合在 v6.x 之间改过，用包里的脚本重新生成一次就行。\n- **pilot 配置表不等 RFI 改完，和改动合成一份委托派。** 为什么：省掉一轮来回。错了的代价：如果 RFI 改动牵连到 pilot 表，最终包里一起修，最多多一轮。\n\n最终包回来后，我先查三件事：转发版正文里有没有内部路径、中文或内部用语；测压孔那一节写得对不对；每个阈值引用的卡片页码对不对。核对过了，我把整包报给根，由你转给 UF。\n\n这一步没有要你做的事。决策记录和项目页已经更新。\n\n\n\n\n\n（附件：UF_RFI_forwardable_and_pilot_sheet_20261009.txt）\n\n（附件：UF_RFI_package_scope_20261009.md）\n\n（附件：UF_Config_and_Sync_Pilot.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 11:26",
+      "text": "【委托结果 · 风洞智能体】RFI 合并单补\"测压孔与通道\"一节（TAP-Q1–Q7）\n交付包：。包内有 、／`.xlsx`、／`.xlsx` 及重算后的。H 节 7 题；全单 43 题，confirmed 0、TBC 43。preflight 仍为 Tier 1 69、Tier 2 126、PIV 核心 13／有符号角 23；DOWN 仍为 `DESIGN_ONLY_NOT_ACTIVE`。\n\nTAP-Q3 的建议原文：“Project proposal: single ring at 600 mm mid-span; UF to check conflicts with supports / internal tubing routing.” TAP-Q5 建议以截面中心为模型局部原点，零攻角时 +x 向下游、+y 向上，+z 沿展向；+α 为 x–y 平面逆时针旋转。建议变换为 `x_F=x_0+x_L cosα−y_L sinα`、`y_F=y_0+x_L sinα+y_L cosα`、`z_F=z_0+z_L`；四面外法向依次为 I=−x、II=+y、III=+x、IV=−y，统一采用，模型所受压力面力为 `−(p_tap−p_ref)n_out`。建议 DAQ 键为 `<run_id>.<model>.T<tap_no:02d>.p_gauge_Pa`，参考压力及原始扫描通道／端口另存。以上均为项目建议，设施坐标和展向起点待 UF 核对，不作为已确认约定。\n\n附件 SHA-256：（148 孔）为 `77856775c20cdbe2a7430abc819e31d68b5381286baaf547e8016a06a67b3380`； 为 `ec4dad2ebdc844ca29c3634af1cd55c0aefa2d4fc1c0b86454dcee0c7c59f1d6`。已核对 Excel 与 Markdown 的 43 个问题、逐文件哈希及 ZIP 完整性。尚缺 UF 书面配置回复、受控制造资料和实物照片；不能据此执行 pilot。\n\n\n\n（附件：2026-10-.zip）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 11:26",
+      "text": "测压孔问题 TAP-Q1–Q7 已经并进 UF RFI 合并单，我核对过，通过了。整包还差最后一步：把 RFI 改成能原样转给 UF 的版本，同时出 pilot 配置表，这件 windtunnel 正在做。\n\n## 结论\n- **H 节（压力孔与通道）**：7 题，保留 TAP-Q1…Q7。全单现在 43 题，confirmed 0、TBC 43。A 组压力题里和 TAP-Q1、Q2、Q4 重叠的只写 \"see TAP-Qn\"，不重复问。\n- **owner 照你定的写**：\n - Q1、Q2、Q4、Q6 归 UF。\n - Q3 写成项目建议：600 mm 中展、单环，请 UF 核对与支座、走管有没有冲突。\n - Q5 写成项目建议，请 UF 确认设施坐标。\n - Q7 只问 UF 有没有模型接收或装配记录、照片。\n - 全文没有 \"pending Liang Hu\"。\n- **Q5 的建议约定**：\n - 原点在截面中心。零攻角时 +x 指向下游，+y 向上，+z 沿展向；+α 是 x–y 平面内逆时针转。\n - 四个面的外法向：I = −x，II = +y，III = +x，IV = −y。\n -。\n - DAQ 变量名 `<run_id>.<model>.T<nn>.p_gauge_Pa`。\n - 我看过，符号和坐标变换前后一致。\n- **附件**：两份附件的 SHA 我和源文件逐一比对过，一致。\n - （148 孔）：`77856775…`\n - ：`…`\n- **还没完的**：TAP-Q7 那一行还写着内部称呼 \"ND-Liang Hu\"。正在做的那一轮会把这类内部用语去掉，同时补开头说明和附件清单，换掉内部路径，再出 pilot 配置表。\n- **下一步**：那一轮交回来后我验收，然后把整包报到根，由你转给 UF。UF 的书面回复和设施安全审查是硬门，没过之前不进 pilot。\n\n项目页已经更新。"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 11:38",
+      "text": "【委托结果 · 风洞智能体】RFI 改成可原样转发 + pilot 配置表与建议阈值\n最终包已写入并校验：；下载 ZIP：\n\n英文 可连同所列附件转给 UF。其 Basis 不含内部目录，Owner 和 Blocks 已改为英文；XLSX 增加空白 `UF reply`、`UF source` 列。RFI 为 A–H 共 43 题：8／6／4／5／4／5／4／7；confirmed 0、TBC 43。preflight 仍为 218 行＝69＋126＋23，PIV 核心角度量值 13 个。UP 是唯一请求的流速分支；DOWN 文件虽在原始 ZIP 中，不属于本次请求。完整工作包含内部状态指针，RFI 工作簿另有 `internal_traceability` sheet；**转发工作簿前须删除该 sheet，不要把完整工作 ZIP 当作对外邮件附件。**\n\nPilot 选择 M11、0°、YM02 UP（2.3→11 m/s，名义 `a_p=0.0026`）：可见性表第 2 行给 0° W_TE 的限制边距 30.00 mm；YM02 采用较低的 11 m/s 目标端速，但其加速度较高，跟踪容易与否仍待实测。方案以两个分别采集、具有有效矢量重叠的 W_TE／W_LE 窗口作同一 pilot，不把它们称为瞬时拼接场。\n\n五类数值均标为“project-proposed acceptance threshold, to be agreed with UF”：跟踪 RMS ≤速度增量的 3%、起坡偏差 ≤0.05 s、实测 `a_p` 偏差 ≤10%；同步延迟 ≤5 ms、校正后仪器间偏斜 ≤2 ms、20 s 漂移 ≤2 ms、保留分析段丢样／丢图像对为零；W_TE 有效矢量 ≥90%、有效重叠 ≥20×50 mm、配准残差 ≤1 个矢量网格间距；原始数据 ≤60 GB/run、校验完成的下载 ≤15 min/run、相机及激光许可容量余量各 ≥20%；压力重复在 N＝5／10／15／20／25／30 检查，采用文档所列 95% bootstrap CI 与连续节点稳定规则。这些**具体阈值均无文献直接依据，是工程建议**。已核读 UUXI8ZDE（PDF p4）、ML5CFU3G（p5）、7EUH5KQ7（p4）、GVYFW4XU（p2）、GV4BFSA7（pp.3–5）的仪器与重复信息；它们只支持方法背景，不证明 UF 配置或本 pilot 的通过标准。任一门槛失败即停在同一 pilot 修复重做，不扩展生产。\n\nSHA-256（完整值亦见）： `8c38ffab6822b45c5bbb9be3a864887739b19495581e9748916182238d28c2ac`；RFI `.md` `fa8b3b69c64889f70f08e31cc65ecb4c99c8364a95868c2001772d98f8fb1edc`、`.xlsx` `ee4f24e709613ee815ec6bec09289a8890730fa7011860c3e327f955de551e3d`；preflight `.csv` `6542b2c988b5d81d62d541d14b7f05a2b8d204f90630ae306674ee71f6379207`、`.xlsx` `bc4f30024d0dd8f4fe003bace9a1a4b0ab2a0d5d8b2e04c3ed2d8bdf2dc73e16`；pilot `.md` `bd970dae0798a4ef8363e379bfa10a25d493856d38a471098a5a77e4b12a5ce7`、`.xlsx` `a96b7dc01c19b18f9d665947fecdeea3fffb55f18e6acd70f7ccceb8762fcc65`；tap map `77856775c20cdbe2a7430abc819e31d68b5381286baaf547e8016a06a67b3380`；reference budget `ec4dad2ebdc844ca29c3634af1cd55c0aefa2d4fc1c0b86454dcee0c7c59f1d6`；生成脚本 `ea1b3528eae56a254f1bb6c1804298b480bf1346dcf61d1249877cd6049dbe4d`；README `3bcfcadad0c6d0b64da969bec3b8a36d37a15595f0ae03ebf5d26de40c7c0716`；最终 ZIP `0c3eb1b81f634ec2b8f36f4232542bd119b4d20c680e3c09e18e8ed95415e8f4`。原始 Att-1 ZIP 为 `60d4f45c39ee830d6d094a9de42ee927a681c60736d97fc964e4d112f4a6876e`，44 成员 CRC 通过。\n\n仍缺 UF 对扫描器、PIV、固定 Cobra、时基与安全边界的书面配置回复，以及受控 M31 坐标／实体通道分配和 pilot 实测数据；本包不构成设施操作或安全批准。\n\n（附件：2026-10-.zip）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 11:38",
+      "text": "对外包已经做好，自检没发现残留的内部字样。接下来上报根，并更新项目页和决策记录。兄弟子项目的审查裁决把正攻角定成了\"迎风前缘上抬，在图中是顺时针\"。bot 在 TAP-Q5 里写的是\"逆时针\"，两边对不上，必须先改。UF RFI 包和 pilot 配置表都做完了，已上报根。转给 UF 前只需要填一处：开头 \"PI/contact\" 那一行，填上联系人和联系方式。转不转、什么时候转，由 Liang Hu 定。\n\n**包里有什么**\n- **RFI 问询单**：英文，md 和 xlsx 各一份，43 题，没有一题标 confirmed。分组是压力 8、PIV 6、Cobra 4、时基 5、数据 4、流场 5、安全 4、测压孔 7（TAP-Q1–Q7）。四个已知冲突（压力 1200 Hz 对 625 Hz、PIV 400 Hz 指什么、FOV、固定 Cobra）都只列出来，不替 UF 回答。xlsx 留了两列空白，给 UF 逐题填回复和出处。\n- **附件 5 份**：\n - Att-1 是 v6.7 ZIP 原件。正文写明只请求 UP，ZIP 里的 DOWN 文件不在这次范围。\n - Att-2 是 preflight 矩阵，218 行，正好等于 Tier1 69 + Tier2 126 + PIV 23 个有符号角。\n - Att-3 是 148 孔的测压孔对照表。\n - Att-4 是参考压预算。\n - Att-5 是 pilot 配置表。\n- **pilot 工况**：M11、0°、YM02 UP（2.3→11 m/s）；压力、固定 Cobra、立体 PIV 同步；先测 W_TE，再测 W_LE，两窗有重叠，但不说成是同一时刻的整场。\n- **建议阈值**：五类都给了数值和计算方法，全部标\"项目建议、待与 UF 商定\"。\n - 这些数值都没有文献直接依据。Yang & Mason 2019（卡片 UUXI8ZDE，PDF 第 4 页）只作方法背景。\n - 跟踪：速度均方根误差不超过速度增量的 3%，起坡偏差不超过 0.05 s。\n - 同步：仪器间偏斜不超过 2 ms。\n - PIV：W_TE 有效矢量不低于 90%。\n - 容量：每次 run 不超过 60 GB。\n - 压力重复次数 N_p：在 5 到 30 次之间按置信区间逐档判断，至少 20 次才能停。\n\n**Decision I made**\n- **对外版我自己生成，没再退回 bot。** bot 的最终包内容是对的，但原样转发还有几处问题：\n - 工作簿里有一页内部表要手工删\n - 矩阵和测压孔表带着本机路径列，owner 写着 \"ND-bot\" 和 \"Liang Hu\"\n - 还剩一处中文。\n\n 这些都是机械替换。我写了脚本，只删内部字段、替换称呼，再重算 SHA，题目和数值一字没动。复查结果：没有残留的内部字样；43 题、218 行、148 孔都和原包一致。为什么：再排一轮 bot 要 1 小时以上，还可能碰上并发上限。错了的代价：如果有替换误伤，改脚本重跑一次就行。bot 的原包不动，留作内部追溯。\n- **TAP-Q5 的正攻角改成\"迎风前缘上抬，来流向右时图中顺时针\"，坐标变换式也跟着改了。** bot 写的是逆时针，这个约定已经被根对话 rev A 审查裁决第 1 条推翻。我验算过：α 为正时，前缘的纵坐标确实变大，也就是前缘上抬。错了的代价：UF 确认设施坐标时再统一一次。\n\n**后面的安排**：UF 的书面回复和设施安全审查是硬门。回复到之前，本子项目没有能推进的事，我暂停派活。还缺两样，都不归本子项目：Q7 的实物照片等 Liang Hu 提供；M31 的物理坐标由兄弟子项目「模型与测压布局制造放行」补。\n\n\n\n\n\n\n（附件：2026-10-.zip）\n\n（附件：UF_RFI_consolidated.md）\n\n（附件：Att-5_pilot_configuration_sheet.md）\n\n（附件：UF_RFI_package_scope_20261009.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 15:38",
+      "text": "【委托 · 来自 风洞 Lead】UF RFI 追加 TAP-Q8、更新 TAP-Q4 措辞\n在 RFI 合并单\"测压孔与通道\"一节：①追加 TAP-Q8（owner=UF/机加工）：UF/机加工能否出具模型空腔、支座和 60/62 根走管束的净空与弯曲半径核查，以及每根管是否可达指定出口端的证据？②TAP-Q4 措辞改为：UF 能否核准 URTH-063/73ZOCM-063 的端接，1.2 m 是整管长度还是出口外段，并制定逐孔长度、漏检和动态传递/同步 pilot？原文见 末尾。③rev A 三张图（WT-M11/M31/M51-TAP，DRAFT—NOT RELEASED FOR MANUFACTURE）作为 RFI 附件，但等兄弟子项目独立审查 裁决修订后的版本再打包，RFI 包可先定稿正文。Q3/Q5 仍按上次：项目建议、UF 核对，非 Liang Hu 决定。；对话忙则排队。\n（原因：兄弟子项目交了 rev A 测压孔图，新增 UF 侧问题）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 15:38",
+      "text": "TAP-Q4 改好了，TAP-Q8 也加上了，对外版 RFI 正文按你的要求先定稿。rev A 三张测压孔图（Att-6）等审查 裁决、图修订完再放进包里。这次是我在对外版上直接改的，没有派 bot，因为对外版本来由我维护，这类改动排 bot 不划算。\n\n## 结论\n- **TAP-Q4 新措辞**：\n - 问 UF 能不能核准 URTH-063 / 73ZOCM-063 的端接\n - 1.2 m 指的是从测压孔到扫描阀的整管长度，还是只算模型出口外面那一段\n - 请 UF 定逐孔长度记录、漏检和动态传递/同步 pilot 的做法。\n - \"我方假设\"一栏注明 1.2 m 是 07-08 的项目请求，不是 UF 给的数值。内外段怎么分、逐孔长度、不锈钢转接短管尺寸，都标 TBC。\n- **TAP-Q8 新增**：请 UF 或机加工核查模型空腔、支座和 M31/M51 的 60/62 根走管束的净空与弯曲半径，并给出每根管都能走到指定出口的证据。owner 写 UF-Operations/Machining。\n- **全单从 43 题变成 44 题**，全部是 TBC。Q3、Q5 仍写\"项目建议、请 UF 核对\"，不写成 Liang Hu 的决定。\n- **Att-6 只先预告**：正文和工作簿封面都写了一句，三张图标着 DRAFT — NOT RELEASED FOR MANUFACTURE，内部审查修订后再发。封面附件清单按对外版的文件名和 SHA 重写过，Att-5 和 Att-6 都列进去了。\n- **自检**：没有残留的内部路径、中文或内部称呼。md 和 xlsx 都是 44 题。新 zip 的 SHA-256 是 `…cc6e`。\n- **下一步**：审查 裁决、图修订后，把修订版的三张图复制进，在附件表补上 Att-6 的 SHA，重跑脚本。之后由 Liang Hu 填 PI/联系人那一行，再转给 UF。\n\n决策记录（第 12 条）和项目页已经更新。\n\n\n\n\n（附件：2026-10-.zip）\n\n（附件：UF_RFI_consolidated.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 15:39",
+      "text": "【委托 · 来自 风洞 Lead】对外包先不交 Liang Hu：并入 TAP-Q8/Q4 与修订图后出最终版\n根 Lead 裁定：2026-10-.zip 暂不交 Liang Hu 转 UF。\n1) 已排队给你的委托 （追加 TAP-Q8：模型空腔/支座/60–62 根走管束净空与弯曲半径、每管可达出口端，owner=UF/机加工；TAP-Q4 改为\"1.2 m 是整管还是出口外段\"）若尚未进包，请并入，测压孔节变 8 题、总数 44。\n2) 兄弟子项目 rev A 审查裁决必须改 4 条，其中\"1.2 m 来源与范围\"\"壁厚 0.250 in\"可能影响 TAP-Q4/Q6 措辞，请据此核对题面。\n沿用你的对外版生成方式与 TAP-Q5 nose-up 修正，认可。\n（原因：对外包缺 TAP-Q8、TAP-Q4 新措辞和审查后修订的三张图；UF 只发一次完整包）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 15:39",
+      "text": "Now preparing the script to take the revised drawings as Att-6 when the path arrives.对外包暂不交 Liang Hu，按你的裁定办。正文已定稿，44 题，测压孔一节 8 题，全部是 TBC。现在只等修订后三张图的路径，到了我重生成一次，然后报\"最终版\"。\n\n## 结论\n- **TAP-Q8 和 TAP-Q4 新措辞已在包里**： 那条已并入，测压孔一节 TAP-Q1–Q8，全单 44 题。\n- **按 rev A 审查裁决核对了题面，改了两处**：\n - **TAP-Q4**：\"我方假设\"一栏改为：1.2 m 是测压孔到扫描阀的名义整管长度，属于项目请求，不是 UF 给的值；图上中展测压环到出口的内部段约 600 mm；外段长度和逐孔长度都是 TBC；不锈钢转接短管的内外径、长度、插入深度，以及由此产生的内径和容积突变，都是 TBC。\n - **TAP-Q6**：\"我方假设\"一栏写明：孔深等于壁厚；设施外形图假设壁厚是 0.250 in（6.35 mm），待 UF 和机加工核实；转接短管参数仍未定。这一题的依据改为引用 Att-6。\n- **TAP-Q5 的 nose-up 修正保留。** Q3、Q5 仍写成\"项目建议、请 UF 核对\"。\n- **自检**：没有残留的内部路径、中文或内部称呼；md 和 xlsx 都是 44 题。\n- **Att-6 已经接好**：生成脚本加了一个参数，给出图的目录就会做以下几件事：\n - 把三张 PDF 作为 Att-6 放进包里，文件名带 `DRAFT_NOT_RELEASED_FOR_MANUFACTURE`\n - 附件表和封面补上它们的 SHA\n - 删掉 \"to follow\" 字样\n - 生成 SHA256SUMS。\n\n 我用当前 rev A 目录在临时目录试跑过，通过了。对外包的文件名不变。\n\n决策记录（第 13 条）和项目页已经更新。"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 15:41",
+      "text": "【委托 · 来自 风洞 Lead】修订图已到：并入 Att-6 并重生成对外最终版\n修订后的测压孔图已到（审查 + 修订，兄弟 Lead 复核合格）：\n- 图： 版）→ 作 Att-6，标 DRAFT — NOT RELEASED FOR MANUFACTURE；对外只附 PDF，不附脚本与 review bundle。\n- 148 孔总表与参考压力预算也随修订更新（1.2 m 改为整管总长 TBC(UF)，不再标 confirmed）：Att-3/Att-4 请从 当前文件重新取，再走你的去内部化脚本。\n- 题面按兄弟 README 第 32、36 行同步：TAP-Q4＝UF 能否核准 1.2 m 名义总长、逐孔内部/外部分段、URTH-063/73ZOCM-063 端接及不锈钢转接短管 ID/OD/长度/插入深度，并把内径/容积突变纳入漏检和动态传递/同步 pilot？TAP-Q6＝UF/机加工能否核实 0.250 in 壁厚假设并确定孔径/孔深/公差、钻进终点、去毛刺、密封及转接短管尺寸与容积突变的样件检验规范？TAP-Q8 照。\n- 重生成对外版（文件名不变，SHA256SUMS 更新），核对：44 题、218 行矩阵、148 孔、Att-6 三张 PDF、无内部字样。完成后 --report 一次'最终版'，写新 SHA-256。\n（原因：兄弟子项目 rev A 审查修订完成、复核合格；对外包可以补齐）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 15:41",
+      "text": "SHA256SUMS 漏了 Att-1（脚本误把 .zip 排除了），修正后重跑，并检查 PDF 图面文字。图框里还有本机路径、\"windtunnel bot\"、\"Liang Hu: NOT REVIEWED\"。我改 SVG 副本里的这几处文字，再用 rsvg 渲染成 PDF，源文件不动。渲染正常，A3 版面和源图一致。下面上报最终版，并更新决策记录和项目页。对外最终版已经生成，并作为\"最终版\"上报给你。Liang Hu 只要填开头 PI/contact 那一行，就能原样转给 UF。\n\n## 结论\n- **包**：，SHA-256 `795b996bf852701b32a1a78e363121d1ff08288cc9778fa0e9721475aed17e43`。同名目录里的 SHA256SUMS.txt 列了全部 12 个文件的 SHA。\n- **核对都通过**：\n - RFI 共 44 题：A8、B6、C4、D5、E4、F5、G4，加测压孔节 TAP-Q1–Q8；全部 TBC，md 和 xlsx 一致。\n - Att-2 矩阵 218 行。\n - Att-3 是 148 孔表，Att-4 是参考压力预算，两份都从兄弟子项目 11:45 的修订版重新取，1.2 m 写成整管总长、TBC（UF）。\n - Att-6 是三张 rev A 图的 PDF，标着 DRAFT — NOT RELEASED FOR MANUFACTURE，正攻角是 nose-up、图中顺时针。\n - Att-1 是 v6.7 ZIP 原件，SHA 是 `…6876e`。\n - 所有 md、csv、xlsx 和 PDF 的文字都扫过一遍，没有内部字样。对外只附 PDF，不附脚本和 review bundle。\n- **题面**：TAP-Q4、Q6 按兄弟 README 第 32、36 行译成英文；TAP-Q8 按；Q3、Q5 仍是\"项目建议、UF 核对\"。\n- **Decision I made**：三张图的图框里有本机路径、\"Author: windtunnel bot\"、\"Liang Hu: NOT REVIEWED\"、\"DOWN: DESIGN_ONLY_NOT_ACTIVE\"、\"07-08\"这几处文字。我在对外副本里只改了这几行，然后重新渲染成 PDF。为什么：验收标准是对外包不用再动就能转给 UF。图形、孔位、尺寸、版次、DRAFT 标记都没动，页面仍是 A3，我看过渲染图，没问题。源图没动。错了的代价：如果兄弟子项目不同意改图框，换回原 PDF 重跑脚本就行。\n- **下一步**：Liang Hu 填 PI/联系人后转给 UF，这是对外动作，我不发。UF 的书面回复和设施安全审查是硬门，回复到之前本子项目暂停派活。\n\n决策记录（第 14 条）和项目页已经更新。\n\n\n\n\n（附件：2026-10-.zip）\n\n（附件：UF_RFI_consolidated.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 19:57",
+      "text": "【委托 · 来自 风洞 Lead】Liang Hu 定起点为 UF 无回音：出对外最终版，并推进我方可做的 pilot 准备\nLiang Hu 确认：UF 长期无回音，本子项目的起点按'UF 无回音'定。不要暂停，把我方能做的做完。\n1) 对外最终版（最优先；若已排队的 、 已收到，就合并成一次处理）：并入 TAP-Q8；TAP-Q4、TAP-Q6 用兄弟 README 第 32、36 行的新措辞；Att-3、Att-4 从 15_…/ 当前文件重新取；Att-6 用 15_…/ 里三张 WT-Mxx-TAP_revA.pdf。用你的脚本重生成 44 题、218 行、148 孔、Att-6 三张图、无内部字样）。\n另外，根 Lead 写的催问邮件草稿 引用了题号 A04、B01、C01/C02、D01、E01，以及'44 questions'。请核对这些和最终包一致，不一致就直接改草稿。完成后 --report，写明新的 SHA-256。\n2) 我方 pilot 准备，不依赖 UF：给 Att-5 pilot（M11 0° YM02 UP）派 windtunnel 做数据接收与质检流水线骨架，在自动化 Level 0–1 之内。要求：\n- run manifest schema\n- 压力、Cobra、PIV 三路原生速率的读入接口，格式未定的部分做成可替换的适配器\n- 按 Att-5 的阈值逐项自动判定：跟踪、起坡、同步偏斜和漂移、丢样、PIV 有效矢量率、容量\n- N_p bootstrap 收敛判据\n- 用合成数据端到端跑通，合成数据必须明确标 SYNTHETIC，不得写成实测。\n验收：一条命令从合成 run 目录出一页 QA 报告。不新造设计版本号；DOWN 不涉及。\n3) 之后本子项目进入等 UF 状态；UF 一回复就转根。\n（原因：Liang Hu 10-09 13:40 确认 UF 长期无回音、无反馈；要求把我方能做的推进到位；Liang Hu 将亲自发催问邮件）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 19:57",
+      "text": "对外包已对齐管路裁决（A04 改为 625 Hz 足够），重新生成后的 SHA 是 …。下面改催问邮件草稿，再派 QA 流水线。对外最终版已重新生成，催问邮件草稿也按包核过、改好了。pilot 的质检流水线已派给 windtunnel，还在做，没有结果。已上报根。\n\n## 结论\n1. **对外最终版**：，SHA-256 `39b714dab753313c5a45bcf471ab55bd0284f6a6f32d65913df17953eee68c91`，替换之前的 …。\n - TAP-Q8、TAP-Q4/Q6 新措辞、Att-3/Att-4 修订版、Att-6 三张图，上一轮都已经在包里。\n - 核对通过：\n - 共 44 题，含 TAP-Q1–Q8\n - 矩阵 218 行，测压孔表 148 孔\n - Att-6 三张 PDF\n - md、csv、xlsx 和 PDF 全文扫过，没有内部字样。\n - **这次唯一的内容改动在 A04 和 pilot 表的压力采样一句。** 原来写\"1200 Hz 请求和 625 Hz 冲突，不预设\"，现在改成\"600–625 Hz 足够，1200 Hz 不是要求（理论管路预估，待 UF 实测），请 UF 给出实际能持续的速率\"。依据是管路裁决第 2 条：最高关心频率约 125 Hz；YM2019 用的是 600 Hz（卡片 UUXI8ZDE 第 63 行）。不改的话，包里的说法会和催问邮件里\"625 Hz 足够\"互相矛盾。\n2. **催问邮件草稿已直接改了三处**：\n - 包的 SHA 换成新的 …8c91\n - \"共享硬件触发和 run ID — D01\"改成\"D01/D02\"，因为触发和时钟关系在 D02\n - 写明 PI/联系人要填两处：md 第 4 行，以及 xlsx Cover 页第 4 行。\n\n 引用的其余题号 A04/A05、B01、C01/C02、E01，以及\"44 questions\"，都和包一致。\n3. **pilot 质检流水线**：交给 windtunnel 的要求如下：\n - run manifest schema\n - 压力、Cobra、PIV 三路读入接口，UF 格式未定的部分做成可替换的适配器\n - 按 Att-5 阈值自动逐项判定：跟踪、起坡、同步偏斜和漂移、丢样、PIV 有效矢量率、容量\n - N_p bootstrap 收敛判据。\n\n 用合成数据跑两组，一组应全部通过，一组故意让几项不通过，证明判定拦得住。合成数据全部标 SYNTHETIC — NOT MEASURED DATA。验收标准是一条命令从合成 run 目录出一页 QA 报告，自动化只到 Level 0–1，不涉及 DOWN，不新造版本号。\n4. **下一步**：流水线交回来我验收；验收后本子项目进入等 UF 状态，UF 一回复就转根。\n\n决策记录（第 15–16 条）和项目页已经更新。\n\n\n\n\n\n（附件：2026-10-.zip）\n\n（附件：2026-10-.md）\n\n（附件：pilot_QA_pipeline_20261009.txt）"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 20:14",
+      "text": "【委托结果 · 风洞智能体】pilot 数据接收与质检流水线骨架（合成数据跑通）\n已交付 Level 0–1 离线流水线骨架，路径为。从该目录运行，即可生成带有“SYNTHETIC — NOT MEASURED DATA”页眉的 QA 报告； 会生成数据并跑完全部自测。4 项单元测试通过，ZIP 的 49 个文件通过 CRC 和逐文件比对。\n\n合成判定结果：pass_W_TE＝GO，pass_W_LE＝GO；fail_W_TE＝NO_GO，fail_W_LE＝NO_GO。故障组被跟踪 RMS、压力丢样和 W_TE 有效矢量率三项拦下。独立合成 run 摘要的 Nₚ bootstrap 在 N＝20 达到脚本停止规则。仅依赖 Python 标准库，无需安装第三方包。\n\n尚待 UF 数据格式确定后替换压力、Cobra、PIV 三路适配器，并接入实测逐路管路传递函数、真实矢量掩膜与配准、时钟记录及设备容量上限。当前 MEASURED 输入会拒绝接收，而不会借合成配置给出 GO。另有一个必须在真实数据判读前厘清的定义冲突：平滑 YM02 目标从 8 s 开始起坡，但“首次持续超过速度增量 5%”发生得更晚；合成通过组用明确标记的人工早期扰动演示代码路径，不能视为目标时程本身通过起坡阈值。\n\n打包文件：，SHA-256 `b46832ba54d1f8b272eadcabfcc81b42558c9c92b882d74cc5a82498c184f16f`。合成 GO 只证明软件判定路径跑通，不构成实测结果或设施、安全、科学批准。\n\n\n\n（附件：2026-10-09_pilot_QA_pipeline.zip）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 20:14",
+      "text": "流水线在本地跑通了，4 项测试全部通过，两组判定都对。接下来量化起坡定义的冲突：算出 YM02 目标时程自身越过 5% 的时刻。对外包和邮件草稿已更新。下面让 bot 按同样的定义改流水线。质检流水线骨架验收合格，我在本地重跑过，结果属实。bot 自己指出的起坡定义冲突也确实存在，而且这个错也写在已经定稿的对外包里。对外包和邮件草稿已经改好，流水线的修改已派回给 bot。\n\n## 结论\n- **流水线验收**：我把包复制到本地重跑，4 项测试通过。\n - 合成通过组判 GO，故障组判 NO_GO。拦下故障组的三项是：跟踪均方根误差 0.397，超过上限 0.261；压力丢样 26 个；W_TE 有效矢量率 0.82，低于 0.90。\n - 压力重复次数 N_p 的收敛判据停在 20 次。\n - 只用 Python 标准库。合成配置下输入实测数据会被拒收，不会借合成配置判 GO。\n - 一条命令 `python3 -m pilotqa qa <run目录> -o <报告>` 能出一页 QA 报告，页眉标 SYNTHETIC — NOT MEASURED DATA。\n- **起坡判据的问题**：原判据是\"实测起坡和 8 s 相差不超过 0.05 s\"，这做不到。我用 v6.7 UP 的目标时程算过：按\"超过速度增量 5%\"定义，目标自身的起坡点就比命令起坡 8 s 晚 0.28–0.67 s，YM02 是 8.394 s。照原判据，跟踪得再好也会判不合格；bot 的通过组是靠人为加的早期扰动才过的。\n- **Decision I made**：起坡偏差改为\"实测和目标用同一定义求起坡时刻，再相减，相差不超过 0.05 s\"。为什么：只有这样，完美跟踪才能判合格。错了的代价：如果 UF 习惯以命令起坡为基准，另加一项\"实测相对命令的延迟\"就行，其他判据不受影响。\n - **对外包**：Att-5 已改，重新生成后 zip 的 SHA-256 是 `6401cf2fc6be36cef1f9826f64306402bd579d79c1bb5881a04cbe57f36e8f58`，替代 …。44 题、218 行、148 孔、Att-6 三张图、没有内部字样，都复核过。\n - **催问邮件草稿**：里面的 SHA 已同步更新。\n - **流水线**：已派 windtunnel 修改：\n - 删掉人为扰动\n - 故障组再加一项起坡延迟，证明新判据会拦\n - 加一个单元测试：把目标时程本身当实测喂进去，误差应为 0、判 PASS。\n- **下一步**：起坡修改交回来我验收，之后本子项目进入等 UF 状态，UF 一回复就转根。已上报根。决策记录第 17 条和项目页已经更新。\n\n\n\n\n（附件：2026-10-.zip）\n\n（附件：2026-10-.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-09 20:18",
+      "text": "【委托结果 · 风洞智能体】pilot 质检：起坡判据改为与目标同定义相减\n已按 Lead 裁定更新并重跑流水线。起坡偏差现在是 `|t5_measured − t5_target|`：两条时程各自用滤波后的原生样本，取首次连续 3 点超过速度增量 5% 的时刻。YM02 的 `t5_target` 从 v6.7 UP 目标 CSV 现算为 8.394 s；报告另列命令起坡 8 s，不再拿它计算偏差。合成通过组已删除人工早期扰动，改为目标加噪声和 0.02 s 延迟。\n\n交付目录：。最终 ZIP：；SHA-256：`c8287a872eef4f82923fc9afbb5dd6d14a797327efabd1cf99ff42e6bb01ab21`。ZIP 的 49 个文件已通过 CRC 和逐文件比对。\n\n 完成，5 项测试全部通过。新增测试将 YM02 目标本身作为“实测”输入，起坡误差与跟踪 RMS 均为 0，判定均为 PASS。四个合成 run 的结果如下：\n\n| Run | 判定 | 被拦项 |\n| --- | --- | --- |\n| pass_W_TE | GO | 无；t5_measured＝8.420 s |\n| pass_W_LE | GO | 无；t5_measured＝8.420 s |\n| fail_W_TE | NO_GO | 跟踪 RMS、起坡偏差 0.156 s、压力丢样、W_TE 有效矢量率 |\n| fail_W_LE | NO_GO | 同上 |\n\n报告已更新于交付目录的，核验记录见。所有 GO／NO_GO 均针对明确标记为 `SYNTHETIC — NOT MEASURED DATA` 的数据，只验证软件判定路径；不构成实测结论或设施、安全批准。\n\n\n\n（附件：2026-10-09_pilot_QA_pipeline.zip）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-09 20:18",
+      "text": "起坡判据的修改验收合格，我在本地重跑过，结果属实。本子项目我方能做的都做完了，现在进入等 UF 状态，已上报根。\n\n## 结论\n- **起坡判据验收**：流水线 zip 的 SHA-256 是 `c8287a872eef4f82923fc9afbb5dd6d14a797327efabd1cf99ff42e6bb01ab21`。我在本地重跑，5 项测试全部通过。\n - 起坡偏差现在是\"实测和目标用同一定义求起坡时刻，再相减\"。YM02 目标的起坡时刻 8.394 s 是程序从目标 CSV 现算的；命令起坡 8 s 只在报告里列出来，不参与计算。\n - 通过组去掉了人为扰动，起坡偏差 0.026 s，判 GO。\n - 故障组被四项拦下：跟踪误差、起坡偏差 0.156 s、压力丢样、W_TE 有效矢量率，判 NO_GO。\n - 新加的测试把 YM02 目标本身当实测输入，起坡误差和跟踪误差都是 0，判 PASS。\n- **怎么用**：在流水线目录里运行 `python3 -m pilotqa qa <run目录> -o <报告>`，出一页 QA 报告，页眉标 SYNTHETIC — NOT MEASURED DATA。只用 Python 标准库。这些 GO/NO_GO 只说明软件判定路径跑通，不是实测结论，也不代表设施或安全批准。\n- **等 UF 给了才能接上的部分**：\n - 压力、Cobra、PIV 三路数据格式的适配器\n - 实测的逐路管路传递函数\n - PIV 矢量掩膜和配准\n - 时钟记录\n - 相机内存、激光等设备的容量上限。\n- **本子项目已完成的**：\n - 对外包 `…`，44 题，附件 Att-1 到 Att-6\n - 催问邮件草稿\n - pilot 质检流水线。\n- **下一步**：等 UF，不再派活。UF 一回复我就转根，按题号填进 xlsx 的 \"UF reply\" 列，据此定下 pilot 配置和阈值，并换上真实格式的适配器。项目页状态已改为\"等 UF\"，决策记录第 18 条已写。"
+    },
+    {
+      "role": "relay",
+      "who": "风洞试验 Lead · 转达",
+      "ts": "2026-10-10 08:43",
+      "text": "【委托 · 来自 风洞 Lead】汇总：对外最终版（含 Att-6）+ pilot 质检流水线；服务重启后的兜底\n若前面的委托已经做完，本条只核对，不重做。\nA. 对外最终版（最优先）：你 15:38 的包已有 44 题和 TAP-Q8，但 attachments/ 里还没有 Att-6。\n- 把 修订版，审查 和修订 已完成并经复核）复制为 Att-6。\n- TAP-Q4、TAP-Q6 换成该目录 README 第 32、36 行的措辞（含 0.250 in 壁厚假设、不锈钢转接短管、内径和容积突变纳入动态传递 pilot）。\n- Att-3、Att-4 从 当前文件重新取（1.2 m 已改为整管总长 TBC）。\n- 正文里\"Att-6 只预告\"的说法改为已附。重跑 build_uf_outbound.py，SHA256SUMS 一并更新。\n- 核对催问邮件草稿 里的题号 A04/A05、B01、C01/C02、D01、E01 和\"44 questions\"与包一致，不一致就直接改草稿。\n- 完成后 --report \"对外最终版\"，写新的 SHA-256。\nB. 然后：派 windtunnel 做 Att-5 pilot（M11 0° YM02 UP）的数据接收与质检流水线骨架，在自动化 Level 0–1 之内。\n- 内容：run manifest schema；压力、Cobra、PIV 三路按原生速率读入，格式未定的部分做成可替换的适配器；按 Att-5 阈值自动判定跟踪、起坡、同步、丢样、PIV 有效矢量率和容量；N_p bootstrap 收敛判据。\n- 用标明 SYNTHETIC 的合成数据端到端跑通。验收：一条命令出一页 QA 报告。\n- 不新造设计版本号，DOWN 不涉及。完成后本子项目转入等 UF。\n（原因：15:3x 服务重启中断过，之前排队的 、 可能丢失；这一条把两件事合在一起，已做过的只核对不重做）"
+    },
+    {
+      "role": "bot",
+      "who": "风洞",
+      "ts": "2026-10-10 08:43",
+      "text": "A、B 两件在服务重启前都已做完。10-10 08:43 我逐项核对过，没发现要改的地方，也没有重做，核对结果已上报根。\n\n## 结论\n**A. 对外最终版**\n- 文件是，SHA-256 `6401cf2fc6be36cef1f9826f64306402bd579d79c1bb5881a04cbe57f36e8f58`。\n- **Att-6 已经在包里**：三张 rev A 图的 PDF 都在，用的是 11:45 修订版。我只改了图框里的内部字样后重新渲染，图面没动。正文已不再写\"随后补发\"，Att-6 列为已附。\n- **题目**：共 44 题，测压孔一节是 TAP-Q1–Q8。TAP-Q4、TAP-Q6 用的是 README 第 32、36 行的措辞，包括 0.250 in 壁厚假设、不锈钢转接短管、内径和容积突变纳入动态传递 pilot。\n- **Att-3、Att-4**：取自 tap_channel_map 目录下 11:45 的当前文件，1.2 m 写成整管总长、TBC。这两份源文件和三张图在打包之后都没有再改过。\n- **SHA256SUMS**：12 个文件全部校验通过。\n- **前几轮已经并进包里的两处改动**：\n - A04 按管路裁决写成\"625 Hz 足够\"\n - Att-5 的起坡判据改成\"实测与目标按同一定义求起坡时刻再相减\"。\n- **催问邮件草稿**：包的 SHA（…8f58）、\"44 questions\"，以及题号 A04/A05、B01、C01/C02、D01/D02、E01，都和包一致。\n\n**B. pilot 质检流水线**\n- 已完成并验收。文件是，SHA-256 `c8287a872eef4f82923fc9afbb5dd6d14a797327efabd1cf99ff42e6bb01ab21`。\n- 内容：\n - run manifest schema\n - 压力、Cobra、PIV 三路读入，格式未定的部分做成可替换的适配器\n - 按 Att-5 五类阈值自动判定\n - N_p bootstrap 收敛判据，在合成数据上停在 20 次。\n- 合成数据全部标 SYNTHETIC：通过组判 GO，故障组判 NO_GO。5 项测试我在本地重跑通过。\n- 一条命令出一页 QA 报告：`python3 -m pilotqa qa <run目录> -o <报告>`。\n- 你担心丢失的，要做的内容都已覆盖，不用补派。\n\n**状态**：本子项目在等 UF，UF 一回复我就转根。\n\n\n\n\n（附件：2026-10-.zip）\n\n（附件：2026-10-.md）"
+    }
+  ],
+  "files": {
+    "self": "d695bf41.json",
+    "claims": null,
+    "pdf": null
+  }
+}

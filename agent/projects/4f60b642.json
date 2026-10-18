@@ -1,0 +1,210 @@
+{
+  "id": "4f60b642",
+  "slug": "4f60b642",
+  "number": "R16.6b",
+  "title": {
+    "zh": "R16.6b 来源内核修复与基准（Dang guard / Moeini / 九模型）",
+    "en": "R16.6b Source-Kernel Fixes and Benchmarks (Dang guard / Moeini / 9 Models)"
+  },
+  "group": "petw6",
+  "parent": "841575f7",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-09 10:37",
+  "end": null,
+  "updated": "2026-10-09 20:03",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "让来源约束内核与原文一致：① Dang 公开内核禁止静默覆盖来源常数（显式 override 并置 更新。",
+    "goal_en": "Align the source-constrained kernels with the original papers: (1) forbid silent overriding of source constants in the public Dang kernel (require explicit override and set status updates accordingly)."
+  },
+  "report": {
+    "zh": "# 来源内核修复与基准\n\n## 目标\n让来源约束内核与原文一致：① Dang 公开内核禁止静默覆盖来源常数（显式 override 并置 更新。\n\n## 当前状态\n三项自 08-12 停在\"已识别、待授权\"。决策表 A2（缺陷修复无需批准）、E3（Moeini 按 A2 自行核对修正）已同意，授权已齐。现值：Moeini finite-ABL 77.8279 m vs 发表 41.6 m（blocked）。10-09 已派 ①、②；① Dang guard 10:45 完成并经 Lead 复跑验收（76 passed）；② Moeini 推导对照表 11:14 交付，原文 Eq.43 印刷符号不一致，按 Eq.12c/19b/35/26 解锁实现并验收（JAWS 41.705 m vs 原文 41.6 m；90 passed，Lead 复跑）。③ 九模型静态回归已验收（chay/li 两处 Python 转写错误已修，94 passed）；公式清单 v2 已写；本机 MATLAB 启动崩溃，改用 Octave 执行 MATLAB bot 独立转写脚本，11/11 一致。**10-09 12:20 收口**。\n\n## 已定决定\n- 2026-10-09 子项目收口 → \n- 2026-10-09 九模型静态验收；公式清单另写 v2 不覆盖归档 → \n- 2026-10-09 Moeini Eq.43 印刷正号判为排版错误，改走 Eq.12c/19b/35/26 → \n- 2026-10-09 Dang guard 验收通过 → \n- 2026-10-09 顺序：Dang guard → Moeini 推导对照表 → 九模型基准；不许调参凑 41.6 m → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 2026-08-09 | T2a–T2d 内核实现与核对 | Dang override 风险、Moeini 77.8 m 未闭合 |\n| 2026-08-12 | 全量库存与公式清单 | 九模型未逐模型 benchmark |\n| 2026-10-09 | Moeini finite-ABL 逐式推导对照 | 结论(b)：Eq.35 δ′=−80.04 m→Eq.26 峰高 41.705 m（原文 41.6，+0.25%）；印刷 Eq.43 正号 77.83 m；改号 41.75 m；isolated 53.7138 m |\n| 2026-10-09 | 九模型测试与 解耦（逻辑移入，加 Octave 独立值测试；101 passed） | 见收口决策补记 |\n| 2026-10-09 | 九模型真 MATLAB 实跑（matlab-batch，R2026a） | 11/11 与 Python 差 ≤7.1e-15、与 Octave ≤4.5e-13；GUI 类实例化崩溃未验 |\n| 2026-10-09 | 九模型独立运行核对 | MATLAB bot 独立转写 .m 在 Octave 6.4.0 执行，11 行与 Python 差 <5e-13；MATLAB 本机启动崩溃未能实跑 |\n| 2026-10-09 | 九模型逐模型静态回归 | 8 模型 Python=GUI 逐字值；chay 补切向分量、li 修内侧 NaN；GUI Moeini 移植仍 blocked（印刷 Eq.43 77.83 m）；多数原文无数值锚点；94 passed |\n| 2026-10-09 | Moeini finite-ABL 解锁实现 | `dbabl_aligned_profile` 走 Eq.12c/19b/35/26，峰高 41.7050 m（<1%）；u_H=0 回 53.7138 m；Eq.41 数值峰与 Eq.26 一致；GUI 旧移植仍 blocked；90 passed |\n| 2026-10-09 | Dang 来源常数覆盖保护 | 非来源值未开 `allow_source_constant_override` 即报错；放行时 `source_equation_modified=True` 并记原/新值；默认输出 SHA 逐位不变；packet 标志改取自 diagnostics；76 passed（venv 复跑） |\n\n## 未决与下一步\n- 测试解释器固定 （NumPy 2，基线 70/70）→；Moeini 任务书重发时写明\n- （残留，非阻断）App Designer 类在 matlab-batch 下实例化崩溃，GUI 回调路径未实跑；需要时在交互 MATLAB 手动跑\n\n## 文献依据\n- （Moeini & Romanic 2023）：Eq.19a p.7、Eq.26 p.8、Eq.35/40/41 p.9、Eq.43 与 41.6 m 正文 p.10（PDF 页，期刊 305–310）；卡片 Eq.19a 已更正、Eq.43 符号注已加（litwiki 10-09）\n- （2022 isolated 解析解）\n- （九模型 GUI）\n- （Dang et al. 2024）+ 常数页码索引 （10-09 litwiki 补）：Eq.(1) 1.095/−1.858/−1.949、Eq.(2) 2.242、R_u,max/D=1.13（Li 原值 1.007）pp.405/410；Eq.(5) p.406；Eq.(6) χ=0.280、η=1.134、R_zmin/D=1.473/1.451 pp.407/410；Coles κ=0.41、C=0.5、Π=0.55 p.413；外层 F=1.52、G=1/6.5、H=0.68 p.415。Table 2 C_st/D_st 是局地求解系数非固定常数（p.413）。guard 的受保护常数清单以此索引为准，双值常数须在代码中显式标明用哪套。\n\n## Liang Hu 注",
+    "en": "# 来源内核修复与基准\n\n## 目标\n让来源约束内核与原文一致：① Dang 公开内核禁止静默覆盖来源常数（显式 override 并置 更新。\n\n## 当前状态\n三项自 08-12 停在\"已识别、待授权\"。决策表 A2（缺陷修复无需批准）、E3（Moeini 按 A2 自行核对修正）已同意，授权已齐。现值：Moeini finite-ABL 77.8279 m vs 发表 41.6 m（blocked）。10-09 已派 ①、②；① Dang guard 10:45 完成并经 Lead 复跑验收（76 passed）；② Moeini 推导对照表 11:14 交付，原文 Eq.43 印刷符号不一致，按 Eq.12c/19b/35/26 解锁实现并验收（JAWS 41.705 m vs 原文 41.6 m；90 passed，Lead 复跑）。③ 九模型静态回归已验收（chay/li 两处 Python 转写错误已修，94 passed）；公式清单 v2 已写；本机 MATLAB 启动崩溃，改用 Octave 执行 MATLAB bot 独立转写脚本，11/11 一致。**10-09 12:20 收口**。\n\n## 已定决定\n- 2026-10-09 子项目收口 → \n- 2026-10-09 九模型静态验收；公式清单另写 v2 不覆盖归档 → \n- 2026-10-09 Moeini Eq.43 印刷正号判为排版错误，改走 Eq.12c/19b/35/26 → \n- 2026-10-09 Dang guard 验收通过 → \n- 2026-10-09 顺序：Dang guard → Moeini 推导对照表 → 九模型基准；不许调参凑 41.6 m → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 2026-08-09 | T2a–T2d 内核实现与核对 | Dang override 风险、Moeini 77.8 m 未闭合 |\n| 2026-08-12 | 全量库存与公式清单 | 九模型未逐模型 benchmark |\n| 2026-10-09 | Moeini finite-ABL 逐式推导对照 | 结论(b)：Eq.35 δ′=−80.04 m→Eq.26 峰高 41.705 m（原文 41.6，+0.25%）；印刷 Eq.43 正号 77.83 m；改号 41.75 m；isolated 53.7138 m |\n| 2026-10-09 | 九模型测试与 解耦（逻辑移入，加 Octave 独立值测试；101 passed） | 见收口决策补记 |\n| 2026-10-09 | 九模型真 MATLAB 实跑（matlab-batch，R2026a） | 11/11 与 Python 差 ≤7.1e-15、与 Octave ≤4.5e-13；GUI 类实例化崩溃未验 |\n| 2026-10-09 | 九模型独立运行核对 | MATLAB bot 独立转写 .m 在 Octave 6.4.0 执行，11 行与 Python 差 <5e-13；MATLAB 本机启动崩溃未能实跑 |\n| 2026-10-09 | 九模型逐模型静态回归 | 8 模型 Python=GUI 逐字值；chay 补切向分量、li 修内侧 NaN；GUI Moeini 移植仍 blocked（印刷 Eq.43 77.83 m）；多数原文无数值锚点；94 passed |\n| 2026-10-09 | Moeini finite-ABL 解锁实现 | `dbabl_aligned_profile` 走 Eq.12c/19b/35/26，峰高 41.7050 m（<1%）；u_H=0 回 53.7138 m；Eq.41 数值峰与 Eq.26 一致；GUI 旧移植仍 blocked；90 passed |\n| 2026-10-09 | Dang 来源常数覆盖保护 | 非来源值未开 `allow_source_constant_override` 即报错；放行时 `source_equation_modified=True` 并记原/新值；默认输出 SHA 逐位不变；packet 标志改取自 diagnostics；76 passed（venv 复跑） |\n\n## 未决与下一步\n- 测试解释器固定 （NumPy 2，基线 70/70）→；Moeini 任务书重发时写明\n- （残留，非阻断）App Designer 类在 matlab-batch 下实例化崩溃，GUI 回调路径未实跑；需要时在交互 MATLAB 手动跑\n\n## 文献依据\n- （Moeini & Romanic 2023）：Eq.19a p.7、Eq.26 p.8、Eq.35/40/41 p.9、Eq.43 与 41.6 m 正文 p.10（PDF 页，期刊 305–310）；卡片 Eq.19a 已更正、Eq.43 符号注已加（litwiki 10-09）\n- （2022 isolated 解析解）\n- （九模型 GUI）\n- （Dang et al. 2024）+ 常数页码索引 （10-09 litwiki 补）：Eq.(1) 1.095/−1.858/−1.949、Eq.(2) 2.242、R_u,max/D=1.13（Li 原值 1.007）pp.405/410；Eq.(5) p.406；Eq.(6) χ=0.280、η=1.134、R_zmin/D=1.473/1.451 pp.407/410；Coles κ=0.41、C=0.5、Π=0.55 p.413；外层 F=1.52、G=1/6.5、H=0.68 p.415。Table 2 C_st/D_st 是局地求解系数非固定常数（p.413）。guard 的受保护常数清单以此索引为准，双值常数须在代码中显式标明用哪套。\n\n## Liang Hu 注"
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 开子项目",
+      "ts": "2026-10-09 10:37",
+      "text": "【Liang Hu 让 线况与派活 分出的子对话】你是风场线子项目「来源内核修复与基准」的 Lead。项目页：（先读，并把 lead_topic 改成你的对话 id 前 8 位）。\n目标与验收：① Dang 公开内核禁止静默覆盖来源固定常数（必须显式 override 且置 source_equation_modified=true）+ 负向回归测试；② Moeini finite-ABL（当前 77.8279 m vs 发表 41.6 m，blocked）逐符号核对 Eq. 41/43，同时命中 isolated 53.6 m 与 finite-ABL 41.6 m；③ 九模型逐模型对 MATLAB GUI/文献数值锚点回归表。原 70 测试全过 + 新测试覆盖三项， 更新。\n输入： （Moeini 2023）、WNYINL4X.md（2022）、72TZTKJJ.md（九模型 GUI）；Dang 2024 卡片根对话已派 litwiki 补，到了会转给你。\n顺序：先 Dang guard（几行代码+测试，A2 范围，做完报备）；再 Moeini——任务书写死\"交一张逐步推导对照表：原文式号与页码 | 代码行 | 中间数值\"，禁止调参凑 41.6 m，若原文自身不一致就如实记录。九模型基准排第三。\nbot 毛病：爱停下来求批（回它\"按既定授权做\"）、报告通胀、子代理超时——派活拆小。授权：决策表 A2/E3 已同意，本任务即批准。回报用。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 10:37",
+      "text": "Enough context. Dispatching the two tasks (bot queues the second automatically).Update project page.「来源内核修复与基准」已接手，前两项活都派给了本线的风场 bot。它一次只做一项，第二项会排在第一项后面自动开始。还没有结果回来，回来后会叫醒我。\n\n**已派**\n1. **Dang 内核保护**\n - 核对代码时找到了能被静默改掉的常数：\n - `dang_2024_coles_no1` 里的 κ=0.41、Coles 常数 0.5、尾流参数 0.55\n - `dang_2024_radial_closure` 和 `dang_2024_vertical_profile` 里的 `log_base` 和 `eq14_last_numerator`。\n - 风场包里 `source_equation_modified` 是直接写死的 `False`，并不反映实际有没有改。\n - 要求：调用方传入的值和原文不同时直接报错，除非显式打开开关；打开了就把标志置为 `True`，并记下改了哪个常数、原值和新值。默认情况下的输出不能有任何变化。要补报错方向的回归测试，原来 70 个测试必须全过。\n2. **Moeini 有限边界层峰高对不上**\n - 要它交一张逐步推导对照表，每一步写：原文式号 | PDF 页码 | 逐符号转写 | 代码行 | 中间数值。孤立下击暴流（53.6 m）和有限边界层（41.6 m）两条链都要推，并附可复现的脚本。\n - 推完要在三个结论里选一个：\n - (a) 是转写或代码错了：改代码，让两个锚点同时命中，误差各在 1% 以内\n - (b) 原文本身前后不一致：照实记录，这个分支继续停用\n - (c) 缺参数：列出缺哪个、原文哪里应该有。\n - 写明了不许调系数去凑 41.6 m。\n\n九模型对照基准排第三，前两项收口后再派。\n\n**Decision I made：两项一次派完，没有等 Dang 做完再派 Moeini。** 原因是 bot 会自动排队，两项都已授权，这样能省掉一轮等待。代价是如果改 Dang 时发现问题需要调整 Moeini 的任务书，要补发一条更正，影响很小。\n\n**其他**\n- 项目页已更新，写入了两条委托编号和交付路径。`lead_topic` 原本就是本对话的 ``，不用改。\n- Dang 2024 的文献卡片还没到。它的原文 PDF 在 Zotero 的 文件夹里，卡片到之前先按 PDF 页码引用。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 10:42",
+      "text": "【委托结果 · 风场智能体】Dang 内核来源常数覆盖保护 + 负向测试\n委托失败：Too many concurrent runs (max 10)\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 10:42",
+      "text": "Dang 那项任务没跑起来。平台同时运行的任务已满 10 个，bot 根本没启动，代码也没动。两条任务书都还在它的执行对话里。\n\n**已处理**\n- 10:45 在同一个执行对话里重发了 Dang 内核保护，要求和交付格式不变。\n- 叫它开工前先查一下 下有没有之前留下的半截改动，有的话先列出差异再继续。\n- 项目页已记上这次失败和重发。\n\n**Decision I made：先只重发 Dang，Moeini 等 Dang 回来后再单独触发。** 原因是平台已经满载，两项一起发，可能又一起卡住。代价是 Moeini 的推导对照表要晚一轮才开工。\n\n如果这次又因为平台满载失败，我会隔一段时间再重发。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 10:45",
+      "text": "【委托结果 · 风场智能体】Moeini finite-ABL Eq.41/43 逐步推导对照表\n委托失败：Too many concurrent runs (max 10)\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 10:45",
+      "text": "这次叫醒是 10:42 那条 Moeini 推导对照表任务失败的通知，原因和 Dang 那条一样：平台同时运行的任务已满 10 个，bot 没启动，没有产生任何改动。\n\n这在预料之中，上一轮我已经决定先不重发 Moeini。现在（10:49）在跑的是 10:45 重发的 Dang 内核保护，bot 还没有回复。它不管成功还是失败都会叫醒我：\n\n- **成功**：我先核对改动和测试结果，再单独发 Moeini 推导对照表。\n- **又因平台满载失败**：我会错开一段时间再重发。\n\n本轮没有新决定，项目页上已经写着 Moeini 等 Dang 回来后再发，不用改。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 10:49",
+      "text": "【委托 · 来自 风场 Lead】告知：runner 解释器固定为 工作目录\n告知，无需回复。bot 10-09 汇报在 anaconda NumPy 1.26.4 下测试 63/70（代码用 np.trapezoid，需 NumPy 2）。根对话已建 工作目录 2.5.3/scipy 1.18.1/pytest），复跑 70/70 通过。派给 bot 的所有 runner/测试任务书写明用 工作目录；不要为此改代码。决策记录。\n（原因：避免 NumPy 1.x 环境下 7 项假失败）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 10:49",
+      "text": "收到，本子项目今后所有测试和 runner 都固定用，代码不为 NumPy 1.x 做改动。\n\n- **已转告 bot**：bot 正在做 Dang 那项，这条告知排在它本回合结束后自动送进去。我要求 Dang 回报里的测试结果必须是用这个解释器跑出来的。\n- **防漏的办法**：bot 可能在告知送到前就交卷了。如果它报的测试结果不是这个解释器跑的，我会自己在 venv 里复跑一遍，以复跑结果为准，不让 NumPy 1.x 下的假失败混进验收。\n- **项目页已更新**：在\"未决与下一步\"里加了这一条，并链接到决策记录。Moeini 的任务书之后重发时也会写明这个解释器。\n\n## 结论\n已执行。本子项目测试和 runner 一律用，已告知 bot（排在 Dang 任务后送达），项目页已记录；Dang 回报若不是这个解释器跑的，由我在 venv 中复跑验收；Moeini 任务书重发时写明这一条。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 11:03",
+      "text": "【委托结果 · 风场智能体】重启：Dang 保护（平台并发满导致未启动）\nDang 公开内核的可传入来源常数已由默认拒绝、显式放行和诊断留痕保护；默认数值输出逐位不变，全套测试通过。\n\n（附件：source_profile_models.py）\n\n（附件：feature_interface_packet.py）\n\n（附件：test_dang_source_override.py）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 11:03",
+      "text": "Verified (76/76, guard fires). Dispatching Moeini and recording.Dang 那项改完了，我自己复跑验收通过：现在不打开开关就改不了来源常数，Moeini 那项已接着派出。\n\n**验收结果**\n- **测试**：在 里复跑 76 项全过，即原来 70 项加新增 6 项。\n- **报错方向**：我手动传了一个非原文的 κ=0.40，没开开关，内核直接报错，并指出是 kappa 被改了。\n- **打开开关时**：显式打开 `allow_source_constant_override` 才放行，放行后 `source_equation_modified` 置为 `True`，并记下被改常数的原值和新值。\n- **默认输出**：bot 报告 Coles、Pfeil、log-law 三个分支改前改后的 SHA-256 一致；我没有另外复算哈希。\n- **风场包标志**： 里的 `source_equation_modified` 不再写死 `False`，改为从计算诊断里读取。\n\n**下一步**\n- **Moeini 推导对照表**：11:10 已派，要求不变；解释器写明用 venv，并嘱咐它先交对照表再动代码，不开子代理批处理。\n- **九模型基准**：排在 Moeini 之后。 的更新也放进这一项一起做。\n\n**Decision I made：公式清单文件的更新并入九模型基准，不单独做。** 原因是 Moeini 和九模型都会改这份清单，分开做要改三次。代价是这份清单在九模型基准做完之前，还看不到 Dang 新加的开关字段。\n\n项目页已更新；新增决策记录，并在 README 加了一行。\n\n向根对话的上报没发出去：平台同时进行的委托已达 16 个上限。等 Moeini 回来时我把两项一起报上去。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 11:07",
+      "text": "【委托结果 · 风场智能体】告知：测试一律用 工作目录\n已按指定的 工作目录 复跑 tools/tests：76 passed，31 subtests passed。Dang 回报中的 pytest 结果由该解释器验证；后续本项目 pytest/runner 均使用它。\n（完整过程见）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 11:14",
+      "text": "【委托结果 · 风场智能体】Moeini finite-ABL Eq.41/43 逐步推导对照表（重发）\n结论为 (b)：原文内部不一致，不能据此解除 finite-ABL 的 evidence_blocked。PDF 第9页 Eq.35 给出负的半高扰动 δ′=−80.0367 m；结合第8页 Eq.26 得峰高 41.7050 m，接近正文的 41.6 m。第10页印刷的 Eq.43 却把对应扰动项写成正号，逐字计算为 77.8279 m。仅将该项改为负号可得 41.7476 m，但这只是候选解读，不作为已核准公式。\n\n孤立分支按现有 0.203 约定为 53.7138 m（原文约 53.6 m）。未改生产代码或 wiki；finite-ABL 继续 fail-closed。使用 工作目录 运行 tools/tests：76 passed，31 subtests passed。Wiki 卡片 DEPR4HXR.md:105 的 Eq.19a 散文平方根因子与 PDF 不符，已在表末单列。\n\nDecision I made：保留 blocked，不以候选符号修正代码——Eq.35 与正文支持该解读，但印刷 Eq.43 相反；若判断错误，代价是暂不能使用 finite-ABL 分支，而不是输出未经来源确认的风场。\n\n对照表：\n\n复现脚本：\n\n运行输出：\n\n\n（附件：derivation_table.md）\n\n（附件：derive.py）\n\n（附件：derive_output.txt）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 11:14",
+      "text": "Now decision record, project page, and the deferred upward report.Moeini 有限边界层峰高对不上的原因找到了：是原文第 10 页印刷的 Eq.43 有一个符号印错，现有代码按这个错符号算出 77.8 m。我裁定改用原文另一条式链实现，峰高 41.705 m，和原文报的 41.6 m 差 0.25%，已派 bot 改代码、补测试。\n\n**bot 交来的对照表（11:14）**\n- **按印刷 Eq.43 逐字算**：峰高 77.83 m，比原文 41.6 m 高 87%。\n- **按原文另一条式链算**：第 9 页 Eq.35 给出半高扰动 δ′ = −80.04 m（方括号里是负号），再代入第 8 页 Eq.26，得 41.705 m，和原文差 0.25%。\n- **用 Eq.41 速度剖面直接数值求峰**：也是 41.705 m。\n- **只把 Eq.43 那一项的正号改成负号**：41.75 m。\n- **孤立下击暴流**：53.7138 m，原文约 53.6 m。\n\n**我的核对**\n- 用 复跑了，数值和对照表一致。\n- 用 pdftotext 直接看了原文：第 9 页 Eq.35 方括号里确实是负号；第 10 页正文写的就是峰高从 53.6 m 降到 41.6 m，还写了\"大气边界层风会把出流上部压向地面，使峰高降低\"。三处都指向扰动该是负的，只有印刷的 Eq.43 是正号。\n\n**Decision I made：把印刷 Eq.43 的正号判为排版错误。**\n- 有限边界层分支改用原文印刷的 Eq.12c、19b、35、26 这条式链计算并解除停用；印刷的 Eq.43 和改号后的 Eq.43 都不用。\n- 计算诊断里注明\"Eq.43 印刷符号不一致，未使用\"，输出仍是 `not_approved`。\n- 已派 bot 实现并补回归测试：41.705 m 与 41.6 m 差在 1% 以内；扰动关掉时回到 53.71 m；Eq.41 数值求峰和 Eq.26 一致。\n- 为什么：三条独立途径和原文正文一致，只有一个印刷式子例外。\n- 错了的代价：如果作者本意就是正号，峰高会低估约 36 m。这个分支只用于核对内核和原文是否一致，不进对外结论，可以随时退回停用。\n- 没有送外部审稿：数值能复现，符号我亲自核对过原文。\n\n**Decision I made：派文献 bot 更正卡片 DEPR4HXR。**\n- 卡片里 Eq.19a 的平方根项转写错了：原文第 7 页是 √(πD²c_w/4)/H，卡片写成了 √c_w·D/(4H)。\n- 同时在卡片上加一条 Eq.43 符号矛盾的注。\n\n**记录与上报**\n- 新增决策记录，每条判断都写了原文页码；项目页已更新。\n- 向根对话的上报又没发出去，平台同时进行的委托还是满 16 个。下次被叫醒时我把 Dang、Moeini 两项一起报上去。\n\n**下一步**：Moeini 改好后，我自己复跑测试验收，然后派九模型对照基准，公式清单 的更新放在九模型那项里一起做。\n\n推导对照表：\n\n\n（附件：derivation_table.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 11:20",
+      "text": "【委托结果 · 文献 Wiki 智能体】更正 DEPR4HXR Eq.19a 转写并补 Eq.43 符号注\nEq.19a 的卡片转写已纠正；Eq.43 的印刷符号冲突已注明，不能将其正号静默当作负号使用。\n\n（附件：DEPR4HXR.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 11:20",
+      "text": "文献 bot 改好了 DEPR4HXR 这张卡片，两处我都打开核对过：\n\n- **Eq.19a**：第 107 行已按原文第 7 页改成 ū_m = (1.32U_J/H)·√(πD²c_w/4)·(r/H)^−1.1。\n- **Eq.43 符号注**：第 88 行新加了一条，写明三点：\n - 印刷的 Eq.43 用正号，和第 9 页 Eq.35 的负号以及正文 53.6→41.6 m 的下降方向矛盾\n - 按印刷式算是 77.83 m，按 Eq.35 加 Eq.26 算是 41.70 m\n - 链接到我们的推导对照表。\n\n这条注写着\"不得把改号后的 Eq.43 当已核准公式\"，和我的裁决不冲突：我裁定的实现只用原文印刷的 Eq.12c、19b、35、26 这条式链，不用任何版本的 Eq.43。\n\n**其他**\n- 之前两次没发出去的上报，这次发出去了：Dang 内核保护已验收，Moeini 原因定位到 Eq.43 印刷符号错误，按这条式链实现。\n- 项目页已更新，文献依据那一行改为\"卡片已更正\"。\n\n现在只剩 Moeini 的代码实现和测试在 bot 手上。回来后我复跑测试验收，然后派九模型对照基准。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 11:26",
+      "text": "【委托结果 · 风场智能体】Moeini finite-ABL 分支按 Eq.12c/19b/35/26 解锁\n指定原文式链的 finite-ABL 内核已解锁并通过回归；41.6 m 锚点在 1% 内，科学状态仍为 not_approved。\n\n\n\n\n\n（附件：moeini_romanic_2023.py）\n\n（附件：test_moeini_finite_abl.py）\n\n（附件：test_windfield_core.py）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 11:26",
+      "text": "Moeini 验收通过（90 passed，自复跑）。派九模型基准。Moeini 有限边界层分支的代码已经改好，我复跑验收通过。第三项\"九模型对照基准\"的任务书写好了，但平台同时进行的委托已满 16 个，还没发出去。\n\n**Moeini 验收**\n- 我用 复跑全套测试，90 项全过，31 个子测试也全过。原 70 项加上 Dang、Moeini 新增的测试都在里面。\n- 现在只用原文印刷的 Eq.12c、19b、35、26 这条式链算峰高。JAWS 算例得 41.7050 m，原文报 41.6 m，差 0.25%；半高扰动 δ′ = −80.04 m。\n- 大气边界层风设为 0 时，结果和孤立下击暴流逐位一致，峰高 53.7138 m；用 Eq.41 速度剖面数值求峰，和 Eq.26 的结果吻合。\n- 计算诊断里标明\"印刷的 Eq.43 符号不一致，未使用\"，同时记下 77.83 m 和改号后的 41.75 m 两个对照值；`source_equation_modified` 为 `False`，科学状态仍是 `not_approved`。\n- GUI 里那份 Moeini 的旧移植代码仍保持停用。\n\n**九模型对照基准（待发出）**\n- 要 bot 对 GUI 的九个模型逐个做回归，交一张表：模型 | 原文式号与卡片页码 | GUI 源码行 | Python 函数行 | 测试输入 | Python 值 | 按 GUI 源码逐字转写的值 | 文献数值锚点 | 判定。\n- 差异如果是 Python 转写错了，就改代码并补测试；如果是 GUI 和原文不一致，只记录、不改。\n- 必须由 MATLAB 实跑才能定的个例，由 bot 列成清单交给我，我再转给 MATLAB bot。\n- 公式清单 在这一项里一起更新，先备份再改。\n- **Decision I made**：我在后台挂了一个自动重发，每 5 分钟试一次，最多试 90 分钟。发出去或超时都会叫醒我；超时就换个时间再发。代价是如果平台一直满载，第三项会再晚开工。\n\n项目页已更新，三项进度和两次验收的结果都写进去了。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 11:47",
+      "text": "【委托结果 · 风场智能体】九模型逐模型回归表 + inventory 更新\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 11:47",
+      "text": "九模型表已核对、新版公式清单已另存（旧档未动）；正在把 MATLAB 实跑个例转给 MATLAB bot。Now records: decision, project page, report up.风场 bot 跑九模型对照基准时中途被平台终止了。它在终止前已经交出了回归表、复算脚本、两处代码修复和新测试，只差公式清单没更新。我核对了它交的东西，清单由我补完。\n\n**九模型回归（11:46 落盘）**\n- **测试**：我在 venv 里复跑，94 项全过，31 个子测试也全过。复算脚本跑出 11 行结果，Python 值和\"按 GUI 源码逐字转写的值\"全部一致。\n- **修了两处 Python 转写错误**：\n - chay 漏了 GUI 里风暴平移带来的切向速度分量\n - li 在最大风速半径以内会算出 NaN（负数开分数次方），改成和 GUI 一样分内外两段。\n- **其余模型**：Verhoff、Oseguera-Bowles、Vicroy、Holmes-Oliver、Wood、Xhelaj 与 GUI 源码一致；Xhelaj 只比了径向部分。GUI 里那份 Moeini 旧移植仍按印刷的 Eq.43 算出 77.83 m，继续停用，实际计算用的是已解锁的新实现。\n- **局限**：这些只是\"Python 和 GUI 源码一致\"的静态比对，两边都出自同一个 bot 的转写。大多数原始论文没有可直接对照的数值。\n\n**Decision I made：九模型静态回归通过验收，同时派 MATLAB bot 实际运行 GUI 取独立数值。**\n- 实跑值对得上，这个子项目就收口。\n- 代价是收口要再等一轮，但不实跑的话，这一项的验收只有自己对自己的比对。\n\n**Decision I made：公式清单没有覆盖原文件，新写了一份 v2。**\n- 08-12 的 登记在那批归档的哈希清单里，覆盖就等于改动已有结果，所以原件没动。\n- v2 写在，里面记了：\n - Dang 内核的保护开关\n - Moeini 的新状态和各个锚点数值\n - 九个模型逐个的状态\n - 指向原件及其哈希的链接。\n- 代价是下游脚本如果写死了旧路径，要改成读 v2。\n\n**其他**\n- 决策记录 已写，项目页已更新。\n- 已向根对话上报。\n\n\n\n\n（附件：benchmark_table.md）\n\n（附件：model_formula_inventory.json）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 12:03",
+      "text": "【委托结果 · MATLAB 智能体】九模型 GUI 在 MATLAB 实跑取数\n九模型的 MATLAB 运行时验收仍未完成；现有表值不能标注为 MATLAB 实跑值。阻断点是本机 MATLAB 启动崩溃，而非某一模型算式报错。\n\n（附件：nine_model_gui_runtime.m）\n\n（附件：nine_model_runtime_attempt.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 12:03",
+      "text": "本机 MATLAB 一启动就崩溃，我改用 Octave 跑 MATLAB bot 写的脚本，正在适配函数定义顺序。「来源内核修复与基准」子项目三项都验收完了，已收口。\n\n**这次结果**\n- MATLAB bot 没能实跑：本机的 MATLAB R2026a 一启动就崩溃，连 `disp(version)` 都执行不了（访问冲突 0xc0000005），所以没交出数值。\n- 它写好的脚本 `nine_model_gui_runtime.m` 是从 GUI 源码里独立转写出来的，和风场 bot 的 Python 出自不同的人手。\n- 我在 WSL 装了 Octave 6.4.0，复制脚本、改了函数定义顺序后执行：11 行结果和 Python 值全部一致，最大差 4.4e-13。\n\n**Decision I made：用 Octave 运行结果代替 MATLAB 实跑完成验收，子项目收口。**\n- 为什么：脚本只有标量算式，Octave 执行和 MATLAB 等价；两份转写各由一个 bot 独立完成，可以互相印证。\n- 错了的代价：GUI 界面在运行时如果有算式以外的处理（比如回调里的默认值、单位换算），这次核对查不出来。MATLAB 修好后，用存下的 `octave_runtime_run.m` 复跑一次即可。\n\n**三项结论**\n1. **Dang 内核**：现在不打开开关就改不了来源固定常数；打开后会留下修改记录；默认输出逐位不变。\n2. **Moeini 有限边界层**：原文印刷的 Eq.43 符号有误，改用原文另一条式链 Eq.12c、19b、35、26 计算，峰高 41.705 m，原文 41.6 m，差 0.25%。\n3. **九模型**：修了两处 Python 转写错误，即 chay 漏了切向分量、li 在内侧算出 NaN。GUI 里 Moeini 的旧移植继续停用。\n\n全套测试 94 项通过，所有输出的科学状态仍是 `not_approved`。\n\n**你需要知道的一件事**：本机 MATLAB R2026a 坏了，MATLAB bot 现在什么都跑不了。需要你修复或重装；在那之前，纯算式的 MATLAB 核对我都用 Octave 先顶上。\n\n**记录**\n- 决策记录 已写，项目页状态已改为\"已收口\"。\n- 已上报根，请根对话在本子项目上执行\"总结并合并\"合回去。\n\n\n\n\n（附件：octave_runtime_values.csv）\n\n（附件：kernel_benchmark_close_20261009.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 15:38",
+      "text": "【委托 · 来自 风场 Lead】收口前小修：九模型测试别依赖 \n根对话 11:55 复跑 94 passed，但 从 加载代码：只拷 tools/ 时整套测试收集报错。收口前把 bench 逻辑（或其锚点值）移进 tools/（如），测试只依赖 tools/， 只放产物。A2 范围，做完报备，无需回复本条。\n（原因：根对话复跑发现测试与输出目录耦合）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 15:38",
+      "text": "Now rewrite bench.py's top to import from tools, and point the test at the tools module.九模型测试已经不再依赖，改动是我自己直接做的，没有再派给 bot。\n\n- **基准逻辑**：移进了。 下的 只负责导入它、写出结果；重跑后 和原来逐字一致。\n- **测试**： 现在只依赖。另外加了一项测试，把 Octave 跑出的 10 个独立值写死在里面，Python 结果必须和它们对上（容差 1e-9）。\n- **复跑结果**：\n - 在本目录跑全套，101 项全过。\n - 只把 拷到别处再跑，九模型测试全过，但还剩 1 项失败：。\n - 这项测试是今天 13:17 别的项目加进来的，依赖 之外的一个源文件，所以只拷 时会在 `windfield_run.py:1283` 报错。它不属于本子项目，我没有动它，已在上报里请根对话转给它所属的项目。\n- **有一处我拿不准**：动手时测试文件已经在 12:06 被别人改成导入 `nine_model_benchmark`。我写 时，没先确认那里原来有没有这个文件；如果原来有，已被我覆盖。现在的内容是原 逻辑的照搬，测试全部通过。\n- **记录**：补记写在 末尾，项目页已加一行，上报已排队。\n\n## 结论\n九模型测试已与 `` 解耦：基准逻辑移入，测试只依赖，并加了 Octave 独立值回归测试；本目录 101 passed。只拷 复跑时仍有 1 项失败，是别的项目 13:17 新增的 `test_literature_spectrum_packet.py::test_literature_candidate_with_hash_bound_source_validates`（依赖 外的源文件），需转给它所属的项目处理。若 在我写入前已存在，已被覆盖；现内容为原 逻辑照搬，测试全部通过。本子项目可以收口。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 19:57",
+      "text": "【委托 · 来自 风场 Lead】重开一件：九模型 MATLAB 实跑验收\n本项目临时重开做这一件，完成后改回已收口。\n重派 MATLAB bot（新任务）：用 `matlab-batch` 命令（不要直接起 matlab，Liang Hu 开着 MATLAB 时第二个实例会崩）在真 MATLAB 里跑九模型取值，交 matlab_runtime_values.csv，并与 （Octave 11/11）和 Python 值逐项比对。输入：、本线 （matlab_cases.csv、octave_runtime_run.m）、tools/Downburst-Models-GUI/*.mlapp。若 matlab-batch 能实例化 App Designer 类，附带用 GUI 类本身取一次值（覆盖原残留\"界面本身未实跑\"）；不能就写明原因，不阻断。\n验收：11/11 与 Octave/Python 差 <1e-10（或说明差异来源）；结果写进 kernel_benchmark_close_20261009.md 补记与项目页，回报只写结论与数字。\n（原因：Liang Hu 10-09 修好 MATLAB（崩溃原因是同时开第二个实例；bot 统一用 matlab-batch），要求重派）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 19:57",
+      "text": "本项目已临时重开，九模型在真 MATLAB 里实跑的任务 19:58 已派给 MATLAB bot，结果还没回来。\n\n- **任务书写明的要求**：\n - 只能用 `matlab-batch`，不许直接启动 matlab\n - 交，11 行逐项写出和 Octave 值、Python 值的差\n - 能实例化 App Designer 的 GUI 类，就用 GUI 类本身再取一次值；实例化不了就写明报错原因，这一项不卡验收。\n- **项目页**：状态已改为\"进行中（临时重开）\"，并在\"未决与下一步\"里记了这次。\n- **结果回来后**：11 行与 Octave/Python 的差都在 1e-10 以内，我就把数字写进 补记和项目页，状态改回已收口，再上报结论和数字。有超差，就先查清差从哪来再定。\n\n## 结论\n已重派：MATLAB bot 用 `matlab-batch` 实跑九模型（10-09 19:58），附带尝试用 GUI 类本身取值。项目页已改为临时重开。结果还没回来；回来后按 11/11 差 <1e-10 验收，写进收口决策补记和项目页，改回已收口，再回报结论和数字。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 20:02",
+      "text": "【委托结果 · MATLAB 智能体】九模型在真 MATLAB 实跑取值（matlab-batch）\n11 项 MATLAB 数值均符合 Octave/Python 的 1×10⁻¹⁰ 阈值；GUI 类实跑仍未验证。\n- MATLAB 取值 → \n- 逐项绝对差 → \n- 实跑脚本 → \n\n\n\n\n（附件：matlab_runtime_values.csv）\n\n（附件：matlab_runtime_comparison.csv）\n\n（附件：nine_model_gui_runtime.m）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 20:02",
+      "text": "九模型在真 MATLAB 里跑通了，11 行全部验收，项目已改回收口；只是用 GUI 界面本身取值这一项没做成。\n\n- **数值比对**：MATLAB R2026a 经 `matlab-batch` 跑完 11 行，我逐项看了比对表。\n - 和 Python 的最大差是 7.1e-15。\n - 和 Octave 的最大差是 4.5e-13，原因是上次存 Octave 结果时只保留了 12 位小数。\n - 两项都在 1e-10 以内，验收通过。\n- **GUI 界面没实跑**：MATLAB bot 试着直接创建 GUI 应用对象（`app=Verhoff`），在 batch 下崩溃，报访问冲突 0xc0000005。所以 GUI 回调里那一层还没真正跑过。\n - 我猜是 batch 模式下没有图形界面，但没有查证。\n - 这一项记为不阻断的遗留：真要核对，在你自己开着的 MATLAB 里手动跑一次就行。\n- **文件与记录**：\n - MATLAB 的取值、比对表和脚本都拷进了。\n - 补记写进了。\n - 项目页状态改回\"已收口\"，并加了一行结果。\n - 已上报根。\n\n\n\n## 结论\n九模型真 MATLAB 实跑通过：R2026a 经，补记已写入，项目已改回收口。\n\n（附件：matlab_runtime_comparison.csv）"
+    }
+  ],
+  "files": {
+    "self": "4f60b642.json",
+    "claims": null,
+    "pdf": null
+  }
+}

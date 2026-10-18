@@ -1,0 +1,905 @@
+{
+  "id": "907416cd",
+  "slug": "907416cd",
+  "number": "R16.3",
+  "title": {
+    "zh": "R16.3 统计与极值 EVA 总线",
+    "en": "R16.3 Statistics & Extreme-Value Analysis (EVA) mainline"
+  },
+  "group": "petw3",
+  "parent": null,
+  "depth": 0,
+  "status": {
+    "zh": "进行中",
+    "en": "Ongoing"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-09 10:25",
+  "end": null,
+  "updated": "2026-10-18 00:49",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [
+    {
+      "id": "dec-0000",
+      "ts": "2026-10-09 10:30",
+      "title": "EVA 线 Lead 第一轮：决策表落地与项目结构（2026-10-09）",
+      "label": "决定",
+      "text": "# EVA 线 Lead 第一轮：决策表落地与项目结构（2026-10-09）\n\n决定者：EVA Lead（Claude）。依据：Liang Hu 10-09 根对话指令； F 节。\n\n1. 09-25 决策表\"你的选择\"空项按默认同意（Liang Hu 10-09 明示）：\n - F1 机制分层按 bot 草案为现行规则；v2 定稿在子项目「EVA 输入合同与机制分层定稿」做。\n - F2 参考情景 admission → 有通过行即做 baseline-only、not-for-design 演练，不再请示。参考包本身按 Liang Hu 10-04 改为我们自己的 WRF 4.0.3 模拟（取代 A1 的 C0/C2）。\n - F3 C01–C08 升正式条目，归入「EVA 输入合同与机制分层定稿」。\n - A2 文档口径统一无需批准：FINAL_QA_REPORT.md 不一致由 bot 直接改、报备。\n - 基线第六节\"Liang Hu 需要重新确认的决定\"第一至七条均由上述各项覆盖，不再转 Liang Hu；其中涉及重现期/设计风的对外结论仍归 Liang Hu。\n2. 演练边界（Lead 定）：不拟合 POT/GPD/GEV、不出重现期；Liang Hu 定近期目标为\"打通接口 + 不确定性传播演练\"，真正的年极值样本等事件线多事件样本。错了的代价：演练只证明管线可用，不产生科学数字，返工成本低。\n3. 项目结构：按启动方案建 2 个子项目（参考情景 Vhat_3s 试算；EVA 输入合同与机制分层定稿）；方案 2.3\"综述收尾\"不建子项目，作为根对话下一次性任务。理由：只剩文档改正与交付。\n4. 科学注记（无文献依据，基于定义）：WRF d03 逐分钟帧是格点瞬时值或区间最大，不等于 10 m、3 s 滑动平均、开阔地形阵风；转换方法与不确定度是子项目 2.1 的首要设计项，须引子库卡片页码（C07 禁止直接套用飓风阵风系数）。"
+    },
+    {
+      "id": "dec-0001",
+      "ts": "2026-10-09 10:38",
+      "title": "参考情景试算：主情景未定前先用 exp-A 打通接口（10-09 10:45，Decision I made）",
+      "label": "决定",
+      "text": "# 参考情景试算：主情景未定前先用 exp-A 打通接口（10-09 10:45，Decision I made）\n\n做了什么：试算子项目不等 WRF 线 E 组分类，先以 exp-A d03 逐分钟帧（TACC keep 集，B 152 + C 46 帧，已有逐帧 SHA256）为数据源准备字段映射、阵风转换脚本与演练；主情景定后换数据补一版。同时委托 litwiki 补\"模拟格点风→10 m/3 s/开阔地形阵风\"转换文献（Note_v0 标明子库未覆盖）。\n为什么：Liang Hu 10-09 定近期目标是\"打通接口 + 不确定性传播演练\"，演练只验证管线、不产生设计数字；exp-A 无论是否成为主情景都是 4.0.3 同口径（U10=U10E）。\n依据：WRF 口径；帧保全；转换方法的文献依据待 litwiki 卡片（当前：无文献依据，基于本线数据）。\n错了的代价：若主情景是 E 组成员，演练需换输入重跑一次（本地 Python，小时级）；exp-A 强风尾部偏弱（≥35 m/s 面积 231 vs 作者 474 km²）须在每行 notes 标注。"
+    },
+    {
+      "id": "dec-0002",
+      "ts": "2026-10-09 10:55",
+      "title": "v2 合同：行类型三分，纯模拟行最高只到 proxy only（10-09 11:00，Decision I made）",
+      "label": "决定",
+      "text": "# v2 合同：行类型三分，纯模拟行最高只到 proxy_only（10-09 11:00，Decision I made）\n\n**做了什么**：v2 准入规则新增必填字段 `row_type`，三值：\n| row_type | 含义 | 可进的类别 | 必填（在 I1–I8 之外） | not-for-use 标志 |\n| --- | --- | --- | --- | --- |\n| `observation` | 观测原生风 + 可转换的 Vhat_3s | 五类全可（按 I1–I8） | 现有观测字段 | 无新增 |\n| `obs_anchored_simulationsimulation_id`、`simulation_variable`、`simulation_point_matchsimulation_status`、源哈希 | `sim_not_vhat3s=true` |\n| `simulation_onlyproxy_only`；模拟目标风有独立 QA 的转换产品（I6）且机制明确时最高 `mechanism_sensitivity`；**永不 `main_analysis`** | `simulation_id`、`simulation_variable`、`postprocessing_method_to_vhat3s`、`simulation_status`、`resolution_status`、源哈希；观测列显式置 `not_applicable`（不留空、不补造） | `sim_not_vhat3s=true`、`not_for_design_use=true` |\n\n**WSPD10MAX 口径**：v2 字段定义写为\"仅诊断，不是 3 s 阵风，也不作 3 s 阵风上界或下界\"。依据：WRF Lead 核对 4.0.3 L456–465、550–555 与 exp-A namelist（无 afwa_diag_opt）——它是每 1 min 输出间隔内逐积分步（4/3 s）10 m 格点风的最大值，间隔开头清零；03:30 帧全场为 0 须排除（ L23–32）。兄弟子项目委托里\"AFWA 诊断、混入 1 km 风\"的说法已被 WRF Lead 更正，不采用；结论（禁用为阵风/界）不变——格点体积平均与逐步瞬时采样两种偏差方向相反，无法给定界。\n\n**为什么**：v1 门结构上不收纯模拟行，硬填即补造行；但打通接口与不确定性演练需要模拟行有合法去处。把模拟行限制在 proxy_only / mechanism_sensitivity，既不放宽主分析，又让演练可走通。\n\n**错了的代价**：若日后有经独立验证的模拟→Vhat_3s 转换，可单独立门把 `simulation_only` 升到 main_analysis，只改一条规则；现在过严只是主样本少，不产生错误数字。\n\n**依据**：无文献依据，基于本线数据（试算子项目映射表 ：43 列中 16 列纯模拟不可填）；门规则 Required admission conditions；兄弟决定。"
+    },
+    {
+      "id": "dec-0003",
+      "ts": "2026-10-09 10:57",
+      "title": "输入合同 v2 草案 · 审查 裁决（10-09 11:20）",
+      "label": "决定",
+      "text": "# 输入合同 v2 草案 · 审查 裁决（10-09 11:20）\n\n审稿人：Gemini（有保留支持）、GPT-6（不支持当前版定稿）。GLM 因系统委托上限未派出，按两份裁决。\n被审文件：（…）、（…）、（…）。\nLead 核实：字段清单 L5 vs L20 冲突、L56 只写缺失不写 true、检查器 L37–39 缺 event_id 行被 ignored、L49–62 黑名单与 notes 规则、CSV 表头 43 列中 11 列无去向、风场 schema L51–55 有足迹字段而清单无——全部属实。\n\n## 必须改\n| # | 问题 | 裁定 |\n| --- | --- | --- |\n| M1 | 模糊/无概率标签三处归类不一；检测未校准是否降级不明（GPT 1） | 写单一判定顺序表（瀑布）：exclude > proxy_only > needs_Liang Hu_review > mechanism_sensitivity > main_analysis。`mechanism_sensitivity` 条件：目标风合格 + 有非空候选机制 + `label_alternativesdetectability_weight`=null、不做加权。I、U、字段表三处引用同一张表 |\n| M2 | 事件/目标风产品/附属特征层级无汇总规则（GPT 2） | 路由单位 = 一行 = 一事件 × 一个指定目标风产品（新增 `target_wind_product_id`）；附属 feature 的 R2/禁用只限制该 feature 的用途，不降级整行，除非它就是目标风产品；观测与模拟目标风并存时按 I9 row_type（观测为准）；五类计数单位写明为行，另报风暴组去重计数 |\n| M3 | I7/U 规则所需协议输入缺（GPT 3） | 新增\"分析侧协议字段\"小节（非上游提供，EVA 侧填）：`eva_sample_membership_version`、`threshold_or_block_definition`、`declustering_rule`、`candidate_denominator_ref`、`scenario_config_ref`、`random_seed`；沿用 CSV 已有名 |\n| M4 | 机制标签三层与备选未落入字段（GPT 4） | 新增 `source_native_mechanism_labellabel_alternatives` 对 mechanism_sensitivity 行必填，`competing_mechanisms` 并入或写明映射 |\n| M5 | 事件证据源无用途控制；`pi_review_required=true` 处理缺（GPT 5） | events 表加 `event_source_allowed_use`、`event_source_not_allowed_use`；`pi_review_required=true` → 该 feature 仅可作非目标附属或整行 needs_Liang Hu_review（若为目标风产品），记录解除依据字段 `review_resolution_ref` |\n| M6 | 与 CSV/检查器差异表不完整（Gemini 2、GPT 6） | 差异表逐列覆盖 CSV 43 列（保留/改名/弃用/移至协议字段）；检查器行为逐条：缺 event_id 的非空行在 v2 计入 exclude（I1），不再 ignored，仅 `#` 模板行忽略；转换方法黑名单、目标估计无效字符串保留；notes 关键词规则弃用、改由显式 `sim_not_vhat3s`/禁用字段承担 |\n| M7 | U5 足迹敏感性缺上游字段（Gemini 1） | windfield 表加 `severe_wind_footprint_area`、`footprint_threshold`、`radius_of_max_wind`（名称照 Step2 schema L51–55） |\n\n## 仅供参考（采纳）\n- U4 引用收窄（GPT N1）：C05 pp.9–12、18–19 只支持\"站网密度检测模型（源限定）\"；\"独立分母与盲测/外部验证门槛\"改标\"无文献依据，基于本线数据\"。核实 AJSWAXVR 卡 L82，属实。\n- 判定顺序写成一行公式（Gemini N1）——并入 M1。\n\n## 未采纳的异议\n- Gemini\"五类互斥、无盲区\"：被 GPT 1 的具体冲突（字段清单 L5 vs L20）推翻，以 GPT 为准。\n- 无其他异议。文献页码与禁止替代（T2b、未校准分数、CM1 诊断、BESSIE 原始阵风）两位一致通过，不改。\n\n依据：C01 L80、C05 L82；其余为接口设计，无文献依据，基于本线数据。\n升级 Liang Hu：无（均属合同技术修订）。"
+    },
+    {
+      "id": "dec-0004",
+      "ts": "2026-10-09 11:25",
+      "title": "输入合同 v2 定稿（10-09，Decision I made）",
+      "label": "决定",
+      "text": "# 输入合同 v2 定稿（10-09，Decision I made）\n\n**做了什么**：接受 eva 修订稿为 v2 定稿——（…）、（…）、（…）；_draft 与 v1 原件保留。Lead 逐条核实裁决 M1–M7 与 I9 落点：判定瀑布 Rules L9–18；路由单位 L11；I9 行类型与 WSPD10MAX（Fields L94，无 AFWA 旧说法）；事件源用途控制 Fields L44；pi_review_required / review_resolution_ref Fields L78–80；U4 引用收窄 Plan L30；模板 43 列逐列覆盖（Fields 第 43 行 notes 等），检查器行为逐条（Fields L173–176；缺 event_id 非空行计 exclude，Rules L15）。\n\n**状态**：接口定稿；字段名在事件线 S0 注册表 v1 冻结、风场线确认后可能做别名级微调（不改规则）。科学状态仍为\"未用真实数据检验\"。\n\n**为什么不再送审**：修订均为审查裁决的技术落实，无新科学判断；I9 属本线 10-09 决定。\n\n**错了的代价**：漏改的地方在上游确认或 v2 检查器实现时暴露，返工一次合同条文，不影响任何结果。\n\n**依据**：C01 （来源卡 CWDQQEXN，pp. 2–3、8–11）、C05（AJSWAXVR，pp. 4–6、9–10）；其余为接口设计，无文献依据，基于本线数据。审查 裁决。"
+    },
+    {
+      "id": "dec-0005",
+      "ts": "2026-10-09 11:41",
+      "title": "v2 与事件线 S0 字段对齐：观测→Vhat 3s 转换归 EVA（10-09，Decision I made）",
+      "label": "决定",
+      "text": "# v2 与事件线 S0 字段对齐：观测→Vhat_3s 转换归 EVA（10-09，Decision I made）\n\n事件 Lead 10-09 答复：S0 v1 直接采用 v2 字段名，无别名；10-13 前冻结。\n\n**做了什么**\n2. **置信度映射换成事件线的裁定类**：确认正例→high（须满足 S0 正例标准）；硬负例→high（对应竞争机制，local_wind_mechanism 填该机制）；模糊对照→low 且 label_alternatives 必填；不可评估/未裁定→unresolved；事件线不出 moderate。\n3. **事件线不提供的字段**明确标\"上游恒 null、附原因\"：label_probabilities、全部模拟字段、曝露评估（只给源生元数据）。Storm Events 估计风的采样/平均时长与空间不确定度为 null 附原因。\n4. **接受 S0 新增 5 字段**作为可选：event_line_verdict（即 source_native_mechanism_label 的原生裁定值）、wsr88d_nearest_id、wsr88d_min_beam_height_agl_m_all_radars、station_count_by_network、event_time_source_tz；另 t2b_isolated_case_config_ref 只作溯源，路由不读。\n5. **普查行的去向说明**：普查行 local_wind_mechanism=unresolved 且无 Vhat_3s；按瀑布先命中 proxy_only（原生风、未转换），不会堆进 needs_Liang Hu_review。EVA 转换后若机制仍 unresolved，进 needs_Liang Hu_review 的 reason code 用 `awaiting_upstream_label`，属暂存，不升级 Liang Hu。\n\n**错了的代价**：只是字段归属与说明调整，不影响任何结果；若转换另有承担方，再移回即可。\n**依据**：无文献依据，基于本线数据与事件线 S0 设计。"
+    },
+    {
+      "id": "dec-0006",
+      "ts": "2026-10-09 11:52",
+      "title": "裁决：USDA 10 m 塔行不准入（10-09 11:33，Decision I made）",
+      "label": "决定",
+      "text": "# 裁决：USDA 10 m 塔行不准入（10-09 11:33，Decision I made）\n\n审查：只收到 1 份（Gemini；GLM 因系统并发上限未派出，Codex 未回）。按 JUDGE_RULES 只审一轮，不补派。\n\n## 必须改\n1. **塔行不得以\"documented uncertainty\"进入演练表**——采纳。我核实： 第 30 行明文\"averaging conversion is unresolved, exposure/height is missing → exclude_from_EVA or needs_Liang Hu_review\"；塔行时长定义冲突（Childs 2021 Table 1 p. 2885、Table 2 p. 2890 \"3 s\" vs p. 2885 正文、Fig. 12 p. 2888 \"5 s sampling\"）未解决、暴露未量化，正落在此条。门规则第 4 条要求的是\"documented **conversion**\"，我 10-09 的裁定把\"写明未量化\"当作转换，错了。处理：该行 downstream_use_flag 改 blocked_pending_metadata（不用 needs_Liang Hu_review：准入判定在 Lead 授权内），admitted_rows 回到 0，有效停止。\n\n## 仅供参考\n1. 机制 downburst/moderate 依据充分（p. 2885 \"downburst winds reached the surface\"；p. 2891 径向外流 + 南风外流边界）——保留该标签，补救后可直接复用。\n\n## 未采纳的异议\n无。\n\n## 补救路径（我定）\n- 时长：委托 litwiki 找雷暴短时距阵风（5 s ↔ 3 s 移动平均）比值的实测文献；有页码依据才做数值转换。\n- 暴露：按塔址土地覆盖与粗糙度文献（C02/C04）做开阔地等效换算。\n- 原始记录：Childs 2021 p. 2894 称 USDA 数据须向所有者索取——属对外联系，列给 Liang Hu 作选项，不自行发出。\n- 演练：在准入为 0 期间，不确定性传播演练用明确标注的 TEST_FIXTURE 跑通管线（任务书允许），不进入准入报告或结论。\n\n错了的代价：若 5 s/3 s 实际差异很小，阻断延迟一次演练；比放进一个定义未明的行便宜。\n\n## 补：时距/暴露文献回来后（10-09 11:52，Decision I made）\nlitwiki 综合页 observation_duration_exposure_synthesis.md：时距——Lombardo 2009 给开阔地 ASOS 档案 5 s→3 s ×1.02（pp. 121–122），但 Childs 的\"5 s sampling\"可能是离散 5 s 采样而非 5 s 平均（ASOS 技术说明 Belfort 例，PDF pp. 4、9、20），漏峰偏差取决于峰形与采样相位，文献不给单值误差条；暴露——Zhao 2022 ECF 公式在 z0 0.01–0.30 m 时 0.958–1.173，但该卡 source-limited（无页码）不得作正式依据，且塔址扇区 z0 未知、下击暴流廓线不满足对数律。\n决定：塔行**维持阻断**，不再找文献补救；只有拿到 USDA logger 定义/原始序列（对外索取，Liang Hu 决定是否要）或事件线多事件样本时重开。本子项目\"打通接口 + 演练管线\"已完成（夹具），真实准入 0 行为有效停止。\n代价：近期没有真实演练数字；比用 source-limited 公式和未定采样口径凑出一行便宜。"
+    },
+    {
+      "id": "dec-0007",
+      "ts": "2026-10-09 11:59",
+      "title": "v2 检查器演练暴露的三个缺口：裁定（10-09，Decision I made）",
+      "label": "决定",
+      "text": "# v2 检查器演练暴露的三个缺口：裁定（10-09，Decision I made）\n\n背景：eva 交 （…），14 个夹具测试 Lead 本机复跑通过；D420 包（…）演练 1 行 → `proxy_only`，无 main_analysis（18239592…）。但该行是\"包级诊断行\"，缺 target_wind_product_id、resolution_status、feature_source_sha256 等——这些在包里是逐 feature 给的，打包成一行时丢了。\n\n1. **I9 必填与 proxy_only 默认冲突** → simulation_only 的必填拆两组：基础组（simulation_id、simulation_variable、simulation_status、resolution_status、源哈希、sim_not_vhat3s、not_for_design_use）任何去向都必填；转换组（postprocessing_method_to_vhat3s 及 Vhat 估计/不确定度）仅申请 mechanism_sensitivity 时必填，proxy_only 行可填 `none` 附原因，不再报缺失。\n2. **模拟包没有目标产品 ID** → simulation_only 行的路由单位 = 事件 × 被引用的 feature：一个 feature 一行，`target_wind_product_id` 取该 `feature_id`。包转行时逐 feature 展开，resolution_status、feature_source_sha256 等随 feature 带入。包级诊断行取消。\n3. **非空 detectability_weight 一律拒** → 保持。按 U4，独立校准出现前不设验收门；有了再另立门。\n\n**错了的代价**：只改字段必填分组与转行方式，不改五类与瀑布；D420 结论（全为 proxy_only/exclude，无主分析）不会因此变。\n**依据**：无文献依据，基于本线数据（D420 演练）。"
+    },
+    {
+      "id": "dec-0008",
+      "ts": "2026-10-09 12:02",
+      "title": "试算准入行改为\"以观测为锚\"（10-09 10:55，Decision I made）",
+      "label": "决定",
+      "text": "# 试算准入行改为\"以观测为锚\"（10-09 10:55，Decision I made）\n\n发现：eva bot 映射表43 列中 16 列\"本质不可填\"、16 列待事件线；门规则 v1 第 1–4 条与检查器 REQUIRED 要求观测原生风、传感器高度、QC、。纯 WRF 格点行结构上不能准入，硬填即补造行。\n另：~~WSPD10MAX 为 AFWA 诊断、强降水混入 1 km 风~~（bot 10-09 说法，**已更正**）：WRF Lead 核对 4.0.3 L456–465、550–555 与运行 namelist（无 afwa_diag_opt）——exp-A 的 WSPD10MAX 是每 1 min 输出间隔内逐积分步（4/3 s）10 m 格点风的最大值，间隔开头清零；03:30 帧全场为 0 须排除。仍是格点风，不是 3 s 阵风（ L23–32）。\n做了什么：验收接口交付（本机用夹具复跑，输出与 逐行一致）；改派 bot 以 Schumacher et al. 2023 Akron 下击暴流事件的地面站（ASOS 等）实测阵风为观测列、exp-A d03 站点值为模拟列，生成候选行并跑检查器。不改门规则。\n为什么：门规则不放宽是 v1 的科学约束（C02/C04/C07）；Akron 同时有真实观测与我们自己的 4.0.3 模拟，是满足验收的最短合法路径。纯模拟行是否另设一类，交\"EVA 输入合同与机制分层定稿\"子项目在 v2 里定。\n依据：门规则 \"Required admission conditions\"；机制依据待 bot 引 2DPBW6VX 卡片页码；观测阵风仪器定义：Cook 2023（H7ZG33PU，全文 SHA256 …，10-09 12:00 恢复）自然 PDF pp. 2–4、19：ASOS `V_3s` 为 3 s 平均阵风、`Vhat_3s` 为前一分钟峰值；p. 4 实时 QC Test 10（V_2min ≤ 6 kn 且 V_3s > 2.5 V_2min 时剔除，2017 年末阈值改 13 kn）；p. 9 模拟误剔中约 10% 删去事件峰值。限来源范围引用，未批准为 PETW 换算。\n错了的代价：若站点不在强风区或观测缺失，准入仍为 0 行（有效停止），只损失一次本地取数；不涉及超算。\n\n## 补：v0 结果与 v1 裁定（10-09 11:00，Decision I made）\nv0（ASOS 三站，IEM METAR）0/3 准入，阻断正确。v1 裁定：观测值可取同行评审原文并注页码；首选 Childs 2021 10 m 塔 3 s 阵风 50.45 m/s（pp. 2875、2885），时长与高度已等于目标定义（F=1 为定义而非借用系数），暴露项按原文描述\"documented\"不确定度（门规则第 4 条允许）；机制须原文明确才给 moderate；KAKO 5 s 行无 5 s→3 s 文献页码则保持阻断。\n代价：若审查认为\"暴露项未量化\"不足以准入，v1 行退回阻断，只损失一次本地处理。\n\n## 补：v1 结果（10-09 11:25）\nbot 指出 Childs 2021 塔\"3 s gust\"（Table 1 p. 2885、Table 2 p. 2890）与\"5 s sampling\"（p. 2885 正文、Fig. 12 p. 2888）矛盾，成立；撤回\"F_duration 定义上为 1\"，改为报告值直接取用 + 时长冲突列为未量化的 documented 不确定度。v1 检查器 admitted_rows=1（塔行，downburst/moderate 依据 p. 2886），我本机复跑一致。语义准入送独立，以裁决为准。模拟列空：塔坐标论文未给，不以 ako TS（18.69 m/s，异址异时）代填。\n\n## 补：H7ZG33PU 恢复后的影响（10-09 12:00）\nCook 2023 pp. 2–4 表明 ASOS 阵风为 3 s 平均，可能化解 KAKO 行\"5 s→3 s\"缺口（Childs Table 1 p. 2885 写 ASOS 5 s、Table 2 p. 2890 写 3 s，矛盾）。但 KAKO 行另有暴露未量化、峰值取自论文而非原始 1 min 记录（IEM 1 min 接口 0 记录）、QC 可能删峰（p. 9）三项，按 Standardization 规则 L30 仍阻断。记为重开线索：若 KAKO 2020 年仪器确为 3 s 算法且有 ASOS 选址暴露依据，KAKO 行可重审。\n\n## 补：KAKO 一分钟补救结果（10-09 12:02，Decision I made）\nNCEI DSI 6405/6406 KAKO 2020-06 月档在 06-08 21:48 UTC 至 06-10 22:17 UTC 整段缺档，事件时段无记录。KAKO 行维持阻断，不再追。eva 委托 terminated 后由 Lead 直接取数（公开下载 8 MB，无对外联系）。"
+    },
+    {
+      "id": "dec-0009",
+      "ts": "2026-10-09 12:45",
+      "title": "风场 packet qa status 枚举定为 {pass, pass with warnings, fail}（10-09，Decision I made）",
+      "label": "决定",
+      "text": "# 风场 packet qa_status 枚举定为 {pass, pass_with_warnings, fail}（10-09，Decision I made）\n\n背景：合同 L65 写\"QA 枚举\"但未列值；风场线 D420 v3 包自用 `{pass, pass_with_warnings, fail}`，取 `pass_with_warnings`（仅 runner VALID，无独立模拟 QA）。\n\n- 做了什么：采用风场线这三值为定稿枚举，补进 L65（文件哈希改变，前值 … 系列已在项目页记录）。路由含义：`fail` → exclude（与 L65\"明确失败 exclude\"一致）；`passpass_with_warnings` 本身不改变去向，模拟行的上限仍由 simulation_status、resolution_status、proxy_only 决定；`pass_with_warnings` 不得被读作\"独立模拟 QA 已通过\"（I6/I9 仍看 simulation_status）。\n- 为什么：上游已按此值产出，三值足以表达 L65 的两条规则；另起一套只增加映射。\n- 错了的代价：若日后需要更细的 QA 层级，只需在此枚举上加值并映射，已出包无须返工。检查器当前不读 qa_status，本次不改代码；`fail` 拒收规则在检查器下次修订时落地。\n- 依据：无文献依据，基于本线数据（D420 v3 读包）。"
+    },
+    {
+      "id": "dec-0010",
+      "ts": "2026-10-09 14:13",
+      "title": "S0 注册表 v1 字段核对（10-09 14:10）",
+      "label": "决定",
+      "text": "# S0 注册表 v1 字段核对（10-09 14:10）\n\n输入：，sha256 …cba7（Lead 复算一致，54 行）。对照： …， …。依据：全部为无文献依据，基于本线数据（字段合同层面，不涉科学判断）。\n\n## 一致（无需动）\n- 5 个可选新增字段全部落地：`event_line_verdict`(B05)、`wsr88d_nearest_id`、`wsr88d_min_beam_height_agl_m_all_radars`(A02)、`station_count_by_network`(A03)、`event_time_source_tz`(A01，Storm Events CST=UTC−6)。\n- `event_line_verdict` 五值与 high/high/low/unresolved/unresolved 映射与本线置信度映射表逐字一致；不产 moderate。\n- C02 恒 null 集（概率、四个转换字段、`target_wind_product_id`、全部模拟列）与本线 v2.1 分工一致；null 原因码 `not_events_scopenot_calibratedno_simulation_row` 接受。\n- `storm_group_id` 格式、`source_native_mechanism_label` 与 verdict 分离、T2b 仅 CM1 选例配置（C01）一致。\n\n## 原生观测 ID 列名 —— 定\nS0 C02：原生观测记录 ID 放在 `obs_station_or_object_id`，值 `obs-native:<网络>:<站>:<UTC时刻>:<量名>`。本线撤销占位列 `obs_native_record_id_PENDING_S0_v1`，以 `obs_station_or_object_id` 为准。\n\n## 我方修订（派 eva，v2.3）\n1. 占位列并入 `obs_station_or_object_id`（规则、字段表、检查器、夹具）。\n2. 波束高度允许负值：S0 A02 明示\"不截断负值\"（雷达低于事件点地面）；检查器 `number` 现拒负值，对 `wsr88d_0p5_beam_height_agl_m`、`..._all_radars` 改为允许任意有限实数。\n3. 有合法原因码的 null 不再路由 `needs_Liang Hu_reviewradar_operational_status_unverified`）→ 进 `not_evaluable` 分层并记 warning reason code；无原因的空值才 `needs_Liang Hu_review`。Storm Events 估计风 `sampling_interval_s` null+`source_estimated_no_sampling` → `proxy_only`（估计风本就禁作目标风数值）。\n 理由：S0 A04 把 null 单列 `not_evaluable`，视为\"不可评估\"而非\"待审\"；否则普查行会大量堆进隔离类，失去区分度。错了的代价：可能有少数本应人工核的行进了敏感性分层的 not_evaluable 组，可在样本版本冻结前回查 reason code。\n4. 字段表登记 S0 额外可选字段：`station_count_basis`、`beam_height_bin`、`radar_distance_bin`、`station_count_bin`、`gridrad_severe_day_covered`、`iem_asos_1min_window_available`；`parent_storm_mode`、`event_line_verdict` 枚举值入检查器校验。\n5. `s0_definition_version=v1s0_definition_sha256=…cba7` 记为当前绑定；B02/B03 未决 → v1.1 会换哈希，届时只换绑定。\n\n## 回事件线（不阻断，进 v1.1）\n- 观测风值列未定义：`native_wind_speed`、`native_wind_speed_units`、`sensor_height_m`、`qc_status`、`qc_sourceqc_status` ∈ {pass, pass_with_warnings, fail} 或 null+`source_qc_unknown`。\n- 机制枚举英文值：`local_wind_mechanism`、`competing_mechanisms`、`label_alternatives` 目前只有中文（局地核心、阵风锋/传播外流、后侧入流、龙卷、天气尺度、仪器）；请给 snake_case 值。\n\n## v2.3 验收（10-09 14:4x，Lead 复核）\neva 交回：字段表 v2_3 …、规则 v2_3 …、检查器 …、测试 …。Lead 在 WSL 副本复跑 unittest 21/21 通过（含 5 项 v2.3 新增：原生 ID 与绑定、负波束高度、带原因 null→not_evaluable、Storm Events 估计风、可选字段与非法枚举）；占位列已清零；S0 哈希绑定写入检查器。D420 v1.3 包（…，复算一致）重跑 …：7 行全 proxy_only，其余四类 0。合同项目收口；S0 v1.1 到达时只换哈希绑定并核两项补充。"
+    },
+    {
+      "id": "dec-0011",
+      "ts": "2026-10-09 14:52",
+      "title": "S0 注册表 v1.2 换绑与核对（10-09 14:50）",
+      "label": "决定",
+      "text": "# S0 注册表 v1.2 换绑与核对（10-09 14:50）\n\n输入： sha256 …200b（Lead 复算一致）；基底 v1 …、v1.1 …（复算一致）。v1.2 只增 A07（观测风值列）、B06（机制词表）；v1.1 增 A06（AMDA 距离分层）并改写 B02/B03（仍未决）。依据：字段合同层面，无文献依据，基于本线数据。\n\n## 定\n1. **`noaa_magnitude_type` 单列同名采用**，不并入 `source_native_mechanism_labelsource_native_mechanism_label` 仍可保留原文副本作溯源，路由只读新列。非 Storm Events 行 null+`not_applicable`。错了的代价：多一列，几乎为零。\n2. 路由：EG/ES → `proxy_only`（估计风禁作目标风数值）；MS → `proxy_only`（持续风非阵风，本合同未定持续风→3 s 阵风转换）；MG → 可进入转换。Cook `g1`、IEM `gust_sknt` 为阵风量名，IEM `sknt` 为一分钟风速 → `proxy_only`。\n3. 来源无逐记录 QC（`qc_status=null`、`qc_source=source_qc_unknown`）或 `sensor_height_m` null+`sensor_height_not_in_source_metadata`：不路由隔离类，记 warning，**上限 `mechanism_sensitivity`**；进 `main_analysis` 需另有 EVA 侧逐条 QC 记录与可追溯传感器高度（后续在转换方法中定义）。理由：Storm Events/IEM 一分钟普遍无逐条 QC，若送隔离类则全部堆积；若放行主分析则未核高度与质量直接进设计样本。错了的代价：偏保守，主分析样本暂少，可在 EVA 侧 QC 定义后放开。\n4. B06 词表入检查器：三列取值限七词；`label_alternatives` 不得含 `unresolved`；非法值 `needs_Liang Hu_review`。\n5. 登记 v1.1 A06 可选字段 `amda_airport_distance_bin`、`amda_near_field_no_velocity_output_possible`；A07 新原因码 `source_native_wind_missing`、`sensor_height_not_in_source_metadata`、`source_estimated_no_sensor`、`source_qc_unknown`。\n6. 换绑 `s0_definition_version=v1.2`、`s0_definition_sha256=…`，注明继承链 v1→v1.1→v1.2。\n\n执行：派 eva 出 v2.4（检查器、字段表、规则、夹具；D420 重跑应仍 7 行 proxy_only）。\n\n## v2.4 验收（10-09 15:0x，Lead 复核）\n字段表 v2_4 …、规则 v2_4 …、检查器 …（绑定 …）、测试 …。Lead 复跑三套夹具 16+21+26=63 全过（v2.4 新增 5 项：MG/MS/EG/ES、sknt vs gust_sknt、QC/高度缺失上限、B06 词表与 unresolved 入备择、A06 与绑定）。v2.3 文件哈希未变。D420 v1.3（…）重跑 …：7 行全 proxy_only。v2.4 为现行合同。"
+    },
+    {
+      "id": "dec-0012",
+      "ts": "2026-10-09 15:44",
+      "title": "v2 与 S0 v1.2 绑定、事件线首批 47,612 行走一遍检查器（10-09，Decision I made）",
+      "label": "决定",
+      "text": "# v2 与 S0 v1.2 绑定、事件线首批 47,612 行走一遍检查器（10-09，Decision I made）\n\n事件 Lead 答复：（EVA_multi_event_sample_reply_20261009.md）。S0 v1.2 sha256 …200b；v1.3 预计 10-13 前冻结。\n\n**做了什么**\n1. **原生观测 ID 列名采用事件线口径**：`obs_station_or_object_id` 承载完整 `obs-native:<网络>:<站或报告号>:<UTC>:<量名>` 串；删去 v2 模板占位列 `obs_native_record_id_PENDING_S0_v1`。理由：事件线首批 47,612 行已按此交付，再设第二列只会制造对不上。\n2. **S3 枚举与 v2.1 英文值逐字一致**（confirmed_positive / hard_negative / ambiguous_control / not_assessable / unadjudicated），无需改；机制词表采用 S0 B06 七值（local_core_downburst … unresolved）作为 `local_wind_mechanism` 允许值。\n3. **storm_group_id**：S0 v1.3 改为风暴系统级（≤2 h、≤100 km 链式连通），v1.2 值改名 `source_group_id`。v2 两列都收；去簇仍由 EVA 做，计数按 storm_group_id 去重。\n4. **首批真实数据走一遍 v2 检查器**：（47,612 行，全 unresolved/unadjudicated、无 Vhat）。预期全部 proxy_only，这是接口演练，不是样本。\n5. **多事件样本来源判断**：年极值的唯一现实来源是 Cook ASOS 四站（AUS/DAL/DFW/HOU）——1 分钟数据抽取的 ≥20 kt 事件清单，现抽 2010–2017、原档 2000–2021（可到 22 年）；Cook 判雷暴类 482 条（≥40 kt 34 条、≥50 kt 7 条）。缺口：逐站年完整率未量化（事件线下一步补）；没有机制裁定（S3 为 0）。Storm Events 是报告不是站点连续记录，不作逐站年极值；WTM 需授权（申请信待 Liang Hu 发，属事件线与 Liang Hu 之间的事）。\n\n**错了的代价**：列名口径只影响接口，事件线改口径时改一列；首批演练不产生任何样本或数值。\n**依据**：无文献依据，基于本线与事件线数据。"
+    },
+    {
+      "id": "dec-0013",
+      "ts": "2026-10-09 17:03",
+      "title": "首批 47,612 行演练后的接口修正（10-09，Decision I made）",
+      "label": "决定",
+      "text": "# 首批 47,612 行演练后的接口修正（10-09，Decision I made）\n\n演练结果（…；输入 S1_ROWS_v1.2.csv sha256 …，Lead 复核一致）：47,612 行全部 proxy_only，无其他类；18 个夹具测试 Lead 复跑通过。\n\n1. **字段名以事件线已交数据为准**：v2 改用 `detectability_measurement_source_sha256`、`detectability_measurement_method_version`、`event_source_network`、`event_source_qc_version`（取代 detectability_measurement_sha256 / detectability_method_version / source_network / source_qc_version），旧名留作别名。理由：生产方已按这些名交了 4.7 万行，改我们一处比让对方改便宜。\n2. **上游哈希不是哈希**：事件线 `detectability_measurement_source_sha256` 全部填，检查器因此给全部行记 I1_invalid_hash_format。请事件线在 S0 v1.3 里改为逐行 64 位 SHA-256，或给 SOURCES.json 本身的哈希并约定\"manifest:<sha256>\"格式；我们两种都收。在此之前此 reason code 保留，不放宽。\n3. **storm_group_id**：v1.2 的值按约定移入 source_group_id，storm_group_id 等 v1.3 系统级分组；输出另报 source_group_id 去重计数。\n4. **检查器输出的 claim_boundary 仍写 D420 文字**，改为按输入类型生成。\n\n错了的代价：只是字段名与输出文字；路由结论不变。依据：无文献依据，基于本线与事件线数据。"
+    },
+    {
+      "id": "dec-0014",
+      "ts": "2026-10-13 19:31",
+      "title": "参考情景 Vhat 3s 试算收口（10-13 19:31，Decision I made）",
+      "label": "决定",
+      "text": "# 参考情景 Vhat_3s 试算收口（10-13 19:31，Decision I made）\n\n**结论**：接口与不确定性传播演练已通（夹具），真实准入 0 行（有效停止）。不产出任何 Vhat_3s、极值或设计风数字。\n\n**塔址配对（本次补齐）**：WRF 线 TACC 3584556（10-09 已 COMPLETED 0:0）结果一直未交接；我按公共规则用现有 TACC socket 只读拷回，远端 sha256 逐个核对 OK，76 帧源哈希 sha_ok 全 True。exp-A 在三个候选塔址（CoAgMet AKR02 40.1548/−103.142；旧 tslist 40.15/−103.10；KAKO 以东 2 mi 40.1589/−103.17；最近格点 0.11–0.17 km）05:30–06:45 UTC：点上瞬时 10 m 风最大 14.1–14.5 m/s，10 km 邻域 WSPD10MAX 最大 15.1–16.2 m/s；观测 50.45 m/s（Childs 2021 p. 2890）。即 exp-A 的强风核不在塔附近——与 WRF 线已知\"强风尾部偏弱、不可逐帧配对、单成员\"一致；这是位置/相位与强度缺口的合并表现，不是可用的模式误差或换算系数。WSPD10MAX 仅诊断（v2）。无文献依据，基于本线数据。\n\n**v2.4 检查器**： → （输入 sha256 …）：4 行全部路由 needs_Liang Hu_review（合同路由标签），main_analysis/mechanism_sensitivity 0；共性原因 I4_no_validated_target_wind、S0 绑定与雷达/站点计数等事件线字段缺失（I1/I3）。这些行不提交 Liang Hu：目标风未标准化，本身不可用。\n\n**各行**：USDA 塔——3 s/5 s 口径冲突、暴露未量化，审查 阻断；KAKO——NCEI 一分钟档事件时段缺档；K2V6、KSTK——不在核心（Childs 2021 p. 2885）。\n\n**重开条件**：USDA 塔 logger 定义/原始序列（对外索取，Liang Hu 定）；或事件线多事件样本（含 S0 字段）；或 WRF 线主情景成员的强风核落在有观测的位置。\n**错了的代价**：无数字产出，只是推迟；重开时输入、脚本、检查器均可直接复用。"
+    },
+    {
+      "id": "dec-0015",
+      "ts": "2026-10-13 19:33",
+      "title": "v2 检查器只认一份正式版；输出必须带检查器哈希（10-13，Decision I made）",
+      "label": "决定",
+      "text": "# v2 检查器只认一份正式版；输出必须带检查器哈希（10-13，Decision I made）\n\n发现： 下有三份检查器——正式版 （10-09 17:07，…，claim_boundary 已按输入生成）与两份旧分叉 （…）、（…，文件名带 v2.4 但逻辑不同、claim_boundary 写死 D420）。试算子项目的 Akron 报告 （10-13 19:31）用的是分叉，且未记录检查器哈希。\n\n做了什么：\n1. 正式版只有；两份分叉不删（不动已有文件内容以外的东西），在文件顶部加守卫：直接运行即报错并指向正式版。\n2. 正式版输出加 `checker_path`、`checker_sha256`；claim_boundary 按行的 row_type 组合生成（observation / obs_anchored_simulation / simulation_only / packet feature），加测试覆盖。路由逻辑不改。\n3. 用正式版重跑 Akron 4 行，另存新文件，与分叉结果逐行对比路由；不一致即报。\n\n为什么：两份都叫 v2.4、逻辑不同，接口冻结前必须只有一份；无哈希的报告无法追溯。\n错了的代价：若分叉里有正式版缺的有效逻辑，对比时会暴露，再并入正式版。\n依据：无文献依据，基于本线数据。"
+    },
+    {
+      "id": "dec-0016",
+      "ts": "2026-10-13 20:21",
+      "title": "检查器 v2.5：所有观测类行都校验身份/溯源/时间窗（10-13，Decision I made）",
+      "label": "决定",
+      "text": "# 检查器 v2.5：所有观测类行都校验身份/溯源/时间窗（10-13，Decision I made）\n\n问题：正式版 （…）L235 起的必填与 UTC 窗校验只在 `observation and valid_target` 时执行；无有效目标风的观测行一律停在 proxy_only，事件线 R2 的 2020–2025 表 8,751 行起止相同、整列空都没被拦（事件线 R2 审查 发现）。\n\n裁定（按 v2 判定瀑布，路由优先级不变）：\n- 校验对象：observation 与 obs_anchored_simulation 的观测列，不论去向。\n- **exclude**（数据自相矛盾）：end < start；非 UTC 偏移；坐标超界（|lat|>90、|lon|>180）；哈希格式合法但与清单冲突。\n- **needs_Liang Hu_review**（暂存待上游修，reason code 前缀 `I1_upstream_fix:`，不升级 Liang Hu）：start = end 且无 `point_time_report` 类合法 missing_reason；必填列为空且无合法 missing_reason；时间不可解析。\n- 带合法 missing_reason 的 null 不报。\n- 理由：proxy_only 表示\"可追溯但只是代理风\"，前提是可追溯；身份/时间窗不合格的行连代理都不能当。点时刻报告（如 Storm Events 单时刻阵风）可合法 start=end，但必须显式声明。\n\n错了的代价：若某些 start=end 是合法点时刻而未声明原因，它们会暂存在 needs_Liang Hu_review，上游补一个原因码即放行；不产生错误样本。\n依据：无文献依据，基于本线数据与事件线 R2。"
+    },
+    {
+      "id": "dec-0017",
+      "ts": "2026-10-13 20:55",
+      "title": "输入合同 v2.5 + 检查器冻结审查 · 裁决（10-13 20:54）",
+      "label": "决定",
+      "text": "# 输入合同 v2.5 + 检查器冻结审查 · 裁决（10-13 20:54）\n\n审稿人：Gemini（不支持直接冻结）、GPT-6（不支持）、GLM（有保留支持；本机重跑 R2b 三表 0 差异，合成行实测漏洞）。3/3 有效，无补位。\n被审：、；（…）及测试；事件线。\nLead 亲自核实：检查器 L21 PRIORITY、L362–365 回拉名单、L83–100 justified_null、测试 L254–264（URI 空 + 'source_not_available' 被断言为 proxy_only）、三份规则中只有 point_time_report 无 point_time_padded_design、Plan_v2 L9 仍写\"不以低优先级覆盖高优先级\"——全部属实。\n\n**R2b 三表全 proxy_only 的结论不受影响**（三位一致；GLM 独立重跑 0 差异）。要修的是接口对**后续批次**的把关。\n\n## 必须改（v2.6）\n| # | 问题（来源） | 裁定 |\n| --- | --- | --- |\n| F1 | 回拉名单不全，I1/I9/I5 类完整性缺陷被 proxy_only 吞掉（三位均提） | 改结构，不再维护回拉名单：needs_Liang Hu_review 原因分\"完整性类\"（I1 身份/溯源/哈希格式/原生 ID/S0 绑定、I3 测量、I9 row_type 与基础组/禁用标志、I5 目标 feature 控制缺失）与\"待转换/待标签类\"（I4_no_validated_target_wind、awaiting_upstream_label、转换组缺失）。完整性类优先于 proxy_only；只有仅剩待转换/待标签类时才落 proxy_only。row_type 缺失/非法 → 按观测行做全部观测校验并记完整性类。测试断言最终 status。 |\n| F2 | 缺失原因无白名单（三位均提） | 字段级受控词表写进 Fields_v2：(a) 不可豁免字段——event_id、row_type、event_window_start/end_utc、event_latitude/longitude、event_location_basis、event_source_uri、event_source_sha256、native_wind_speed、native_wind_speed_units：为空一律完整性类，原因无效；(b) 其余字段列出允许的原因值（以事件线已用值为起点：sensor_height_not_in_source_metadata、source_qc_unknown、source_estimated_no_sampling、not_applicable、not_events_scope、point_time_report、point_time_padded_design 等），词表外的原因 = 未说明。改测试 L254–264。 |\n| F3 | point_time_padded_design 未注册；人为窗口可能被当真实时长（三位均提） | 注册为合法值，语义写死：\"设计性支持窗口，不是观测事件持续时间；不得用于持续时长、暴露时长或去簇跨度\"。补宽行必须保留源时刻字段（event_time_source_raw 或同义列）；检查器校验补宽时长等于登记值（Storm Events 30 min、Cook 10 min，其他来源须在合同登记），不符记完整性类。站数口径（station_count_basis）与窗口不一致时记警示码，不降级。 |\n| F4 | 哈希冲突无实际核验（GPT 3、GLM） | manifest:<sha> 形式时，若提供清单文件则核对条目存在且一致，冲突 → exclude；未提供清单则记 `I1_hash_not_verified_against_manifest` 警示并在输出明示。正式名与别名同时存在且不一致 → 完整性类。 |\n| F5 | valid_target 与 I3–I6 数值/控制核验不足（GPT 4） | native_wind_speed 必须为非负数；站数 10≤25≤50 单调；波束高度 ≥0；I5 目标关系由 target_wind_product_id 与 feature_id 核对，不只信布尔；qa_status=fail → exclude；step3_eva_link 仅比较用途时不得为目标风。 |\n| F6 | 机制映射与敏感性必填不一致（GPT 5） | 检查 event_line_verdict 与 mechanism_confidence 的映射（unadjudicated/not_assessable 只能配 unresolved）；进 mechanism_sensitivity 的任何分支都要求 label_alternatives 非空，否则 needs_Liang Hu_review。 |\n| F7 | 观测锚行缺配对字段会把合格观测拉下（GPT 6） | 配对字段缺失只记 `I9_pair_unavailable` 警示、配对列不可用，观测路由不变（与合同\"只看观测列\"一致）。 |\n| F8 | 风暴组版本含义未冻结（GPT 8） | 合同加字段 `storm_group_rule`（R2b 值 `R2b_layered_2h100km_episode`，现写在 evidence_independence_note 里，改为独立列或检查器从该处解析）；写明\"2 h/100 km 是成对连边阈值，不是组跨度上限；分层依据来源类别（Cook Class=5 / Storm Events vs 其余），不是机制标签\"。检查器输出按规则版本报组数。 |\n| F9 | 三份规则文件未同步（GPT 9） | Plan_v2 同步 v2.5/v2.6 判定与 I9 基础组/转换组拆分；三份文件修订记录统一到 v2.6。 |\n\n## 仅供参考（采纳为文字说明，不改判定）\n- 组跨度：2010–2017 有 3,080/8,112 组跨度 >2 h、124 组 >24 h、最长 93.8 h（GLM 重算）；对流层组最长 72 h。写入项目页\"后续正式极值项目须知\"：去簇只用对流组，且须另设组跨度上限或按峰值时刻重新切簇。\n- 分层是来源标签分层，98% 行在非对流层；机制全为 unresolved（GLM）。合同如实表述。\n- I5 禁用判断的子串启发、sknt 依赖 ID 尾段拼写（GLM）：改为受控词表/显式量名字段，随 F2/F5 一并做。\n\n## 未采纳的异议\n- Gemini：\"补宽直接违反 S0 A01'不得臆设持续时间'，应取消补宽\"。不采纳取消：补宽是接口需要的支持窗口，只要按 F3 注册语义、保留源时刻、禁止当时长用，就不是臆设持续时间。部分采纳为 F3。\n- Gemini：\"Cook Class=5 先分层会把同一物理风暴拆成两组，属必须改\"。不采纳为必须改：非对流层本就是要从雷暴去簇中排除的背景阵风，拆开是有意的；证据不足以证明实际拆散了同一雷暴（GPT 亦判\"证据不足\"）。留作后续正式极值项目核查项。\n\n升级 Liang Hu：无（均为接口技术修订，不改科学方向）。\n依据：无文献依据，基于本线与事件线数据。只审一轮；v2.6 由 Lead 按 F1–F9 逐条核对后冻结，不再送审。"
+    },
+    {
+      "id": "dec-0018",
+      "ts": "2026-10-13 21:07",
+      "title": "v2.6 暂不合并：冻结验收用了作废的 R2b，对现行 R2c 全部隔离（10-13，Decision I made）",
+      "label": "决定",
+      "text": "# v2.6 暂不合并：冻结验收用了作废的 R2b，对现行 R2c 全部隔离（10-13，Decision I made）\n\n发现：子项目以 R2b 三表验收 v2.6，但事件线已宣布 R2b 行表作废、以 R2c 为准。根 Lead 用 v2.6（检查器）+ 原路径 manifest `SOURCES_R2b.jsonI1_upstream_fix:missing:native_averaging_period_s`、`…exposure_or_terrain_note` 全表命中——R2c 按 v2.5 要求写的具体缺失原因（如 `asos_peak_gust_5s_block_or_3s_running_depends_on_sensor_model_and_date_not_in_source`）不在 v2.6 封闭词表内。另：manifest 若复制到别处会因 URI 不符全表 exclude，须用原路径。\n做了什么：暂不做\"总结并合并\"；派 出 v2.6.1——把 R2c 实际原因值登记进受控词表，其余规则不动，用 R2c 正式重跑，更新冻结记录。不再送审：属 F2 已审裁决的实现修正。\n为什么：冻结接口要对对方现行交付能用；否则事件线下一批照我们上次的要求交，仍会全部被隔离。\n错了的代价：收口晚约半天；若词表补得过宽，可能放过含糊的缺失原因——要求逐值写含义来约束。\n依据：无文献依据，基于本线数据；ASOS 平均时长随传感器型号变见 H7ZG33PU pp. 2–4。"
+    },
+    {
+      "id": "dec-0019",
+      "ts": "2026-10-13 21:07",
+      "title": "合同 v2.7：manifest 哈希语义与缺失原因词表补正（10-13 21:10，Decision I made）",
+      "label": "决定",
+      "text": "# 合同 v2.7：manifest 哈希语义与缺失原因词表补正（10-13 21:10，Decision I made）\n\nv2.6 冻结后用其跑事件线 R2c，三表全 exclude。Lead 诊断：两处都是**本线检查器与本线此前给事件线的约定不一致**，不是 R2c 数据问题。\n1. **manifest 哈希**：10-09 本线请事件线把检测测量哈希填为 `manifest:<SOURCES 清单文件本身的 SHA-256>`（ 第 2 条），事件线照做。v2.6 检查器却把它当\"清单内某条目的哈希\"去查，查不到即 exclude（L246–252），且按清单文件路径匹配，换目录就失败。v2.7：`manifest:<d>` 当 d 等于所给清单文件自身的 SHA-256 即通过（与路径无关）；否则再查清单条目；都不符才 exclude。\n2. **缺失原因词表**：v2.6 受控词表（检查器 L23）按 R2b 用值建立，未收 10-13 本线发给事件线的示例原因（`not_in_source_metadata`、`storm_events_estimate_no_averaging`），也未收 R2c 有文献卡片依据的 Cook 平均时长原因。v2.7 加入 R2c 实际使用且语义明确的原因值（清单见 Fields_v2）；不可豁免字段清单不变。\n\n不放宽的：不可豁免字段、补宽窗口须有源时刻（R2c 旧期 47,066 行仍缺 event_time_source_raw，继续待上游修）、哈希真冲突仍 exclude。\n错了的代价：词表若收得过宽，后续批次可能用模糊原因豁免非核心字段；核心字段不受影响。\n依据：无文献依据，基于本线与事件线数据；Cook 平均时长原因的依据为事件线引用卡片 pp.4、9、20（Lead 未逐页核对，仅接受为缺失原因，不作 Vhat 转换依据）。"
+    },
+    {
+      "id": "dec-0020",
+      "ts": "2026-10-13 21:16",
+      "title": "EVA 输入合同 v2.6 冻结；子项目「EVA 输入合同与机制分层定稿」收口（10-13 21:05，Decision I made）",
+      "label": "决定",
+      "text": "# EVA 输入合同 v2.6 冻结；子项目「EVA 输入合同与机制分层定稿」收口（10-13 21:05，Decision I made）\n\n**冻结内容（对外接口，事件线/风场线向 EVA 交数据按此）**\n| 文件 | SHA-256 |\n| --- | --- |\n| （v2.6） | … |\n| （v2.6） | … |\n| （v2.6） | … |\n| （唯一正式检查器） | … |\n| （32 项） | … |\n| | … |\n今后任何改动须升版本号并记决策；v2_3/v2_4 分叉检查器已加作废守卫。\n\n**审查**：冻结审查 （Gemini、GPT-6、GLM，3/3 有效）裁决 F1–F9 必须改；v2.6 已全部落实，Lead 逐条核对落点并用审稿人的三个反例实测（哈希填 'see SOURCES.json'、row_type='Observation'、自造缺失原因）均判 needs_Liang Hu_review，干净未转换行仍 proxy_only。按只审一轮规定不再送审。\n\n**验收结果**\n- 五类判定规则与 row_type 三分（observation / obs_anchored_simulation / simulation_only）；纯模拟永不 main_analysis；WSPD10MAX 仅诊断。\n- 上游确认：事件线（S0 v1.2 字段名、R2b 交付）、风场线（D420 包字段齐）。\n- 真实接口演练：D420 v4 包 8 行全 proxy_only；事件线 R2b（v2.6， …）：2010–2017 47,612 行 → proxy 546 / 待上游修 47,066（补宽窗口缺可溯源源时刻）；2020–2025 8,751 行全 proxy；种子 245 行 → proxy 133 / 待修 112。主分析、机制敏感性均为 0——本阶段无 Vhat_3s 转换，属预期。\n- C01–C08 文献条目全部正式（C03/C06 经 6QV237TK 全文复核恢复）。\n\n**移交（不在本子项目内继续）**\n- 事件线：旧期补宽行补可溯源源时刻列（或声明同义列）后用同一检查器 + `--manifest` 复跑——已发事件 Lead。\n- 后续正式极值项目须知（见项目页\"未决\"）：Cook ASOS 四站为唯一年极值现实来源（2010–2022 站年完整率表已到）；去簇只用对流组且另设组跨度上限；补宽窗口不得当时长；全年完整率≠事件时段覆盖。\n- 观测→Vhat_3s 转换归本线，属后续项目。\n\n**错了的代价**：合同若仍有漏洞，会在下一批真实数据复跑时暴露，按版本号升级即可，不影响已有结果。\n**依据**：C01（CWDQQEXN pp. 2–3、8–11）、C05（AJSWAXVR pp. 4–6、9–12）支持机制分离与检测性设计；判定门槛与接口细节无文献依据，基于本线与事件线数据。\n\n## 补记 10-13 21:20：现行冻结版为 v2.7\nv2.6 冻结后用事件线 R2c 发现检查器两处与本线既定约定不一致，已升 v2.7。现行冻结文件：Rules_v2 …、Fields_v2 …、Plan_v2 …、检查器 c161b267e5eeb04c089411bd9fb2ca8822eb28c4bdefcebaeddff2aade0af18b、测试 …（34 项，Lead 复跑通过；清单换路径仍通过已实测）。R2c v2.7 正式重跑（ …）：新期 8,751 全 proxy_only；旧期 546 proxy + 47,066 待上游补源时刻；种子 133 + 112。冻结审查 审的是 R2b，R2c 与 R2b 差异仅为新期 396 行用途字段与三表缺失原因，不重审。事件线 R2d（补 event_time_source_raw）10-14 内交，到后用 v2.7 复跑确认待修清零。\n\n## 检查器版本与哈希对照（10-13 21:15，防外线混淆；只有最后一行是现行版）\n| 版本 | 时间（盘上写入） | 检查器 sha256 | 说明 |\n| --- | --- | --- | --- |\n| v2.4（单一正式版确立前） | 10-09 17:07 | … | 已被覆盖 |\n| v2.4 统一版 | 10-13 | … | 输出带检查器哈希；已被覆盖 |\n| v2.5 | 10-13 20:2x | … | 观测行不论去向校验；已被覆盖 |\n| v2.6（冻结审查 后） | 10-13 21:00 | … | F1–F9；已被覆盖，盘上不再存在 |\n| **v2.7（现行冻结版）** | **10-13 21:07** | **c161b267e5eeb04c089411bd9fb2ca8822eb28c4bdefcebaeddff2aade0af18b** | manifest 自身哈希判通过且与路径无关；缺失原因词表补收 R2c 四值 |\n同目录 、 是作废分叉，运行即报错。\n\n## 收口验收数据：事件线 R2d（10-13 21:13；验收版本已改为 srctime，见下方更正段）\nR2d（旧期 …、新期 …、种子 …）用 v2.7 + SOURCES_R2b.json：三表 47,612 / 8,751 / 245 全 proxy_only，I1 码 0，风暴组 8,112 / 1,609 / 159。R2c 回归只剩 padded_source_time_missing，R2d 补齐后清零。至此接口验收完成，子项目收口。\n\n## 补记 10-13 21:20：v2.7 同时接受 v2.6 受控词与 R2c 原词\n检查器未改（…）。测试文件加 `test_v27_v26_controlled_reasons_still_accepted_FIXTURE`（v2.6 受控词通过、自造词仍隔离），与既有 `test_v27_controlled_missing_reasons_FIXTURE`（R2c 原词）成对；35 项全过，测试文件 sha256 …。规则三文件：Rules_v2 …、Fields_v2 …、Plan_v2 …。已发事件 Lead 用同一版复跑 R2d 补交自跑报告。\n\n注（10-13）：事件线另出 （只补源时刻），据根 Lead 转告已作废（目录内 VOID 声明文件截至 10-13 21:15 尚未见，已请事件线补放）；收口验收以原 为准。\n\n## 更正 10-13 21:20：R2d 现行版为 srctime（推翻上一条注）\n事件线最终定版：现行 R2d = （旧期 …、新期 …=R2c、种子 …；只补源时刻，缺失原因保持 R2c 原词），映射版 作废（其目录内 VOID_R2d_vocab_mapping.md）。上面\"以原 R2d 目录为准\"一注撤销。v2.7 对现行版：三表全 proxy_only、I1 0、风暴组 8,112/1,609/159。此批不再改版；事件线 v2.7 自跑正式交付后核对哈希即可。\n\n## 补记 10-13：R2d_srctime 正式交付核对完毕\n事件线正式交付现行 R2d = （旧期 …、新期 …、种子 …），自跑报告 SELFRUN_V27_*.json 的 checker_sha256 = …、输入哈希与上表一致、三表全 proxy_only、I1 0、风暴组 8,112/1,609/159、I3 警示 482/130/112——与本线 v2.7 验收逐项一致。**收口验收版本 = srctime**；映射版（…/…/…）作废，结果相同，仅作历史。此批不再改版。"
+    },
+    {
+      "id": "dec-0021",
+      "ts": "2026-10-18 00:49",
+      "title": "工作站 清理 P5：删除 [local path omitted] lead（Liang Hu 10-18 批，执行记录）",
+      "label": "决定",
+      "text": "# 工作站 清理 P5：删除 [local path omitted]（Liang Hu 10-18 批，执行记录）\n\n批准：Liang Hu 10-18，经 PETW 统筹委托转达。\n\n## 预演清单（10-18 00:47）\n- 路径 （WSL 本机，Lead 10-09–10-13 核对事件线交付时的临时副本与检查器输出）；47 个文件，1,581,559,499 字节（约 1.58 GB）。逐文件清单：。\n- 与原件按 SHA-256 比对：\n - 19 个 CSV/清单/检查器副本与 原件一致（事件线 、本线）——直接删。\n - 4 个无原件，已先拷回 并核哈希一致：、检查器 v2.5、v2.6、R2c 新期表首发版（事件线已原地替换为）。\n - 21 个 JSON 与 3 个空 .err：Lead 本机复跑检查器的输出，可由上述输入 + 检查器重算；正式报告已在 与事件线 SELFRUN 文件。不拷回，逐文件哈希、行数、路由计数记入 `scratch_json_manifest.tsv`。\n- 必留项： 内全部原件（上述路径）与本线 、。\n\n## 执行（10-18 00:5x）\n- 只删 整个目录（即上述清单），实删 1,581,559,499 字节；删后目录不存在。\n- 必留项复核：R2d_srctime 三表 //、检查器 、拷回 4 件 /// 均在且哈希一致。\n- ：删前 952G/864G 已用/88G 可用；删后不变（WSL 虚拟盘需压缩后才回收）。\n- 台账： 已登记（approved：Liang Hu 10-18）。"
+    }
+  ],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-09 10:25",
+      "text": "【Liang Hu】你是EVA研究线新任 Lead，本对话是这条线的根对话（只放线况与跨项目决定）。第一轮请做：\n2. 派本线 bot 做一次只读汇报（它 09-25 以来做了什么、在跑什么、停在哪、有哪些未交付物），结果回来后核对方案\n4. 用 建立子项目（至少一个，按方案；你认为方案不对可以改，改了记决策记录），每个子项目写项目页 <名>.md；方案里指明“现有对话应成为执行对话”的，在回答里列出 topic 前缀，我来挂；写“新开”的由子项目 Lead 第一次派活自动建立\n5. 09-25 决策表里“你的选择”为空的项一律按默认同意执行，不要再问我。\n本线近期目标先定为“打通接口 + 不确定性传播演练”，真正的年极值样本等事件线给出多事件样本再做。\n只有三类事问我：改科学方向、删除/覆盖已有结果、对外结论。其余自己定、先做再说。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 10:25",
+      "text": "**这一轮的情况**\n- 基线已读完。本线从 08-12 起没有新的科学证据，准入表一直是 0 行（检查的是空模板，属于有效停止）。规划文件、准入检查器、C01–C08 内部 Wiki 和中英文综述都可以直接复用。\n- 中英文综述 PDF 我重新算了哈希，与控制用的 QA JSON 一致（中文 21 页，英文 25 页）。只有 还写着 22 页和旧哈希，已派 bot 直接改。\n- 已派 eva bot 两件事：只读现状汇报；综述 QA 文档改正，并给 里待核的句子补上文献卡片页码。\n- 已建 、两个项目页和一条决策记录。\n\n**我做的决定**\n- 09-25 决策表的空项按默认执行：F1 机制分层先按 bot 草案执行；F2 准入有通过行就做一次只演练、不用于设计的试算；F3 把 C01–C08 升为正式条目；A2 文档改正不需批准，做完报备。参考情景按你 10-04 的决定，用我们自己的 WRF 4.0.3 模拟。基线第六节列的 7 条\"需 Liang Hu 确认\"全部由这几项覆盖，不再找你。如果错了，代价很小：演练只验证管线，不产生科学数字。\n- 子项目建两个：「参考情景 Vhat_3s 试算」和「EVA 输入合同与机制分层定稿」。方案里的 2.3 综述收尾只剩改文档和交付，所以不单列子项目，作为根对话下的一次性任务处理。\n- 演练边界：不拟合 POT/GPD/GEV，不出重现期。\n- 一个定义上的难点已经写进任务书：WRF d03 的逐分钟输出是格点瞬时值，或输出区间内的最大值，不是 10 m、3 秒平均、开阔地形的阵风。怎么转换、不确定度多大，是试算子项目第一件要定的事，依据必须引文献卡片和页码。\n\n**要你挂的执行对话**：没有。方案里两个子项目都写\"新开\"，执行对话会在子项目 Lead 第一次派活时自动建立。\n\n**下一步**\n1. 汇报回来后：核对方案，用 建两个子项目，派 eva 做 d03 到准入表的字段映射和 3 秒阵风脚本的干跑（不动 TACC），同时派 v2 分层规则草案。\n2. WRF 线 10-10 以后定主情景，再由试算子项目向 WRF Lead 要 d03 帧路径、变量口径和哈希清单。委托列表里跨线给 WRF Lead 标着\"需要 Liang Hu 批准\"，到时界面可能会弹出批准请求，点通过即可。\n\n两份综述 PDF 请审阅（科学状态仍是未批准）：\n\n\n\n线况和决策记录：\n\n\n\n（附件：Step3_Thunderstorm_EVA_Literature_Review_CN.pdf）\n\n（附件：Step3_Thunderstorm_EVA_Literature_Review_EN.pdf）\n\n\n（附件：lead_first_round_20261009.md）"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 10:31",
+      "text": "【委托结果 · EVA 智能体】Step 3 综述收尾：QA 文档一致性与标准化说明补注\n本次完成 3 个文件的最小修正；中文 QA 与控制 JSON、实物 PDF 一致，英文文件无同类差异。\n\n（附件：FINAL_QA_REPORT.md）\n\n（附件：FINAL_ARTIFACT_HASHES.sha256）\n\n（附件：Vhat3s_Standardization_Note_v0.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 10:31",
+      "text": "**综述收尾**\n- 和哈希清单已改为 21 页、`…`，和实际 PDF、控制用的 JSON 对上了。旧的\"22 页 / …\"没有删，挪到文末\"历史记录（已被取代）\"一节。英文稿没有同类问题。我抽查过文件，确认改动属实。\n- 里待核实的句子已逐条补上文献卡片和页码。子库没覆盖的写明\"无文献依据\"。其中最关键的缺口是：把模拟出来的格点风换算成 3 秒阵风，这一步目前没有文献依据。这正是试算子项目要先补的，已写进它的任务书。\n\n**子项目**（执行对话都由子项目 Lead 第一次派活时自动建立，不需要你挂）\n- 「参考情景 Vhat_3s 试算」：先派 bot 做 d03 到准入表的逐列字段映射，并写 3 秒阵风后处理脚本草案，这一步不动 TACC。WRF 线 10-10 以后定主情景，再由它向 WRF Lead 要数据。\n- 「EVA 输入合同与机制分层定稿」：派 bot 起草 v2 规则和\"上游须提供字段\"清单，然后发三方。\n\n**下一步**：只读现状汇报还没回来。回来后我对照启动方案核对，有出入就调整子项目，并记一条决策记录。\n\n两个项目页和线况都已更新："
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 10:34",
+      "text": "【委托结果 · EVA 智能体】EVA 线只读现状汇报（09-25 以来）\nEVA 自 09-25 以来有基线和建线文件更新，但未见新增科学数据；当前准入 0 行，下一道实质门槛是真实事件与可追溯 Vhat_3s 转换输入。中文 QA 当前为 21 页且哈希一致；准入模板 43 列中只有 21 列是检查器的无条件必填列。\n（完整过程见）"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 10:49",
+      "text": "【子项目回报 · 参考情景 Vhat_3s 试算】门规则 v1 不收纯模拟行，试算改用 Akron 观测锚行\n结论：eva 映射表显示纯 WRF d03 行有 16 列本质不可填（观测原生风/传感器/QC/观测 Vhat_3s），门规则 v1 与检查器结构上不收纯模拟行。我没有放宽门规则，改派 eva 以 Schumacher 2023 Akron 下击暴流的地面站实测阵风为观测列、exp-A 站点值为模拟列生成候选行（决策）。另：WRF 4.0.3 WSPD10MAX 是 AFWA 区间最大，强降水时混入 1 km 风，不能作 3 s 阵风界。\n请转给「EVA 输入合同与机制分层定稿」：v2 是否设'纯模拟/模拟锚'行类别、以及 WSPD10MAX 口径，供其草案参考。下一步：等 eva 观测锚行与准入报告、litwiki 转换文献、WRF Lead 帧清单。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 10:49",
+      "text": "试算子项目发现：光靠 WRF 模拟数据，生成的行过不了现行准入门。我同意它不放宽准入规则、改用观测锚行的做法，并已把这条发现转给合同定稿子项目。\n\n**发现了什么**\n- 准入表一行 43 列。用 WRF d03 模拟风场填，有 16 列本质上填不出来：观测原生风速、传感器、QC、观测得到的 Vhat_3s。现行 v1 准入规则（下称 v1 门）要求这些列必须有，所以纯模拟行进不了门。硬填就等于编造数据行。\n- WRF 4.0.3 的 10 m 风最大值变量 `WSPD10MAX` 不能拿来给 3 秒阵风定上下界：它是输出区间内的最大值，强降水时会混入 1 km 高度的风。\n\n**子项目 Lead 的处理**\n- 准入规则不放宽。改为用 Schumacher 2023 Akron 下击暴流那次事件：观测列填地面站实测阵风，模拟列填 exp-A 在站点位置的值，生成候选行再跑准入。\n- 我读了它的决策记录，判断合理：这次事件同时有真实观测和我们自己的模拟，是最短的合法路径。如果站点不在强风区，结果就是 0 行准入，这也是有效的停止，不用上超算。\n\n**我做的决定**\n- 把两项发现转给「EVA 输入合同与机制分层定稿」，让它在 v2 合同里定两件事。\n - 是否单设\"纯模拟行\"和\"观测锚 + 模拟行\"两类；如果设，各自能用于下游哪些分析、哪些字段必填、带什么不用于设计的标志。\n - 在字段定义里写明 `WSPD10MAX` 禁用，或只作诊断。\n- 合同定稿后，字段和类别定义回传试算子项目。\n- 理由：行类别属于合同范畴，归定稿子项目管，避免两边各定一套。\n- 错了的代价：只是 v2 草案多一节内容。\n\n**下一步**\n- 试算子项目在等三样东西：bot 生成的观测锚行和准入报告、litwiki 找的\"模拟风换算成 3 秒阵风\"文献、WRF Lead 的帧清单。\n- 根对话这边还在等只读现状汇报。\n\n线况已更新："
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 11:31",
+      "text": "【子项目回报 · EVA 输入合同与机制分层定稿】EVA 输入合同 v2 定稿；请转试算子项目 \n结论：v2 定稿（审查 两方一轮，必须改 7 条已落实）。C01–C08 已升正式，C03/C06 因 6QV237TK 来源卡未更新仍'待补证'，litwiki 在重建（08-12 已恢复过全文）——综述若引 C03/C06 请留意。字段确认已派 、。\nv2 已定稿：（单一判定瀑布 exclude > proxy_only > needs_Liang Hu_review > mechanism_sensitivity > main_analysis；路由单位 = 一行 = event_id × target_wind_product_id；I9 行类型）、。\n对试算子项目要点：(1) row_type 三值 observation / obs_anchored_simulation / simulation_only；Akron 观测锚行用 obs_anchored_simulation，路由只看观测列，模拟列仅配对比较，须填 simulation_id、simulation_variable、simulation_point_match、simulation_status、源哈希、sim_not_vhat3s=true；纯模拟行默认 proxy_only、最高 mechanism_sensitivity、永不 main_analysis，另加 not_for_design_use=true，观测列填 not_applicable。(2) WSPD10MAX 仅诊断，不是 3 s 阵风也不作上下界；exp-A 03:30 帧排除。(3) 映射表 与 v2 改名清单见字段表 L184：latitude/longitude→event_latitude/event_longitude；native_averaging_period→native_averaging_period_s；native_sampling_interval→sampling_interval_s；vhat3s_observed/simulated_estimate→按产品分行的 vhat3s_estimate_mps；downstream_use_flag→allowed/not_allowed_downstream_use；还缺 row_type、target_wind_product_id、simulation_variable、simulation_point_match、label_alternatives 等。冲突以 v2 为准，旧名可作别名。(4) 现检查器未实现 v2 五类，试算继续用 v1 检查器跑观测锚行即可；v2 检查器改造由本子项目另派。S0 v1 冻结后字段名可能微调，会通知你。\n下一步：上游确认后派 eva 改 v2 检查器；S0 v1 冻结后别名级核对。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 11:31",
+      "text": "Files verified. Forwarding to the pilot subproject.EVA 输入合同 v2 已经定稿，内容已转给试算子项目。我核对过 v2 文件和它的决策记录，都在、对得上。\n\n**v2 定了什么**\n- **样本怎么分档**：每行先判是否排除，再依次判\"只作代理比较\"、\"交你审\"、\"机制敏感性分析\"，最后才进主分析。\n- **数据行分三类**：纯观测、观测锚加模拟、纯模拟。纯模拟行最高只能进机制敏感性分析，永远不进主分析，并且一律标\"不用于设计\"。试算子项目正在做的 Akron 观测锚行属于第二类：分档只看观测列，模拟列只用来配对比较。\n- **`WSPD10MAX` 只作诊断用**，不能当 3 秒阵风，也不能当它的上下界。\n- **审查**：独立审查做了一轮，只收到两方意见。要求必须改的 7 条，子项目 Lead 都已改进 v2。\n- **C01–C08 已升为正式文献条目**，但 C03/C06 还在等补证，因为它们的来源卡片正在重建。补证之前，试算结论不以这两条为依据，我已经告诉试算子项目。\n\n**我做的决定**\n- 由我把 v2 的要点转给试算子项目。原因是两个子项目平级，它们之间不能直接发消息。\n- 试算继续用现有的 v1 检查器跑观测锚行；同时把这些行按 v2 的字段名另存一份，等 v2 检查器改好后重跑一遍。这样试算不用停下来等检查器改造。错了的代价只是到时多跑一次检查器。\n\n**下一步**\n- 合同子项目在等事件线、风场线确认上游字段，确认后派 bot 改造 v2 检查器。\n- 试算子项目在等 Akron 观测锚行的准入结果、litwiki 找的阵风转换文献，以及 WRF 线的帧清单。\n- 只读现状汇报还没回来。\n\nv2 合同的三个文件：\n\n\n\n\n（附件：Step3_Sample_Inclusion_Rules_v2.md）\n\n（附件：Step3_Upstream_Required_Fields_v2.md）\n\n（附件：Step3_Detectability_and_Label_Uncertainty_Plan_v2.md）"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 11:49",
+      "text": "【子项目回报 · EVA 输入合同与机制分层定稿】C03/C06 已恢复可调用；试算子项目勿引 H7ZG33PU\n结论：(1) litwiki 重取 Cook 2023 官方 PDF（6QV237TK），SHA-256 …ed5a 与 08-12 精读记录一致、24 页，Lead 本机复核通过；C03、C06 已改为限来源范围可调用，C01–C08 全部正式。综述引用 C03/C06 不再有问题。(2) 提醒试算子项目 ：其决定 写'观测阵风仪器定义待 H7ZG33PU 等卡片'，但 H7ZG33PU 来源卡仍是 source_limited_no_full_text，不得作依据；请换卡或委托 litwiki 恢复全文（参照 6QV237TK 做法）。请转告。下一步：本子项目等风场线字段确认与 eva 字段清单 v2.1。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 11:49",
+      "text": "C03 和 C06 两条文献条目已恢复可用，C01–C08 现在全部是正式条目。H7ZG33PU 的问题已查清，但给 litwiki 和试算子项目的两条消息还没发出去：全系统同时进行的委托数满了（上限 16 个），后台每 2 分钟重试一次，最多试 1 小时。\n\n**C03/C06 恢复**\n- litwiki 从官方来源重新取回 Cook 2023 的 PDF（6QV237TK），哈希和 08-12 精读时的记录一致，共 24 页，子项目 Lead 在本机也复核过。综述里引用 C03/C06 不再有问题。\n\n**H7ZG33PU 不能作依据**\n- 试算子项目的决策记录里，打算拿 H7ZG33PU 卡片定义观测阵风的仪器口径，但这张卡片仍标着\"无全文\"。\n- 我查了 08-12 的恢复记录：这篇（Cook 2023，ASOS 质量控制）当时已从官方 MDPI 取回全文并通读，19 页，哈希 `…`。问题出在卡片没跟着更新，和 6QV237TK 是同一类。同批恢复的 TN6C93KA、UBTE4EBP 可能也一样。\n\n**我做的决定**\n- 派 litwiki 按 6QV237TK 的做法，重新取回这三篇的 PDF：哈希一致才把卡片改为全文可读，不一致就维持原状并写明差异。\n- 同时告诉试算子项目：卡片更新前不要引用 H7ZG33PU；撤销之前\"勿引 C03/C06\"的提醒。\n- 错了的代价：试算的观测仪器口径晚一点才有文献依据，不影响数据。\n\n**下一步**\n- 后台重试发出去后，litwiki 的结果会自动回到本。如果 1 小时内还发不出去，我会被叫醒再处理。\n- 只读现状汇报仍未回来。\n\n线况已更新："
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 11:59",
+      "text": "【委托结果 · 文献 Wiki 智能体】eva_vhat3s 子库：08-12 已恢复全文的 3 篇卡片状态更新\n已从出版方重取 PDF、复算完整 SHA-256 并核对页数；三张指定的 claims 卡片已写入核验结果与自然 PDF 页码信息。以下路径均位于\nH7ZG33PU | 9419d90bb6921dc0dea80084f9b0406b2c4046bed3e6d3f6078a9e89b89d1e7c | 19 页 | 哈希、页数均一致 | identity_matched_full_text_sha256_verified | H7ZG33PU.md\n\nTN6C93KA | f0c4a16d7b2c66e454a5c161c164e6c083b5e7ebe84d322d075133f7c94a07a8 | 14 页 | 哈希、页数均一致 | identity_matched_full_text_sha256_verified | TN6C93KA.md\n\nUBTE4EBP | c7ad366dbbd2bb81b7f59a7cedf9efdb1e8457bc631b5551da9ecda91c20f536 | 8 页 | 页数一致，哈希与 08-12 记录的 13882d5304b774b17a6ccc413757b5c882669f0092d75efa6034096f40c8caf9 不一致 | source_limited_no_full_text（保持） | UBTE4EBP.md\n\nDecision I made：UBTE4EBP 不升格——本次出版方 PDF 的完整哈希不符；代价是即使差异仅来自出版方动态生成的 PDF，卡片也暂时保持 source_limited。三张卡片的科学批准状态均未改变；其余六个 source_limited 键与 D5AF3D82 未修改。\n\n\n\n\n\n（附件：H7ZG33PU.md）\n\n（附件：TN6C93KA.md）\n\n（附件：UBTE4EBP.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 11:59",
+      "text": "三张文献卡片核完了：两张恢复为可引用，一张暂时还不能引用。我在本机看过三张卡片，状态和 litwiki 汇报的一致。\n\n- **H7ZG33PU（Cook 2023，ASOS 实时质量控制）、TN6C93KA**：从出版方重新下载的 PDF，哈希和页数都与 08-12 的记录一致，卡片已改为\"全文已核验\"，带页码。我已通知试算子项目，H7ZG33PU 现在可以引用，要写到具体页码。\n- **UBTE4EBP**：仍不能引用。出版方的 PDF 每下载一次哈希就变一次，看起来是发放时自动改写文件，但这不能证明内容和 08-12 那份完全一样，所以 litwiki 保持原状态没有放行，我同意。\n- **Decision I made**：UBTE4EBP 暂不追。目前没有哪个结论非用它不可；真需要时，再拿 08-12 的全文记录逐段比对正文来恢复。错了的代价是这篇晚一点才能用，不影响任何结果。\n\n线况已更新。现在还在等两样：只读现状汇报和试算子项目的准入结果。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 11:59",
+      "text": "【委托结果 · EVA Lead】输入合同 v2 已定稿：行类型、WSPD10MAX、字段改名\nLiang Hu，eva 已把试算对齐到 v2 输入合同，我抽查过要点，都对。真实准入仍是 0 行。\n\n**我核过的要点**\n- **4 行候选**：都按 v2 标为\"观测锚+模拟配对\"行，模拟值都标明\"不是 Vhat_3s\"。按 v2 判定顺序，4 行的预期去向都是\"needs_Liang Hu_review\"。这只是合同里的一个路由标签，不是现在要你审：这几行在准入检查里本来就被挡下，不会送到你那里。\n- **WSPD10MAX**：脚本会直接拒绝把它当作阵风的上限或下限；转换说明已改正，并写明依据的 v2 条文。\n- **C03/C06**：现有文件里没有作为科学依据的引用；bot 说 METAR 报文里有字符相同的天气代码，与卡片无关。\n- **新版映射表**：已另存为，旧版保留未动。\n\n**我做的决定**\n我做的决定：这个子项目只剩一件事，等 WRF 线交来塔址周边的模拟风，填进塔这一行的配对列，算出观测和模拟的差值。之后我向根对话回报收尾，项目页改为\"等上游\"。为什么：接口和演练流程已经跑通，真实准入行要等你决定是否索取 USDA 原始数据，或等事件线的多事件样本。错了的代价：没有。\n\n\n\n（附件：v2_contract_alignment_note.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 11:59",
+      "text": "试算子项目已对齐 v2 输入合同，进入收尾。真实数据行目前 0 行通过准入，接口和演练流程只用测试数据跑通过。\n\n**进展**\n- 候选行最好的一条是 Akron 下击暴流时 USDA 10 m 测风塔的 50.45 m/s 阵风，引自 Childs 2021。它最初通过了准入检查，但独立审查后被否了，原因有三个：\n - 论文表格写的是\"3 秒阵风\"，正文和图注却说按 5 秒采样，两处口径矛盾。\n - 塔的精确坐标、周围地形是否算开阔地、质量控制情况都不清楚。\n - 我们的阵风转换文献里，找不到能用于这座塔的数值换算。\n- 另外 3 个机场气象站的行也全部被挡。\n- 因为 0 行通过，演练只能用测试数据：接口与不确定性传播流程已跑通，但还没算出真实的不确定度宽度。\n- 新版字段映射表已另存，旧版保留未动。我抽查过 v2 对齐的要点，没有问题。\n\n**我做的决定**\n同意子项目 Lead 的收尾安排。WRF 线正在 TACC 上提取塔址附近的模拟风（作业 3584556），回来后填进配对列，项目页改为\"等上游\"，子项目收口。\n理由：近期目标\"打通接口 + 不确定性传播演练\"已经达到；要有真实准入行，只能等新数据。\n错了的代价：没有。重开的条件已写进项目页。\n\n**需要你定的一件事（对外联系）**\n要不要向 USDA 站的所有者索取 Akron 10 m 塔的原始逐秒记录？可以经 Childs 2021 的作者联系，Schumacher 也是作者之一。\n- 拿到了，就能核实 3 秒口径和峰值时刻，这一行有机会成为第一条真实准入行。\n- 不索取，真实行就等事件线的多事件样本。这不影响其他工作。\n\n线况已更新："
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 12:00",
+      "text": "【委托结果 · EVA Lead】H7ZG33PU 卡片暂不可作依据；C03/C06 已恢复\n- H7ZG33PU：试算决策记录已改为\"待 litwiki 恢复全文后引用\"。Akron v1、v2 候选行引用它的地方均注明\"source-limited, no QC transfer\"，未作依据，产物不需要改。卡片更新前，试算结论不引用它。\n- C03/C06：项目页的禁用提醒已撤销。试算现有结论没有用到这两条，不受影响。\n- 试算现状：真实准入 0 行，属有效停止。接口和演练流程已用测试数据跑通。塔址模拟风等 WRF 线交付后填入配对列，之后我回报收尾。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 12:00",
+      "text": "这是试算子项目对早先那条提醒的回执。它已按当时的说法，把决策记录改成\"待 litwiki 恢复全文后引用\"。现有候选行没有拿 H7ZG33PU 作依据，产物不用改。\n\n这个回执已经过时：之后 litwiki 核实了 H7ZG33PU 全文，卡片已恢复为可引用。\"已恢复、可按页码引用\"那条通知已排在它后面，它下一轮会把引用改成具体页码。\n\n试算现状没变：真实准入仍是 0 行，在等 WRF 线交来塔址周边的模拟风，填进配对列后收尾。\n\n这一轮我这边不需要再做什么，在等两样东西：只读现状汇报，以及试算子项目的收尾回报。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 12:00",
+      "text": "【委托结果 · EVA Lead】H7ZG33PU 卡片已恢复，可引用\n- 试算决策记录 第 7 行已改为具体引用：H7ZG33PU（Cook 2023）自然 PDF pp. 2–4、19（ASOS 阵风为 3 秒平均）、p. 4（实时 QC Test 10）、p. 9（误剔中约 10% 删去事件峰值），限来源范围引用。UBTE4EBP 试算未引用。\n- 新线索：Cook 2023 可能化解 KAKO 行\"5 秒换 3 秒\"的缺口（Childs Table 1 p. 2885 与 Table 2 p. 2890 对 ASOS 时长的写法矛盾）。但 KAKO 行还缺地形量化、原始 1 分钟峰值、QC 删峰评估，按口径规则第 30 行仍阻断，已记为重开条件。\n- 试算整体：真实准入 0 行，属有效停止。接口和演练流程已用测试数据跑通。塔址模拟风等 WRF 线交付后填入配对列，之后回报收尾。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 12:00",
+      "text": "H7ZG33PU（Cook 2023）现在已经按具体页码引用进了试算的决策记录：\n- pp. 2–4、19：ASOS 阵风是 3 秒平均\n- p. 4：实时质量控制的第 10 项检查\n- p. 9：这项检查的误删里，约 10% 删掉的是事件峰值。\n\n试算子项目还从这篇里找到一条新线索：它可能解决 Akron 机场站（KAKO）那一行\"5 秒还是 3 秒\"的口径矛盾。不过这一行还缺三样东西：原始一分钟峰值、质量控制删峰的影响评估、地形量化，所以仍然被挡在准入门外。\n\n**我做的决定**：子项目收尾前，让它再试一次补救。ASOS 一分钟数据在 NCEI 公开可下，不用联系任何人。具体是：\n- 下载 KAKO 2020 年 6 月的文件，读出风暴经过时段的逐分钟峰值，再结合 Cook 2023 判断前两个缺口能不能补上\n- 地形用公开的站点资料和航拍图描述，并标明不确定度\n- 能补上就按 v2 重跑准入检查，补不上就照常收口。\n\n这样做的理由：KAKO 有可能成为第一条真实准入行，而且不用等你决定是否向 USDA 要数据。错了的代价是 bot 白花一次本地下载和分析的工夫，不上超算。\n\n现在在等两样东西：试算子项目的 KAKO 补救结果和收尾回报，以及只读现状汇报。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 12:02",
+      "text": "【子项目回报 · EVA 输入合同与机制分层定稿】EVA 输入合同 v2.2 与检查器就绪，等 S0 冻结收口\n结论：v2.2 定稿（ …、Step3_Upstream_Required_Fields_v2.md …）；v2 检查器 （…）夹具测试通过；风场线 D420 真实包逐 feature 6 行全 proxy_only、无主分析。事件线、风场线都已确认字段；观测→Vhat_3s 转换归本线。\n请转试算子项目 （v2.2 新增）：simulation_only 必填分两组——基础组（simulation_id、simulation_variable、simulation_status、resolution_status、源哈希、sim_not_vhat3s、not_for_design_use）任何去向必填；转换组（postprocessing_method_to_vhat3s、Vhat 估计/不确定度）仅申请 mechanism_sensitivity 时必填，proxy_only 可填 none 附原因。模拟包按 feature 一行，target_wind_product_id=feature_id。试算可用新检查器跑观测锚行与 exp-A 行。\n下一步：事件线 S0 v1 10-13 前冻结后核对原生观测 ID 列名与 S3 裁定类枚举，然后收口合并。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 12:02",
+      "text": "输入合同已升到 v2.2 定稿，新的 v2 检查器也能用了；这个子项目只等事件线 10-13 前冻结 S0，核对完列名就收口。\n\n**进展**\n- 事件线、风场线都已确认上游要交的字段。双方还说定：从观测风速换算到 Vhat_3s 这一步由本线负责。\n- 新检查器的哈希我核过一致，用测试数据跑通了。\n- 风场线交来的 D420 真实数据包按每个风场特征一行，共 6 行，第一次进了新检查器。6 行全部只能作代理比较，没有一行进主分析，结论标明不用于设计。这符合预期：这些都是纯模拟数据，按合同最高也进不了主分析。\n\n**我做的决定**\n- 已把 v2.2 新增的规定转给试算子项目：纯模拟行的必填字段分两组，模拟包按每个风场特征一行。\n- 要求试算子项目收口前用新检查器重跑一遍所有观测锚行（包括 KAKO 补救的结果）和 exp-A 行，作为它的最终准入报告。这样两个子项目的结论出自同一版规则。\n- 错了的代价：只是多跑一次本地检查器。\n\n**下一步**\n- 合同子项目：S0 冻结后核对两处，一是原生观测 ID 的列名，二是事件线裁定的机制类别取值，核完就收口。\n- 试算子项目：KAKO 补救、WRF 塔址模拟风、新检查器重跑，三样齐了后收口。\n- 只读现状汇报仍未回来。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 12:03",
+      "text": "【委托结果 · EVA Lead】KAKO 行补救：ASOS 一分钟公开数据\n- **KAKO 补救未闭合，维持阻断。** NCEI ASOS 一分钟档（DSI 6405/6406）KAKO 2020-06 月文件在 06-08 21:48 UTC 至 06-10 22:17 UTC 之间整段缺档，事件时段 06-09 06:00–06:30 UTC 没有记录。原始一分钟峰值和 QC 删峰两项都无法闭合。\n- 证据：，原档在同目录 下。6405 文件 SHA-256 为 …，6406 文件为 …。原 eva 委托已终止，由我直接下载公开数据，未联系任何人。\n- **试算收口为\"等上游\"**：真实准入 0 行，属有效停止。USDA 塔一行经独立审查阻断（3 秒与 5 秒口径冲突、地形未量化），KAKO 一行因缺档阻断，K2V6、KSTK 两行不在核心区。\n- 接口和不确定性传播演练流程已用测试数据跑通，有了真实准入行换掉输入就能用。\n- **重开条件（任一即可）**：USDA 塔的原始记录（需对外索取，是否去要由 Liang Hu 定）；或事件线交来多事件样本。\n- WRF 线核对后交来塔址周边的模拟风，我再填入配对列，只作对照。项目页和线况已更新。\n\n\n\n（附件：KAKO_1min_gap_note.md）\n（完整过程见）"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 12:03",
+      "text": "【委托结果 · EVA Lead】v2.2 合同与 v2 检查器就绪\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-09 13:37",
+      "text": "【Liang Hu】补充：本线现在就开，先打通接口和不确定性演练，后续正式做极值统计；把\"多事件样本从哪来\"（事件线普查、WRF 成员）写进项目页的未决项。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 13:37",
+      "text": "已写进两个项目页的\"未决与下一步\"，线况页也加了一行。本线按你说的定位走：现在先打通接口、做不确定性演练，正式的极值统计以后另立项目。\n\n**多事件样本从哪来**\n- **事件线普查**：S0 注册表里有观测记录（机场 ASOS 站、测风塔）的多次雷暴大风事件。只有这类数据能做年极值或超阈值样本。还要问清三件事：覆盖哪些年份、多少站点、第一批什么时候按 v2 字段交来。\n- **WRF 成员**（exp-A 和各扰动成员）：都是同一次 Akron 事件的不同模拟，不是独立事件，不能当年极值样本。它们只用来估计同一事件内的不确定性，也就是模拟结果的散布；作为纯模拟行，最多进机制敏感性分析。如果以后要让 WRF 也成为多事件来源，就得模拟其他事件，这属于扩展范围，到时由我定。\n\n**我做的决定**\n- 让合同子项目在 10-13 前核对事件线冻结的 S0 注册表时，顺带向事件线问清普查的规模和交付时间，写进未决项。理由是它本来就在和事件线对接字段，一并问省一轮来回。错了的代价是没有。\n- 正式极值统计什么时候立项，要等普查数字回来、看合格观测行数和记录年限够不够，到时再定门槛。\n\n\n\n\n（附件：参考情景Vhat3s试算.md）"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 15:38",
+      "text": "【委托结果 · EVA Lead】兄弟子项目输入：纯模拟行类别与 WSPD10MAX 口径\n委托失败：服务重启中断了子对话\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 15:38",
+      "text": "报失败的是 10-09 上午那条转发，内容是\"纯模拟行类别\"和 `WSPD10MAX` 口径。子对话被服务重启打断了，但这两项早已写进 v2.2 定稿合同，所以我没有重发：\n\n- **行类型**：v2.2 合同里写明了三类，纯观测、观测锚加模拟、纯模拟。\n- **`WSPD10MAX`**：合同里注明只作诊断，exp-A 03:30 那一帧排除。合同的说法已按 WRF 线核过的源码更正为\"每分钟输出间隔内逐积分步的最大值\"，不再是我当初转述的 AFWA 说法，以合同为准。\n\n刚才问事件线多事件普查规模的那条，是重启后另发的，不受影响。\n\n现在在等四样东西：\n- 只读现状汇报\n- 试算子项目的 KAKO 补救结果和收尾回报\n- WRF 线交来的塔址模拟风（TACC 作业 3584556）\n- 合同子项目在 S0 冻结后的核对结果，以及事件线普查的规模。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 17:11",
+      "text": "【委托结果 · EVA Lead】收口前加问事件线：多事件普查的规模与时间\nv2.4 合格：字段名、哈希格式、去重计数这几处小修都已经落实。21 个测试我在本机复跑通过。\n\n**首批重跑结果**\n- 47,612 行仍然全部是 `proxy_only`，按事件线原来的分组去重后是 7,053 组。\n- 输出说明里残留的那句 D420 旧文字已经改掉。\n- 哈希格式报错还在。原因是事件线 v1.2 这一列填的仍是 \"see SOURCES.json\"，要等 S0 v1.3 改成 `manifest:<哈希>` 才会消失，这在预期之内。\n\n**剩下一步**：事件线 10-13 前冻结 S0 v1.3。之后我用 v1.3 的行表把首批数据再跑一遍，确认两件事：哈希报错消失；按风暴系统分组的去重计数正常。确认后写结论记录，这个子项目收口。\n\n**和线况页对不上的地方**：线况里根对话写的这一行状态是\"已收口 v2.3\"，还提到\"D420 v4，8 行\"。我这边的实际情况是 v2.4，D420 是 6 行，而且还在等 S0 v1.3。我只改了这一行的\"下一步\"一格，状态一格没动。以哪边为准，请根 Lead 核对。\n\n项目页已更新。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 17:11",
+      "text": "合同子项目这一轮验收合格，只剩等事件线冻结 S0 v1.3。它指出的线况页对不上也已核实：是线况页写错了，已整页改正。\n\n**合同子项目**\n- v2.4 合格，21 个测试由子项目 Lead 本机复跑通过。\n- 事件线首批 47,612 行仍全部只能作代理比较（proxy_only），去重后 7,053 组，我核过输出文件的计数。\n- 还剩一个哈希格式报错。原因是事件线这一列暂时填的是\"see SOURCES.json\"，S0 v1.3 改了就会消失，这在预期之内。事件线 10-13 前冻结 S0 v1.3，重跑一次确认后收口。\n\n**线况页对不上的地方**\n- 线况页写了\"已收口 v2.3\"，是错的。项目页抬头也误标成了已收口。两处都改成\"等 S0 v1.3、近收口\"。\n- D420 的行数子项目报错了：最新的 v4 包是 8 行，全部 proxy_only；它说的 6 行是更早一版包的跑次。我已告诉它以 v4 为准。\n\n**多事件样本有了答案**（已写进线况页）\n- 正式极值统计最现实的来源是 Cook 整理的 ASOS 四站：AUS、DAL、DFW、HOU。一分钟数据最长可回溯 22 年（2000–2021）。其中判为雷暴的 482 条，≥40 kt 的 34 条，≥50 kt 的 7 条。\n- 缺口有三个：\n - 各站逐年的数据完整率还没算\n - 这是事件清单，不是连续记录\n - 机制裁定还是 0 例，也就是还没有一条事件被判定为哪种风暴机制。\n- 事件线 10-13 前交二批数据（约 245 行）和逐站逐年完整率表。\n\n**Decision I made**\n- 线况页今后只由我改，子项目只改各自的项目页，免得两边各写各的。错了的代价只是我多更新几次。\n- 正式极值统计等二批数据和完整率表到了再定门槛、再立项。理由是现在不知道每站有效年数，定不了门槛。错了的代价是立项晚几天。\n\n另外，你那条\"是否向 USDA 要 Akron 塔原始记录\"仍是可选项，不要也不影响主线，主线已经转向 ASOS 四站。最早派的只读现状汇报其实上午 10:28 就回来了，内容和我们核过的一致，没有新东西。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-09 17:12",
+      "text": "【委托结果 · EVA Lead】线况已核正；D420 以 v4 包 8 行为准\n1. 已照根 Lead 的核正执行：D420 以 v4 包为准，8 行全部是 `proxy_only`，已核对并写进项目页；之前的 6 行来自 v1.1 包的旧跑次。\n2. 今后线况页只由根 Lead 改，子项目只改自己的项目页；项目页状态保持\"等结果\"，收口时改为\"已收口\"。\n3. 下一步按原计划：S0 v1.3 到后重跑，确认哈希报错消失、风暴系统去重计数正常；然后写结论记录、收口，合并回根。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-09 17:12",
+      "text": "这只是合同子项目的回执，三点都按我的核正执行了：\n- D420 以 v4 包的 8 行为准，全部只能作代理比较（proxy_only）。\n- 线况页今后只由我改，子项目只改自己的项目页。\n- 下一步不变：事件线 S0 v1.3 交来后重跑一遍，确认哈希报错消失、按风暴系统去重的计数正常，然后写结论、收口。\n\n这一轮不需要再做什么。现在在等三样东西：\n- 事件线 10-13 前冻结的 S0 v1.3，以及二批数据和逐站逐年完整率表\n- WRF 线交来塔址周边的模拟风，试算子项目填进配对列后收口\n- 你看完两份综述 PDF 的意见。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 19:29",
+      "text": "【委托 · 来自 事件 Lead】事件线第二批样本延期至 10-14 中午（改称 R2）\n告知：事件线 10-09 答应你们在 10-13 前交的三样（行数据新版：风暴系统级 storm_group_id + manifest 哈希；二批 S2 种子约 245 行；Cook 四站 AUS/DAL/DFW/HOU 站年完整率表）没有按时交，是我这边漏跟，抱歉。新的交付时间 10-14 中午前。为避免与 S0 定义注册表版本号（已到 v1.6）撞名，行数据改称'EVA 交付批 R2'，放 SP1_Event_Classification_Reconstruction/；交付前会用你们 v2.4 检查器自跑并过 3 人，由 S1 子项目 Lead 直接发你路径、行数、哈希与审查。另附 2020-07–2025 时段同口径行表一份（德州四城加 TDWR 后的新时段）。你们如需改范围请直接回我。\n（原因：总 Lead 督办，告知延期与命名）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 19:29",
+      "text": "事件线这批数据推迟到 10-14 中午交，范围不用改，已转进合同子项目。核对时我发现，WRF 线的塔址模拟风已经 4 天没交，顺手催了一次。\n\n**事件线延期**\n- 原定 10-13 前交的三样，改到 10-14 中午前一起交，改称\"EVA 交付批 R2\"：\n - 新版行表（带风暴系统级分组号和文件哈希）\n - 二批数据，约 245 行\n - Cook 四站（AUS、DAL、DFW、HOU）逐站逐年的数据完整率表。\n- 另附 2020-07 到 2025 年的同口径行表。新年份多了一批数据，这批要单独核口径。\n- 我已转给合同子项目。到货后它用 v2.4 检查器重跑全部行表，确认哈希报错消失、分组计数正常，再把四站有效站年数写进项目页。\n\n**Decision I made**\n1. 合同子项目收口前先做一次三方独立。收口等于把输入合同冻结交给事件线和风场线，按 10-11 的新规属于必须先审的情况。错了的代价是收口晚一天左右。\n2. 催 WRF 线交塔址邻域的模拟风。这个 TACC 作业 10-09 就跑完了，但交接目录里一直只有帧清单。如果 48 小时内还没交，试算子项目就不再等：配对列标\"待上游\"，按\"接口与演练已通、真实准入 0 行\"直接收口，重开条件写进项目页。错了的代价是观测和模拟那组对比要晚点补，不影响结论。\n\n\n\n## 结论\nEVA 线收到延期通知，同意 10-14 中午前交付\"EVA 交付批 R2\"，范围不改。已放进「EVA 输入合同与机制分层定稿」。到货后由该子项目 Lead 用 v2.4 检查器重跑全部行表，核对哈希、分组计数和四站有效站年数，经三方审查后收口，预计 10-15 前出结果。对事件线只有一个要求：交付时附上 2020-07–2025 新时段与原时段的口径差异说明（新增 TDWR 后检测口径变了哪些），我们需要据此判断两个时段能否合并统计。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 19:30",
+      "text": "【委托结果 · EVA Lead】事件线 R2 延期至 10-14 中午；收口前需三方审查\n1. 已改为等事件线\"EVA 交付批 R2\"（原称 S0 v1.3），10-14 中午前到货，路径。项目页的收口计划已同步改好。\n2. 到货后的步骤：用 v2.4 检查器重跑首批和 R2 全部行表，确认哈希报错消失、风暴系统去重计数正常；把四站各自的有效站年数写进项目页；发起三方审查（证据为 v2 三文件、检查器和 R2 重跑结果），裁决后收口。\n3. 兜底回访约在 10-14 18:00；如果届时 R2 未到，直接问事件线。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 19:30",
+      "text": "合同子项目已确认接手：等事件线的\"EVA 交付批 R2\"，10-14 中午前到货。\n\n- **到货后**：它用 v2.4 检查器重跑首批和 R2 的全部行表，把四站各自的有效站年数写进项目页，再发起三方，裁决后收口。\n- **兜底**：它约了 10-14 18:00 回访，到时 R2 没到就直接问事件线。\n\n我已在上一轮的回复里请事件线随 R2 附上新时段（2020-07–2025，新增 TDWR）的检测口径差异说明，我们要据此判断两个时段能不能合并统计。\n\n这一轮不用我再做什么。还在等两样：事件线的 R2，以及 WRF 线的塔址模拟风（10-13 已催，48 小时没交就不再等）。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 19:32",
+      "text": "【委托结果 · EVA Lead】催：WRF 塔址邻域提取 4 天未交付\n- **参考情景 Vhat_3s 试算已收口**：接口与不确定性传播演练已用测试数据跑通，真实准入 0 行，属有效停止。没有产出任何 Vhat_3s、极值或设计风数字。收口记录在，项目页 `status: 已收口`。\n- **塔址配对已补齐**：数据由 EVA 用现有连接从 TACC 自取，哈希已核对，存放在；已告知 WRF Lead 不用再交付。exp-A 在三个候选塔址处的格点瞬时风最大 14.1–14.5 m/s，10 km 内 WSPD10MAX 最大 15.1–16.2 m/s，观测为 50.45 m/s（Childs 2021 p. 2890）。exp-A 的强风核不在塔附近，这个差距不能当作模式误差或换算系数使用。\n- **v2.4 检查器**：输出为。4 行全部路由 needs_Liang Hu_review，主分析 0 行。原因是目标风未标准化（I4），并缺定义绑定、雷达和站点计数等事件线字段（I1/I3）。这些行本身不可用，不提交 Liang Hu。\n- **各行阻断原因**：\n - USDA 塔：3 秒与 5 秒口径冲突、地形未量化，经审查 阻断\n - KAKO：NCEI 一分钟档在事件时段缺档\n - K2V6、KSTK：不在下击暴流核心。\n- **重开条件**（任一即可）：拿到 USDA 塔的数据记录设置或原始序列（需对外索取，是否去要由 Liang Hu 定）；事件线交来带完整字段的多事件样本；WRF 主情景成员的强风核落在有观测的位置。项目页已写明。\n- 线况页 里试算这一行请根 Lead 更新：我是子项目，只改项目页。\n\n\n\n（附件：vhat3s_pilot_closure_20261013.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 19:32",
+      "text": "「参考情景 Vhat_3s 试算」已于 10-13 收口。接口和不确定性传播演练都用测试数据跑通了；真实数据 0 行通过准入，属于有效停止，没有产出任何 Vhat_3s、极值或设计风数字。我核对过收口记录、准入报告和从 TACC 取回的文件，都在。\n\n**塔址配对**\n- 我催之后，bot 直接从 TACC 上取回了塔址邻域提取结果，哈希已核，WRF 线不用再交付。\n- exp-A 在三个候选塔址处的格点风最大只有 14.1–14.5 m/s，塔上观测是 50.45 m/s。原因是 exp-A 的强风核不在塔附近，所以这个差距不能当作模式误差，也不能当换算系数。\n- 4 行候选按 v2.4 都被路由到\"需你审核\"一类，但这几行本身不可用，不会送到你那里：\n - USDA 塔：3 秒和 5 秒口径冲突，审查阻断\n - KAKO：公开的一分钟数据在事件时段缺档\n - 另外两个站不在下击暴流核心区。\n\n**重开条件**（任一满足即可）\n- 拿到 USDA 塔的原始记录。这需要对外索取，要不要去要由你定。\n- 事件线交来带完整字段的多事件样本。\n- WRF 主情景里某个成员的强风核正好落在有观测的位置。\n\n**Decision I made**：我在收口报告里发现一个小毛病：v2.4 检查器输出里的边界说明写死成了\"D420 模拟特征\"，Akron 的观测行也套用了这句话。已交给合同子项目，在 R2 重跑前改成按行类型生成，并加一条测试。不改路由逻辑。错了的代价只是一句文案。\n\n现在只剩合同子项目在进行，等事件线 R2（10-14 中午）。\n\n\n\n\n（附件：vhat3s_pilot_closure_20261013.md）"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 19:37",
+      "text": "【委托结果 · EVA Lead】v2.4 检查器 claim_boundary 文案写死为 D420\n现在只剩一份正式检查器了，我本机核过，没有问题。\n\n**核对结果**\n- **正式版**：，哈希 `…`。24 个测试我本机复跑全部通过。代码里已经没有 D420 字样，输出会记录检查器自己的路径和哈希。\n- **两份旧分叉**（`_v2_3`、`_v2_4`）：文件保留，但一运行就报错退出，我试过了。\n- **Akron 4 行**：用正式版重跑后，和原来那份用分叉跑的报告逐行对比，4 行都是 `needs_Liang Hu_review`，判定原因也完全一致。说明分叉只是说明文字写错了，判定结果没错。\n- **说明文字**：现在按行类型自动生成。这 4 行是观测锚定行，所以写的是\"只按观测列判定，模拟值不是观测的 Vhat_3s\"。\n\n接下来等事件线的 R2（10-14 中午前到）。到了就用这份正式版重跑首批数据和 R2 的全部行表，然后送三方，审查裁决后收口。这次修检查器的结果会一并写进 R2 收口报告。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 19:37",
+      "text": "检查器修好了，现在只保留一份正式版。我本机核过：哈希是 `…`，代码里已没有 D420 字样。\n\n- **24 个测试**：合同子项目 Lead 本机复跑，全部通过。\n- **两份旧分叉**：文件留着，但已停用，一运行就报错退出。\n- **Akron 4 行用正式版重跑**：每行的判定结果和原因都与之前一致。所以上次只是说明文字写错了，判定没有错。\n- **说明文字**：现在按行类型自动生成。\n\n线况已更新。下一步等事件线的 R2（10-14 中午前），到货后用这份正式版重跑首批数据和 R2 的全部行表，送三方，裁决后收口。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 20:20",
+      "text": "【委托 · 来自 事件 Lead】事件线 R2 审查未过、R2b 照期交；你们检查器 proxy_only 漏校验\n告知（R2 进度 + 你们检查器的一处漏洞）：事件线 R2 交付前审查未过，查出六项必须改：种子表缺失原因被覆写清空；2020–2025 表事件窗起止相同（8,751/8,751 行，违反你们合同 start<end）；2020–2025 表缺 19 列、采样间隔与源生标签全空；storm_group_id 链式分组被 Cook 非雷暴背景阵风搭桥（121 组跨 >24 h，最长 93.8 h）、同一 NWS episode 又被拆开——改为对流层（Storm Events + Cook Class=5）与非对流 Cook 分层分组并加 episode 强制连边；写明 storm_group_id 覆盖注册表 v1.2 的 A05 定义（行数据仍绑 v1.2）；溯源清单补全。修正版 R2b 另起新目录（R2 不动），仍按 10-14 中午前交，口径差异说明随附。\n请你们注意：v2.x 检查器对 proxy_only 行跳过了观测必填字段与时间窗校验，所以上面第 2、3 项这类问题检查器没拦住。建议在 v2.5 里对 proxy_only 行也校验 start<end 与必填列非空。无需回复。\n（原因：告知交付状态与检查器缺口）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 20:20",
+      "text": "事件线 R2 在交付前的审查没过，修正版 R2b 仍按 10-14 中午前交。事件线指出我们检查器有个漏洞，我核实属实，已派合同子项目修。\n\n**R2 没过审的主要问题**\n- 2020–2025 那张表有两处毛病：全部 8,751 行的事件窗起止时间相同，还缺 19 列。\n- 风暴系统分组被非雷暴的背景阵风\"串连\"了：121 组跨度超过 24 小时，最长 93.8 小时。事件线改为把对流和非对流事件分开分组。\n- 修正版 R2b 另放新目录，原版 R2 不动，并附两个时段的口径差异说明。\n\n**我们检查器的漏洞**\n- 数据完整性只对可能进主分析的行做校验。只能作代理比较（proxy_only）的行全部跳过，所以上面那种窗口错误、整列空白都没被拦下。问题出在 第 235 行起的条件判断。\n- 首批 47,612 行全是 proxy_only，那次重跑等于没做这项校验。好在这些行都没进分析，不影响任何结果。\n\n**Decision I made**\n- 已派合同子项目出检查器 v2.5，要求如下：\n - 所有观测类行不论最后去向，都校验身份、溯源、时间窗、坐标和必填列。带合法缺失原因的可以放行，其余不合格的不得停在 proxy_only。\n - 加对应测试，再重跑首批和原版 R2。原版 R2 用作回归检查，v2.5 应能拦下那 8,751 行。\n - 最后跑 R2b。\n- 这次检查器改动并入原已计划的三方审查一起审。\n- 理由：检查器是交给别线的接口，校验不能因数据去向不同而放松。\n- 错了的代价：收口可能晚半天左右。\n\n\n\n## 结论\nEVA 线确认：同意 R2b 照期（10-14 中午前）交到新目录，R2 不动，范围不改。检查器漏洞已核实属实：完整性校验只在\"观测行且目标风有效\"时执行，proxy_only 行全部跳过。已在「EVA 输入合同与机制分层定稿」派修 v2.5，对所有观测类行不论去向都校验时间窗和必填列，并用原版 R2 做回归检查，应能拦下那 8,751 行。R2b 到货后用 v2.5 重跑，再送三方，裁决后收口，结果由该子项目回给事件线。对事件线没有新要求，口径差异说明随 R2b 附上即可。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 20:26",
+      "text": "【委托结果 · EVA Lead】检查器 v2.5：proxy_only 行也要校验身份与时间窗；R2 改为 R2b\nv2.5 能拦下了：R2 那 8,751 行起止时间相同的行，这次全部被拦下，没有一行再归 `proxy_only`。我已核对 v2.5 改动后的检查器和规则文件，项目页也已更新。\n\n**核对结果**\n- 27 个测试我本机复跑，全部通过。\n- 四份回归报告都记录了检查器哈希（`…`）和输入文件哈希，行数对得上。\n\n**四张表的结果**：全部归 `needs_Liang Hu_review`，原因码都以 `I1_upstream_fix:` 开头，表示等上游修数据。按 v2.5 的规则这是暂存，不需要 Liang Hu 处理。\n\n| 表 | 行数 | 风暴组去重 |\n| --- | --- | --- |\n| 首批 S1 v1.2 | 47,612 | 旧版没有系统级分组 |\n| R2 2010–2017 | 47,612 | 7,723 |\n| R2 2020–2025 | 8,751（全部命中\"起止时间相同\"） | 1,519 |\n| R2 S2 种子 | 245 | 162 |\n\n**新发现的共性缺口**：所有表都在同几列上为空，而且没有逐列写明原因，包括地形暴露说明、原生平均时长、传感器高度（S2 种子表也缺），QC 状态也全是未知。这样即使 R2b 修好了事件审查查出的六项问题，到货后仍会全部被暂存。\n\n**已提前通知事件线**（赶在 R2b 10-14 中午交付之前）：\n- 这几列能填就填\n- 填不了的，在 `s0_missing_reason` 里按列名写原因\n- 单时刻的报告起止时间相同是合法的，写 `point_time_report` 即可\n- 交付前可以先用我们的检查器自己跑一遍。\n\neva 没有替上游补造原因码，也没有把空列推断成合法缺失，这个做法是对的。\n\n**下一步**：R2b 到货后，派 eva 用 v2.5 重跑；然后发三方审查（v2 三文件、v2.5 检查器、R2b 重跑结果），裁决后收口。10-14 18:00 有回访兜底。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 20:26",
+      "text": "检查器 v2.5 修好了：原版 R2 里那 8,751 行起止时间相同的数据这次全部被拦下，没有一行再漏进\"只作代理比较\"。我核过检查器的哈希（`…`），回归结果也在本地；27 个测试由合同子项目 Lead 本机复跑，全部通过。\n\n**用 v2.5 重跑的四张表**（风暴组数为按风暴系统分组去重后的组数）\n\n| 表 | 行数 | 风暴组 |\n| --- | --- | --- |\n| 首批 S1 v1.2 | 47,612 | 旧版无系统级分组 |\n| R2 2010–2017 | 47,612 | 7,723 |\n| R2 2020–2025 | 8,751（全部命中\"起止时间相同\"） | 1,519 |\n| R2 S2 种子 | 245 | 162 |\n\n四张表的行全部暂存，等上游修数据。系统标签写的是\"需 Liang Hu 审核\"，但原因码标明是等上游修，不用你处理。\n\n**新发现的问题**：四张表都在同几列上空着，也没写原因：地形暴露说明、原生平均时长、传感器高度、QC 状态。这样就算 R2b 修好了审查查出的六项，到货后还会全部被暂存。子项目已在 10-14 中午交付前提前告诉事件线：\n- 能填的就填\n- 填不了的按列写明原因\n- 只有单一时刻的报告，起止时间相同是合法的，单独标注即可\n- 交付前先用我们的检查器自跑一遍。\n\nBot 没有替上游编造缺失原因，也没有把空列当成合法缺失，这样做是对的。\n\n**下一步**：R2b 到货后用 v2.5 重跑，再送三方审查（审 v2 合同三份文件、v2.5 检查器和 R2b 重跑结果），裁决后收口。10-14 18:00 有回访兜底。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 20:27",
+      "text": "【委托 · 来自 事件 Lead】EVA 交付批 R2b：第二批多事件样本、S2 种子与站年完整率表\n【事件线交付：EVA 交付批 R2b（第二批多事件样本，10-09 承诺）】\n目录： 为说明）\n- EVA_ROWS_R2b_2010_2017.csv：47,612 行，sha256 e9f390d126aefc46d645057671cc2942ed64902c17c29c30a75755f1dc7bb056\n- EVA_ROWS_R2b_2020_2025.csv：8,751 行，sha256 0a970b76f873a0377024167df7b5e42b112ea6be8e90efaff2ac8d899fbef98b\n- EVA_S2SEED_R2b.csv：245 行，sha256 626299e8fd002439bd1d3e7a3a42ed1f700c594e9e6f470009c91c6fd5a305ab\n- ASOS_STATION_YEAR_COMPLETENESS_R2b.csv：Cook 四站 AUS/DAL/DFW/HOU × 2010–2022，52 行（IEM 一分钟有效风分钟/全年分钟，Cook 首末记录），sha256 fc19e614357814a49eb5d61f5dfed02b2670be30c795520d3c6cb01f9f062008\n- SOURCES_R2b.json（清单，sha256 359979c6c2674f22db661a0449738e8468591fedcf4d73725fac4428b2d52d3a）；R2b_2020_SOURCE_EXTRA.json（2020 期 TDWR 附加字段，按 event_id）\n要点：storm_group_id 为风暴系统级分组，覆盖 S0 v1.2 A05（原值在 source_group_id）：对流层（Storm Events + Cook Class=5）与非对流 Cook 分层，层内 Δt≤2 h 且 Δd≤100 km 链式连接，同一 NWS EPISODE_ID 强制连边；设计值。去簇请只用对流层组或按层区分；组跨度对流层 p99 约 14–20 h、最长 72 h，非对流层最长 94 h（README 有统计）。行字段绑 S0 v1.2（…200b，你方现行 validate_eva_admission_v2.py 只认此版）；注册表已到 v1.6，v1.3–v1.6 只改裁定定义不改行字段。点时刻记录的事件窗已按设计补宽（Storm Events ±15 min、Cook ±5 min，原因码 point_time_padded_design）。全部行 proxy_only，不是已验证 Vhat_3s，不进主分析。\n质量：经审查 （3 位审稿人）裁决六项必须改后重出（裁决），本线合同自查 CONTRACT_CHECK_R2b.json PASS；你方 v2 检查器三表退出码 0、exclude 0、needs_Liang Hu_review 0。R2作废，请勿使用。\n提请注意：v2 检查器对 proxy_only 行跳过观测必填字段与时间窗校验，R2 的零长度时间窗与缺列没被它拦下，建议加严。\n要你方做：确认收到与路由结果；如需按层或其他参数重分组，告知参数即可，无算力重算。\n（原因：10-09 对 EVA 的承诺补交，已过）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 20:27",
+      "text": "Hashes match. Running v2.5 myself on the three tables.事件线的第二批样本 R2b 提前到了（原定 10-14 中午），我核对了文件哈希、用 v2.5 检查器预跑了一遍，没发现问题。原版 R2 作废不用。\n\n**预跑结果**\n- 三张行表全部通过检查，每一行都只作代理比较（proxy_only）。缺失的字段都写明了合法原因，上次全表空白、没写原因的问题已经修好。\n\n| 表 | 行数 | 风暴组 |\n| --- | --- | --- |\n| 2010–2017 | 47,612 | 8,112 |\n| 2020–2025 | 8,751 | 1,609 |\n| S2 种子 | 245 | 159 |\n\n- 事件线自报\"零个需审核\"，和我预跑一致。\n\n**四站数据完整率**\n- AUS、DAL、DFW、HOU 四站，2010–2022 年，共 52 个站年。按全年分钟算，完整率 ≥90% 的 35 个，≥80% 的 48 个。最低的一个站年是 DAL 的 75%。\n- 这是第一次拿到正式极值统计能用多少年数据的实际数字。\n\n**Decision I made**\n- 已转给合同子项目：出正式重跑报告，做三方，裁决后收口。\n- 已在它的项目页给以后的正式极值项目记下两条约束：\n - 按风暴系统去重时，只用对流性事件的分组；非对流的分组最长跨度达 94 小时，不适合去重。\n - 全年完整率高不代表事件时段有数据。KAKO 就出现过事件时段整段缺档，所以正式统计前要按暖季和事件窗另算缺测。\n- 理由：这两点不先写下来，以后做极值统计时最容易出错。错了的代价是没有。\n\n\n\n## 结论\nEVA 线确认收到 R2b，五个文件的哈希全部核对一致。用 v2.5 检查器（…，已对 proxy_only 行加严）预跑：三表退出码都是 0，全部为 proxy_only（47,612 / 8,751 / 245 行），风暴组去重后为 8,112 / 1,609 / 159 组，没有 exclude，也没有需人工审核的行。R2 已按作废处理。暂不需要重新分组；以后做去重时我们只用对流性事件的分组。另请事件线以后能提供一张四站按暖季（或按事件窗）统计的缺测表，不急，等正式极值项目立项时再要。正式重跑报告和三方审查由「EVA 输入合同与机制分层定稿」子项目完成，收口后通知你们。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 20:48",
+      "text": "【委托 · 来自 事件 Lead】R2c 补丁与两时段口径差异说明\nR2b 的补丁，已过审查 （3 份，裁决）。目录 \n1) EVA_ROWS_R2c_2020_2025.csv（8,751 行，sha256 …a038）替代 R2b 新期表：R2b 中 396 行 Storm Events 的 allowed_use/not_allowed_use 误套了 Cook 默认值（271 行 EG 未禁 target_wind_numeric），R2c 按旧期规则改正，其余字节不变；checker v2（…）proxy_only 8751，与 R2b 同。旧期表、种子表、完整率表、SOURCES、EXTRA 沿用 R2b 不变。\n2) PERIOD_COMPARABILITY_NOTE_R2c.md（sha256 …0f30）：14 项口径差异及对合并的影响方向。要点：新期 72 行 Cook 因当日目录判 KFWS 不运行而跳到 >200 km 远雷达（2020-12—2021-02），wsr88d_* 不可直接合并；新期 IEM 完整率 0.78–0.92 低于旧期 0.86–0.99；21 列旧期有值新期全空；Cook 只覆盖 2020-07-16—2021。只写哪些可直接合并、哪些需分层，不替你们下统计结论。\n要你们做：换用 R2c 新期表；新期全空列（分档、radar_channel_design 等）如需我方补，告诉我列名。\n（原因：R2 交付附口径说明，按根 Lead 要求随审查后交付）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 20:48",
+      "text": "事件线发来的 R2c 补丁已核对，可以用，已转给合同子项目。\n\n- **补丁本身**：只换 2020–2025 新期这一张表，修的是 396 行 Storm Events 的用途字段，其余 R2b 文件照旧。我核了哈希，用 v2.5 检查器复跑：8,751 行全部只作代理比较（proxy_only），和 R2b 一致。\n- **两时段口径差异说明**：写得清楚，结论是两期不能直接合并，主要原因如下：\n - 新期有 72 行跳到了 200 km 以外的远雷达，需要剔除或单列\n - TDWR 只有新期有，需要分层\n - Cook 的数据只到 2021 年，2022 年以后是数据源终止，不是没有事件\n - 新期数据完整率整体偏低：0.78–0.92，旧期是 0.86–0.99。\n\n**Decision I made**\n- 合同子项目的正式重跑和三方审查改用 R2c 新期表，并附上这份说明。如果审查已经发出就不重审：两版只差用途字段，在裁决里注明即可。\n- 上面这些合并约束先记进项目页\"未决\"，留给以后的正式极值项目。新期空着的那些列现在不向事件线要：输入合同收口用不到；其中分档列可以按旧期的边界自己重算。错了的代价是正式项目启动时要再找事件线点名补一次列。\n\n\n\n## 结论\nEVA 线确认收到 R2c。 哈希 … 已核对一致，用 v2.5 检查器（…）复跑：退出码 0，8,751 行全部 proxy_only。以后新期一律用 R2c 这张表，R2b 的新期表不再使用，其余 R2b 文件照旧。口径差异说明已收到，作为正式极值统计时分层与剔除的依据。目前新期全空的列不需要你们补：分档列我们按旧期的边界自己重算，其余列等正式极值项目立项时再点名向你们要。正式重跑与三方审查由「EVA 输入合同与机制分层定稿」子项目完成，收口后通知你们。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 20:50",
+      "text": "【委托 · 来自 事件 Lead】R2c 更新：三表逐列缺失原因对齐 v2.5，自跑无 I1\n接上条 R2c（同目录 R2c 版）。按你们 v2.5 的缺失原因写法对齐：exposure_or_terrain_note、native_averaging_period_s、sensor_height_m 三列都没有可追溯值（ASOS 峰风平均时长取决于站点传感器型号与更换日期：Belfort 5 s 块 / Vaisala 425 3 s 运行平均，源里没有；传感器高度源元数据没有，不默认 10 m），故不填值，s0_missing_reason 逐列写了具体原因（Cook 行 asos_peak_gust_5s_block_or_3s_running_depends_on_sensor_model_and_date_not_in_source；Storm Events 估计行 storm_events_estimate_no_averaging、实测行 storm_events_measured_report_no_averaging_metadata）。v2.5（…）自跑：旧期 47,612、新期 8,751、种子 245 全部 proxy_only，I1_upstream_fix 0 行；Cook 行起<止全部成立。报告 SELFRUN_V25_*.json。\n文件：EVA_ROWS_R2c_2010_2017.csv …fc65；EVA_ROWS_R2c_2020_2025.csv …b339；EVA_S2SEED_R2c.csv …8f68；说明页 PERIOD_COMPARABILITY_NOTE_R2c.md …ea33。与 R2b 的逐列差异见 README_R2c.md。R2b 三张行表作废（保留不删）。\n（原因：根 Lead 转 EVA 来函：交付前对齐缺失原因并自跑 v2.5）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 20:50",
+      "text": "事件线交来 R2c 终版：三张行表全部换成 R2c，我核对过，没有问题。\n\n- **核对**：4 个文件哈希一致。我用 v2.5 检查器在本机复跑三张表，都正常退出，结果如下：\n\n| 表 | 行数 | 风暴组 |\n| --- | --- | --- |\n| 2010–2017 | 47,612 | 8,112 |\n| 2020–2025 | 8,751 | 1,609 |\n| S2 种子 | 245 | 159 |\n\n 三张表的行全部只作代理比较（proxy_only），没有一行再被暂存等上游修数据。\n- **缺失原因**：地形暴露、平均时长、传感器高度这三列在源数据里确实查不到可追溯的值。事件线没有硬填（比如默认 10 m），而是逐列写明了原因，这样做是对的。\n- **一个以后要处理的物理问题**：ASOS 峰值阵风的平均时长取决于传感器型号和更换日期。老式 Belfort 是 5 秒分块，Vaisala 425 是 3 秒滑动平均，源数据里没有这项信息。换算到 Vhat_3s 是本线的活，所以正式极值项目要按各站传感器更换史分段处理（依据：H7ZG33PU 卡片 pp. 2–4）。这一条已记进合同子项目页的未决和线况的\"已学到的方法\"。\n\n**Decision I made**：正式重跑和三方审查的证据全部改用 R2c 这三张表；如果审查已经发出，就不重审，只在裁决里注明版本差异。两个版本只差缺失原因列和用途字段，路由结果完全相同。错了的代价是审稿人看到的是前一版，结论不受影响。\n\n\n\n## 结论\nEVA 线确认收到 R2c 终版，以后以它为准。三张行表（… / … / …）和说明页（…）的哈希已核对一致。用 v2.5 检查器（…）复跑：三表退出码 0，全部 proxy_only（47,612 / 8,751 / 245 行），I1_upstream_fix 0 行，风暴组 8,112 / 1,609 / 159 组，和你们自跑的结果一致。R2b 三张行表按作废处理。缺失原因写法认可，不需要再补列。ASOS 平均时长随传感器型号和日期变化，这一项由 EVA 线在正式极值项目里按站点传感器史处理，不要求事件线提供。正式重跑与三方审查由「EVA 输入合同与机制分层定稿」子项目完成，收口后通知你们。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 20:51",
+      "text": "【委托 · 来自 事件 Lead】两时段口径说明终版（补 Sui 一行）\n补交说明：两时段口径差异说明现行版 （sha256 …ccf6，28 行），较前条只加一行'Sui 风暴对象：资料止于 2017，新期永久不可得，若将来用 Sui 对象字段须分层'，其余不变。R2b 目录另放指向页 PERIOD_COMPARABILITY_R2b.md。行表仍以 R2c 为准（README_R2c.md）。\n（原因：根 Lead 要求说明页随 R2b 附交，并须含 Sui 项）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 20:51",
+      "text": "事件线补交的口径说明终版已核对：哈希 … 一致，共 28 行，比上一版只多了 Sui 风暴对象这一行，行表不变，仍以 R2c 为准。\n\n新加的这条说的是：Sui 风暴对象的资料只到 2017 年，新时段永远补不上，以后如果用到 Sui 对象字段，两个时段必须分层。我已经把它转给合同子项目，在审查证据和项目页里改引这个哈希，并把这条约束加进留给正式极值项目的待办。\n\n## 结论\nEVA 线确认收到口径说明终版 PERIOD_COMPARABILITY_NOTE_R2c.md，哈希 … 和 28 行都已核对一致。以后的审查和项目页一律引用这一版。Sui 一行已记为正式极值统计的分层约束。行表仍以 R2c 为准，你们不需要再做什么。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:05",
+      "text": "【子项目回报 · EVA 输入合同与机制分层定稿】EVA 输入合同 v2.6 已冻结，子项目收口\n结论：合同 v2.6 冻结（经三方，裁决 F1–F9 全部落实；Lead 用审稿人三个反例实测均被隔离）。冻结文件与哈希见 ：三份规则文件、唯一正式检查器 （…，32 测试）、模板。R2b v2.6 重跑：2020–2025 8,751 行全 proxy_only；2010–2017 47,066 行与种子 112 行因补宽窗口缺可溯源源时刻转'待上游修'（已发事件 Lead 补 event_time_source_raw，下一批交）；主分析/敏感性 0（无 Vhat 转换，属预期）。项目页已标已收口，'未决'里留了给后续正式极值项目的四条须知（Cook 四站唯一年极值来源及站年完整率、去簇只用对流组且另设跨度上限、补宽窗不当时长、全年完整率≠事件时段覆盖）。\n下一步（属根）：请在本对话做'总结并合并'；观测→Vhat_3s 转换与正式极值统计是否立项由你定。10-14 18:00 的兜底回访已无必要，到时我会确认后直接结束。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:05",
+      "text": "卡住了一处：合同 v2.6 只在已作废的 R2b 上验过；我用现行的 R2c 复跑，三张表全部被隔离。现在派合同子项目修，修完再合并。合同 v2.6 我暂时不合并。它的收口验收用的是事件线已经作废的 R2b；我用现行的 R2c 复跑，三张表一共 56,608 行全部被隔离，送进\"待上游修\"。\n\n**问题出在哪**\n- 我在本机复跑：R2b 的结果和子项目一致；R2c 三张表（47,612 / 8,751 / 245 行）全部被挡。\n- 原因是 v2.6 把\"缺失原因\"改成了只认固定几个词。R2c 是事件线按我们 v2.5 的要求逐列写的具体原因，例如\"ASOS 平均时长取决于传感器型号与日期，源中没有\"。这些原因写得更细，v2.6 却一个都不认。\n- 也就是说，冻结版拿到对方现行的交付就用不了。不修的话，事件线下一批按我们上次的要求交，仍会全部被挡。\n- 另有 47,066 行（种子表 112 行）缺原始报告时刻，这是真缺口，已请事件线补。\n- 顺带发现一个技术细节：检查器读溯源清单时必须用原路径，复制到别处会全表误判。已写进任务书。\n\n**Decision I made**\n- 派合同子项目出 v2.6.1：把 R2c 实际用的缺失原因逐个登记进词表，并写明每个词的含义；其他规则不动。然后用 R2c 正式重跑，更新冻结记录和测试。\n- 这次不再送审。理由是三方审查已经裁定了缺失原因的规则，这次只是把实现修对。\n- 错了的代价：收口晚约半天。词表如果放得太宽，可能放过含糊的原因，所以要求逐个写明含义来约束。\n- 决策记录：。\n\n**合同收口后，下一个项目需要你定**\n建子项目归你，所以要问你：要不要立一个子项目「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」？内容是：\n- 按各站传感器更换史，把峰值阵风统一换算到 3 秒\n- 按暖季和事件窗算缺测\n- 只用对流组去重\n- 先做一次不出重现期的样本与不确定性演练。\n\n数据现在都有了：四站 2010–2022 共 52 个站年，其中完整率 ≥90% 的 35 个。要的话回一句，我就分出这个子项目。\n\n\n\n\n（附件：v2_6_merge_hold_R2c_conflict_20261013.md）"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:07",
+      "text": "【委托结果 · EVA Lead】R2b 已到货：请正式重跑、三方审查、收口\nEVA 输入合同 v2.6 已冻结，这个子项目收口了。\n\n**审查意见是否落实**\n- 三方审查要求必须改的 9 条，v2.6 都改了，我对着代码逐条核了位置。\n- 审稿人举的三个反例我实际跑了一遍，现在都被判为 `needs_Liang Hu_review`，不再混进 `proxy_only`：\n - 哈希一栏填的是 \"see SOURCES.json\"\n - row_type 写成了首字母大写的 Observation\n - 缺失原因是随手编的。\n- 格式没问题、只是还没换算成 Vhat_3s 的行，仍然正常归 `proxy_only`。32 个测试复跑全部通过。\n\n**冻结的内容**：三份规则文件、唯一的正式检查器、测试和模板。文件清单和哈希记在。以后任何改动都要升版本号，并写决策记录。\n\n**用 v2.6 重跑 R2b 的结果**（这次带上了来源清单，清单里的哈希没有冲突）\n\n| 表 | 行数 | proxy_only | 待上游修 |\n| --- | --- | --- | --- |\n| 2020–2025 | 8,751 | 8,751 | 0 |\n| 2010–2017 | 47,612 | 546 | 47,066 |\n| S2 种子 | 245 | 133 | 112 |\n\n- 2010–2017 表和种子表里的待修行，都是把单个时刻人为补宽成时间窗的记录，但没有保留补宽前的原始时刻。v2.6 要求补宽的行必须能追溯到源时刻，所以这些行被拦下。\n- 我已请事件线在下一批给这些行补上源时刻，交付前先用同一个检查器自己跑一遍。\n- 三张表都没有一行进 `main_analysis` 或 `mechanism_sensitivity`。这在预期之中，因为现在还没有任何观测换算成 Vhat_3s。\n\n**已上报根对话**，请根 Lead 在本对话做\"总结并合并\"，并决定要不要为下面两件事立新项目：观测换算成 Vhat_3s、正式的极值统计。项目页\"未决\"里留了四条须知，给以后的正式极值项目用：\n\n1. Cook ASOS 四个站是目前唯一现实可用的年极值来源。\n2. 去簇只用对流组，而且要另设一个组跨度上限。\n3. 人为补宽的时间窗不能当作事件时长使用。\n4. 全年数据完整率不等于事件时段内有数据。\n\n10-14 18:00 原先约好的兜底回访已经用不上了，到时我确认一下就结束。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:07",
+      "text": "这条是合同子项目对\"R2b 到货、正式重跑并收口\"那条委托的回执，内容和它之前那份收口上报一样，上一轮我已经看过并处理了。\n\n所以合并仍然暂停。原因不变：v2.6 只在已作废的 R2b 上验过，换成现行的 R2c，三张表会全部被隔离。合同子项目正在出 v2.6.1 补丁，把 R2c 实际用的缺失原因加进受控词表，然后用 R2c 正式重跑；交回后我再合并。\n\n还有一件事等你回话：合同收口后，要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」这个子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:10",
+      "text": "【委托 · 来自 事件 Lead】R2d：补 Cook 源时刻列与 v2.6 受控缺失原因\n目录 有全部说明）。以 R2c 为底，只改两列，其余逐字节同 R2c：\n1) event_time_source_raw：旧期 47,066 行、种子 112 行 Cook 从 Cook Mendeley v2 原文件（4 文件哈希与 SOURCES_R2b 登记一致）按站文件+indx 回填 utc（epoch 秒，写法同新期表）。核对：回填行设计窗全部 = 源时刻 ±5 min（0 例不符）；站–文件对应用新期 8,355 行已有值验证全中。补宽窗只作设计支持窗。\n2) s0_missing_reason：我方 4 个自定词映射到 v2.6 受控词表（曝露→not_events_scope；Cook 平均时长→not_in_source_or_not_assessed；Storm Events 估计→source_estimated_no_sampling；实测→not_in_source_or_not_assessed）。\n3) I3_station_count_window_differs_from_event_support（482/130/112，均为 Cook Class=5）不改：站数按 S0 定义取 ±30 min 有风站，是可探测性测量窗，不是事件支持窗。\nv2.6 + --manifest SOURCES_R2b.json 自跑：旧期 47,612、新期 8,751、种子 245 全部 proxy_only，I1 0 行，风暴组 8,112/1,609/159。哈希：旧期 …3532，新期 …01d0，种子 …6f39。注意：自跑时你们检查器 sha256 是 …af18b（文件时间 10-13 21:07），不是决定里写的 …，请按你们冻结的版本复跑。\n（原因：v2.6 冻结后唯一剩余上游缺口）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:10",
+      "text": "事件线交来的 R2d 补上了最后一个上游缺口。我核过三张表的哈希，并用盘上现在的检查器在本机预跑：三张表（47,612 / 8,751 / 245 行）全部归\"只作代理比较\"，没有一行被拦下。\n\n**R2d 改了什么**：在 R2c 基础上只改两列。\n- **原始报告时刻**：给 47,066 行补上了 Cook 原始报告时刻（种子表另有 112 行），每行的设计时间窗都正好等于原始时刻前后各 5 分钟。\n- **缺失原因**：事件线把自己写的原因改成了我们词表里的标准写法。\n\n**检查器版本**：事件线指出，他们自跑用的检查器哈希是 `…`，和冻结记录里写的 `…` 对不上。原因是合同子项目当时正在出 v2.7 补丁，21:07 改过文件。v2.7 修两处：\n- 溯源清单的哈希按我们当初跟事件线的约定来认\n- 缺失原因词表补进 R2c 实际用过的写法。\n\n**Decision I made**\n- **验收数据改用 R2d**：v2.7 定版后以 R2d 正式重跑、验收收口，另拿 R2c 做回归检查（理应只剩缺原始时刻那一类）。冻结记录里写清各版本的哈希和时间，免得别的线混淆。\n - 理由：R2d 是事件线现行版本，上次验收出错，正是因为用了已作废的版本。\n - 错了的代价：收口再晚一点。\n- **v2.7 不再送审**：两处都是我们自己检查器和此前约定不一致，属于把已审裁决落实到代码，不是新规则。\n- **一项警示照旧**：Cook 雷暴行的站点计数窗口和事件时间窗不一致，这项警示保留、不降级。事件线的解释成立：站点计数窗是前后 30 分钟的可探测性测量窗，本来就不是事件窗。\n\n**等你回话**：合同收口后，要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」这个子项目。\n\n\n\n## 结论\nEVA 线确认收到 R2d，三张表哈希已核对一致（… / … / …）。用我方现行检查器（…，即正在定版的 v2.7）加 R2b 目录下的 SOURCES_R2b.json 复跑：三表全部 proxy_only，没有任何 I1 码，和你们自跑的结果一致。今后以 R2d 为现行版本。检查器哈希对不上，是因为我方在 v2.6 冻结后因 R2c 冲突出了 v2.7 补丁，不是你们用错了版本。冻结记录会写清各版本哈希和时间，定版后通知你们最终哈希。I3 站数窗警示按你们的解释保留为警示，不需要改。事件线这边已没有剩余缺口。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:11",
+      "text": "【委托 · 来自 事件 Lead】R2d 已交：缺失原因已映射到 v2.6 受控词\n告知：你们 v2.7 更正那条到达前，S1 子项目已按前一条要求交了 R2d：补了 2010–2017 表 47,066 行与种子表 112 行的 Cook 源时刻，同时把 R2c 的 4 个自定缺失原因映射成了 v2.6 受控词；manifest:<清单哈希> 写法未变。我们不回滚到 R2c 原词——受控词是你们合同的正式词，v2.7 两种都应接受，请确认 v2.7 也认受控词。另：子项目发现检查器文件在 21:07 已变为 …（非冻结的 …），请在 v2.7 定稿后把正式 sha256 发我，我们用它对 R2d 复跑一次并补交报告。无需其他回复。\n（原因：告知 R2d 现状，避免两边口径错位）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:11",
+      "text": "事件线问的两件事都已处理：v2.7 会认 R2d 用的受控词；定版后由合同子项目直接把正式哈希发给事件线。\n\n- **R2d 不用回滚**：上一轮我已用盘上的 v2.7 草稿版（`…`）跑过 R2d，三张表全部只作代理比较（proxy_only），没有一行被拦下。\n- **两种写法都认**：我已要求合同子项目，v2.7 必须同时接受合同里的正式缺失原因词，和 R2c 用过的那几个原词，并各加一类测试。\n- **定版后的通知**：合同子项目把检查器正式哈希、规则三文件的哈希和 R2d 的验收结果，一并直接发给事件线；事件线用同一版复跑后补交报告。\n\n## 结论\nEVA 线确认：v2.7 同时接受 v2.6 受控词和 R2c 原词，R2d 不需要回滚。我方已用当前 v2.7 草稿版检查器（…）加 SOURCES_R2b.json 复跑 R2d，三张表全部 proxy_only，没有 I1 码；`manifest:<清单哈希>` 的写法 v2.7 按约定认可。v2.7 定稿后，由「EVA 输入合同与机制分层定稿」子项目直接把检查器正式 sha256、规则三文件的哈希和 R2d 验收结果发给事件 Lead。请事件线用该版复跑 R2d 并补交报告，此外不需要再做什么。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:11",
+      "text": "【子项目回报 · EVA 输入合同与机制分层定稿】EVA 合同现行冻结版 v2.7；R2c 已正式重跑\n结论：v2.6 冻结后用 R2c 发现检查器两处与本线 10-09 约定不一致（manifest:<清单自身哈希> 被当条目查致全表 exclude；缺失原因词表漏收 4 个本线自己给事件线的原因），已升 v2.7，只改这两处，不放宽不可豁免字段与源时刻要求。检查器 sha256 …，34 项测试，Lead 复跑通过并实测清单换路径仍通过。R2c v2.7 正式重跑：新期 8,751 全 proxy_only；旧期 546 proxy + 47,066 待补源时刻；种子 133 + 112。冻结审查 不重审（R2c 相对 R2b 只改新期 396 行用途字段与缺失原因），已补记在 v2_6_contract_frozen_closure_20261013.md。两时段合并约束 6 条已写入项目页未决。事件线 R2d（补 event_time_source_raw）已拿到 v2.7 哈希，10-14 内交。\n下一步：R2d 到后我用 v2.7 复跑确认待修清零即彻底收口；\"总结并合并\"仍请你在本对话做。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:11",
+      "text": "合同 v2.7 已定为现行冻结版。检查器哈希 `…`，正是我上一轮预跑 R2d 用的那一版。34 项测试由子项目 Lead 复跑通过，溯源清单换了路径也照样认。\n\n- **R2c 正式重跑**：新期 8,751 行全部只作代理比较（proxy_only）。旧期有 47,066 行、种子表有 112 行停在\"待补源时刻\"，这正是 R2d 补上的那一列。\n- **R2d 怎么验**：子项目写这份回报时还没收到我转过去的 R2d，所以写的是\"R2d 10-14 内交\"。我的转发已在它那里排队。它接下来会用 v2.7 正式跑 R2d，我预跑时三张表已经全部通过；然后把正式哈希发给事件线，再报彻底收口。\n- **\"总结并合并\"**：等它报彻底收口，我就在界面上做合并。\n\n线况已更新。还在等你回话：要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:11",
+      "text": "【委托结果 · EVA Lead】R2c 补丁：新期表换用 R2c，附两时段口径差异说明\n1. 现行冻结版是 v2.7，检查器 （`…`），34 个测试通过。相比 v2.6 只修了两处与本线约定不一致的地方：`manifest:<清单自身哈希>` 现在能正确判为通过，而且与清单放在哪个目录无关；补收了 4 个缺失原因。不可豁免字段和源时刻的要求没有放宽。\n2. R2c 用 v2.7 正式重跑：新期 8,751 行全部 `proxy_only`；旧期 47,066 行和种子表 112 行只差源时刻，等事件线 R2d 补齐。报告在。\n3. 冻结审查不重审，R2c 与 R2b 的差别已补记进收口决策。两时段合并的 6 条约束已写进项目页\"未决\"，留给以后的正式极值项目。\n4. R2d 到货后，用 v2.7 复跑确认待补的行清零，子项目就彻底收口。\"总结并合并\"请根 Lead 在本对话里做。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:11",
+      "text": "这是合同子项目对之前\"换用 R2c\"那条委托的回执，内容和它上一份回报一样，没有新情况：\n- 现行冻结版是 v2.7，检查器哈希 `…`。\n- R2c 正式重跑后，只差源时刻那一列；这一列 R2d 已经补上。\n\n接下来等它处理已经排着队的 R2d：用 v2.7 正式重跑，确认待补的行清零，把正式哈希发给事件线，然后报彻底收口。收口回报一到，我就在本对话做\"总结并合并\"。\n\n还在等你回话：要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:12",
+      "text": "【子项目回报 · EVA 输入合同与机制分层定稿】R2c 三表已用 v2.7 正式重跑；ASOS 平均时长须知已记（改引 NWS 2.7A 卡）\n结论：(1) 你说的 R2c 三表（…/…/…）正是我已用 v2.7 正式重跑的版本，不用再跑：新期 8,751 全 proxy_only；旧期 546 proxy + 47,066、种子 133 + 112 为 I1_upstream_fix:padded_source_time_missing（补宽窗缺源时刻）。你的 v2.5 复跑显示全 proxy 是因为 v2.5 尚无 F3 源时刻校验，以 v2.7 为准。事件线 R2d 补 event_time_source_raw 后预期清零。报告。(2) PERIOD_COMPARABILITY_NOTE_R2c.md 当前文件哈希是 …，不是你写的 …，以文件为准。(3) 冻结审查 裁决补记已注明 R2c 相对 R2b 仅缺失原因列与新期用途字段不同（v2_6_contract_frozen_closure_20261013.md 补记段）。(4) ASOS 平均时长须知已写入项目页未决，但依据改为 （NWS 2.7A，PDF pp. 4、9、20）：H7ZG33PU 来源卡仍是 source_limited_no_full_text，按线规不能引；要用它须先让 litwiki 恢复全文。\n下一步：R2d 到后用 v2.7 复跑确认清零即彻底收口；'总结并合并'请你在本对话做。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:12",
+      "text": "合同子项目这份回报说得对：我上一轮看到的\"R2c 全部通过\"，是 v2.5 跑的。v2.5 还不检查补宽时间窗有没有对应的原始时刻，所以没把那 47,066 行拦下。以 v2.7 的结果为准：\n- 新期 8,751 行全部只作代理比较\n- 旧期 47,066 行、种子表 112 行缺原始时刻，这正是 R2d 补的那一列；我上一轮预跑 R2d 时这些行已全部通过。\n- 口径说明的哈希它也说得对，以文件里的 `…` 为准。\n\n**我查出一处知识库卡片不同步**：H7ZG33PU 这篇有两张卡。10-09 litwiki 只更新了结论卡，改成\"全文已核验\"；来源卡还写着\"无全文\"。子项目按来源卡判断不能引，按规矩这样做没错，所以这次它改引了 NWS 2.7A 的卡片，结论不受影响。\n\n**Decision I made**：已派 litwiki 把 H7ZG33PU 和 TN6C93KA 的来源卡同步到 10-09 核验过的状态。PDF 当时已暂存，不用重新下载；同时查一下首页和阅读状态页有没有同样落后。理由是以后的正式极值项目会用到 Cook 2023 讲 ASOS 3 秒平均的那几页。错了的代价没有。\n\n接下来等 R2d 的 v2.7 正式重跑，它会在子项目那边处理；收口回报一到，我就做\"总结并合并\"。还在等你回话：要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:12",
+      "text": "【委托 · 来自 事件 Lead】R2d 收窄版已写盘，等 v2.7 自跑后正式交\n按你们 v2.7 更正，上一条 R2d（含缺失原因词表映射，目录 EVA_Delivery_R2d_20261013）作废，请勿使用。收窄版已写盘： Cook 源时刻：旧期 47,066 行、种子 112 行，从 Cook 原文件按站文件+indx 回填 utc，设计窗全部 = 源时刻 ±5 min（0 例不符）；同行删去已失效的 event_time_source_raw 原因键，其余缺失原因与 R2c 原样；新期表与 R2c 逐字节相同。哈希：旧期 …d51f，新期 …b339（=R2c），种子 …09d3。请 v2.7 检查器定版后回我它的 sha256，我用同路径 + --manifest 自跑，I1 为 0 后再正式交付。\n（原因：EVA 更正 v2.6 检查器缺陷，R2d 收窄）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:12",
+      "text": "事件线这条\"R2d 收窄版\"已经过时：收窄版目录里已有作废说明，写明以原 R2d 目录为准、不回滚。所以我没有改用收窄版。v2.7 定版哈希按它的要求回复在下面。\n\n- **v2.7 已定版**：检查器 sha256 是 `c161b267e5eeb04c089411bd9fb2ca8822eb28c4bdefcebaeddff2aade0af18b`。\n- **两版 R2d 我都跑过**：用 v2.7 加原路径溯源清单，两版结果一样，三张表全部只作代理比较，没有一行被拦（三张表的风暴组数为 8,112 / 1,609 / 159）。\n- **已告诉合同子项目**：收口验收用原 R2d 目录，收窄版不用。\n\n## 结论\nv2.7 检查器已定版，sha256 为 `c161b267e5eeb04c089411bd9fb2ca8822eb28c4bdefcebaeddff2aade0af18b`。R2d 以原目录 为准，与你们 VOID_R2d_srctime.md 一致。收窄版 不使用。我方已用 v2.7 加 `--manifest` 原路径 SOURCES_R2b.json 跑过两版：三张表全部 proxy_only，I1 为 0，风暴组 8,112 / 1,609 / 159。请用这一版对原 R2d 自跑后正式交付，此外不需要再改。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:13",
+      "text": "【子项目回报 · EVA 输入合同与机制分层定稿】你要的 v2.6.1 已作为 v2.7 完成；R2c 正式重跑在案，可合并\n结论：你这条要求的补丁已在 10-13 21:20 以 v2.7 完成（比 v2.6.1 多修一处：manifest:<清单自身哈希> 与路径无关，复制清单到别处也通过——我实测过）。\n- 检查器 sha256 …；词表（L23）已收 R2c 四个原因 not_in_source_metadata、storm_events_estimate_no_averaging、storm_events_measured_report_no_averaging_metadata、asos_peak_gust_5s_block_or_3s_running_depends_on_sensor_model_and_date_not_in_source，Fields_v2 L26 逐值登记；测试 34 项含 test_v27_controlled_missing_reasons_FIXTURE 与 test_v27_manifest_file_digest_and_relocation_FIXTURE。\n- 决定：（写明属本线与事件线既定约定的实现修正，不放宽不可豁免字段与源时刻，不重审）；冻结记录 v2_6_contract_frozen_closure_20261013.md 末尾补记现行冻结版 v2.7 全部哈希与 R2c 结果。\n- 收口证据（R2c 现行三表 …/…/…）：——新期 8,751 全 proxy_only；旧期 546 proxy + 47,066、种子 133 + 112 仅剩 I1_upstream_fix:padded_source_time_missing（等 R2d）。 只作历史。\n- 项目页已更新（status 已收口，未决含两时段 7 条约束与 ASOS 传感器须知）。\n可合并。R2d 到后我用 v2.7 复跑确认清零，作为合并后的跟进项。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:13",
+      "text": "两个子项目都收口了。输入合同 v2.7 已冻结，事件线约 5.6 万行多事件样本全部走通了检查器。打通接口和不确定性演练这个近期目标已经完成。\n\n**合同收口情况**\n- **v2.7**：现行冻结版是 v2.7，它就是我要的那个补丁。比原计划多修了一处：溯源清单不管放在哪个目录都能认。34 项测试通过。\n- **R2c 收口证据**：除了缺原始时刻的行，其余全部合格。\n- **R2d 复跑**：我已用 v2.7 跑过 R2d，三张表 47,612、8,751、245 行全部只作代理比较，没有一行被拦。\n- **后续跟进**：事件线用同一版检查器自跑后正式交付即可。\n- **主分析为什么是 0 行**：还没有任何观测换算成 Vhat_3s，这在预期之中，正是下一阶段要做的。\n\n**需要你在界面上点两下**：我这边没有命令行可以做合并，请在「EVA 输入合同与机制分层定稿」和「参考情景 Vhat_3s 试算」两个子项目上各点一次\"总结并合并\"。\n\n**下一步要你定**（建子项目归你）：要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」？\n\n- **做什么**：\n - 按四站各自的传感器更换史，把峰值阵风统一到 3 秒\n - 按暖季和事件时段算缺测\n - 只用对流性事件分组去重\n - 先做一次不出重现期的样本与不确定性演练。\n- **数据**：四站 2010–2022 共 52 个站年，其中 35 个完整率在 90% 以上。正式统计要避开的坑已经写进项目页，比如新旧两个时段不能直接合并。\n\n回一句\"立\"，我就分出这个子项目并派第一批活。\n\n\n\n\n\n（附件：v2_7_manifest_semantics_and_vocab_20261013.md）"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:14",
+      "text": "【委托 · 来自 事件 Lead】事件线 R2 交付定版：现行版为 R2d_srctime\n更正我上一条：两条指令交叉，S1 子项目最后按你们 v2.7 更正出了收窄版——（只补旧期 47,066、种子 112 行源时刻，缺失原因保持 R2c 原词，新期与 R2c 逐字节同）。现行版以它为准；映射版 R2d（EVA_Delivery_R2d_20261013/）作废保留。子项目会用 v2.7（…）自跑后正式交你，附报告与哈希。此后这批不再改版。无需回复。\n（原因：避免 EVA 按作废版本验收）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:14",
+      "text": "事件线已定版：现行的 R2d 是只补源时刻的那一版（R2d_srctime），另一版作废。我核对了两边目录里的作废说明，和事件线的说法一致；之前我对合同子项目说\"以原目录为准\"，已经撤回改正，线况也改了。\n\n两版我都用 v2.7 跑过，结果一样：三张表全部只作代理比较，没有被拦的行。所以不管用哪一版，都不影响验收结论。事件线自跑后会正式交付，合同子项目收到后核一下哈希就行。\n\n另外两件事还等你：\n- 在两个子项目上点\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。\n\n## 结论\nEVA 线确认：R2 交付批的现行版是 （旧期 …、新期 …、种子 …），映射版 作废。我方此前\"以原目录为准\"的说法撤回。我方已用 v2.7 检查器（…）加原路径 SOURCES_R2b.json 跑过 srctime 版：三张表全部 proxy_only，I1 为 0，风暴组 8,112 / 1,609 / 159。你们正式交付时附上自跑报告，我方核对哈希后即验收完毕。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:14",
+      "text": "【子项目回报 · EVA 输入合同与机制分层定稿】R2d 验收通过，EVA 输入合同 v2.7 收口，可合并\n结论：v2.7 即定版（检查器 …，盘上 21:07 写入，之后未改；你预跑用的就是它）。R2d 用 v2.7 + SOURCES_R2b.json 正式重跑：三表 47,612 / 8,751 / 245 全 proxy_only，I1 码 0，风暴组 8,112 / 1,609 / 159；R2c 回归只剩 padded_source_time_missing，R2d 补齐后清零。冻结记录 末尾加了检查器各版本哈希与时间对照表（→→→→，仅最后一个现行）和 R2d 验收段。I3 站数窗警示按事件线说明保持。项目页已收口。请合并。"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:14",
+      "text": "合同子项目报的 R2d 验收通过，用的是映射版（… 等三个哈希）。事件线已经宣布这一版作废，现行版是只补源时刻的 R2d_srctime。\n\n这个差别不影响结论。我此前已用同一版 v2.7 检查器跑过 srctime 版，三张表的行数、全部只作代理比较、没有被拦的行、风暴组数，和这次验收完全一致。我上一轮已把\"按 srctime 版验收\"的更正发进子项目，它正在排队处理。处理完后，验收记录就会补上 srctime 版的跑次和哈希。这一步只是把记录对齐，不必等它，现在就可以合并。\n\n除此之外，验收是完整的：\n- v2.7 检查器哈希 `…` 写入后没有再改过\n- 冻结记录里补了检查器历次版本的哈希对照，只有最后一版是现行的。\n\n还请你做两件事：\n- 在两个子项目上点\"总结并合并\"\n- 定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:14",
+      "text": "【委托 · 来自 事件 Lead】更正：R2d 以首版为准，收窄版作废\n撤回我上一条'R2d 收窄版'。R2d 以首版为准： Cook 源时刻 + 缺失原因映射到 v2.6 受控词表；旧期 …3532、新期 …01d0、种子 …6f39），数据不再改。EVA_Delivery_R2d_srctime_20261013 作废，勿用。v2.7 检查器定版后请回我 sha256，我用 v2.7 + --manifest 对 R2d 三表复跑，报告补进 R2d 目录。\n（原因：根 Lead 撤回收窄指令，避免多一版）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:14",
+      "text": "这条\"R2d 以首版为准\"是事件线较早发的，到得晚了，已被后面的定版推翻。现行版仍是 R2d_srctime，我这边不变。\n\n判断依据是两边目录里的文件：\n- 首版目录里有 21:13 写的作废说明，明确写着现行版是 srctime 版。\n- srctime 目录里有事件线 21:13 用 v2.7 自跑的三份报告。\n- 这两样都晚于这条消息里的\"撤回收窄\"。\n\n两版用 v2.7 跑的结果完全相同，选哪一版都不影响验收，以后也不需要再来回改版。v2.7 的哈希已回给事件线。\n\n## 结论\nEVA 线以盘上最新定版为准：现行 R2d 是。依据是首版目录 21:13 的 VOID_R2d_vocab_mapping.md，以及 srctime 目录 21:13 的 v2.7 自跑报告，两者都晚于这条\"以首版为准\"，所以这条按已被推翻处理。v2.7 检查器定版，sha256 为 `c161b267e5eeb04c089411bd9fb2ca8822eb28c4bdefcebaeddff2aade0af18b`。两版用 v2.7 跑的结果完全相同：三张表全部 proxy_only，I1 为 0，风暴组 8,112 / 1,609 / 159。如果事件线最终仍想改回首版，只需在盘上调换作废说明并告知我们，我方不需要重新验收。建议就此定为 srctime，不再改版。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:15",
+      "text": "【委托 · 来自 事件 Lead】事件线 R2d 版本以最终正式交付为准\n抱歉，我方指令交叉，R2d 的两个版本在你那边被来回宣布作废。最终口径：现行版 = R2d_srctime，以 S1 子项目接下来那次附 v2.7自跑报告与哈希的\"正式交付\"为准；在那之前收到的任何\"某版作废\"通知都以此为准作罢。两版数据差别只在缺失原因用词（v2.7 两种都认），不影响你们验收。无需回复。\n（原因：版本来回，给 EVA 一个确定口径）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:15",
+      "text": "事件线给了最终口径：现行 R2d 就是 R2d_srctime，和我上一轮按两边目录里的文件判断的一致，我这边什么都不用改，线况已经是这个口径。之后事件线还会正式交付一次，附 v2.7 自跑报告；收到后，合同子项目核一下哈希就算验收完毕。\n\n还请你做两件事：\n- 在两个子项目上点\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。\n\n## 结论\nEVA 线确认最终口径：现行 R2d =，以 S1 子项目附 v2.7（…）自跑报告与哈希的正式交付为准。之前所有关于某一版作废的往来通知，都按这一条作罢。这一版我方已用 v2.7 预跑通过：三张表全部 proxy_only，I1 为 0。正式交付到达后，由「EVA 输入合同与机制分层定稿」子项目核对哈希，验收即完成，不需要你们再做什么。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:15",
+      "text": "【委托 · 来自 事件 Lead】R2d 定版：现行版 = R2d_srctime（v2.7 自跑 I1 0）\n现行版=R2d_srctime： EVA_Delivery_R2d_20261013 作废勿用；我前两条关于 R2d 版本的消息以本条为准。内容：以 R2c 为底只补 Cook 源时刻（旧期 47,066、种子 112 行，从 Cook 原文件按站文件+indx 回填，设计窗全部 = 源时刻 ±5 min），缺失原因保持 R2c（仅删补上那列已失效的原因键），新期表与 R2c 逐字节同。哈希：旧期 8698abae8dd17e4e…d51f，新期 …b339，种子 …09d3。v2.7（…）+ --manifest SOURCES_R2b.json 自跑：47,612 / 8,751 / 245 全部 proxy_only，I1 0，风暴组 8,112 / 1,609 / 159，I3 警示 482/130/112（Cook Class=5 的 ±30 min 站数窗，S0 设计如此）。报告 SELFRUN_V27_*.json。本批交付收尾，不再改版。\n（原因：根 Lead 定版收尾）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:15",
+      "text": "事件线的第二批样本已正式定版交付：现行版是 R2d_srctime。它的自跑结果和我之前用 v2.7 预跑的完全一致，三张表 47,612 / 8,751 / 245 行全部只作代理比较，没有一行被拦，事件线也说这批不再改版。\n\n**Decision I made**：已让合同子项目在冻结记录里把验收版本改成 srctime 版，项目页同步更新。理由是之前验收记的是已作废的映射版，两版结果完全相同，只是把记录对齐。\n\n线况已更新。还请你做两件事：\n- 在两个子项目上点\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。\n\n## 结论\nEVA 线验收通过：R2d_srctime（旧期 … / 新期 … / 种子 …）。你们的 v2.7 自跑结果与我方复跑一致：三张表全部 proxy_only，I1 为 0，风暴组 8,112 / 1,609 / 159。I3 警示保留为警示，不需要处理。R2 这批交付到此收尾，事件线不需要再做什么。下一批需求等 EVA 正式极值项目立项后再提。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:15",
+      "text": "【委托结果 · EVA Lead】R2c 终版：三表全换 R2c，用它做正式重跑与审查\n1. R2c 三表（`………`）已用现行冻结版 v2.7 正式重跑，结果见\n - 新期表 8,751 行全部 `proxy_only`\n - 旧期表 47,066 行、种子表 112 行只差源时刻，等 R2d 补\n - v2.5 显示全部 `proxy_only`，是因为它没有源时刻检查。\n2. 冻结审查不重审，裁决补记已注明 R2c 与 R2b 的差别只在缺失原因列和新期用途字段。\n3. 口径说明的实际哈希是 `…`，不是 `…`。\n4. ASOS 平均时长须知已记入项目页\"未决\"，供以后正式极值项目使用：峰值阵风的平均方式随传感器型号和更换日期而变，须按各站传感器更换史分段，换算成 Vhat_3s 由本线负责。依据改为 NWS 2.7A 卡（PDF pp. 4、9、20）；H7ZG33PU 仍是来源受限，不能引用，要用须先请 litwiki 恢复全文。\n5. R2d 到货后用 v2.7 复跑，确认待修行清零，就彻底收口。\"总结并合并\"请根 Lead 在本对话做。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:15",
+      "text": "这条又是合同子项目的一份旧回执，回的是之前\"R2c 全换\"那条，没有新内容。之后的进展已经盖过它：\n- R2d_srctime 已正式交付，待修行已清零，合同已收口。\n- H7ZG33PU 两张卡不同步：我已派 litwiki 去同步那张还标着来源受限的来源卡，结果回来后它就能再被引用。\n\n还请你做两件事：\n- 在两个子项目上点\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:15",
+      "text": "【委托结果 · EVA Lead】口径说明终版 （加 Sui 一行）\n1. 口径说明以终版 `…`（28 行）为准。正式重跑报告 本来就引用这个哈希，项目页也已改成它；我查过，没有任何文件还在引用 ``。\n2. 项目页\"给正式极值项目的未决约束\"已加第 7 条：Sui 风暴对象资料止于 2017 年，新期永远拿不到；用 Sui 对象字段时须分新旧两期处理。\n3. 行表仍是 R2c，v2.7 的重跑结果不变。剩下只等 R2d 补源时刻后复跑，确认待修行清零。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:15",
+      "text": "这又是一份迟到的旧回执，内容都已经办完：口径说明按 `…` 引用，Sui 那条约束已列为给正式极值项目的第 7 条。这里说的\"等 R2d\"也已过时，R2d_srctime 已正式交付并验收通过。\n\n我这边不用再做什么。两件事还等你：在两个子项目上点\"总结并合并\"，以及定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:15",
+      "text": "【委托结果 · EVA Lead】暂不合并：v2.6 只在作废的 R2b 上验过，对现行 R2c 全部隔离\n1. 你要的补丁已在 10-13 21:20 以 v2.7 完成，检查器哈希 `…`，34 项测试：\n - R2c 的四个缺失原因已登记进受控词表和 Fields_v2，并有对应测试\n - 另外修了一处：清单自身哈希的判定与路径无关，复制清单到别处不再触发全表 `exclude`。\n 决策见，冻结记录已补记 v2.7 的哈希。\n2. 收口证据已换成现行 R2c 三表：新期表 8,751 行全部 `proxy_only`；旧期表 47,066 行、种子表 112 行仅剩\"补宽缺源时刻\"，等 R2d；其余行全部 `proxy_only`。\n3. 项目页状态已标\"已收口\"，可以合并。R2d 到后我用 v2.7 复跑、确认待修行清零，这是合并后的跟进项。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:15",
+      "text": "这也是合同子项目的一份迟到回执，回的是之前\"暂不合并\"那条，没有新进展。里面说的 v2.7 补丁和 R2d 复跑都已完成：R2d_srctime 已正式交付，三张表全部归入\"只作代理比较\"，没有被拦下的行，合同已收口。\n\n现在只剩你的两件事：\n- 在「EVA 输入合同与机制分层定稿」和「参考情景 Vhat_3s 试算」两个子项目上各点一次\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:15",
+      "text": "【委托结果 · EVA Lead】R2d 到货：用它作 v2.7 收口验收数据\n1. v2.7 即定版，检查器，哈希 `c161b267e5eeb04c089411bd9fb2ca8822eb28c4bdefcebaeddff2aade0af18b`，10-13 21:07 写入后未改，34 项测试。\n2. R2d 验收通过：三表 47,612 / 8,751 / 245 行全部。R2c 回归时只剩\"补宽缺源时刻\"一项，R2d 补齐后已清零。\n3. 冻结记录末尾已写入检查器各版本的哈希与时间对照表（只有 `` 是现行版）和 R2d 验收段。站数窗口警示按事件线的说明保持为警示。\n4. 项目页状态为\"已收口\"，请合并。后续\"观测→Vhat_3s 转换\"和\"正式极值统计\"另立项目，相关须知和两个时段的合并约束都已写在项目页\"未决\"里。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:15",
+      "text": "这是合同子项目对\"R2d 到货\"那条委托的回执，内容都已核对，没有新情况。它验收用的是首版 R2d，事件线后来定版为 R2d_srctime。两版结果完全相同，我已经让它把冻结记录里的验收版本改成 srctime。\n\n我这边不用再做什么，只等你两件事：\n- 在两个子项目上点\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:16",
+      "text": "【委托结果 · EVA Lead】v2.7 定版后把正式 sha256 发事件 Lead\n1. v2.7 检查器（`c161b267e5eeb04c089411bd9fb2ca8822eb28c4bdefcebaeddff2aade0af18b`）同时接受 v2.6 受控词和 R2c 原词，R2d 不需要回滚。检查器本身未改，只新增一条测试：v2.6 受控词通过、自造原因仍被隔离。与原有的 R2c 原词测试成对，35 项全部通过，测试文件 sha256 为 `…`。\n2. 已直接发给事件 Lead：\n - 检查器正式 sha256\n - 规则三文件哈希：Rules `…`、Fields `…`、Plan `…`\n - 我方 R2d 结果路径，三表全部 `proxy_only`，I1 类报错为 0\n - 请对方用同一版复跑 R2d，补交注明 V27 的自跑报告。\n3. 冻结记录末尾已补记。子项目保持\"已收口\"，可以合并。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:16",
+      "text": "合同子项目已把 v2.7 的正式哈希、规则三份文件的哈希和我方 R2d 的验收结果直接发给了事件线。事件线那边已经用同一版检查器自跑并正式交付，两边对上了。\n\n检查器代码没有改，只多了一条测试，确认 v2.6 的正式缺失原因词能通过、自己编的原因仍会被拦下，现在测试共 35 项，全部通过。\n\n我这边没有要处理的事，还等你两件：\n- 在两个子项目上点\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:16",
+      "text": "【委托结果 · EVA Lead】R2d 以原目录为准（收窄版已作废）\n1. 收口验收数据就是原目录 （…/…/…），v2.7 跑的结果是三张表全部 `proxy_only`，I1 类报错为 0，风暴组去重 8,112 / 1,609 / 159。srctime 版没有使用，已有结论不变。\n2. 10-13 21:15 查看时，srctime 目录里没有，却有三份 SELFRUN_V27 自跑报告，已请事件 Lead 补放作废声明。验收汇总和冻结记录里都已注明\"以原 R2d 目录为准\"。\n3. 子项目保持\"已收口\"，可以合并。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:16",
+      "text": "合同子项目按我一条已经撤回的旧消息办了事，差点让 R2d 的版本又翻一次，已经拦下了。\n\n**出了什么事**：10-13 21:15 前后，合同子项目照我早先\"以原目录为准\"那条消息，请事件线给 srctime 目录补一份作废声明。可事件线最后定版的现行版正是 srctime。事件线要是照做，两版就又要来回切一轮。\n\n**Decision I made**：\n- 已直接告诉事件 Lead：忽略这个请求，哪个目录都不要动，现行版仍是 R2d_srctime，这批不再改版。\n- 已告诉合同子项目：不要再为 R2d 版本联系事件线，只需按我排在后面的那条，把验收版本改成 srctime。\n- 两版的检查结果完全一样，所以对结论没有影响；要防的只是版本记录再乱一次。\n\n这次乱子的根源是消息乱序：几条指令前后交叉，到达顺序和发出顺序不一致。以后版本这类事，我都以盘上的作废说明和定版文件为准。\n\n还请你做两件事：\n- 在两个子项目上点\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:16",
+      "text": "【委托结果 · 事件 Lead】请忽略我方子项目\"给 srctime 补作废声明\"的请求\n没有动任何目录，R2d_srctime 目录里没有作废声明。现行 R2d 是 （… / … / …），已验收通过，本批不再改版，事件线这边已关闭。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:16",
+      "text": "事件 Lead 确认没有动任何目录，srctime 目录里也没有作废声明。现行 R2d 仍是 R2d_srctime，已验收，这批不再改版，事件线这边已关闭。R2d 版本的事到此结束。\n\n还请你做两件事：\n- 在两个子项目上点\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:16",
+      "text": "【委托结果 · EVA Lead】更正：R2d 现行版改为 R2d_srctime（定版，不再改）\n1. 收口验收改为以 R2d 现行版为准：，三张表哈希为旧期 `…`、新期 `…`（与 R2c 相同）、种子 `…`。用 v2.7（。\n2. 映射版 作废，目录内已有作废声明。我那份基于映射版的验收结果保留作历史，已标作废。冻结记录已追加更正，撤销\"以原 R2d 目录为准\"。\n3. 已向事件线撤回\"在 srctime 目录放作废声明\"的请求。事件线用 v2.7 自跑后正式交付，届时我核对哈希即可。\n4. 子项目保持\"已收口\"，可以合并。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:16",
+      "text": "合同子项目已把验收改到现行的 R2d_srctime 版，和事件线的定版一致。新的验收结果放在。原先按映射版做的那份验收留作历史，已标作废，冻结记录也补了更正。我这边、子项目、事件线三方口径一致，这件事收尾了。\n\n现在只等你两件事：\n- 在「EVA 输入合同与机制分层定稿」和「参考情景 Vhat_3s 试算」两个子项目上各点一次\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:17",
+      "text": "【委托结果 · EVA Lead】R2d_srctime 正式交付到达：补记验收即完\n1. R2d_srctime 正式交付已核对：事件线自跑报告的检查器哈希是 ``（v2.7），输入哈希为旧期 `…`、新期 `…`、种子 `…`。三表 47,612、8,751、245 行全部 `proxy_only`，I1 类报错为 0，风暴组去重 8,112、1,609、159，I3 警示 482、130、112。这些与本线 v2.7 验收逐项一致。\n2. 冻结记录 的收口验收版本已改为 srctime。映射版作废，结果相同，只作历史。项目页已同步。\n3. 这批数据不再改版。子项目保持\"已收口\"，可以合并。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:17",
+      "text": "R2d_srctime 的正式交付已验收：事件线自跑的结果和我们 v2.7 的结果逐项一致，冻结记录的验收版本也改成了 srctime。这批数据不再改版，合同子项目已经全部结束。\n\n现在只等你两件事：\n- 在「EVA 输入合同与机制分层定稿」和「参考情景 Vhat_3s 试算」两个子项目上各点一次\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:17",
+      "text": "【委托结果 · EVA Lead】停止：不要请事件线作废 srctime\n1. 21:15 那条\"请事件线为 srctime 补作废声明\"的请求，我已于 21:16 撤回，并请事件 Lead 不要放作废声明。之后不再就 R2d 版本联系事件线。\n2. 收口验收版本已改为 R2d_srctime：\n - 三张表的哈希：旧期 `…`、新期 `…`、种子 `…`\n - 检查器 v2.7（``）验收结果：三张表全部 `proxy_only`，I1 报错为 0；事件线正式自跑结果与之逐项一致\n - 映射版作废，结果相同，只作历史。\n 冻结记录和项目页都已同步。\n3. 子项目保持\"已收口\"，可以合并。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:17",
+      "text": "合同子项目确认：给事件线发的那条错误请求，它在 21:16 已经撤回；验收和冻结记录都改成了 R2d_srctime。这和事件线那边、我这边的口径一致，R2d 版本的事彻底结束了。\n\n现在只等你两件事：\n- 在「EVA 输入合同与机制分层定稿」和「参考情景 Vhat_3s 试算」两个子项目上各点一次\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-13 21:18",
+      "text": "【委托结果 · 文献 Wiki 智能体】eva_vhat3s：H7ZG33PU、TN6C93KA 来源卡与 claims 卡状态不一致\nH7ZG33PU | identity_matched_full_text_sha256_verified（19 页） | \nTN6C93KA | identity_matched_full_text_sha256_verified（14 页） | \n\n同步的导航与状态页：\nHome.md → \nReading_Status.md → \n\n\n\n\n\n\n（附件：H7ZG33PU.md）\n\n（附件：TN6C93KA.md）\n\n（附件：Home.md）\n\n（附件：Reading_Status.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-13 21:18",
+      "text": "H7ZG33PU 和 TN6C93KA 两篇的来源卡已经同步，都改成\"全文已核验\"。我核过两张卡，和 litwiki 的回报一致，首页和阅读状态页也一并改了；UBTE4EBP 仍是来源受限，没有动。\n\n这样 Cook 2023（H7ZG33PU）讲 ASOS 阵风取 3 秒平均的那几页，以后可以按页码引用。正式做 ASOS 四站转换时，它和已在用的 NWS 2.7A 卡可以互相印证。线况页已更新。\n\n现在只等你两件事：\n- 在「EVA 输入合同与机制分层定稿」和「参考情景 Vhat_3s 试算」两个子项目上各点一次\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-14 14:23",
+      "text": "【委托 · 来自 实验室 Lead】询问：有无现成的 ASOS 非雷暴年最大风（实验室 AI 气候模拟器试验用）\n实验室在试一个想法（Liang Hu 10-14 同意）：用 AI 气候模拟器（ACE2/NeuralGCM/ArchesWeatherGen 等）生成大量合成年份，统计非雷暴（温带气旋、冷锋）年最大风，看能否补混合气候 EVA 里天气尺度那部分的长重现期外推。第一步只检验模拟器年最大风是否比 ERA5 系统偏低，以及 ERA5→站点 3 s 阵风的换算误差。请告诉：(a) 你们线是否已在做或计划做类似事情（AI 模拟器、ERA5 换算到站点、非雷暴分离），避免重复；(b) 有没有已经按雷暴/非雷暴分好的 ASOS（或其他站）年最大风或超阈值序列可以只读借用——站点清单、年份、路径（绝对路径）、格式、分类方法与已知局限；(c) 你们认为哪几个站最适合做这个检验（建议美国中部/东北、非飓风主导）。数据只读，结果会交回你们。\n（原因：避免重复 EVA 线已做的分离与站点工作）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-14 14:23",
+      "text": "实验室 Lead 来问：他们想用 AI 气候模拟器做非雷暴年最大风的试验，我们线上有没有可借用的站点数据。我已按实际数据回复，结论附在下面。这件事不占本线工作量，我在线况页\"跨线往来\"记了一行。\n\n回复要点：\n- **没有撞车**：我们线没做 AI 模拟器，也没做 ERA5 换算到站点阵风。\n- **能借的数据**：只有德州四站的 Cook ASOS 阵风事件清单，可以只读借用。\n- **局限**：这批不是年最大风序列，只有 Class=5 被事件线明确认作雷暴；四站都在德州，不符合他们要的\"美国中部或东北\"。\n- **我们想要的回报**：他们算出的 ERA5 换算到站点 3 秒阵风的误差，对将来做 Vhat_3s 换算有用，已请他们结果交回本线。\n\n还请你做两件事：\n- 在两个子项目上点\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。\n\n## 结论\n**(a) 有无重复**：EVA 线没有在做、也没有计划做 AI 气候模拟器或 ERA5→站点 3 s 阵风换算，不会重复。雷暴/非雷暴分离目前只沿用 Cook 数据集的源生类别，本线没有做过独立的机制裁定（S3 机制裁定 0 例）。\"观测→Vhat_3s 转换\"项目尚未立项。\n\n**(b) 可借用的数据**：只读，现行版 （字段说明见 README_R2d.md）：\n- 旧期 ：Cook ASOS 47,066 行，另有 Storm Events 546 行。四站行数为 DFW 16,103、DAL 12,524、AUS 10,742、HOU 7,697。\n- 新期 ：Cook 部分只覆盖 2020-07-16 到 2021。\n- 站年完整率 ：四站 × 2010–2022。\n- 格式：CSV 每行一个阵风事件，风速单位 kt，阈值 ≥20 kt（取自 IEM 一分钟数据），类别放在 `source_native_mechanism_label` 列（JSON）。\n- 分类：Cook 源生 Class 共 0–6 七类。事件线只把 Class=5 当雷暴（旧期 482 条），Class=1 占多数（44,206 条）。其余各类的含义请以 Cook 2023 数据说明为准，本线没有核对过。\n\n已知局限：\n1. 这是事件清单，不是年最大风或连续序列。要年最大风须按站年自行取最大，并对照完整率表（52 站年中 ≥0.9 的 35 个，最低 0.753）。\n2. ASOS 峰值阵风的平均时长随传感器型号和日期而变，Belfort 是 5 s 分块，Vaisala 是 3 s 滑动平均。源数据里没有传感器更换史，不能直接当作 3 s 阵风。\n3. ASOS 实时质控会误删一部分事件峰值（卡片 H7ZG33PU p. 9）。\n4. 全年完整率不等于事件时段内有数据，KAKO 就出现过事件时段整段缺档。\n5. 非对流事件按 2 h / 100 km 链式分组，最长一组跨 94 h，去簇时须另设跨度上限。\n6. 新旧两期口径不同，不能直接合并，见。\n7. 全部行都是 proxy_only，还没有标准化成 Vhat_3s。\n\n**(c) 站点建议**：本线只有这四个德州站，不在你们要的美国中部或东北区域。如果只用现有数据做第一步检验：DFW 最合适（行数最多，13 个站年完整率全部 ≥0.889），其次 AUS。HOU 受热带气旋影响，建议排除。中部或东北的站本线没有数据，需要另取。如果新取的站希望与 EVA 输入合同兼容，可以用本线 v2.7 检查器 （sha256 …）自查。结果交回 EVA 线时，请附上 ERA5→站点 3 s 阵风换算误差的估计。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-14 18:02",
+      "text": "【委托结果 · EVA Lead】回访回报：EVA 输入合同与机制分层定稿\n这次回访要查的事情早已办完，不用再派活，也不再约下一次回访。\n\n- R2 当时没过事件线，后来作废，又先后被 R2b、R2c 替代，最后定版为 R2d_srctime。\n- 现行冻结版 v2.7 的检查器（``）我刚又核对了一遍，没有改动过。\n- 用它验收 R2d_srctime：三张表全部 `proxy_only`，I1 报错为 0。事件线自己正式跑的结果与此一致。\n- 三方审查已经裁决。四个站各自的有效站年数已写进项目页。\n- 项目页状态仍是\"已收口\"，等根 Lead 合并。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-14 18:02",
+      "text": "合同子项目 10-14 18:00 那次兜底回访已结束，查的事早就办完了，不用再派活，也不再约下一次回访。它顺带又核对了一遍：v2.7 检查器（``）没有改动过；用它验收现行的 R2d_srctime，结果仍和事件线自己跑的一致。\n\n子项目这边没有遗留事项，只等你两件事：\n- 在「EVA 输入合同与机制分层定稿」和「参考情景 Vhat_3s 试算」两个子项目上各点一次\"总结并合并\"\n- 回话定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-14 19:19",
+      "text": "【委托 · 来自 实验室 Lead】实验室试 RAFT/STORM 合成台风到沿海 50/700 年风速：有无在做或可借用\n实验室 B 台风节点下的 B2想做一个小试验：用 RAFT（Xu 2024 Sci Data，统计路径+ML 强度的北大西洋 4 万合成台风，Zenodo 10392725）和 STORM（Bloemendaal 2020）两套合成台风目录，过同一个参数化风场（CLIMADA H08+海陆粗糙度），算 10–20 个美国墨西哥湾/大西洋沿岸站点的 50/700 年重现期风速，对照 ASCE 7-22。想问：(1) 你们有没有在做或做过同类工作（飓风设计风速、合成台风目录）？(2) 有没有现成的站点 ASCE 7-22 风速值、飓风目录或已核过的 ASCE 7-22 风接口资料（如）可以只读借用（只引结论和路径）？(3) 有没有你们不希望实验室碰、以免重复的部分？只需文字答复；B2 等你们回复再冻结判据。\n（原因：避免与 PETW 线重复）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-14 19:19",
+      "text": "实验室 B2 问我们有没有在做或可借用合成台风的东西。我已回复：EVA 线没有飓风方面的工作，和他们不冲突。ASCE 7-22 的资料归设计荷载线，已请他们直接去问。这一条已记进线况页\"跨线往来\"。\n\n我们只提了一个要求：飓风的阵风换算不要拿到雷暴上用。这是本线文献卡片 C07 定的边界。\n\n现在只等你两件事：\n- 在两个子项目上各点一次\"总结并合并\"\n- 定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。\n\n## 结论\n1. **有无在做或做过同类工作**：没有。EVA 线（PETW Step 3）只做雷暴大风：Vhat_3s 标准化、机制分层极值分析、雷暴事件输入合同。没有做过飓风设计风速、合成台风目录、参数化台风风场或 ASCE 7-22 对照，B2 的试验与本线不重复。\n2. **能借用什么**：本线没有 ASCE 7-22 站点风速值，也没有飓风目录。 等 ASCE 7-22 风接口资料属设计荷载线，请直接问 能否只读借用，本线不代答。本线能提供的只有雷暴侧的东西，与台风无关，B2 大概用不上：\n - Cook ASOS 德州四站（AUS/DAL/DFW/HOU）雷暴/非雷暴阵风事件清单：。其中 HOU 受热带气旋影响，本线不拿它当雷暴代表站；B2 如果需要沿岸站的实测对照，可以参考，但这批数据未按热带气旋分类，阵风也还没标准化成 3 s。\n - 文献子库。\n3. **不希望碰的部分**：没有禁区。只请注意一点：飓风的阵风系数和换算关系不要直接用到雷暴或混合气候 EVA 上，依据是本线候选条目 C07。如果 B2 的结果以后要和雷暴侧合成混合气候设计风，请先通知 EVA 线对接口径；混合气候的合成与重现期结论最终归 Liang Hu。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-14 22:48",
+      "text": "【委托 · 来自 PETW 总 Lead】工作站 C 盘告急：暂停本机 >1 GB 写入\n总 Lead 紧急通知（10-14 23:00）：工作站 C 盘只剩约 21 GB，可能今晚或明天写满，写满全平台停。即刻起至另行通知：本线（含 bot、子项目）暂停在 工作站 本机上任何单次 >1 GB 的写入或下载（含 WSL 里的 工作目录 目录——WSL 盘就在 C 盘上；也含 工作区）。CRC/TACC 上的作业不受影响。大输出一律留在集群。已在进行的 >1 GB 本机写入请停在安全点并回我一句；没有则不需回复。不删任何文件——删除仍须 Liang Hu 批。\n（原因：工作站 C 盘将满，全平台风险）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-14 22:48",
+      "text": "总 Lead 23:00 通知 工作站 的 C 盘快满了，全平台暂停本机上任何一次超过 1 GB 的写入或下载，等另行通知。我刚查了：C 盘只剩 19 GB；EVA 线没有正在进行的大写入，两个子项目都已收口，本机也没有本线的进程在跑。这条暂停规定已记进线况。\n\n有一处可以腾空间：我核对数据时在 WSL 临时目录 留了约 1.5 GB 副本，都是从事件线交付目录拷来的行表和检查器输出，原件都还在。删掉能释放 1.5 GB。按规定删除要你批，所以我没动。你回一句\"删\"，我就清掉。\n\n还在等你的两件事照旧：在两个子项目上点\"总结并合并\"；定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。如果你说立，在通知解除之前，这个项目只做本机小文件的工作；大数据留在集群，或等解除后再取。\n\n## 结论\nEVA 线（含 bot 和两个子项目）收到通知，即刻起暂停 工作站 本机上任何单次 >1 GB 的写入或下载。核查结果：本线没有正在进行的 >1 GB 本机写入，没有需要停在安全点的任务，也没有在跑的集群作业。我方唯一的本机大块占用是 Lead 的临时副本，约 1.5 GB，属可再生副本，原件仍在。已列为可删项，等 Liang Hu 批准后再删，现在未动。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-15 12:59",
+      "text": "【告知 · 来自 PETW 统筹】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nCRC 共享 SSH 主连接（[用户]@超算）10-15 12:56 断开，socket 已不在（总 Lead 12:59 复核）。在平台通知恢复之前：本线及 bot 暂停一切 CRC 命令（ssh/scp/rsync/qsub/qstat），**绝不重连、不重试**。已在 CRC 上跑的作业不受影响，只是暂时没人盯；TACC 照常。有 CRC 依赖的活先做本机小文件部分或 TACC 部分。恢复后平台会通知。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-15 15:32",
+      "text": "【告知 · 来自 PETW 统筹】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nCRC 主连接已由 Liang Hu 重建，平台 15:30 确认正常，可恢复 CRC 操作。注意：分析提交到计算节点跑，登录节点只提交作业和做很短的查询；scp 大文件分批、每批限时；经 socket 的 ssh/scp 一律加 -n 或 stdin 用普通文件/ [local path omitted]，不用 FIFO 或不结束的管道；d24cepyc154 仍默认排除；连接再断不重连。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-15 18:01",
+      "text": "【委托 · 来自 实验室】请给两个混合气候风速问题，供句级文献聚类试验\n实验室在试一件事：把全文文献库（Zotero+EndNote+台式机约 60 万页）切到句级做向量聚类，回答\"文献对某问题怎么说、有没有共识\"，并和现有 pages 的页级检索对照。已定的第一个问题是\"wind speed decrease/increase with climate change\"。请 EVA 线给 2 个你们真正关心的混合气候（mixed climate）极值风问题，形式像上面那句，中英各一行即可，例如雷暴风与良态风分开拟合是否必要、某类分布在混合气候下的偏差等。只要问题，不要你们做任何计算。交回：2 个问题（中英文）+ 一句话你们期望得到什么样的答案（有无共识、主流方法）。10-17 前给即可。\n（原因：任务书规定 B 部分用 EVA 线给的 2 个混合气候问题，结果会同步给 EVA 线参考）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-15 18:01",
+      "text": "实验室要 EVA 线出两个混合气候极值风问题，给他们的句级文献聚类试验用。我已回复，问题见下面的结论，已记进线况页\"跨线往来\"。\n\n我选的两个问题，正是以后正式极值项目要先回答的：\n1. **分开拟合还是混合拟合**：雷暴风和非雷暴风是先分开拟合再合成，还是直接混在一起拟合？两种做法对长重现期设计风速的影响有多大。\n2. **机制标签不准的影响**：雷暴和非雷暴的机制标签分错、或雷暴风漏测时，混合气候的设计风速会偏多少。\n\n他们的试验结果会同步回来，可以当作文献线索参考，但不能直接当依据用。\n\n现在还等你两件事：在两个子项目上点\"总结并合并\"；定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。\n\n## 结论\nEVA 线给出两个混合气候极值风问题：\n\n1. 中文：混合气候下，雷暴风与非雷暴（良态/天气尺度）风分开拟合后再合成，与把两类风混在一起拟合单一分布相比，对长重现期设计风速的影响有多大？\n English: In mixed wind climates, how much do long-return-period design wind speeds differ between fitting thunderstorm and non-thunderstorm (synoptic) winds separately and then combining them, versus fitting a single distribution to the pooled data?\n 期望答案：主流观点是否认为必须分开拟合，或者至少分开后更保守、更稳健；分开或合并分别使估计偏高还是偏低、偏多少；这种差异随重现期、站点和记录长度怎样变化；常用的组合方法（如按年超越概率相乘的混合模型）是什么。\n\n2. 中文：雷暴与非雷暴的机制标签存在误分类，或雷暴风存在漏测（检测性不足）时，混合气候极值风速估计会产生多大偏差，文献通常怎样处理？\n English: How do misclassification of thunderstorm versus non-thunderstorm wind events, and incomplete detection of thunderstorm gusts, bias extreme wind speed estimates in mixed climates, and how does the literature account for this?\n 期望答案：偏差的方向和量级是否有共识（如误分类使雷暴尾部变轻还是变重）；主流做法是否用气象资料（雷暴记录、雷达）辅助分类，或做概率分类、敏感性分析；有没有把分类不确定性传播到设计风速的标准方法。\n\n两题的结果请同步给 EVA 线，供后续正式极值项目参考。按本线规矩，结果只作线索；凡要用作依据的结论，须回到原文核对页码。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-16 23:16",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-17 12:17",
+      "text": "【告知 · 来自 实验室】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n实验室 10-15 向你们要了两个混合气候问题做句级聚类试验。结论：句级聚类没用（分不出立场），但页级检索（ pages）直接给出了这两题的核心文献原页，供你们参考，均为线索、引用前请回原页核对：\n- 分开拟合 vs 合并拟合：Gomes & Vickery 1978「Extreme wind speeds in mixed wind climates」（PDF 第 1、8、10 页）；Cook et al. 2003「Extreme wind speeds in mixed climates revisited」（PDF 第 13、15 页）；Zhang et al. 2018「Extreme wind speed distribution in a mixed wind climate」（PDF 第 13 页）；Lombardo & Zickar 2021「Prediction of Non-Synoptic Wind Speeds」（PDF 第 11、19 页）；Aboshosha et al. 2020（性能化设计、雷暴风速评估，PDF 第 16–17 页）。\n- 误分类与漏测：「Automated classification of gust events in the contiguous USA」（2023，PDF 第 1、14 页）；「Extreme Convective Gusts in the Contiguous USA」（2024，PDF 第 3 页）；以及上面的 1978、2003 两篇。\n原样输出在 与 B-3_pages.txt（含 PDF 路径）。不需回复。"
+    },
+    {
+      "role": "relay",
+      "who": "统计与极值 EVA Lead · 转达",
+      "ts": "2026-10-18 00:46",
+      "text": "【委托 · 来自 PETW 统筹】工作站 清理执行：P5 [local path omitted]（Liang Hu 10-18 已批）\nLiang Hu 10-18 批准删除 [local path omitted]（约 1.5 GB，你方 10-14 确认原件在，可随时再拷）。删前确认里面没有只在这里有的新文件（与 原件比对，有新文件先拷回再删）。执行规矩：1) 先出预演清单（路径、大小、文件数）写进本线 执行记录；2) 只删列明内容；3) 删后复核必留项；4) 记实删大小与删前/删后 df -h 本地盘（00:46 总 Lead 实测 88 GB）；5) 删后在 工作站 记台账：工作目录 add --type 删除 --what … --src … --dst … --size … --verify … --approved \"Liang Hu 10-18（P14_CLEANUP_FOR_pi_20261014.md）\" --by … --restore … --status 完成。注意 WSL 里删文件 C 盘余量不会立刻回升，要等虚拟盘压缩，df 不变属正常。本消息即为 Liang Hu 批准。\n（原因：工作站 C 盘 88 GB）"
+    },
+    {
+      "role": "bot",
+      "who": "EVA",
+      "ts": "2026-10-18 00:46",
+      "text": "预演记录已写好，4 个只在临时目录里有的文件已拷回并核过哈希；现在删除 并复核。你 10-18 批准的 已经删了，实删 1.58 GB。删之前找出 4 个只在这里有的文件，已先拷回工作区：\n- 两个旧版检查器：v2.5 和 v2.6，盘上原来只剩现行的 v2.7\n- R2c 新期表的首发版：事件线后来把原文件原地替换了\n- 一个自动重试小脚本。\n\n其余文件处理如下：\n- **CSV 副本**：和事件线交付目录里的原件哈希一致，直接删了。\n- **检查器复跑输出（JSON）**：随时能重算，没拷回，逐个记了哈希和路由计数。\n\n删完后复核过：现行数据、检查器和拷回的 4 个文件都在，哈希一致。C 盘可用空间仍是 88 GB，因为 WSL 虚拟盘要压缩后才回收，属正常。执行记录写进了决策记录，工作站 台账已登记，线况已更新。\n\n还等你两件事：在两个子项目上点\"总结并合并\"；定要不要立「ASOS 四站观测 → Vhat_3s 转换与极值统计准备」子项目。\n\n\n\n## 结论\nP5 已按 Liang Hu 10-18 批准删除，实删 1,581,559,499 B（约 1.58 GB，47 个文件）。\n\n1. **预演清单**：逐文件路径和大小写在，执行记录在。\n2. **删前比对**：\n - 19 个副本与 原件 SHA-256 一致\n - 4 个无原件文件已先拷回，哈希一致：检查器 v2.5 、v2.6 、R2c 首发新期表 、retry.sh \n - 21 个 JSON 是可重算的复跑输出，未拷回，哈希清单为 `scratch_json_manifest.tsv`。\n3. **删除范围**：只删了该目录本身。\n4. **删后复核**：必留项（R2d_srctime 三表、检查器 、4 个拷回件）都在，哈希一致。\n5. **磁盘**： 删前 88G 可用，删后 88G，未回升。原因是 WSL 虚拟盘尚未压缩，属正常。\n6. **台账**：已用 登记（10-18 00:49）。\n\n（附件：p14_cleanup_tmp_eva_lead_20261018.md）"
+    }
+  ],
+  "files": {
+    "self": "907416cd.json",
+    "claims": null,
+    "pdf": null
+  }
+}

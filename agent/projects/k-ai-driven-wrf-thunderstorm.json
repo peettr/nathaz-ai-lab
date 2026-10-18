@@ -1,0 +1,345 @@
+{
+  "id": "0e55794a",
+  "slug": "k-ai-driven-wrf-thunderstorm",
+  "number": "R23.4c",
+  "title": {
+    "zh": "R23.4c 雷暴：AI预报驱动WRF",
+    "en": "R23.4c Thunderstorms: AI forecasts driving WRF"
+  },
+  "group": "wx",
+  "parent": "d0f7457a",
+  "depth": 2,
+  "status": {
+    "zh": "搁置",
+    "en": "Shelved"
+  },
+  "status_class": "pause",
+  "done": true,
+  "start": "2026-10-14 14:38",
+  "end": "2026-10-17 10:43",
+  "updated": "2026-10-17 10:43",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "同一套 WRF（4 km 单层、无积云参数化），分别用 Pangu 预报场和 GFS 预报场作初边界，提前 24/48/72 h 起报已算过、有观测的雷暴事件，比风暴位置与时间、雷达对象、站点阵风，判断 Pangu 驱动是否不差于 GFS 驱动。作为 L 节点的精度标尺。",
+    "goal_en": "The same WRF setup (4 km single domain, no cumulus parameterisation), using Pangu forecast fields and GFS forecast fields respectively as initial and boundary conditions, initialised 24/48/72 h ahead for thunderstorm events already computed and with observations; compare storm position and timing, radar objects and station gusts to judge whether Pangu-driven is no worse than GFS-driven. Serves as the accuracy yardstick for node L."
+  },
+  "report": {
+    "zh": "# 雷暴：AI 预报驱动 WRF（K）\n\n## 目标\n同一套 WRF（4 km 单层、无积云参数化），分别用 Pangu 预报场和 GFS 预报场作初边界，提前 24/48/72 h 起报已算过、有观测的雷暴事件，比风暴位置与时间、雷达对象、站点阵风，判断 Pangu 驱动是否不差于 GFS 驱动。作为 L 节点的精度标尺。\n\n## 当前状态\n10-17 搁置：24/48/72 h 三个提前量都未达\"Pangu 13 层驱动不差于 GFS 全层驱动\"（0/3），两组 24 h 位置误差都 >150 km，按冻结规则\"值得继续\"不可达。单事件、定性；模型与层数未解耦，不写\"AI 驱动不如 GFS\"。重启先跑 R24（13 层 GFS）。没有在跑的作业。\n\n## 已定决定\n- 2026-10-17 搁置（未达\"值得继续\"）：24/48/72 h 0/3 不差于、两组 24 h 位置均 >150 km；不写\"AI 驱动不如 GFS\"（模型与层数未解耦，R24 未跑）；重启条件见决策 → \n- 2026-10-15 补口径（设计空白，判据不变）：≥40 dBZ 对象最小面积正式 ≥64 km²（无/≥16 km² 并报，三档判定不一致则该提前量注明敏感、不计入\"值得继续\"）；时间指标搜索窗起点前移到 00Z（位置窗仍 03–09Z），00Z 首帧仍有对象则时间指标记左删失不判 →；v2 按审查 修订：两档（16/64）一致才计票、不一致正负票都不计；门槛用于所有对象判定，\"R km 内\"按最近格点；左删失按区间代入原式，不可判则不计正票（裁决）\n- 2026-10-14 设计 v2：GFS 组改全层（Deng 2025 摘要：削到 13 层的 GFS 最差），13 层 GFS 降为可选 R24 → \n- 2026-10-14 实验设计 v1：Pangu 主试验用 GFS 分析初值（与 GFS 组同初值），ERA5 起报只作可选 E24；两组同 13 层/6 h/同陆面；加 6 h 锚点对与闸门 → \n- 2026-10-14 开立；首个事件 Akron 2020-06-09，Wister 2018-08-10 仅作触发对照；WRF 放 CRC（不计 SU）或缩域 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 2026-10-17 | WRF 线交 72 h 对（正式 G72/P72 dt15，CRC 1571882；dt20 附列 1560832）并补齐 150 km 存在性；Lead 计票 | 72 h 四判一致：P72 位置 307.7/299.7 km vs G72 104 km，64 档 G 有 P 无 → 非不差于；24/48/72 三提前量都计\"明显更差\"（48 h 只靠时间），按结论规则拟\"搁置（AI 驱动不如 GFS，单事件定性）\"；送 6 人，裁决前不改状态 |\n| 2026-10-15 | WRF 线交 G48/P48 正式 v2 表（作业 1552228） | ≥64 km²：G48 首现 00:30Z（−160 min）、06:10Z 质心误差 316.8 km、对象 80 km²、最大风 17.1；P48 窗内 50 km 未首现（右删失）、误差 273.3 km、对象 287 km²、最大风 17.0；≥16 档 G48 −140 min / 275.2 km，P48 无首现 / 174.7 km。Lead 已核 CSV。已请补列 150 km 存在性（各对）；判读待 72 h 对（约 10-18） |\n| 2026-10-15 | WRF 线接受配对安排 | 正式 72 h 对 = G72 dt15 vs P72 dt15（1547482 在跑）；G72 dt15 新根 CRC，先过 WRF 线审查 再提交，预计 10-17 晚完成；G72 dt20（1544570）作附列；48 h 对 10-15 晚交 |\n| 2026-10-15 | WRF 线交 G24/P24 正式 v2 表（作业 1548771） | ≥64 km²：首现 观测 03:10Z、G24 04:00Z（+50 min）、P24 00:20Z（−170 min）；06:10Z 质心误差 G24 183.4 / P24 307.9 km；最大 10 m 风 22.2 / 21.5 m/s。≥16 档：P24 左删失（00Z 首帧），选中 32 km² 另一对象，位置 233.1 km。Lead 已核 CSV。判读待三对齐；72 h 对因 P72 CFL 改 dt=15 s，已要求 G72 同 dt 补跑 |\n| 2026-10-15 | WRF 线交 G06/P06 正式 v2 表（作业 1545333） | ≥64 km²：首现 观测 03:10Z、G06 04:40Z（+90 min）、P06 00:50Z（−140 min，起转期内，仅锚点）；06:10Z 质心误差 G06 53.1 / P06 66.6 km；对象面积 观测 1380、G06 928、P06 1055 km²；100 km 内最大 10 m 风 24.8 / 26.7 m/s vs 观测阵风 37.0。G06 闸门按 v2 通过（150 km 内有 ≥64 km² 对象）。≥16 档 P06 选中另一 48 km² 对象。N0Q 交叉检查位置重叠、面积量级不同，只作带局限核查。Lead 收下，口径不改 |\n| 2026-10-15 | WRF 线采纳口径 v2 | 新版脚本（旧版保留）按面积过滤后判 hit50/150 km/闸门；G06 闸门按 ≥64 km² 重核；正式表先出 G06/P06，其余每对报路径，最长组约 10-16 早上完；10-16 16:41 兜底回访仍在 |\n| 2026-10-15 | WRF 线采纳两处口径 | 正式表 3 档面积 × 2 种窗起点；先出 G06/P06，其余 6 积分最长约 10-16 早上完；观测 06:10 的 ≥40 dBZ 对象仅 1 个 2 km 格点，疑三雷达合成有误，正拿 IEM N0Q 对照（若属实，正式口径下观测可能无对象，须照实标出由 Lead 判读） |\n| 2026-10-15 | ideas 生成驱动场 v2.2（CRC 作业 1544281，CO-，0 SU） | 66 文件 SHA 全过（Lead 复核）；只有 Q2 变了，其余逐字节同 v2.1；KAKO 300 km 内新减旧 −0.37～−0.91 g/kg，与 WRF 线报告正好反号，即等于参照算法 |\n| 2026-10-14 | WRF 线 G06/P06 前处理试跑（作业 1542899/1542900） | metgrid 通过（G 32 层 / P 14 层）；海面 SNOW=0、SMOIS=1、SST=TSK 已确认；real.exe 两组在 06-09 12Z 边界区垂直插值出 NaN（WRF 线判为他们管线的问题）；Q2 敏感性：v2.1 偏湿 +0.38～+0.91 g/kg，最大绝对差 1.6～9.3 g/kg，全超 1 g/kg → 改 v2.2 |\n| 2026-10-14 | ideas 生成 8 组驱动场（v2.1，0.25° GFS） | 66 个 WPS 文件 1.6 GB，读回与 SHA 校验通过（Lead 抽验 4 个 OK）；G 31 层/P 13 层，陆面两组逐字节相同；海面土壤和雪用最近格补齐、Pangu 负 q 限幅为 0（均标假设） |\n| 2026-10-14 | ideas 驱动场预检 | 2020 年 GFS 0.5° 多时效预报已无公开存档（NCEI 404，只保留约 2 年；AWS 只保留 30 天）；原生 0.25° 在 NCAR GDEX d084001 可下载；未开 Colab，0 CU |\n| 2026-10-14 | Grok 快查先例 | 无中纬度下击暴流/雷暴大风的 AI 驱动 CPM 先例；Deng 2025 摘要已核：33 层 GFS≈13 层 Pangu，削到 13 层的 GFS 最差；Brewer 2025 摘要已核：GraphCast 驱动 WRF 与 GFS/ECMWF 驱动相当（下坡风） |\n\n## 参数来源表\n| 参数 | 取值 | 来源或\"假设\" | 查过哪些地方 |\n| --- | --- | --- | --- |\n| WRF d01 设置 | 4 km、748×600×80、dt 20 s、cu0、mp8、PBL2/sf2、lw4 | 作者 namelist | WRF Lead 回复 |\n| 机时 | 约 1 SU/模式小时（未基准化） | WRF Lead 按 exp-A 折算 | 待短测 |\n| 投影 | Lambert，38N/100W，truelat 38/38 | WRF 线；作者 wrfinput 元数据 | — |\n| grid_fdda | 0 | 作者 namelist.input 第 113 行 | — |\n| 本试验 GFS 源 | 原生 0.25°，NCAR GDEX d084001 | ideas 预检（README） | NCEI、AWS、d335000 均无 2020 年 0.5° 预报 |\n| RH→q（G 组）、Pangu 负 q 限幅、海面土壤/雪最近格补齐 | 见 | **假设**（实现） | 待 metgrid/real 检验 |\n| 2 m 比湿 | v2.2：取 GHT>SOILHGT 的最低完整气压层的 q（v2.1 的 ln p 插值作废） | **假设**（设计 v2.2；依据 WRF 线 Q2 敏感性，无文献依据） | Brewer 仓库：其 GFS 未给 2 m RH |\n| 作者驱动 | GFS 0.5°，00Z 起报，3 h | WRF 线 | — |\n| 观测对象来源 | NEXRAD Level-II 垂直最大反射率合成 + KAKO METAR/特殊报；阵风以 37.04 m/s 为锚 | WRF 线 10-15（ASOS 1 分钟当日缺档、NCEP 存档当日无 MRMS） | 判据阈值不变 |\n| 实测峰时 | 约 06:10 UTC（KAKO 02:10 EDT） | GZYPXN4S PDF pp.9–13（经 WRF 线 REPORT_FINAL 转引） | 待本节点核 |\n| GFS 标尺层数 | 全层（不削到 13） | Deng 2025 AOSL 10.1016/j.aosl.2025.100589 摘要（OpenAlex 原文摘要已读） | 正文未读（ScienceDirect 403） |\n| Pangu 初值 | 同一时刻 GFS 分析 | Deng 2025 摘要未写；Grok 称其 SI 写明用 GFS 分析——**未核** | 待 ideas 查原文 |\n| 地面/土壤补齐、2 m 湿度、PSFC | 陆面取起报时 GFS f000；2 m 湿度两组同法推导；PSFC 不给 | **假设**加 WRF Lead 意见；Brewer 2025 仓库 rfovell/GraphCast-WRF（Apache-2.0，最近推送 2024-12-19）有补齐做法待核 | 委托 |\n| WRF 版本 | 4.0.3 | WRF Lead （作者结果对版本敏感） | — |\n\n## 未决与下一步\n- ideas 交驱动场 → 核字段清单与对等性 → 正式通知 路径。\n- Grok 快查已回（见试过与结果）。Deep Research 第二步**未做**：30 天额度 30/30 用完；额度恢复或 Liang Hu 加额度后补发。\n- WRF Lead 接受 v2：结论须写明主对比的差别含模型与层数两部分；余力先跑 R24 再 E24；metgrid/real 试跑 G06、P06 各一次。\n- 驱动场 v2.2 已交付（10-15 05:00 --report 上级节点，经根 Lead 转 WRF Lead）。\n- WRF 线 10-15 04:58 复核 v2.2 后开跑：real 的边界 NaN 用 all_ic_times=true 绕开（实测对边界强迫逐位无影响）；先跑 G06/P06（约半天），按第 5 节判 G06 闸门；过闸后 24/48/72 三对 6 个积分并行（最长 78 h 那组约 16–18 h 墙钟，排队另算）。三维场只留 03–09Z，目标 <15 GB。数值表存 并转回本节点；本节点按冻结判据判读，报上级节点。10-16 16:41 兜底回访。\n- 等 ：设计异议、交付位置、排期。\n- WRF 线短测 → 06 对过闸门 → 24/48/72 对 → 对比表 → 结论（给 Liang Hu 前 \n\n## 边界\n- 试验场规矩：Colab 不设单试验上限（母项目 10-14 按 Liang Hu 原话\"现阶段多用 Colab、不限 CU\"更正，原 ≤20 CU 作废），单试验预计 >100 CU 先停下报上级节点 Lead；用完必须 colab stop，不让会话空转，同一轮只派一个执行方；超算单作业 ≤50 SU（CRC 不计 SU），WRF 由 WRF 线 bot 提交，须 ComputeOps 资源申请、 登记、预检与提交分两条命令；其他线数据只读。\n- 存储与计算地点（Liang Hu 10-14 加严）：工作站 不跑计算、不存计算数据，只放脚本、单项 <200 MB 的小结果、图和报告；确需临时放 >1 GB 先报上级节点 Lead。驱动场与 WRF 输出只放 Colab 或集群（现存 CRC）；新的大数据优先 TACC [local path omitted] 或 [local path omitted]（CRC 组空间约 95%），CRC 默认单节点。任务书一律写明在哪算、结果放哪。\n- 层级（根 Lead 10-14 定，5 层上限）：本节点是二级节点，**不再开三级子项目**；需要细分时在本节点内用任务，或报上级节点 Lead（雷暴与对流尺度）开同级二级节点。\n- 往下只剩两跳：本节点 → bot → 工具。任务书里不让工具 bot（gpu-gemini、审稿人、litwiki 等）再委托别人。\n- 的子树列表不按父节点分组，以界面项目树为准。\n\n## 文献依据\n- Akron 机理：卡片 2DPBW6VX PDF pp.6, 9–11；观测：Childs 2021 卡片 GZYPXN4S Table 2，PDF p.16（经 WRF Lead 转引，待本节点核）\n- Xu 2024 ERL 10.1088/1748-9326/ad41f0；Liu 2024 JGR:MLC 10.1029/2024JH000207（未建卡，本地库无）\n- Deng 2025 AOSL 10.1016/j.aosl.2025.100589（摘要已核，未建卡）；Brewer 2025 WAF 10.1175/WAF-D-24-0097.1（摘要已核，未建卡）——这 4 篇已委托 litwiki 建卡核原文（10-14 回报：PDF 未取到，已转 Literature 取全文，取到后建卡）；建卡前不在结论里引用。\n\n## Liang Hu 注\n- 10-14：与台风（B3）尺度本质不同，单列。",
+    "en": "# Thunderstorm: AI Forecast Driving WRF (K)\n\n## Objective\nUsing the exact same convective-permitting WRF setup (4 km single domain, no cumulus parameterization), drive the initial and lateral boundary conditions with Pangu forecasts vs operational GFS forecasts at 24/48/72 h lead times across observed historical thunderstorm events already simulated by the WRF line, comparing storm initiation timing/location, radar reflectivity objects, and station wind gusts to judge whether Pangu-driven WRF is non-inferior to GFS-driven WRF. Serves as the physical downscaling accuracy benchmark for Node L.\n\n## Current Status\n10-17 Shelved: None of the three lead times (24/48/72 h) met \"13-level Pangu driving is non-inferior to full-level GFS driving\" (0/3), and both groups had 24 h position errors >150 km, making \"worth continuing\" unreachable under the frozen rules. Single-event, qualitative; model and vertical level count are not decoupled, so we do not claim \"AI driving is inferior to GFS.\" Restarting requires running R24 (13-level GFS) first. No jobs currently running.\n\n## Decisions Made\n- 2026-10-17 Shelved (\"worth continuing\" not met): 0/3 non-inferior across 24/48/72 h and both 24 h position errors >150 km; do not state \"AI driving is inferior to GFS\" (model and level count are not decoupled, and R24 was not run); see decision for restart conditions →\n- 2026-10-15 Protocol refinement (filling an unstated edge case while keeping criteria unchanged): set the formal minimum area threshold for `≥40 dBZ` radar objects to `≥64 km²` (reporting unthresholded and `≥16 km²` alongside), and shift the onset-time search window start back to `00Z` (while keeping the `03–09Z` spatial evaluation window); refined per review verdict in `v2`: count a vote only when the `≥16 km²` and `≥64 km²` area thresholds agree (counting neither a positive nor a negative vote if they disagree), apply the area threshold uniformly across all object metrics, measure `\"within R km\"` to the nearest object grid cell, and evaluate left-censored onset times (when an object is already present in the `00Z` frame) via interval bounds without awarding a positive vote if ambiguous →\n- 2026-10-14 Design `v2`: switch the GFS baseline to full vertical levels (per Deng 2025 abstract showing that truncating GFS to 13 levels degrades skill most severely), moving 13-level GFS to optional sensitivity run `R24` →\n- 2026-10-14 Experimental design `v1`: initialize primary Pangu runs from GFS analyses (matching the GFS group's initial state) while keeping ERA5-initialized Pangu as optional `E24`; use identical 6 h boundary intervals and land-surface fields, and add the 6 h pair (`G06/P06`) as a pipeline anchor and gate →\n- 2026-10-14 Node established: first case is the Akron `2020-06-09` macroburst (with Wister `2018-08-10` as an optional initiation control), running WRF on CRC (0 SU charged) →\n\n## Attempts and Results\n| Date | What Was Done | One-Line Result |\n| --- | --- | --- |\n| 2026-10-17 | WRF line delivered 72 h pair (formal G72/P72 dt15, CRC 1571882; dt20 auxiliary column 1560832) and completed 150 km existence; Lead tallied votes | All four 72 h criteria agreed: P72 position error 307.7/299.7 km vs G72 104 km, and at ≥64 km² G has an object while P has none → not non-inferior; all three lead times (24/48/72 h) scored \"clearly worse\" (48 h on timing alone); drafted \"Shelved (AI driving inferior to GFS, single-event qualitative)\" per decision rule and sent to 6-reviewer panel before changing status |\n| 2026-10-15 | WRF line delivered formal `v2` table for `G48/P48` (job `1552228`) | At `≥64 km²`: `G48` first appears at `00:30Z` (`−160 min`), `06:10Z` centroid error `316.8 km`, object area `80 km²`, max 10 m wind `17.1 m/s`; `P48` has no onset within 50 km during the window (right-censored), centroid error `273.3 km`, area `287 km²`, max wind `17.0 m/s`; at `≥16 km²`, `G48` is `−140 min / 275.2 km` and `P48` has no onset / `174.7 km`. CSV verified by Lead; requested 150 km existence column across pairs; final interpretation awaits the 72 h pair (~10-18) |\n| 2026-10-15 | WRF line accepted 72 h time-step pairing | Formal 72 h pair = `G72 (dt=15 s)` vs `P72 (dt=15 s)` (job `1547482` running); `G72 (dt=15 s)` staged in a clean CRC directory and submitted after WRF-line review, expected to finish late on 10-17; completed `G72 (dt=20 s)` (`1544570`) retained as auxiliary time-step sensitivity column; 48 h pair delivered on 10-15 evening |\n| 2026-10-15 | WRF line delivered formal `v2` table for `G24/P24` (job `1548771`) | At `≥64 km²`: observed onset `03:10Z`, `G24` `04:00Z` (`+50 min`), `P24` `00:20Z` (`−170 min`); `06:10Z` centroid error `G24` `183.4 km` / `P24` `307.9 km`; max 10 m wind `22.2` / `21.5 m/s`. At `≥16 km²`: `P24` is left-censored (present at `00Z` frame), selecting a separate `32 km²` object at `233.1 km`. CSV verified by Lead; because `P72` hit a CFL blow-up at `dt=20 s` and switched to `dt=15 s`, requested `G72` rerun at `dt=15 s` |\n| 2026-10-15 | WRF line delivered formal `v2` table for `G06/P06` (job `1545333`) | At `≥64 km²`: observed onset `03:10Z`, `G06` `04:40Z` (`+90 min`), `P06` `00:50Z` (`−140 min`, inside spin-up window, anchor only); `06:10Z` centroid error `G06` `53.1 km` / `P06` `66.6 km`; object area observed `1,380`, `G06` `928`, `P06` `1,055 km²`; max 10 m wind within 100 km is `24.8` / `26.7 m/s` vs observed gust `37.0 m/s`. `G06` passed the pipeline gate under `v2` (`≥64 km²` object within 150 km). At `≥16 km²`, `P06` selects another `48 km²` object. IEM `N0Q` cross-check confirmed spatial overlap with different area scaling; accepted by Lead |\n| 2026-10-15 | WRF line adopted Protocol `v2` | Updated evaluation script (preserving `v1` script) to apply area filtering prior to scoring `hit50` / `150 km` / gate; re-verified `G06` gate at `≥64 km²` |\n| 2026-10-15 | WRF line adopted two protocol refinements | Configured formal table across 3 area thresholds × 2 window start times; noted that at `06:10Z` the initial 3-radar composite had only a single 2 km pixel `≥40 dBZ` and cross-checked against IEM `N0Q` |\n| 2026-10-15 | Research assistant generated driving fields `v2.2` (CRC job `1544281`, 0 SU) | All 66 files passed SHA256 verification (spot-checked by Lead); only `Q2` changed while all other fields remain byte-for-byte identical to `v2.1`; within 300 km of `KAKO`, `v2.2 − v2.1` is `−0.37` to `−0.91 g/kg`, matching the exact opposite sign of the moist bias reported by the WRF line |\n| 2026-10-14 | WRF line `G06/P06` preprocessing trial (jobs `1542899/1542900`) | `metgrid` passed (`G` 32 levels / `P` 14 levels); confirmed open-water `SNOW=0`, `SMOIS=1`, `SST=TSK`; `real.exe` produced lateral-boundary vertical interpolation `NaN`s at `06-09 12Z` in both groups (identified by WRF line as an internal configuration issue bypassed via `all_ic_times=true`); `Q2` sensitivity check showed `v2.1` was `+0.38` to `+0.91 g/kg` too moist (max point diff `1.6–9.3 g/kg`, exceeding the `1 g/kg` tolerance) → triggered `v2.2` |\n| 2026-10-14 | Research assistant generated 8 driving-field sets (`v2.1`, `0.25°` GFS) | 66 WPS intermediate files (1.6 GB) passed readback and SHA256 verification (`G` 31 pressure levels / `P` 13 levels, land-surface fields byte-identical between groups; ocean soil/snow nearest-neighbor filled and Pangu negative `q` clipped to `0`, all labeled as assumptions) |\n| 2026-10-14 | Driving-field archive pre-check by research assistant | Historical 2020 GFS `0.5°` multi-lead forecasts are no longer publicly archived (NCEI returns 404 beyond ~2 years; AWS retains only 30 days), whereas native `0.25°` GFS forecasts are downloadable from NCAR GDEX `d084001` (0 CU) |\n| 2026-10-14 | Grok quick search for precedents | Found zero prior studies driving convection-permitting models with AI weather forecasts for mid-latitude downbursts / severe thunderstorm winds; verified Deng 2025 abstract (33-level GFS ≈ 13-level Pangu, whereas 13-level truncated GFS is worst) and Brewer 2025 abstract (GraphCast-WRF comparable to GFS/ECMWF-WRF for downslope windstorms) |\n\n## Parameter Sources\n| Parameter | Value | Source or \"Assumption\" | Places Checked |\n| --- | --- | --- | --- |\n| WRF `d01` configuration | `4 km`, `748×600×80`, `dt = 20 s`, `cu=0`, `mp=8`, `PBL=2/sf=2`, `lw=4` | Original author `namelist` | WRF Lead reply |\n| Compute cost | ~1 SU / model hour (unbenchmarked) | Scaled by WRF Lead from `exp-A` | Pending short test |\n| Map projection | Lambert conformal, `38N/100W`, `truelat = 38/38` | WRF line; original `wrfinput` metadata | — |\n| `grid_fdda` | `0` | Original `namelist.input` line 113 | — |\n| GFS archive for this experiment | Native `0.25°`, NCAR GDEX `d084001` | Pre-check by research assistant (`README`) | NCEI, AWS, and `d335000` lack 2020 `0.5°` forecasts |\n| `RH → q` (Group G), Pangu `q < 0` clipping, ocean soil/snow nearest-neighbor fill | Documented in preprocessing spec | **Assumed** (implementation choices) | Verified via `metgrid`/`real` |\n| 2 m specific humidity (`Q2`) | `v2.2`: take `q` from the lowest complete pressure level with `GHT > SOILHGT` (`v2.1` `ln p` extrapolation voided) | **Assumed** (Design `v2.2` based on WRF-line `Q2` sensitivity check; no literature basis) | Checked Brewer repo (`rfovell/GraphCast-WRF`, which omits 2 m RH) |\n| Original paper's driving data | GFS `0.5°`, `00Z` cycle, 3-hourly | WRF line | — |\n| Observational verification source | NEXRAD Level-II column-maximum reflectivity composite + `KAKO` METAR/SPECI, anchored to `37.04 m/s` peak gust | WRF line on 10-15 (1-minute ASOS missing on that date; NCEP archive lacks MRMS on that date) | Evaluation thresholds unchanged |\n| Observed peak timestamp | ~`06:10 UTC` (`02:10 EDT` at `KAKO`) | Card `GZYPXN4S` PDF pp. 9–13 (cited via WRF-line `REPORT_FINAL`) | Pending direct verification by this node |\n| GFS baseline vertical levels | Full 32 pressure levels (not truncated to 13) | Deng 2025 *AOSL* 10.1016/j.aosl.2025.100589 abstract (verified via OpenAlex) | Full text behind ScienceDirect 403 |\n| Pangu initial condition | Same-cycle GFS `f000` analysis | Unstated in Deng 2025 abstract (Grok claimed SI specifies GFS analysis — **unverified**) | Pending full-text check |\n| Surface/soil fill, 2 m humidity, `PSFC` | Land surface copied from initialization-time GFS `f000`; 2 m humidity derived identically across both groups; `PSFC` omitted | **Assumed** + WRF Lead guidance; cf. Brewer 2025 repo `rfovell/GraphCast-WRF` (Apache-2.0, latest push `2024-12-19`) | Delegated check |\n| WRF version | `4.0.3` | WRF Lead (results are sensitive to WRF version) | — |\n\n## Open Items and Next Steps\n- ideas delivers driving fields → verify field list and parity → formally notify of the delivery location.\n- Grok quick check returned (see Attempts and Results). Deep Research step 2 **not done**: 30-day quota 30/30 exhausted; will issue once quota resets or Liang Hu adds quota.\n- WRF Lead accepted v2: conclusions must explicitly state that the main comparison difference includes both model and vertical level count; if capacity permits, run R24 first and then E24; run one metgrid/real trial each for G06 and P06.\n- Driving fields v2.2 delivered (10-15 05:00 --report to parent node, forwarded via root Lead to WRF Lead).\n- WRF track started runs on 10-15 04:58 after re-verifying v2.2: boundary NaNs in real bypassed using all_ic_times=true (tested to have bitwise zero impact on lateral boundary forcing); running G06/P06 first (~half a day) and evaluating the G06 gate per Section 5; once past the gate, the three 24/48/72 pairs (6 integrations) will run in parallel (the longest 78 h group takes ~16–18 h wall-clock time, excluding queue wait). 3D fields retained only for 03–09Z, targeting <15 GB. Numerical tables saved and returned to this node; this node will interpret results per the frozen criteria and report to the parent node. Fallback follow-up at 10-16 16:41.\n- Waiting on: design objections, delivery location, schedule.\n- WRF track short test → 06 pair passes gate → 24/48/72 pairs → comparison table → conclusion (before presenting to Liang Hu \n\n## Boundaries\n- Testbed rules: no single-experiment limit on Colab (corrected by parent project on 10-14 per Liang Hu's exact words \"use Colab heavily at this stage, unlimited CU\", superseding the previous ≤20 CU cap), but if a single experiment is expected to exceed 100 CU, pause and report to the parent node Lead first; must run colab stop when finished so sessions do not sit idle, and dispatch only one executor per round; supercomputer single job ≤50 SU (CRC does not bill SU), WRF jobs submitted by the WRF track bot, requiring ComputeOps resource request, registration, and separate commands for pre-check and submission; data from other tracks are read-only.\n- Storage and compute locations (tightened by Liang Hu on 10-14): the workstation does not run computations or store compute data, holding only scripts, small results <200 MB per item, figures, and reports; if temporary storage >1 GB is strictly needed, report to the parent node Lead first. Driving fields and WRF outputs are placed only on Colab or clusters (currently on CRC); new large datasets prioritize TACC work or scratch storage (CRC group quota is at ~95%), and CRC defaults to a single node. Every task brief must state where computations run and where results are stored.\n- Hierarchy (set by root Lead on 10-14, 5-level cap): this node is a level-2 node and **will not open level-3 sub-projects**; when subdivision is needed, use tasks within this node or report to the parent node Lead (Thunderstorms and Convective Scale) to open a peer level-2 node.\n- Only two hops remain downward: this node → bot → tool. Do not allow tool bots (gpu-gemini, reviewer, litwiki, etc.) to delegate further in task briefs.\n- The subtree list is not grouped by parent node; the UI project tree is authoritative.\n\n## Literature Basis\n- Akron mechanism: card 2DPBW6VX PDF pp.6, 9–11; observations: Childs 2021 card GZYPXN4S Table 2, PDF p.16 (cited via WRF Lead, pending verification by this node)\n- Xu 2024 ERL 10.1088/1748-9326/ad41f0; Liu 2024 JGR:MLC 10.1029/2024JH000207 (no card created, not in local library)\n- Deng 2025 AOSL 10.1016/j.aosl.2025.100589 (abstract verified, no card created); Brewer 2025 WAF 10.1175/WAF-D-24-0097.1 (abstract verified, no card created) — these 4 papers have been delegated to litwiki to create cards and verify full texts (10-14 report back: PDFs not yet retrieved, forwarded to Literature to fetch full texts and create cards upon retrieval); do not cite in conclusions before cards are created.\n\n## Liang Hu Notes\n- 10-14: Fundamentally different in scale from typhoons (B3); listed separately."
+  },
+  "decisions": [
+    {
+      "id": "dec-0000",
+      "ts": "2026-10-14 14:39",
+      "title": "K「雷暴：AI 预报驱动 WRF」开立（2026-10-14，雷暴与对流尺度节点 Lead）",
+      "label": "决定",
+      "text": "# K「雷暴：AI 预报驱动 WRF」开立（2026-10-14，雷暴与对流尺度节点 Lead）\n\n- 做了什么：WRF Lead 回复不重复、可以投入后， 开 K，首个事件 Akron 2020-06-09（WRF 线 exp-A 已算，作者 d01 4 km 设置可复用），Wister 2018-08-10 只作\"驱动场能否触发\"对照。WRF 由 WRF 线 bot 跑，放 CRC（不计 SU， 第 32 行）或缩域到 72 h ≤25 SU。主指标为风暴位置与时间，最大阵风次要（作者 4 km 回算本身强风偏弱偏位，卡片 2DPBW6VX PDF p.6）。\n- 为什么：K 依赖 WRF 线，对方已答应且最早 10-20 起；先开节点，实验室这边的驱动场准备（Colab ≤20 CU）可以提前做完，不占 WRF 线时间。\n- 错了的代价：若 WRF 线排期再往后推，驱动场文件闲置几天，花费几个 CU。"
+    },
+    {
+      "id": "dec-0001",
+      "ts": "2026-10-15 04:46",
+      "title": "K 实验设计（2026-10-14，K 节点 Lead）",
+      "label": "决定",
+      "text": "# K 实验设计（2026-10-14，K 节点 Lead）\n\n- **做了什么**：定稿 Akron 实验设计并冻结判据。设计要点：\n - Pangu 主试验用与 GFS 组相同的 GFS 0.5° 分析起报；ERA5 起报只作可选 E24。\n - 两组同用 13 个气压层、6 h 间隔，陆面场取同一份 GFS f000。\n - 在 24/48/72 h 之外加 6 h 锚点对（对应作者的起报时刻），G06 不出对象就停。\n - 主指标是 ≥40 dBZ 对象的位置和时间，阵风作次要指标。\n - 驱动场派 ideas 生成，设计发 确认。\n- **为什么**：\n - WRF Lead 要求两组口径对等；同一份初值让差别只来自预报模型，也和 AWS AIWP 的业务做法一致。\n - 作者和 exp-A 在 0–6 h 时强风带就已偏东北 45–80 km（WRF 线 REPORT_FINAL），4 km 单层的阵风必然偏弱，所以位置和时间是更能分辨的指标。依据：卡片 2DPBW6VX PDF p.6；其余基于本线和 WRF 线数据。\n - 锚点对可以先判断管线本身表现不表现得出这个事件，避免白跑长时效。\n- **错了的代价**：\n - 如果评审认为应该用 ERA5 起报的 Pangu（文献常见做法），就补跑 E24 及其他时效，约多 3 个积分。\n - 13 层、6 h 会让两组都比作者设置粗；如果 G06 因此表现不出风暴，闸门会提前止损，只损失 12 模式小时。\n\n## v2 改版（10-14 15:20）\n- **做了什么**：GFS 主组改用 0.5° GFS 全部气压层，削到 13 层的 GFS 降为可选 R24。WRF Lead 的 6 条技术意见全部并入：14 个 metgrid 层、两组同法给 2 m 湿度且都不给 PSFC、WRF 4.0.3、10 分钟输出、时间标注改为 00:10 MDT。撤掉 v1 的，改派。\n- **为什么**：Deng 2025（AOSL，10.1016/j.aosl.2025.100589，摘要，经 OpenAlex 读原文摘要）四组对照显示，削到 13 层的 GFS 最差，33 层 GFS 与 13 层 Pangu 相当。v1 把两组都削到 13 层，会人为压低 GFS 标尺，让\"Pangu 不差于 GFS\"变得太容易成立。\n- **错了的代价**：两组层数不同，差别里混进了层数的影响；可选的 R24 能把这部分单独分出来，多 30 模式小时，在 CRC 上不计 SU。\n- Deep Research 第二步未做：30 天额度已用完（30/30）。\n\n## v2.1 数据源（10-14）\n- **做了什么**：GFS 改用 NCAR GDEX d084001 的原生 0.25° 业务预报；2 m 比湿的推导公式定为假设，两组同式。\n- **为什么**：ideas 预检查明，2020 年的 0.5° 多时效预报已无公开存档。0.25° 是同一业务系统的原生输出，不是降采样冒充，Pangu 也免了插值。\n- **错了的代价**：和作者设置（0.5°、3 h）多一处差别，G06 锚点和作者不完全同源。这一点写进结论的局限；如果闸门判读受影响，再请 WRF 线用他们手上的 0.5° 00Z 分析做对照。\n\n## v2.2（10-15）\n- **做了什么**：2 m 比湿改为取位势高度高于地形的最低完整气压层的比湿；设计第 5 节的观测数据来源改为 NEXRAD Level-II 垂直最大反射率合成，加 KAKO METAR/特殊报，阈值不变。派 ideas 在 CRC 单节点生成 v2.2，放进，不覆盖 v2.1。\n- **为什么**：WRF 线的 Q2 敏感性检查里，8 组的最大绝对差全部超过事先约定的 1 g/kg 阈值（PREP_FAILURE_Q2_REPORT_v1.txt）；观测侧原定的 ASOS 1 分钟数据当日缺档，NCEP 存档当日也没有 MRMS。\n- **错了的代价**：最低层取值会让山区的 2 m 湿度略偏干，两组同式，不影响对比的公平。生成只是小 CPU 活，0 SU。"
+    },
+    {
+      "id": "dec-0002",
+      "ts": "2026-10-15 17:39",
+      "title": "K Akron：进判据的三对、72 h 对的步长统一（10-15）",
+      "label": "决定",
+      "text": "# K Akron：进判据的三对、72 h 对的步长统一（10-15）\n\n- 进判据：24/48/72 h 三对（设计第 5 节结论规则只用这三对）；06 h 对 G06/P06 只作管线闸门与锚点。\n- 72 h 对：P72 在 dt=20 s 时于模式 06-06 21:14 CFL 崩溃，WRF 线已以 dt=15 s 从头重跑。为保持配对只差驱动场，**G72 也以 dt=15 s 重跑，作为正式配对成员**；已跑的 G72（dt=20 s）保留作步长敏感性附列（G72 两个 dt 的差异给出步长对指标的影响量级）。\n- Decision I made：要求 G72 dt=15 s 补跑 — 为什么：配对里一边 20 s、一边 15 s 会把数值设置差异混进 Pangu vs GFS 的比较，单事件、单对本就弱，不能再加混杂项 — 错了的代价：CRC 一个单节点 72 h 积分（CRC 不计 SU）约 16–18 h 墙钟，72 h 对的判读推迟约半天。\n- 依据：无文献依据，基于本线设置（设计 dt=20 s，P72 CFL 崩溃记录见 WRF 线 lab_K_akron 目录）。\n\n## 补充（10-15 晚，应 WRF 线）：步长翻转时的计票\n- 72 h 对按正式配对 G72(dt15) vs P72(dt15) 判；同时用附列 G72(dt20) vs P72(dt15) 按同口径各判一次。两者的\"不差于 / 明显更差\"判定不一致 → 72 h 记\"步长敏感·不判\"，正负票都不计（与面积敏感规则同理）。\n- 与面积规则叠加：72 h 只有在 ≥16、≥64 km² 两档 × 两个 G72 步长四个判定全部一致时才计票。\n- 若因此\"不差于\"与\"明显更差\"都不足 2 票，总结论\"不判（对面积/步长敏感）\"。\n- 附列只作稳健性检查，不能单独产生票；G72 两步长之差只代表 G72 自身对步长的响应，结论中照此写。\n- 汇总注明：24/48 h 为 dt 20 s、72 h 为 dt 15 s；WSPD10MAX 每 10 min 30 vs 40 步、TS 采样 20 vs 15 s。\n- 墙钟更正：dt15 下 78 h 积分约 25–33 h，72 h 对预计 10-17 晚到 10-18。\n- 未另送审：属已审面积敏感规则的同构延伸，WRF 线审查 已提出此要求。"
+    },
+    {
+      "id": "dec-0003",
+      "ts": "2026-10-15 23:26",
+      "title": "K Akron：两处设计空白的口径（最小对象面积、首现时刻左删失）（10-15）",
+      "label": "决定",
+      "text": "# K Akron：两处设计空白的口径（最小对象面积、首现时刻左删失）（10-15）\n\n背景：WRF 线核查时发现设计 第 5 节未写 (a) ≥40 dBZ 对象的最小面积，(b) \"KAKO 50 km 内首次出现 ≥40 dBZ\" 的搜索窗起点；实测场 03Z 首帧已有对象（左删失）。属设计空白补口径，阈值与\"不差于\"判据、结论规则不变。**口径在看 WRF 线暂定数值表之前定。**\n\n## (a) 最小对象面积\n- 正式口径：**≥64 km²**（模式 4 km 网格的 4 格）；观测与模式各在原生网格上按 8 连通识别对象、按实际面积算。\n- 无下限与 ≥16 km² 作敏感性并报。三档对\"不差于/明显更差\"的判定若不一致，该提前量的结论注明\"对对象面积敏感\"，不作为支持\"值得继续\"的一票。\n- 依据：无文献依据，基于本线设置——模式 dx = 4 km（设计第 37 行），16 km² 只是单格，模式不可能分辨单格对象，留着只会让雷达杂波/孤立像元进入\"最近对象\"。\n\n## (b) 时间指标搜索窗\n- 正式口径：搜索窗起点**前移到 00Z**，终点仍 09Z；位置指标的 03–09Z 不变。\n- 若 00Z 首帧（实测或某组模式）在 50 km 内已有 ≥40 dBZ 对象，该组该提前量的时间指标记为\"左删失·不判\"，这一提前量只按位置指标和\"有无对象\"判\"不差于\"，结论里写明。\n- G06/P06 起报即 00Z，前约 3 h 为起转期，其时间指标只作锚点参考，不进入判据（判据本来只用 24/48/72 h）。\n- 依据：无文献依据，基于本线数据（实测 03Z 首帧已有对象）。\n\nDecision I made：按上定口径；WRF 线照样三档、两窗都报，口径错了只需换列重算，代价小。按公共规则（冻结交给别线的协议）送 \n\n## v2（10-15，按审查 裁决修订，取代上面 (a)(b) 中冲突的部分）\n- 措辞：补设计空白，原\"不差于\"的合取判据保持；64 km² 是操作性下限。观测在 2 km 笛卡尔重映射网格上识别（每格 4 km²），模式在 4 km 网格上，均 8 连通、按物理面积。\n- 面积门槛（正式 ≥64 km²）用于所有用到对象的地方：位置、首现时间、150 km 存在性、有无对象、G06 闸门。\"对象在 R km 内\"= 对象最近格点距离 ≤ R；位置误差仍用质心距离。\n- 敏感性：≥16 与 ≥64 km² 两档判定一致才计票；不一致记\"面积敏感·不判\"，正负票都不计；若因此两类都不足 2 票，总结论\"不判（对对象面积敏感）\"。无下限档只作描述。\n- 左删失：首现取区间 t ≤ 00Z 代入 |tP−tobs| ≤ |tG−tobs| + 1 h；所有取值结论一致则照判，否则\"时间不可判\"。时间不可判的提前量不得计\"不差于\"正票；只有位置或有无对象条件已单独不满足时计非\"不差于\"。\n- 实测 03–09Z 无满足门槛的对象 → 该提前量\"不判（实测不可分辨）\"。\n- 已核：按 ≥64 km²，实测 03:00Z 50 km 内无对象（仅 12 km² 的 id=40），首现 03:10Z（id=33，68 km²）；06:10Z 主体对象 id=27 为 1380 km²、最近格 1.4 km。\n\n## v2 补充（10-15 夜，48 h 对出现\"窗内未首现\"）\n- 模式在 00–09Z 窗内 KAKO 50 km 内始终无达标对象（如 P48）＝右删失：首现取区间 t > 09Z，按与左删失相同的区间法代入 |tP−tobs| ≤ |tG−tobs| + 1 h；所有取值结论一致则照判，否则\"时间不可判\"。表中照实留空，不填数值。\n- 150 km 存在性（设计\"不判\"规则与\"GFS 有、Pangu 无\"规则）需逐对显式列出：03–09Z 内每组是否有达标对象最近格点 ≤150 km，及最小最近格点距离与时刻；已请 WRF 线补列。"
+    },
+    {
+      "id": "dec-0004",
+      "ts": "2026-10-17 01:46",
+      "title": "K（AI 预报驱动 WRF，Akron 2020-06-09）搁置：未达\"值得继续\"（10-17）",
+      "label": "决定",
+      "text": "# K（AI 预报驱动 WRF，Akron 2020-06-09）搁置：未达\"值得继续\"（10-17）\n\n- 结论：本个例下，Pangu 13 气压层（metgrid 14 层）驱动 WRF 4 km 的配置，在 24/48/72 h 三个提前量都未达到\"不差于 GFS 0.25° 全层驱动\"（0/3），且两组 24 h 位置误差都 >150 km（G24 183.4、P24 307.9 km），按冻结结论规则\"值得继续\"不可达 → K **搁置**。单事件、定性；预报模型与垂直层数未解耦（R24 未跑）。不得表述为\"AI 驱动不如 GFS\"。\n- \"明显更差\"设计未定义：补集读法 3/3，严格位置读法 1/3（仅 72 h），并列报告、不作结论。\n- 关键限制：48 h P 位置误差反比 G 小；72 h dt15 两组时间都不可判；两组 10 m 风只有观测阵风的 43–60%；与作者设置差别（0.25°/6 h vs 0.5°/3 h、单域不嵌套）与 Q2 假设；24/48 h dt 20 s、72 h dt 15 s。\n- 审查：（5/6 有效，GPT-6 通道失败未补位），裁决；计票表。\n- 重启条件：要回答\"Pangu 模型本身是否不如 GFS\"先跑 R24（13 层 GFS）拆开层数影响；或换 ≥3 个事件做统计比较；或有全层输出的 AI 模型。\n- Decision I made：K 改搁置并采用收窄后的结论措辞 — 为什么：冻结判据下继续不可达，但\"明显更差\"的定义有争议、层数混杂，强结论站不住 — 错了的代价：若 Pangu 实际不差、问题全在 13 层，搁置会推迟这条线；R24 一组积分（CRC 不计 SU）即可重开。\n- 依据：无文献依据，基于本线数据。"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rev-0000",
+      "ts": "2026-10-15 09:33",
+      "title": "裁决：K Akron 两处观测口径（Gemini / GPT-6 / GLM，3/3 有效）",
+      "label": "审查裁决",
+      "text": "# 裁决：K Akron 两处观测口径（Gemini / GPT-6 / GLM，3/3 有效）\n\nLead 亲核：\n- 03:00Z KAKO 50 km 内只有 id=40（3 格 × 4 km² = 12 km²，最近格 21.4 km）；03:10Z 出现 id=33（17 格 = 68 km²，最近格 15.8 km）。→ 按 ≥64 km²，实测 03Z 首帧**不**左删失，首现 03:10Z（Gemini 复算属实）。\n- 06:10Z 无下限时最近质心对象是 id=26（1 格），而主体 id=27 为 345 格 = 1380 km²、最近格 1.4 km。→ WRF 线\"06:10 观测对象只有 1 格\"是无下限取最近质心造成的，不是合成故障的证据。\n- 观测对象识别在 2 km 笛卡尔重映射网格上（每格 4 km²），不是\"原生网格\"。\n\n## 必须改（全部采纳，写进决策 v2）\n1. **面积敏感规则对称化**（三位一致）：只要求 ≥16 与 ≥64 km² 两档一致；不一致的提前量记\"面积敏感·不判\"，**正负票都不计**；若因此\"不差于\"与\"明显更差\"都不足 2 票，总结论记\"不判（对对象面积敏感）\"。无下限档只作描述，不参与一致性（采纳 Gemini 注 1：单格杂波不应有否决权）。\n2. **面积门槛适用于所有用到对象的地方**（Gemini、GLM）：位置、首现时间、150 km 存在性、\"有无对象\"、G06 闸门同档。\"对象在 R km 内\"统一按对象**最近格点距离 ≤ R**；位置误差仍用质心距离（原设计）。\n3. **左删失按配对处理、不放宽合取判据**（Gemini、GPT-6）：左删失时首现时刻取区间 t ≤ 00Z 代入原式 |tP−tobs| ≤ |tG−tobs| + 1 h；对所有可能取值结论一致则照判（如实测删失、两组都在 00Z 后首现，则等价于 tP − tG ≤ 1 h；模式单方 00Z 即有对象则按下界判）；不一致才记\"时间不可判\"。时间不可判的提前量**不能**计\"不差于\"的正票；只有位置或有无对象条件已单独不满足时才计非\"不差于\"。不再说\"只按位置判不差于\"。\n4. 删去\"判据不变\"的说法，改为\"补空白；合取判据保持\"。\n5. 实测在 03–09Z 内没有任何 ≥64 km² 对象满足位置取时规则时，该提前量记\"不判（实测不可分辨）\"（GLM）。\n\n## 仅供参考\n- 64 km² 是操作性下限，不是可分辨性保证（GPT-6）——措辞改为\"操作性下限\"。\n- \"明显更差\"原设计未操作化（GLM）——属原设计缺口，本次不补；判读时逐提前量写明实际生效的判据条件。\n- 实测更早的初生时刻可作描述性锚点（GLM）——不进判据。\n- 时序：口径在 24/48/72 h 任何结果出来前定（这些作业仍在跑）；G06/P06 暂定表已存在但不进判据（GPT-6 证据不足的点，照实记录）。\n\n## 未采纳的异议\n- GLM：同一绝对面积跨 2 km/4 km 网格不等价，须论证等价性。未采纳论证要求：对象按物理面积比较本来就是要的口径，观测网格更细只会让同面积对象更容易成立；实测主体 1380 km² 远超门槛。以第 5 条兜底\"实测不可分辨\"的情形。"
+    },
+    {
+      "id": "rev-0001",
+      "ts": "2026-10-17 01:45",
+      "title": "裁决：K Akron 计票与搁置（10-17 01:4x）",
+      "label": "审查裁决",
+      "text": "# 裁决：K Akron 计票与搁置（10-17 01:4x）\n\n派发：要求 6 份，有效 5 份（E Gemini、D GLM、C DeepSeek、B Kimi 有保留地支持/支持；F Grok 不支持）。A GPT-6 因 Codex 令牌失效失败，候选用完无人补位（已报平台 Lead）。只审一轮，不重派。\n\nLead 亲核：逐格重算 24/48/72 h 位置余量——24 h ≥64 P 超 G+50 74.5 km、≥16 P 低于 G+50 0.345 km（通过）；48 h 两档 P 位置比 G 好 93.5 / 150.5 km；72 h 四判 P 超 G+50 145.7–154.2 km。≥16 档观测首现 02:40，右删失下界应为 >380 min（摘要误写 >350）。10 m 风比：进判据三对 43.1–60.1%，含 06 h 为 43.1–72.0%。\n\n## 核心问题与裁决\n\"明显更差\"在冻结设计里没有定义（C、F 指出；E、D、B 认为补集读法可用但需披露）。F 的严格读法（\"明显更差\"须位置超出 G+50）下：24 h 两档不一致→面积敏感不判，48 h 位置 P 更好→不计负票，只有 72 h 一票。**两种读法下都成立的只有一件事：三个提前量 0/3 \"不差于\"，且\"值得继续\"的附加条件（某组 24 h 位置 ≤150 km）两组都不满足（183.4 / 307.9 km）。**\n→ 裁定：K 记为**\"搁置（未达'值得继续'）\"**，依据是\"值得继续\"在冻结判据下不可达，不依赖\"明显更差\"的定义；**不采用**\"AI 驱动不如 GFS\"这一结论类别。\"明显更差\"按两种读法并列报告（补集读法 3/3，严格位置读法 1/3），不作结论。\n\n## 必须改（全部采纳）\n1. 标签改为\"本个例下，Pangu 13 气压层（metgrid 14 层）驱动 WRF 的配置在 24/48/72 h 都未达到'不差于 GFS 0.25° 全层驱动'，未达继续标准；预报模型与垂直层数未解耦（R24 未跑），单事件定性\"。不写\"AI 驱动不如 GFS\"（E、D、C、F）。\n2. \"明显更差\"的两种读法并列，注明是 10-17 结果齐后的操作化（C、F）。\n3. 摘要 48 h ≥16、72 h dt20 ≥16 的右删失下界改为 >380 min（E、D、C、F；不改判定）。\n4. 10 m 风比改为 43–60%（进判据三对），含 06 h 为 43–72%（E、B、C、F）。\n5. 限制补全（E、C、D）：48 h P 位置误差反比 G 小 93.5 / 150.5 km，负票只来自\"50 km 内窗内未出现\"；72 h dt15 两组时间都不可判，票只来自位置与存在性；与作者设置差别（GFS 0.25°/6 h vs 作者 0.5°/3 h，单域 4 km 不嵌套）、Q2 采用 v2.2 假设；24/48 h dt 20 s、72 h dt 15 s，WSPD10MAX 每 10 min 30 vs 40 步、TS 采样 20 vs 15 s，G72 两步长差只代表 G72 自身响应；右删失区间法是 10-15 晚见到 P48 后补的（D）。\n\n## 仅供参考\n- R24 不是搁置前提（五位一致）；若将来要把结论落到\"Pangu 模型本身\"，必须先跑 R24。\n- 右删失本质是\"00–09Z 窗内 50 km 未检出\"，按 t>09Z 折算（E）。\n- 冻结记录 FROZEN_CRITERIA_v1 的设计 SHA 与现文件不一致，因 v2.1/v2.2 追加、第 5 节未动（C）。\n- 层数：Pangu 13 个气压层，加地面为 metgrid 14 层（F）。\n\n## 未采纳的异议\n- F：\"不能据此搁置\"。部分采纳（不用\"明显更差\"类别、不写 AI 不如 GFS）；不采纳\"不能记搁置\"：0/3 不差于且 24 h 两组位置都 >150 km，冻结规则下继续不可达，\"搁置\"在这里只表示不再按本配置推进，不是对 Pangu 的负面结论。\n- GLM：同面积门槛跨网格不等价（上次审查已裁未采纳），本轮无新证据。\n\n依据：无文献依据，基于本线数据；设计 Deng 2025（设计第 29 行引，摘要级）提示削层可能是劣势来源之一，仅作背景。"
+    },
+    {
+      "id": "rev-0002",
+      "ts": "2026-10-17 01:45",
+      "title": "K Akron（Pangu vs GFS 驱动 WRF 4 km）：按冻结判据计票（10-17）",
+      "label": "审查材料",
+      "text": "# K Akron（Pangu vs GFS 驱动 WRF 4 km）：按冻结判据计票（10-17）\n\n判据：设计 第 5 节；口径 v2 及补充；步长规则。数据全为本线数据（WRF 线交付表，路径见文末），Lead 逐表核过。\n\n\"不差于\"＝同时满足：位置 P ≤ G + 50 km；时间 |tP−tobs| ≤ |tG−tobs| + 60 min（删失按区间代入）；不出现\"G 有 150 km 内对象而 P 无\"。\"明显更差\"按二元判定的补集操作化：某条件在所有可能取值下都不满足（确定失败）。原设计未单独定义\"明显更差\"，这是本次计票的操作性解读，送审时一并审。\n\n| 提前量 | 档 | 位置 P / G+50 (km) | 时间 | 150 km 存在 G/P | 判定 |\n| --- | --- | --- | --- | --- | --- |\n| 24 h（dt20） | ≥64 | 307.9 / 233.4 ✗ | P −170 vs G +50：170 > 110 ✗ | T/T | 非不差于（确定） |\n| 24 h | ≥16 | 233.07 / 233.41 ✓（差 0.3 km） | P 左删失 tP≤00:00，tobs 02:40 → ≥160 > 70+60 ✗ | T/T | 非不差于（确定） |\n| 48 h（dt20） | ≥64 | 273.3 / 366.8 ✓ | P 窗内未首现 → >350 min；G 160+60=220 ✗ | F/F | 非不差于（确定） |\n| 48 h | ≥16 | 174.7 / 325.2 ✓ | P >380 vs G 140+60=200 ✗ | T/T | 非不差于（确定） |\n| 72 h dt15（正式） | ≥64 | 307.7 / 154.1 ✗ | 两组都未首现，不可判 | T/F（G 有 P 无 ✗） | 非不差于（确定） |\n| 72 h dt15 | ≥16 | 299.7 / 154.1 ✗ | 不可判 | T/T | 非不差于（确定） |\n| 72 h dt20 附列 | ≥64 | 307.7 / 153.4 ✗ | G +50；P >350 ✗ | T/F ✗ | 非不差于（确定） |\n| 72 h dt20 附列 | ≥16 | 299.7 / 153.4 ✗ | G +80；P >380 ✗ | T/T | 非不差于（确定） |\n\n- 一致性：24 h 两档一致；48 h 两档一致；72 h 四判一致（G72 首现随步长翻转，但二元判定不翻转，位置单独已确定失败）→ 三个提前量都计\"明显更差\"一票，无\"敏感·不判\"。\n- 结论规则：≥2 个提前量 Pangu 明显更差 → **\"搁置（AI 驱动不如 GFS）\"**；\"值得继续\"另需某组 24 h 位置 ≤150 km，两组都不满足（G24 183.4、P24 307.9）；\"不判（不可分辨）\"不触发（24 h 两组 150 km 内都有对象）。\n- 06 h 锚点：G06 闸门过；G06 53.1 / P06 66.6 km。\n- 限制（必须写进结论）：单事件，只作定性；主对比同时含预报模型与垂直层数（GFS 全层 vs Pangu 14 层），R24 未跑，拆不开；两组 10 m 风为观测阵风 37.04 m/s 的 43–60%（进判据三对；含 06 h 为 43–72%）；48 h 的\"明显更差\"只来自时间条件（P48 在 50 km 内始终没出现，G48 也早了 160 min、偏 317 km，两组都差）；24 h ≥16 档位置差只 0.3 km 就过线。\n\n文件： FORMAL / SENSITIVITY16 / EXIST150 CSV）。\n\n\n**10-17 按审查 裁决修订**：结论改为“搁置（未达值得继续）”，不用“AI 驱动不如 GFS”；“明显更差”两种读法并列（补集 3/3，严格位置 1/3）；右删失 ≥16 档下界改 >380 min；风比改 43–60%。"
+    }
+  ],
+  "results": [
+    {
+      "id": "res-0000",
+      "ts": "2026-10-15 04:57",
+      "title": "Akron v2.2 完成后核验",
+      "label": "结果",
+      "text": "# Akron v2.2 完成后核验\n\nCRC 作业 1544281 正常结束，退出码 0；资源申请 CO-；输出。源 只读。远端 第 118–129 行。\n\n 含各组首末文件每字段的层位、单位、极值，以及每时次 KAKO（40.17563N, 103.22203W）300 km 范围新旧 Q2 统计。首末读回字段相同，完整气压层 G=31、P=13；土壤四层温湿、SKINTEMP、LANDSEA、SOILHGT、SNOW 与 v2.1 相同。每时次圈内 480 格点；按组逐时次均值再平均，Q2 新减旧（g/kg）及组内最大绝对格点差如下：\n\n| 组 | 文件数 | 平均差 g/kg | 最大绝对差 g/kg |\n| --- | ---: | ---: | ---: |\n| G06 | 3 | -0.3790 | 1.5859 |\n| P06 | 3 | -0.5729 | 3.9744 |\n| G24 | 6 | -0.3731 | 4.6672 |\n| P24 | 6 | -0.7675 | 8.0354 |\n| G48 | 10 | -0.4301 | 6.8972 |\n| P48 | 10 | -0.7764 | 8.9881 |\n| G72 | 14 | -0.5089 | 6.0660 |\n| P72 | 14 | -0.9126 | 9.2849 |\n\n说明：最大全域格点差不是组平均；个别格点仍有大幅变化，不能以平均差判定 WRF 敏感性阈值已通过。v2.2 Q2 仍为设计假设，尚未运行 metgrid/real.exe 或 WRF 敏感性检查。"
+    }
+  ],
+  "figures": [],
+  "code": [
+    {
+      "name": "rewrite_q2.py",
+      "group": "v22",
+      "url": "../../code/v22/rewrite_q2.py"
+    }
+  ],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 开子项目",
+      "ts": "2026-10-14 14:38",
+      "text": "【Liang Hu 让 雷暴与对流尺度 分出的子对话】【任务书原文（Liang Hu 10-14）】目标：用 AI 大尺度预报（Pangu 等）驱动 WRF，由 WRF 算出雷暴和阵风。Liang Hu 10-14：与台风（B3）尺度本质不同，单列。\n条件：WRF 线现成流程（需 WRF 线投入，走 协调）；Xu 2024 ERL、Liu 2024 JGR:MLC；AWS AIWP 回算；与\"对流尺度AI与雷暴短临\"节点（L）共用事件清单，并作为它的精度标尺。\n第一步：与 WRF 线协调选 1–2 个已算过、有观测的雷暴事件，Pangu 驱动 vs GFS 驱动同一套 WRF，提前 1–3 天起报，比风暴位置时间、最大阵风、站点误差。\n\n【WRF Lead 10-14 回复要点】不重复，可以投入，最早约 10-20 起（排在 Wister 首对之后）。\n- 事件 1：Akron CO 2020-06-09。只用作者 namelist 的 d01（4 km、748×600×80、dt 20 s、cu_physics=0、Thompson mp8、MYJ PBL2/sf2、RRTMG lw4），不嵌套。namelist：（只读）。观测：KAKO ASOS 阵风 37.04 m/s；USDA 塔 50.45 m/s（Childs 2021 卡片 GZYPXN4S Table 2，PDF p.16）。机理为高架对流+重力波破碎（卡片 2DPBW6VX PDF pp.9–11），作者 4 km/HRRR 回算强风也偏弱偏位（PDF p.6）→ 以风暴位置与时间为主指标，最大阵风为次要。\n- 事件 2（可选）：Wister OK 2018-08-10，局地新生、寿命约 30 min，WRF 线 HRRR 驱动单成员未在 WIST 附近触发→ 只作\"驱动场能否触发\"对照，不比阵风大小。\n- 分工：实验室交 Pangu 与 GFS 驱动场的 WPS 中间格式文件；WRF bot 跑 WPS/real/WRF 并读出站点与雷达对象，按绝对 UTC、不放大口径。开跑前先做 1–2 h 模式时长短测校准机时。\n- 注意：Pangu 只有 13 层气压面、无土壤与地表场 → 土壤/地表用 GFS（或 ERA5）补齐，两组试验同一处理；Pangu 起报场用什么初值（ERA5 或 GFS 分析）要写明，两组口径对等。\n- 机时：原尺寸 d01 约 1 SU/模式小时（未基准化），72 h 约 70–100 SU → 放 CRC（不计 SU，依据 第 32 行），或缩域到约 400×400×60（72 h 约 15–25 SU）。\n\n【第一步交付】(1) 实验设计表：事件、起报时刻（提前 24/48/72 h）、Pangu 初值来源、地表补齐方式、域、判据（事先写定：风暴位置/起始时间偏差、雷达对象、站点阵风，Pangu 组与 GFS 组谁更好算\"好\"）；(2) 在 Colab 生成 Akron 的 Pangu 与 GFS 驱动场中间格式文件（复用），本地只留小文件，大文件按 WRF 线指定位置交；(3) 把驱动场路径、起报时刻、单作业 SU 上限发给 （走对方 Lead，不直接派 WRF bot）；(4) 结果回来后的对比表与一句结论：Pangu 驱动是否不差于 GFS 驱动，值得继续/搁置。\n\n【边界（从严）】试验场：尽快判断值不值得继续。单试验 Colab ≤20 CU，用完必须 colab stop，同一轮只派一个执行方；超算单作业 ≤50 SU（CRC 不计 SU），WRF 由 WRF 线 bot 提交，须有 ComputeOps 资源申请与 登记、预检与提交分两条命令；文献先 Grok 再，结论；批量杂活走 （单批 ≤100 题，审查在跑时不开，不用 --force）；其他线数据只读。事件清单与 L 共用，见上级页 的\"共用事件清单\"，每个事件标明对 L/K 是否在训练期外。项目页：（parent 写），已由上级建好，你维护。有结论"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 14:38",
+      "text": "驱动场的生成任务已经派给 ideas，在排队。接下来把设计发给 WRF Lead 确认，然后更新项目页。K 节点（AI 预报驱动 WRF）已开工：实验设计定稿，判据在开跑前冻结；驱动场的生成已派出，设计也发给了 WRF Lead 确认。现在还没有结果，派出的三件事都在排队或在跑。\n\n**实验设计**\n- **事件**：Akron 2020-06-09 下击暴流。2020 年在 Pangu 训练期外，可以当检验事件。\n- **跑法**：同一套 WRF，用作者设置的 4 km 单层，不嵌套。GFS 驱动和 Pangu 驱动各从提前 6、24、48、72 小时起报，共 8 个积分、348 模式小时，放 CRC，不计 SU。\n- **两组对等**：\n - 用同一份 GFS 分析作初值，差别只来自预报模型，这也是 AWS AIWP 的业务做法。ERA5 起报的 Pangu 只作可选对照。\n - 两组都只用 Pangu 的 13 个气压层、6 小时间隔，陆面和土壤场取同一份。\n- **主指标**：雷达 ≥40 dBZ 对流对象的位置，以及在 Akron 50 km 内首次出现的时间。最大阵风只作次要指标。原因是作者和 WRF 线 exp-A 在提前 0–6 小时时，强风带就已经偏东北 45–80 km，4 km 网格下阵风必然偏弱。\n- **\"Pangu 不差于 GFS\"的定义**：同一提前量下，位置误差不超过 GFS 组 + 50 km，时间误差不超过 GFS 组 + 1 小时。\n- **怎么下结论**：\n - **值得继续**：24/48/72 小时三个提前量里至少 2 个做到\"不差于\"。\n - **搁置**：至少 2 个提前量上 Pangu 明显更差。\n - **不判**：两组都表现不出这个风暴，就不硬下结论。\n - 只有一个事件，结论只是定性的。\n- **闸门**：先跑提前 6 小时那一对。如果 GFS 组在 Akron 150 km 内连对流对象都没有，说明 4 km 单层表现不出这个事件，其余几对不跑，及早止损。\n\n**已派出的三件事**\n- **ideas（排队中）**：在 Colab 生成两组驱动场的 WPS 中间格式文件，花费不超过 10 计算单元，预计约 1–1.5 GB。放 工作站 时超过 2 GB 先停下报我。它还要查 Xu 2024、Liu 2024 原文里怎么补地面和土壤场，现在这几项先标为\"假设\"。\n- **WRF Lead（排队中）**：请他确认设计有没有异议，特别是 13 层、6 小时间隔对 WRF 前处理的要求；再请他指定交付位置，确认 10-20 起跑的排期不变。\n- **Grok 快查**：找\"AI 全球模型驱动区域对流模式\"的先例和做法。结果回来后再决定要不要跑 Deep Research。\n\nDecision I made：Pangu 主试验用和 GFS 组同一份的 GFS 分析起报，不用 ERA5。为什么：WRF Lead 要求两组口径对等，同一份初值才能把差别归到模型本身。错了的代价：如果审查认为应该用文献里常见的 ERA5 起报，就补几个积分，驱动场在 Colab 上补做只要几个计算单元。\n\n项目页、上级节点页、线况总表都已更新，决策记录写在。\n\n## 结论\nK 节点已开工：实验设计定稿，判据在开跑前冻结，驱动场生成已派 ideas，设计已发 WRF Lead 确认。WRF 线最早 10-20 起跑。驱动场交给 WRF 线、短测通过后，再给出\"Pangu 驱动是否不差于 GFS\"的结论。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 14:47",
+      "text": "【深度调研】「AI 全球模型驱动 WRF 做对流/雷暴：先例与做法」（Grok 快速调研）完成，用时约 3 分钟，报告约 15474 字。\n- 报告：\n- 引文核对： DOI 5/10 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.1088/1748-9326/ad41f0.**、10.1088/1748-9326/ad6fbb/pdf、10.1029/2024jh000207.**、10.1016/j.aosl.2025.100589).**、10.1175/waf-d-24-0097.1.**。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 14:47",
+      "text": "设计已改成 v2，WRF Lead 的 6 条技术意见也并进去了。现在把改版后的任务书重新派给 ideas，并通知 WRF Lead 改了哪里。Grok 快查回来后，我据此改了 K 节点的实验设计，WRF Lead 也已确认，驱动场一到位当天就开跑，不用等 10-20。Deep Research 第二步没跑起来：近 30 天的额度已经用满（30/30）。\n\n**Grok 报告里核过、采用的两条**（读的是 OpenAlex 上的原文摘要；本地文献库没有这几篇）\n- **Deng 2025（AOSL，10.1016/j.aosl.2025.100589）**：这是对流尺度上最接近我们设计的先例。用 33 层 GFS 作边界，和用 13 层 Pangu 效果相当；同样的 GFS 削到 13 层后，四组里最差。\n- **Brewer 2025（WAF，10.1175/WAF-D-24-0097.1）**：用 GraphCast 驱动 WRF 模拟下坡大风，效果和用 GFS、ECMWF 驱动的相当。它的配套开源代码 rfovell/GraphCast-WRF（Apache-2.0）里有补齐缺失地面场的做法，已经交给 ideas 参考。\n- **先例空白**：没找到用 AI 全球模型驱动区域模式模拟中纬度下击暴流或雷暴大风的研究，K 正好填这个空。\n- 报告里标\"查不到\"的 5 个 DOI，都只是格式问题（DOI 后面粘了标点），去掉标点后都能查到。Grok 说的另几件事，比如 Deng 的 Pangu 用 GFS 分析起报，我没核到原文，不采用，交给 ideas 查原文。\n\n**设计改成 v2**\n- **GFS 组用全部层**：原设计把两组都削到 13 层，按 Deng 2025 的结果，这会人为压低 GFS 这把标尺，让\"Pangu 不差于 GFS\"太容易成立。现在 GFS 组用业务上真实可得的全层数据，削到 13 层的 GFS 降为可选对照，只用来单独看层数的影响。\n- **WRF Lead 的 6 条技术意见全部并入**：\n - 两组都用同一公式推导 2 m 湿度，地面气压都不给\n - 用作者那个版本的 WRF 4.0.3\n - 每 10 分钟输出一次阵风等二维场\n - 实测风峰的时间标注改正为 06-09 00:10 MDT（06:10 UTC）。\n- 判据、闸门、\"不差于\"的定义都没变。\n\n**派活**\n- v1 的驱动场委托还没开始，我撤掉了，按 v2 重派给 ideas（在排队）。花费不超过 10 计算单元，生成的文件放 工作站 上，超过 3 GB 先停下报我。\n- WRF 线会从那里只读拷到 CRC 跑，CRC 不计 SU，不缩域。改动已通知 WRF Lead。\n\nDecision I made：GFS 组用全部层，不削到 13 层。为什么：要比的是 Pangu 和业务上真实可用的 GFS，削层会压低标尺，有文献为证。错了的代价：两组的差别里会混进层数的影响，用可选的 13 层对照就能分开，多跑 30 模式小时，不花 SU。\n\n**要你知道的一件事**：近 30 天的 Deep Research 额度已经用满，这次第二步没跑。K 的设计不靠它，可以照常推进。等额度恢复我会补跑；你要是想加额度，跟平台说一声就行。\n\n## 结论\n设计 v2 已冻结。GFS 组改用全部层，依据是 Deng 2025 的摘要：GFS 削到 13 层后最差。WRF Lead 已确认，驱动场到位当天就开跑。驱动场由 ideas 生成（在排队）。Deep Research 额度用满，这次没跑。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 14:50",
+      "text": "【委托 · 来自 实验室 Lead】层级规矩：二级节点下不再开三级\n告知（根 Lead 10-14 定，5 层上限，无需回复）：(1) 你这个二级节点不再开三级子项目；需要细分时在本节点内用任务，或报我开同级二级节点。(2) 往下只剩两跳：你 → bot → 工具；写任务书时不要让工具 bot（gpu-gemini、审稿人、litwiki 等）再委托别人。(3) 子树列表不按父节点分组，以界面项目树为准。请把这两条写进你的项目页\"边界\"。\n（原因：迁移后 5 层上限）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 14:50",
+      "text": "收到。层级规矩已经写进 K 节点项目页，新加了一节\"边界\"，原有的试验场边界也一并写在这一节里。\n\nK 节点眼下的安排本来就合规，不用改：\n- **没开三级子项目**。\n- **派活只到两跳**：ideas 生成驱动场，任务书没让它再委托工具 bot；WRF 线的工作通过 WRF Lead 安排，不由我直接派他们的 bot。\n\n## 结论\n已照办。K 节点项目页新加了\"边界\"一节，写明三条：二级节点不再开三级，需要细分时用任务对话或报根 Lead 开同级节点；往下只剩\"本节点 → bot → 工具\"两跳，任务书不让工具 bot 再委托别人；子树以界面项目树为准。现有安排都合规，不用调整。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 14:51",
+      "text": "【委托结果 · WRF Lead】K：Akron Pangu/GFS 驱动 WRF 的实验设计，请确认并指定交付位置\n1. **设计无原则异议，补 6 条技术意见：**\n - **(a) 层数：** num_metgrid_levels = 14（13 个气压层加地面层），num_metgrid_soil_levels = 4。作者设的模式顶 p_top_requested = 5000 Pa，正好是 Pangu 最高的 50 hPa 层，不用改，但驱动场里必须有完整的 50 hPa 层。\n - **(b) 地面湿度和地面气压：** Akron 地面约 850 hPa，1000/925 hPa 两层在地下，近地面层主要靠地面场。建议两组都提供 2 m 湿度（RH 或比湿），用同一公式从各自的 T2、MSL、近地层 q 推导。地面气压（PSFC）可以不给，由 real.exe 用海平面气压和地形推算，但两组必须同样处理。不要只给 MSL 而不给 2 m 湿度。\n - **(c) METGRID.TBL：** 按 GFS 常规变量名（GHT/TT/UU/VV/SPECHUMD/PMSL/SKINTEMP/土壤 4 层）预计不用改。这一点以 WRF bot 拿 G06 驱动做的 metgrid/real 试跑为准：先检查在地下的气压层怎么外推、有没有缺字段告警，结果报回给你们，开跑前冻结。\n - **(d) WRF 版本：** 用 CRC 上 Wister 在用的 WRF 4.0.3。我们确认过作者结果对 WRF 版本敏感，版本对上作者以后，区域统计基本复现了作者。\n - **(e) 输出精简（本线教训）：**\n - 每 10 分钟输出二维场：柱最大反射率、U10/V10、WSPD10MAX、T2、PSFC。\n - 三维场每小时一次。\n - KAKO 点加逐步时间序列。\n - WSPD10MAX 是“两次历史输出之间”的最大值，所以输出间隔要固定在 10 分钟，否则阵风口径会变。\n - **(f) 时间标注：** 第 2 节写“KAKO 02:10 EDT”，Akron 在山地时区，06:10 UTC 是 06-09 00:10 MDT。全程按绝对 UTC 计算，不影响实验，只建议改正这一处标注。\n - 闸门、判据和“不差于”的定义都照第 5 节执行，开跑前冻结，我们不改。\n\n2. **交付位置：** 同意放在 工作站 的 （1–1.5 GB，低于 5 GB 门槛），请附 SHA256 和字段清单。WRF bot 只读拷到 CRC 新运行根 下，并逐个核对 SHA256。CRC 不计 SU，不缩域。\n\n3. **排期提前：** 不再等 10-20。你们正式通知驱动场到位后，我当天派 WRF bot：\n - 先做 metgrid/real 试跑和 1–2 h 短测，校准机时\n - 再按 06 → 24 → 48 → 72 的顺序正式积分，G06 闸门照设计执行\n - 每一对的对比表数值都回到这个。\n - 提交照常：先向 ComputeOps 申请资源， 登记，预检和提交分成两条命令。\n - 前提是 CRC 组可用存储 ≥450 GB（现在约 510 GB）。观测侧的 NEXRAD/MRMS 对象和 KAKO 时序也由 WRF bot 同时准备。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 14:51",
+      "text": "这是 WRF Lead 对设计 v1 的正式回复。内容我上一轮已经提前查到，6 条意见都已并进设计 v2；刚才又核了一遍设计文件，改动都在。这一步不用你做什么。\n\n- **交付和排期**：驱动场放 工作站 的，WRF 线只读拷到 CRC 的，逐个核对校验码。驱动场到位当天就开跑，不再等 10-20。\n- **和 v2 的一处差别**：WRF Lead 建议 14 个前处理层，这是按 v1\"两组都削到 13 层\"算的。v2 里 GFS 组改用全部层，所以只有 Pangu 组是 14 层，GFS 组按实际层数设置。这一点已经通知对方，并请他们的前处理试跑两种层数各试一次。\n- **下一步**：等 ideas 交驱动场（在排队）。我核过字段和两组是否对等，就正式通知 WRF Lead 开跑。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 14:51",
+      "text": "【委托 · 来自 实验室 Lead】更正一处：开同级节点报本节点 Lead\n告知，无需回复：边界里\"报根 Lead 开同级节点\"请改为\"报上级节点 Lead（雷暴与对流尺度）开同级二级节点\"——你的上级是我，不是根 Lead。\n（原因：路由更正）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 14:51",
+      "text": "已改正。K 节点项目页\"边界\"一节第 51 行，现在写的是：需要细分时，报上级节点 Lead（雷暴与对流尺度）开同级二级节点，不再写\"报根 Lead\"。\n\n## 结论\n已更正。K 节点项目页的\"边界\"一节第 51 行改为：需要细分时，在本节点内用任务，或报上级节点 Lead（雷暴与对流尺度）开同级二级节点。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 14:52",
+      "text": "【委托结果 · WRF Lead】K 设计 v2：GFS 组改全层，你的 6 条意见已并入\n1. **接受 v2，无异议。** 主对比改为 GFS 全层对 Pangu 14 层，代表各自原样用的实际效果。结论里请写明：两组差别同时含预报模型和垂直层数两部分。可选的削层 R24 能把这两部分拆开，建议在 8 个必做积分之后、有余力时先跑 R24，再跑 E24。\n2. **执行安排：**\n - metgrid/real 试跑做两次：G06 用 GFS 实际层数加地面层，P06 用 14 层。两次各报一次外推和缺字段的检查结果。\n - 作者设定的模式顶是 50 hPa，GFS 全层一直到 1 hPa，不用改。\n - 其余照 v2 和上次的约定执行。\n3. **文献：** Deng 2025（AOSL, 10.1016/j.aosl.2025.100589）本线没有建卡，我们也只看到摘要。在结论里引用前，请先让 litwiki 建卡、核对原文。\n4. **开工：** 等你们正式通知驱动场到位（请附 SHA256 和字段清单），我当天派 WRF bot。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 14:52",
+      "text": "WRF Lead 接受了设计 v2，没有异议。他提的三点我都照办了：\n\n- **结论要写明差别的来源**：主对比是 GFS 全层对 Pangu 14 层，两组的差别同时含预报模型和垂直层数两部分。这句已写进设计的判据一节。有余力时先跑削到 13 层的 GFS（R24），把这两部分拆开，再跑 ERA5 起报的 Pangu（E24）。\n- **前处理试跑**：G06 和 P06 各试一次，各自报一次地下气压层怎么外推、有没有缺字段告警。\n- **文献建卡**：已委托 litwiki 给 4 篇读原文建卡：Deng 2025、Brewer 2025、Xu 2024、Liu 2024，每张卡要写明试验设置和缺失场怎么补，并注明页码。卡建好之前，结论里不引用这几篇。\n\n下一步还是等 ideas 交驱动场。我核过两组的字段和对等性，附上校验码和字段清单，正式通知 WRF Lead，他当天就派 bot 开跑。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 15:14",
+      "text": "【委托结果 · 实验室助手】Akron 的 Pangu 与 GFS 驱动场（WPS 中间格式，设计 v2）\n当前不能向 WRF 线交付或开跑；缺口是四个循环的原生 GFS 0.5° 分析及预报，不是 Pangu 算力。\n\n（附件：README.md）\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 15:14",
+      "text": "驱动场还没生成，原因是数据源：2020 年 0.5° 分辨率的 GFS 多时效预报，已经没有公开在线存档。我已决定改用原生 0.25° 的 GFS，并让 ideas 续做。\n\n**ideas 预检查到的情况**（它没有开 Colab，花费为 0）\n- **NCEI**：0.5° 预报目录返回 404，只保留约最近两年的数据。\n- **AWS**：只滚动保留 30 天。\n- **NCAR GDEX d084001**：有 2020 年原生 0.25° 的 GFS 业务预报，ideas 实测能下载，例如 06-06 06Z 起报的第 78 小时那一份。\n- ideas 处理得对：它没有擅自换源，也没有把 0.25° 降采样后冒充 0.5°，停下来报给了我。\n\n**改成设计 v2.1**\n- GFS 组、两组共用的初值和陆面场，全部改用 NCAR 的原生 0.25° GFS，文件里写明是 0.25°。这是同一个业务预报系统的原生输出，Pangu 本身就是 0.25°，直接用它起报，连插值都省了。\n- 2 m 湿度的推导公式定了下来，标为\"假设\"，两组用同一公式：\n 1. 先用海平面气压、地形高度和 2 m 气温，按标准递减率估出地面气压\n 2. 再把各气压层的比湿插值到这个地面气压上。\n- 陆面场取起报时刻 GFS 的同一份，这一做法也标为本设计的假设。ideas 查到 Brewer 2025 的开源代码用的是 GFS 预报的地面场，这一点写进说明作对照。\n\nDecision I made：改用原生 0.25° GFS。为什么：0.5° 的已经拿不到，0.25° 是同一业务系统的真实输出。错了的代价：和作者的设置（0.5°、3 小时间隔）多了一处差别，提前 6 小时那组锚点和作者不完全同源。这一点会写进结论的局限；如果影响闸门判读，再请 WRF 线用他们手上的 0.5° 分析做对照。\n\nideas 已按 v2.1 续做，花费不超过 10 计算单元。驱动场到位、我核过之后，正式通知 WRF Lead 开跑，数据源的变化到时一并告诉他。设计文件、项目页和决策记录都已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 15:57",
+      "text": "【委托结果 · 文献 Wiki 智能体】建卡：AI 全球模型驱动区域模式的 4 篇\n四张卡尚未交付；当前缺少可逐页核读的四篇 PDF。已尝试本地 Zotero DOI 检索及出版社下载，其中部分下载受到站点拦截。Literature 的全文获取委托已排队，结果返回后再完成建卡。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 15:57",
+      "text": "四篇文献的卡片还没建好：litwiki 没拿到可以逐页核对的 PDF，部分出版社下载被拦截。它已经把取全文的活交给 Literature，在排队，全文到了再建卡。\n\n这不卡 K 节点的进度：这几张卡只在写结论时要用，卡建好之前我不引用这几篇。实验那边还是在等 ideas 按 v2.1 生成驱动场，到位后就通知 WRF 线开跑。项目页已记下这个状态。\n\n如果到驱动场跑完时卡还没建好，我会让 ideas 直接下载开放获取的原文核对页码，再交给 litwiki 建卡。Xu 2024、Deng 2025、Liu 2024 都是开放获取的。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 16:38",
+      "text": "【委托结果 · 实验室助手】驱动场续做：改用原生 0.25° GFS（设计 v2.1）\n八组必做驱动场已交付并通过文件级校验，可以交给 WRF 线做 metgrid/real.exe 短测；在该短测通过前，不应视为可正式积分的输入。\n\n（附件：README.md）\n\n（附件：READBACK_complete.json）\n\n（附件：SHA256SUMS_complete）\n\n正文中提到的文件：\n- \n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 16:38",
+      "text": "Akron 的 8 组驱动场都生成好了，我核过以后已在 16:45 正式交给 WRF Lead。下一步由 WRF 线做前处理试跑，确认 WRF 读得进去以后才正式积分，所以现在还没有实验结果。\n\n**交付了什么**\n- 共 66 个驱动文件，约 1.6 GB，放在，分 G06、P06、G24、P24、G48、P48、G72、P72 八组。\n- 我抽了 4 个文件核对校验码，都对得上。\n- 文件数和设计一致：4 个起报时刻、每 6 小时一份，两组各 33 份。\n- GFS 组用 31 层，Pangu 组用 13 层。两组的土壤、地表温度、海陆分布、地形和积雪逐字节相同。\n- Colab 上这个任务没有留下在跑的会话。\n\n**请 WRF 线试跑时专门检查的四处**（ideas 的处理都标成了\"假设\"）\n- **海面的土壤和雪**：海上原本没有这两项数据，用最近的有效格点补齐，其中有 27 个海面格点带上了积雪。要确认 WRF 的海陆分布能让这些格点不参与海洋计算。\n- **海温**：海温取起报时刻的地表温度，全程不更新；有一项土壤湿度最大值略超过 1（1.0004），看会不会告警。\n- **2 m 湿度**：在山区，推导时可能用到地形以下外推出来的气压层。如果 WRF 线认为不妥，两组按同样办法改。\n- **GFS 层数**：只纳入五个变量都齐全的 31 层，请对方确认这样可以。\n\n另外，交付目录的上一层还有一份未修正的暂存，我已经告诉 WRF 线不要用它。\n\n**接下来**：WRF 线做前处理试跑和 1–2 小时短测，先跑提前 6 小时那一对；只有它过了闸门，才跑 24、48、72 小时。每一对的对比数值都会回到这里。两组的可选对照（13 层 GFS、ERA5 起报的 Pangu）等 8 个必做积分跑完再看。\n\n项目页、上级节点页和线况总表都已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 16:41",
+      "text": "【委托结果 · WRF Lead】K：Akron 驱动场已到位（8 组，66 文件），请开 metgrid/real 试跑\n1. **已派 WRF bot（排队中，轮到后自动开始）：**\n - **拷贝与核对：** 只用 这一个目录，拷到 CRC，逐个核对 SHA256。\n - **试跑与短测：** G06 和 P06 两种层数各做一次 metgrid/real 试跑，然后用 G06 做 1–2 h 短测，校准机时和存储。\n - **正式积分：** 按 06 → 24 → 48 → 72 的顺序跑，G06 闸门、第 5 节判据照原设计不改。\n - **提交规矩：** 照常执行，先向 ComputeOps 申请资源、提交后 登记，预检和提交分成两条命令。\n - **读出：** 观测侧的 NEXRAD/MRMS 对象和 KAKO 时序同时准备；每一对的数值表都回到这个。\n2. **你们 4 个问题，我的预判（以试跑实测为准，开跑前冻结）：**\n - **(1) 海面格补的土壤和雪：** real.exe 应按 WRF 自己的陆海掩膜处理，海面格不进陆面物理。bot 会核对 wrfinput 里海面格的 SNOW、土壤湿度、土壤温度实际值。\n - **(2) SST：** 没有 SST 时，海面温度预计取 SKINTEMP，不报缺失。SM100200 = 1.0004 是否告警或被截断，由 bot 报告。\n - **(3) 2 m 比湿：** 暂时保持 v2.1。bot 会在 KAKO 300 km 范围内，量化 v2.1 算法和“取地表以上最低完整层的 q”这两种算法的差。差超过 1 g/kg 才建议两组同改，到时我们会给出具体改法。\n - **(4) G 组 31 层口径：** 认可，只要求 metgrid 和 real 运行时都没有告警。\n3. **时间：** 试跑和短测预计 1–2 天内回报，正式积分全放 CRC，不计 SU。每一对跑完就把数值表回给你们；“Pangu 不差于 GFS”的结论由你们按第 5 节出，我们只交数值。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 16:41",
+      "text": "WRF Lead 已经派 bot 开工（在排队），预计 1–2 天内回报前处理试跑和短测的结果。\n\n- **他们要做的**：\n 1. 把驱动场拷到 CRC，逐个核对校验码\n 2. G06、P06 两种层数各做一次前处理试跑，再用 G06 跑 1–2 小时短测，校准机时\n 3. 之后按 06 → 24 → 48 → 72 的顺序正式积分，闸门和判据都照原设计。\n- **我提的四个问题，对方的初步判断**：\n - 海面补齐的土壤和雪，预计 WRF 会按自己的海陆掩膜处理，不进陆面计算\n - 海温会取冻结的地表温度，不会报缺失\n - 31 层的口径认可，前提是试跑时没有告警\n - 2 m 湿度先保持现在的算法，bot 会在 Akron 周围 300 km 内量化它和另一种算法差多少，差超过 1 g/kg 才建议两组一起改。\n- **分工**：他们只交每一对的数值表，\"Pangu 驱动是否不差于 GFS\"的结论由我按设计第 5 节来下。\n\n我约了 10-16 16:41 回访兜底。到时如果还没回报，就去 CRC 查试跑产物、问 WRF Lead 进度；如果已经回报，就逐项核对这四处检查。项目页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 04:43",
+      "text": "【委托 · 来自 实验室 Lead】Colab 口径更正：不设单试验上限，>100 CU 先报\n口径更正（母项目 10-14 按 Liang Hu 原话\"现阶段多用 Colab、不限 CU\"对齐；不用回复）：原\"单试验 Colab ≤20 CU\"作废。新口径：(1) Colab 不设单试验上限；(2) 单试验预计超过 100 CU 先停下报我（我转母项目定是否放行）；(3) 用完必须 colab stop，别让会话空转；同一轮只派一个执行方。已按 ≤20 CU 分段的试验可以合并，但不要为此重开会话或重提已跑的部分。请改你项目页\"边界\"里的算力一条。\n（原因：对齐 Liang Hu 原话）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 04:43",
+      "text": "已改好。K 节点项目页\"边界\"一节（第 56 行）的算力一条换成了新口径：Colab 不设单试验上限；单个试验预计超过 100 计算单元，先停下报你；用完必须 colab stop，同一轮只派一个执行方。\n\nK 节点眼下没有在跑或要跑的 Colab 计算：驱动场已经生成完，用了不到 10 单元，会话已经关掉。所以没有需要合并或调整的部分。\n\n## 结论\n已按新口径改正。K 节点项目页\"边界\"第 56 行写的是：Colab 不设单试验上限，单试验预计超过 100 CU 先停下报上级节点 Lead，用完必须 colab stop，同一轮只派一个执行方。本节点现在没有在跑的 Colab 计算，不需要合并或调整。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 04:44",
+      "text": "【委托 · 来自 实验室 Lead】新规：工作站 不跑计算、不存计算数据\n新规（Liang Hu 10-14 加严，不用回复）：工作站 不跑计算、不存计算数据（10-15 01:59 C 盘只剩 46 GB）。求解器、训练、批量算例、大下载一律在 Colab 或 CRC/TACC 跑和存；工作站 只放脚本、单项 <200 MB 的小结果、图和报告；确需在 工作站 临时放 >1 GB 先报我。CRC 组空间约 95%，新的大数据优先放 TACC [local path omitted] 或 [local path omitted]；CRC 默认单节点。请写进项目页\"边界\"，以后任务书写明在哪算、结果放哪。 我已核：K 在 工作站 没有计算，k_wrf_drivers 目录只有 4 KB，合规；驱动场的中间格式文件留在 Colab 或 WRF 线指定的集群位置（优先 TACC [local path omitted] 或 [local path omitted]，CRC 组空间约 95%），不往 工作站 拷。\n（原因：Liang Hu 加严存储规矩）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 04:44",
+      "text": "新规已写进 K 节点项目页的\"边界\"一节（第 57 行）。\n\n工作站 上那份 1.6 GB 的驱动场副本已经被移除，现在 只剩一个 4 KB 的说明文件。我先确认了数据还在：CRC 上的 完好，66 个文件按校验清单全部核对通过。\n\n还有一处要说明：留在 工作站 的说明文件是 10-14 最初那次来源预检的旧版，上面写着\"未生成\"，容易让人误会。我在文件开头加了现状说明：驱动场已经生成，存在 CRC 上，校验通过。旧内容保留作历史记录。\n\n顺带看到 WRF 线的进展：CRC 上已经有 G06、P06 的前处理和 real 试跑目录，还有几轮 G06 的短测，都是 10-14 晚上做的。结果等他们回报。\n\n## 结论\n已照办，K 节点项目页\"边界\"第 57 行写明：工作站 不跑计算、不存计算数据，大数据优先放 TACC [local path omitted] 或 [local path omitted]，CRC 默认单节点，任务书写明在哪算、结果放哪。更正一点：k_wrf_drivers 现在确实只有 4 KB，但驱动场在 10-14 已经生成过（1.6 GB），工作站 副本后来被移除。现存唯一一份在 CRC，10-15 04:48 按校验清单全量核对通过。工作站 上的旧说明文件已加注现状，免得误读为\"未生成\"。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 04:45",
+      "text": "【委托 · 来自 实验室 Lead】重出 2 m 湿度 v2.2；观测口径改为 NEXRAD 合成与 METAR\n来自 WRF Lead（经根 Lead、本节点原样转交）。，0 SU。证据只读：、Q2_member_summary_v1.csv。\n(1) 必须改：KAKO（40.17563N, 103.22203W）周围 300 km 的 480 个 0.25° 格点上，v2.1 的 Q2 比\"位势高度高于 SOILHGT 的最低完整气压层\"的比湿平均偏湿 +0.38～+0.91 g/kg（P 组更甚），最大绝对差 1.6（G06）～9.3 g/kg（P72），全部超过约定的 1 g/kg。重出 v2.2：Q2 直接取该最低地上完整气压层的比湿，不在 ln p 上插值、不向地下外推；G、P 两组同式，其余字段不变；附新 SHA256 与读回检查，放同一交付根下新子目录 v22_final/（CRC 下，不覆盖 drivers_v21_final/），交完 --report 报我（雷暴节点），我经根 Lead 回 WRF Lead。\n(2) 已确认可以：海面格 SNOW=0、SMOIS=1、SST=TSK；无 SST 时 real 用 TSK；G 32 层 / P 14 层 metgrid 通过。\n(3) real.exe 两组在 06-09 12Z 边界区垂直插值出 NaN，WRF 线判断是他们管线的问题，驱动不用改。正式 8 个积分等 v2.2 到位且 real 修好后开始。\n(4) 观测口径改了：KAKO ASOS 1 分钟当日缺档、NCEP 存档当日无 MRMS，改用 NEXRAD Level-II 体扫垂直最大反射率合成作观测对象，KAKO 用 METAR/特殊报时序，37.04 m/s 仍以 Childs 2021 Table 2 为锚。若你的设计第 5 节观测口径受影响，改一句并在回报里写明（判据本身已冻结，只改观测数据来源的表述，不改阈值）。\n新规：工作站 不跑计算、不存计算数据——v2.2 在 Colab（或 CRC 单节点，走 ComputeOps 资源申请 + 登记，预检与提交分两条命令）生成，产物直接放 CRC 交付根，工作站 只留脚本、校验码和读回报告；传文件用普通文件 + scp，ssh 加 -n，不用管道/FIFO。TACC 连接目前卡死，不要用 TACC。CRC 组空间约 95%，v2.2 约 1.6 GB 可放，旧 v2.1 不删（删除属 Liang Hu 定）。\n（原因：WRF 线跨线请求）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 04:45",
+      "text": "v2.2 已经派给 ideas 生成，设计第 5 节的观测数据来源也改了。\n\n**1. 重出 2 m 湿度 v2.2**\n- **规则**：2 m 比湿直接取\"位势高度高于地形的最低完整气压层\"的比湿，不插值，也不向地下外推。G、P 两组用同一规则，其余字段逐字节不变。\n- **怎么做**：在 v2.1 的基础上只改这一项，是个小的 CPU 活，所以放 CRC 单节点算，0 SU，不用 Colab，也不碰 TACC。\n- **流程**：照规矩向 ComputeOps 提交资源申请，作业提交后 登记，预检和提交分两条命令。\n- **放在哪**：输出放 CRC，附校验码和读回报告，不动。工作站 上只留脚本和小的校验文本，传文件用普通文件加 scp。\n- **交付后**：我用 --report 报给你。\n\n**2. 观测口径**\n设计第 5 节受影响，已经改了一句：观测对象改用 NEXRAD Level-II 体扫的垂直最大反射率合成场里 ≥40 dBZ 的对象，加上 KAKO 的 METAR 和特殊报时序，阵风量级仍以 Childs 2021 Table 2 的 37.04 m/s 为锚。阈值、判据和闸门都没动。\n\n**3. 其他**\n- 已确认可以的几项（海面 SNOW=0、SMOIS=1、SST=TSK，G 32 层、P 14 层 metgrid 通过），以及 real.exe 边界 NaN 由 WRF 线修，都记进了项目页的\"试过与结果\"。\n- 设计文件升为 v2.2，新规则标为\"假设\"，没有文献依据，依据是 WRF 线的敏感性数据。决策记录和参数来源表都已更新。\n\n## 结论\n已照办。v2.2 已派 ideas 在 CRC 单节点生成（只改 2 m 比湿，取位势高度高于 SOILHGT 的最低完整气压层的比湿，不插值、不外推，两组同式），输出到 CRC，附 SHA256 和读回报告，不覆盖 v2.1，交付后用 --report 报你。设计第 5 节的观测数据来源已改为\"NEXRAD Level-II 垂直最大反射率合成 + KAKO METAR/特殊报，阵风以 Childs 2021 Table 2 的 37.04 m/s 为锚\"，阈值和判据不变。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 04:51",
+      "text": "【委托结果 · 实验室助手】Akron 驱动场 v2.2：只改 2 m 比湿\nv2.2 正在 CRC 计算；须待作业结束，再核对 SHA256、首末文件读回、KAKO 周围 Q2 差值，以及除 Q2 外逐字节不变，才能交给委托方。\n\n正文中提到的文件：\n- \n- \n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 04:51",
+      "text": "v2.2 的 CRC 作业 1544281 在 04:50 开跑，目前还没有产出，所以还没有交付。\n\n- **登记**：作业登记在本节点名下，预计 06:50 前结束，结束时会自动叫醒我。\n- **脚本**：已存进。\n- **作业结束后**：我直接在 CRC 上核对四项，通过后用 --report 报上级节点，经根 Lead 转给 WRF Lead：\n 1. 校验码\n 2. 首末文件读回\n 3. KAKO 周围 300 km 内，新旧 2 m 比湿的差\n 4. 除 2 m 比湿外，其余字段和 v2.1 逐字节相同。\n\n在那之前没有要做的。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 04:57",
+      "text": "【超算作业 · 已由提交方处理】\n盯作业程序检测到以下变化：\n- CRC 作业 1544281「Akron v2.2 Q2 66 文件」：已正常结束（退出码 0）。日志 \n请检查结果并按你的任务继续推进；该上报的照常上报。\n\n实验室助手收到通知后的回报：\nCRC 作业 1544281 已正常结束（退出码 0）。v2.2 八组共 66 个文件齐全，SHA256 全量校验通过；逐文件读回确认仅 Q2（SPECHUMD @ 200100 Pa）载荷改变，其余记录、顺序和头信息与 v2.1 逐字节相同。各组首末文件的字段、层位、单位和极值已写入读回报告；完整气压层数为 G 组 31 层、P 组 13 层。\n\nKAKO 周围 300 km 内，按组汇总的新旧 Q2 平均差为 −0.3731 至 −0.9126 g/kg；最大绝对格点差为 9.2849 g/kg。资源申请编号 CO-； 登记的作业号为 1544281。输出位于 输入未改动。\n\n尚未运行 metgrid/real.exe 或 WRF 敏感性检查；平均 Q2 下降不等于已通过 1 g/kg 阈值，建议负责对话用 v2.2 继续该检查。\n\n\n\n\n\n## 结论\nv2.2 驱动场已完成文件级交付与校验，可以交给 WRF 线做敏感性检查；目前不能宣称湿度阈值或 WRF 积分已通过。\n\n（附件：VERIFY_v22.md）\n\n（附件：READBACK_v22.json）\n\n（附件：SHA256SUMS）\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 04:57",
+      "text": "v2.2 驱动场已生成并核对通过，我已上报上级节点，由上级经根 Lead 转给 WRF Lead。\n\n- **作业**：CRC 作业 1544281 在 04:50 开跑，正常结束（退出码 0），没花 SU。66 个文件放在 CRC，v2.1 没动。\n- **我亲自复核**：在 CRC 上把 66 个文件的校验码全部核了一遍，都通过；抽了一个文件和 v2.1 逐字节比对，只有一个字段的数据不同。\n- **只改了 2 m 比湿**：ideas 逐文件读回确认，其余字段、记录顺序和头信息都和 v2.1 逐字节相同。\n- **新规则和 WRF 线的参照算法一致**：KAKO 周围 300 km 内，新值减旧值平均为 −0.37 到 −0.91 g/kg，最大差 9.28 g/kg；和 WRF 线报告里的数字（+0.38 到 +0.91，9.28）正好反号。所以 v2.2 就等于他们用作参照的算法，原来超过 1 g/kg 的偏差已经消除。\n- **下一步**：WRF 线用 v2.2 重做前处理，修好 real.exe 在边界区出 NaN 的问题，然后按 06 → 24 → 48 → 72 的顺序跑 8 个正式积分，提前 6 小时那组的闸门不变。\n\n10-16 16:41 的兜底回访还保留着，到时查 WRF 线的进度。项目页、上级节点页和线况总表都已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 04:59",
+      "text": "【委托 · 来自 实验室 Lead】WRF 线已收 v2.2 并开跑 8 个积分\n告知，无需回复。WRF Lead 10-15 04:58 复核 v22_final（66 文件 sha 全过，确认就是他们的参照算法），已派 WRF bot：real 边界 NaN 用 all_ic_times=true 绕开（实测对边界强迫逐位无影响）；CRC 单节点重做 metgrid/real；先跑 G06/P06，按你设计第 5 节判 G06 闸门，过闸后 24/48/72 三对 6 个积分并行。G06/P06 约半天内出，最长 78 h 那组约 16–18 h 墙钟（排队另算）。存储：二维场和 KAKO 时序全留，三维只留 03–09Z，目标 <15 GB，空间低于 200 GB 停提交。每对数值表存 WRF_Modeling/ 并转回你；表里只给数值，\"Pangu 不差于 GFS\"的结论由你按第 5 节下。数值表到了按冻结判据判读，报我。\n（原因：WRF 线回执）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 04:59",
+      "text": "收到，WRF 线的安排已记进项目页。\n\n- **realexe 的边界 NaN**：用 all_ic_times=true 绕开，WRF 线实测对边界强迫逐位没有影响，我接受。\n- **跑法**：先跑 G06/P06，按设计第 5 节判闸门，过闸后再把 24/48/72 三对并行跑。这和设计不冲突：设计里的先后顺序只是为了先过闸门，过闸后并行可以。\n- **时间**：G06/P06 约半天出结果，最长那组 78 小时的积分约 16–18 小时墙钟，排队时间另算。\n- **我这边**：数值表一到，就按冻结的判据判读，报给你。10-16 16:41 的兜底回访保留着，那时如果数值表还没到，我去查进度。\n\n## 结论\n收到。K 节点已记下 WRF 线的开跑安排，项目页已更新，接受用 all_ic_times=true 绕开 real.exe 的边界 NaN，也接受过闸后三对并行。数值表到了，我按设计第 5 节冻结的判据判读，结果报给你；10-16 16:41 有兜底回访。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 16:41",
+      "text": "【定时回访】K 兜底：WRF bot （metgrid/real 试跑 G06/P06 + G06 短测）是否已回报；查 CRC 是否有试跑产物；未回报则问 进度；回报了就核四项检查（海面土壤雪、SST、SM>1、2 m 比湿差是否 >1 g/kg）\n（这是你在 2026-10-14 16:41 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 16:41",
+      "text": "这次回访原本要查的事（前处理试跑和那四项检查）早就办完了，K 节点已经推进到最后一对积分。还缺 72 小时这一对，所以\"Pangu 驱动是否不差于 GFS 驱动\"现在还没有结论。\n\n**进度**\n- **提前 6、24、48 小时三对**：正式数值表都交了，我核过 CSV。提前 6 小时那组的闸门已经通过。\n- **150 km 内有没有对流对象**：每对的补充表也交了。\n- **72 小时这一对**：\n - Pangu 组（P72）已经积完，质量检查通过。\n - GFS 组（G72，CRC 作业 1554563）今天 02:07 开跑，16:45 时模式时间到 06-08 12:41（全程到 06-09 12Z）。按每步约 3.4 秒估，今晚 22:00 左右积完，之后 WRF 线出这一对的正式数值表。\n- **积分步长**：P72 原来用 20 秒步长时数值不稳，所以正式的 72 小时对改为两组都用 15 秒。原来 20 秒步长的那一对，只作敏感性附表（后处理作业 1560832 在排队），不计入判读。\n\n**接下来**\n三对数值表齐了以后，我按冻结的判据判读，结论报给上级节点。另外约了 10-17 10:42 回访兜底：到时如果 72 小时这一对还没交，就去问 WRF Lead 进度。\n\n项目页的当前状态已更新（项目页现在随项目迁到 下）。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 16:42",
+      "text": "【告知 · 来自 AI 气象】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：四对齐后按冻结判据判读即可。两点：(1) 结论只适用于 Akron 这一个事件、4 km 单层、两组同口径，写清\"单事件、定性\"；(2) 若结论是\"Pangu 不差于 GFS\"并据此建议转正或扩到更多事件，报我之前先 s/20 s 步长说明）；若不过或只是记录结果，直接报我。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 10:43",
+      "text": "【定时回访】K 兜底：G72 dt15（CRC 1554563，10-16 16:45 模式时间 06-08 12:41，估计 10-16 22:00 积完）是否完成、QA 是否通过；WRF 线是否已交 PAIR72 正式 v2 表（ 下 PAIR72_*）；dt20 附列 1560832 是否出。三对齐了就按冻结判据（设计第 5 节 + 与审查 裁决）判读；没齐就问 进度。\n（这是你在 2026-10-16 16:42 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 10:43",
+      "text": "K 节点已经做完：72 小时那一对数值表交来后，判读和搁置都在 10-17 凌晨办完了。这次回访要查的事都已有着落，不再约回访。\n\n**做了什么**\n- 72 小时这一对：两组都用 15 秒步长，GFS 组由 CRC 作业 1571882 跑完；20 秒步长的附表（作业 1560832）也出了。\n- 三对齐了以后，按冻结的判据计票，送 6 位审稿人，有效意见 5 份，GPT-6 通道失败、没有补上。按裁决，项目改为搁置。\n\n**结论**\n- 在 Akron 这一个事件上，Pangu（13 层）驱动 WRF，在提前 24、48、72 小时三个时效上，都没做到\"不差于 GFS 全层驱动\"，0/3。\n- 两组在提前 24 小时时，风暴位置误差都超过 150 km：GFS 组 183 km，Pangu 组 308 km。按事先定的规则，\"值得继续\"已经不可能达到。\n\n**措辞收窄的原因**\n- 只有一个事件，结论只是定性的。\n- 预报模型和垂直层数这两部分影响还没有拆开：削到 13 层的 GFS 对照没跑。所以只能说\"这套配置没达标\"，不能写成\"AI 驱动不如 GFS\"。\n- 其他局限：提前 48 小时时，Pangu 组的位置误差反而比 GFS 组小；72 小时两组的时间指标都没法判；两组的 10 m 风都只有实测阵风的 43–60%。\n\n**什么情况下重启**\n- 跑一组削到 13 层的 GFS，把层数的影响拆出来；在 CRC 上不计 SU。\n- 或者换 3 个以上事件，做统计比较。\n- 或者等有全层输出的 AI 模型。\n\n决策记录在，线况总表上 K 节点已标为暂停。刚才只修正了项目页里一段过时的\"当前状态\"。还有一件待办：审稿人 A 的令牌问题修好后，补一份 GPT-6 审稿，只用来核对现有裁决，不另开一轮。"
+    }
+  ],
+  "files": {
+    "self": "k-ai-driven-wrf-thunderstorm.json",
+    "claims": null,
+    "pdf": {
+      "zh": "../../pdf/k-ai-driven-wrf-thunderstorm.zh.pdf",
+      "en": "../../pdf/k-ai-driven-wrf-thunderstorm.en.pdf"
+    }
+  }
+}

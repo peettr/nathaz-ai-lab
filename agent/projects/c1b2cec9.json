@@ -1,0 +1,60 @@
+{
+  "id": "c1b2cec9",
+  "slug": "c1b2cec9",
+  "number": "L30.2d",
+  "title": {
+    "zh": "L30.2d 风机惯容鲁棒设计与疲劳评估",
+    "en": "L30.2d Robust design and fatigue assessment of inerter systems for wind turbines"
+  },
+  "group": "hw_vib",
+  "parent": "d84a6be7",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-16 20:43",
+  "end": null,
+  "updated": "2026-10-16 20:45",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "振动控制 Lead · 开子项目",
+      "ts": "2026-10-16 20:43",
+      "text": "【Liang Hu 让 线况与派活 分出的子对话】目标：风机（单桩/漂浮）惯容装置在频率漂移下的鲁棒设计与全工况疲劳评估，基于 OpenFAST（TMDI 模块 PR #3101）。页面：；依据 §3 风电、§4-3。状态：待开工：等开工指令，不做研究、不派 bot、不提交作业。"
+    },
+    {
+      "role": "bot",
+      "who": "风振控制",
+      "ts": "2026-10-16 20:43",
+      "text": "子项目「风机惯容鲁棒设计与疲劳评估」已经建好，现在等你的开工指令。这一轮我只核对了项目页和线况表，没有做研究、没有派 bot、也没有提交作业。\n\n- **项目页**： 已在，状态是「待开工」。目标写的是：转速和气动阻尼变化会让频率漂移，在这种情况下做风机（单桩、漂浮）惯容装置的鲁棒设计和全工况疲劳评估，基于 OpenFAST 的 TMDI 模块（PR #3101）。依据是母页「现状与路线」§3 风电和 §4-3。\n- **线况表**：已登记这一行，状态是「待开工」。\n- **已定决定**：先建子项目、开工另行通知，记录在。\n\n**开工后第一步：** 先查 OpenFAST 的 TMDI 模块到底合并、发布了没有（论坛说拟随 v5.1 发布，还没确认），再定基准机型。我倾向单桩用 NREL 5MW 或 IEA 15MW，漂浮用 OC3/OC4，这只是我的初步想法，没查过也没定。接着在频率漂移的范围里，比较常规 TMD 和 TMDI 的鲁棒性，然后做疲劳评估。要上 CRC 算的部分，照规矩先向 ComputeOps 申请，再用 登记，每个作业只用一个节点。\n\n## 结论\n- **页面**：，状态「待开工」。\n- **现在**：没有在跑的委托或作业。\n- **下一步**：你说开工后，先查清 TMDI 模块是否已进 OpenFAST 并选定基准机型，再做 TMD 和 TMDI 在频率漂移下的鲁棒性对比和全工况疲劳评估。\n\n\n\n（附件：风机惯容鲁棒设计与疲劳评估.md）"
+    }
+  ],
+  "files": {
+    "self": "c1b2cec9.json",
+    "claims": null,
+    "pdf": null
+  }
+}

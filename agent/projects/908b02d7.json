@@ -1,0 +1,54 @@
+{
+  "id": "908b02d7",
+  "slug": "908b02d7",
+  "number": "T13.4",
+  "title": {
+    "zh": "T13.4 风洞模型加工图",
+    "en": "T13.4 Wind-Tunnel Model Fabrication Drawings"
+  },
+  "group": "mesh",
+  "parent": "a56d8fe7",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-16 23:20",
+  "end": null,
+  "updated": "2026-10-16 23:20",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "风洞模型加工图与测压孔布置图；现有 pressure_tap* 文件（R1 2026-07-29 PETW-PT-M11-001）归此，只加不改",
+    "goal_en": "Wind-tunnel model fabrication drawings and pressure-tap layout drawings; existing pressure_tap* files (R1 2026-07-29 PETW-PT-M11-001) are archived here, append-only without modifying existing files"
+  },
+  "report": {
+    "zh": "# T13.4 风洞模型加工图\n\n## 目标\n风洞模型加工图与测压孔布置图；现有 pressure_tap* 文件（R1 2026-07-29 PETW-PT-M11-001）归此，只加不改\n\n## 当前状态\n10-16 建页；L30.1 要参数化测压模型四件套，L2 开工后 1–2 月。T13 首步只盘点，路线经 Liang Hu 点头前不开发。盘点与路线见。\n\n## 已定决定\n- 10-16 开通，见 \n\n## 试过与结果\n| 日期 | 做了什么 | 结果 |\n| --- | --- | --- |\n\n## 参数来源表\n| 参数 | 取值 | 来源/假设 | 查过哪些地方 |\n| --- | --- | --- | --- |\n\n## 未决与下一步\n- 等路线批准（现状与路线 §4 已排期）。\n\n## 文献依据\n- 见现状与路线 §2。\n\n## Liang Hu 注",
+    "en": "# T13.4 风洞模型加工图\n\n## 目标\n风洞模型加工图与测压孔布置图；现有 pressure_tap* 文件（R1 2026-07-29 PETW-PT-M11-001）归此，只加不改\n\n## 当前状态\n10-16 建页；L30.1 要参数化测压模型四件套，L2 开工后 1–2 月。T13 首步只盘点，路线经 Liang Hu 点头前不开发。盘点与路线见。\n\n## 已定决定\n- 10-16 开通，见 \n\n## 试过与结果\n| 日期 | 做了什么 | 结果 |\n| --- | --- | --- |\n\n## 参数来源表\n| 参数 | 取值 | 来源/假设 | 查过哪些地方 |\n| --- | --- | --- | --- |\n\n## 未决与下一步\n- 等路线批准（现状与路线 §4 已排期）。\n\n## 文献依据\n- 见现状与路线 §2。\n\n## Liang Hu 注"
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "CAD Lead · 开子项目",
+      "ts": "2026-10-16 23:20",
+      "text": "【Liang Hu 让 T13 总控 分出的子对话】目标：风洞模型加工图与测压孔布置图。现有测压孔布置图（、 的 pressure_tap*，R1 2026-07-29 PETW-PT-M11-001）归本子项目，文件只加不改、不删不搬；L30 硬件实验室几何不进公开展示。状态：待开工。T13 首步只盘点、不开发；路线经 Liang Hu 点头前不派开发活。项目页。等父对话路线批准后再接具体任务。"
+    }
+  ],
+  "files": {
+    "self": "908b02d7.json",
+    "claims": null,
+    "pdf": null
+  }
+}

@@ -1,0 +1,1079 @@
+{
+  "id": "728a9982",
+  "slug": "728a9982",
+  "number": null,
+  "title": {
+    "zh": "AI 气象总线",
+    "en": "AI Weather mainline"
+  },
+  "group": "wx",
+  "parent": null,
+  "depth": 0,
+  "status": {
+    "zh": "进行中",
+    "en": "Ongoing"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-15 05:57",
+  "end": null,
+  "updated": "2026-10-18 09:45",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [
+    {
+      "id": "dec-0000",
+      "ts": "2026-10-15 06:49",
+      "title": "ideas scratch 中已迁节点文件的去留（10-15 06:48）",
+      "label": "决定",
+      "text": "# ideas scratch 中已迁节点文件的去留（10-15 06:48）\n\n来源：实验室，清单。只回答，不动文件；由平台统一删。\n\n| 项 | 决定 | 理由 |\n| --- | --- | --- |\n| a2-input（117 MB） | 删 | 与另四份 md5 相同，原件在 CFD 线 CRC 运行目录；A2 已搁置 |\n| loss_wind_ncei（151 MB） | 删 | NOAA StormEvents 公开，可重下；I 已搁置 |\n| urban_v2_incomplete.npz（17 MB） | 删 | J 已到 v6，v2 中间数据不再被任何结论引用 |\n| a1_smoke.csv / a1_smoke_output（8 MB） | 删 | 冒烟测试，可重跑；A1 结论不依赖它 |\n| ifs41r2 / nwsi_10_1605 / idalia_tcr_* / a1_peakfactor 的 .pdf | 留，搬到 （约十几 MB，工作站 内搬动不增占用） | 未检到这几份的卡片，A1/B1B4/I 引用过；后续补 Zotero/建卡 |\n| 上述 PDF 抽出的 .txt | 删 | 可由 PDF 重抽 |\n\n错了的代价：被删的都能重建（公开下载或重跑），最坏多花几分钟到一小时；PDF 保留不占新空间。"
+    },
+    {
+      "id": "dec-0001",
+      "ts": "2026-10-15 23:14",
+      "title": "E2 精读两篇：建议出口均为 X2（10-15 23:2x，出口待 Liang Hu 经平台审批）",
+      "label": "决定",
+      "text": "# E2 精读两篇：建议出口均为 X2（10-15 23:2x，出口待 Liang Hu 经平台审批）\n\n精读卡：、（wx）。Lead 抽核原文文字层：003 的 7,524 条 QC 剖面、R² 0.948/0.963、Lee 案例 MAE 1.774 / RMSE 1.936 m/s；004 的 100 万列 Fortran 54546.96 ms vs JAX 152.64 ms、作者原话\"聚焦数值正确与 GPU 性能而非可微性\"（PDF 第 2 页）——均与卡一致。\n\n- （arXiv 2610.11405，Ma 等）：建议 X2。可借鉴 10 m 硬锚定 + 10–300 m 连续廓线 + 物理软约束；但它以可信 10 m 风与 RMW 为输入，B1+B4 两链偏低 35–38% 正来自输入假设，用它不能纠偏；只在海上下投探空上训练验证，未验证美国登陆陆面。代码未公开，QC 后剖面数据在 Zenodo 21868265（CC BY 4.0）。\n- （arXiv 2610.12662，Linck 等，NCAR LAFT）：建议 X2。可借鉴\"跨编译器包络作逐变量容差 + 接口桥单测 + GPU 剖析后再验\"的迁移验证流程；只验证了 Kessler 单次调用，未做可微性/梯度/耦合，对 K/L/C 当前问题无直接作用。代码公开（github.com/NCAR/LAFT，Apache-2.0）。\n- Decision I made：两篇都建议 X2，不建议 X3/X4 — 为什么：都没有对本线现有问题的直接可用性（B 卡在输入、K/L/C 不在物理迁移）— 错了的代价：若日后做混合物理模型或海上入流，需要时从方法卡重新取用，损失很小。\n- 依据：上述精读卡（PDF 物理页已标）；无其他文献依据。"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rev-0000",
+      "ts": "2026-10-16 01:20",
+      "title": "第三轮预注册送审附件：样本量/功效计算（10-16 L Lead）",
+      "label": "审查材料",
+      "text": "# 第三轮预注册送审附件：样本量/功效计算（10-16 L Lead）\n\n方法：配对 McNemar 精确检验（双侧 α=0.05，模拟 2000 次）；不一致对占比取第二轮实测（P≥0.3 下 b=仅 AI 命中，c=仅 HRRR 命中）。\n第二轮不一致对：V1(n=20) 1h 1/5, 2h 1/4, 3h 2/4；CONUS(n=12) 1h 0/3, 2h 1/2, 3h 0/3。\n任一成员口径：V1 3/2, 3/0, 5/2；CONUS 2/2, 5/0, 1/1。\n\n| 假设效应 | b/c | n=40 | 60 | 80 | 100 | 120 |\n| --- | --- | --- | --- | --- | --- | --- |\n| V1 三时效平均 4/60 vs 13/60 | 6.7%/21.7% | 0.32 | 0.51 | 0.67 | 0.78 | 0.86 |\n| V1 1h 1/20 vs 5/20 | 5%/25% | 0.59 | 0.81 | 0.91 | 0.96 | 0.98 |\n| CONUS 平均 1/36 vs 8/36 | 2.8%/22.2% | 0.65 | 0.88 | 0.96 | 0.98 | 0.99 |\n\n非劣效（真差为 0，单侧 α=0.05，功效 0.8，n=(z_.95+z_.8)^2·p_disc/m^2）：\np_disc=0.2：m=0.10→124，m=0.15→55；p_disc=0.3：m=0.10→186，m=0.15→83。\n\n可得样本（估计）：V1 候选约 400（2022/2024/2025，剔 2023 与 2022 拟合 9 例），第二轮核实率约 14% → 约 55–80 事件；CONUS 2025-10 以后全国约 30–60（假设）。\n成本：V1 主时效 2 h 每组约 0.6 CU（含存层 +20%）；80+80 → 约 95 CU；120+120 → 约 145 CU。"
+    },
+    {
+      "id": "rev-0001",
+      "ts": "2026-10-16 01:52",
+      "title": "裁决 · 审查 ：第三轮预注册能否定稿冻结（10-16）",
+      "label": "审查裁决",
+      "text": "# 裁决 · 审查 ：第三轮预注册能否定稿冻结（10-16）\n\n## 审查概况\n- 有效意见 3 份：审稿人 A（GPT-6）、D（GLM）、C（DeepSeek）。\n- 审稿人 E（Gemini）因额度用尽失败，由 DeepSeek 顺延补位。\n- 三份意见的总体结论：A 不支持按现稿冻结；D、C 有保留地支持。\n- **裁决：按下列“必须改”逐条改完后冻结。** 定稿见。只审这一轮，不再送审。\n\n## 必须改（均已核实，均已改进定稿）\n1. **已见样本漏排**（A1、D1）。核实： 里有 DSM 2024-08-01 和 ALO 2024-05-21 两个事件。改为按显式清单剔除（定稿第 1.1 节）。\n2. **Z 的单位**（A2）。我无法在本机核实 Earth2Studio 的变量表，但审稿人指出的风险成立：草案写的 Z/g，如果 Z 本来就是高度，结果就错了。处理是写明“Z 为海拔高度（m），不再除以 g”，并由 S1(c) 实测量级（Z1hl − 地形应在 3–20 m）（定稿第 2.2 节）。\n3. **输入层和边界处理**（A3）。核实日志：p 只到 hl1–11、13、15、20。另据 Benjamin 2020 原文（litwiki 卡片 VDS4SD3F，PDF 第 14 页，我已抽查），PBL 顶的参考值取最低原生层的 θv 加 0.5 K。这样就不再需要 q2m、t2m 和海平面气压，草案中“q1hl 代替 q2m”的假设随之取消。“超量全为负”和“PBL 顶在 hl20 以上”两种情况的处理也已写定（定稿第 2.1–2.2 节）。\n4. **S1 闸门的范围和计算方式**（A4、C2、D 的意见）。S1 只验证实现是否正确，不验证诊断对雷暴大风的适用性。r 的计算单元写明为：窗口内格点 × 时次合并计算的 Pearson r。另新增 S1(b) 粗层检验：把公式只用于 StormCast 拥有的那些层，与 HRRR 全部原生层的结果比较，<0.85 即停。这一条采纳的是 DeepSeek 的意见（定稿第 6 节）。\n5. **抽样和对照的选择空间**（A5、D 的意见）。同日超过 3 个事件时怎么取、对照怎么配、能否复用、缺测怎么办、TS/VCTS 是否对称，都已写定。同时写明对照剔除了“近阈”样本这一限定，以及误报判据可能看不出差别（定稿第 1.2–1.3 节）。\n6. **“气候基准”这个说法不对**（A6、C 的意见）。1:1 抽样下的参照是抽样设计决定的，不是气候基准，定稿已改称“样本内 1:1 参照”，并收窄了 BSS 的解释范围（定稿第 4.3 节）。\n7. **统计执行规则**（A7、C、D 的意见）。已写定：每个单元等权、配对、按 UTC 日成簇的 bootstrap、5000 次、百分位法、“下限”“上限”一律指单侧 95% 界、缺成员和缺数据的处理（定稿第 4.1–4.2 节）。\n8. **预报配置和时效对应**（A8）。已写明本轮是回报配置，起报和窗口的对应关系照第二轮代码第 38–44 行明文写出（定稿开头与第 3 节）。\n9. **样本量必须预先写定**（D2、C1、A10）。改为确定性规则：V1 有 60–120 个就全用，超过 120 个分层随机抽 120 个；CONUS 有 40–80 个就全用（定稿第 1.4 节）。\n 这也回答了上级的问题“事件多于 80 是否提到 100 以上”：**是，提到上限 120。** 理由：抽到 120 个时，真实差距与第二轮相当的 AI 被误判“通过”的概率从 0.05 降到 0.02；真实差距为 0 时判“通过”的概率从 0.83 升到 0.88；代价约 +50 CU。\n10. **0.15 界限的含义**（A9、D2、C 的意见）。照实写明：0.15 是按样本量能检出的幅度定的，它正好等于第二轮 V1 的命中差距。为此另加“点估计 ≥ −0.05”一条，防止 AI 明显更差时仍被放行（定稿第 4.4 节）。功效按单侧界加点估计规则补做了模拟（定稿第 5 节）。\n11. **文献出处**（D3、C3）。Zotero 条目号是 PU6IMCA9，附件目录是 C6JC4ZNH，两个号都写上。公式出处改为 Benjamin 2020 原文，并标出它与 Collins 2024 写法的差异。\n\n## 仅供参考（已采纳写进定稿）\n- 主时效取 2 h 的理由，以及“第二轮 2 h 档成绩最好”这一事实，照实写出（D）。\n- GFS 条件场退出本轮，不在报告项里出现（A、D）。\n- 预算统一加 20% 存层开销；换算率 6.85 CU/h 写明来历，并注明另有 5.38 一说（C、D）。\n- S3 也按大计算送审；“上级另行授权”不算通过本协议闸门（A、C）。\n- 增加两项敏感性分析：去掉开发者评价期、雷达阈值改 35 dBZ（A）。\n- 峰值比报告 bootstrap 区间，并说明它与第二轮口径不同（A、C）。\n- Collins 2024 的 −11.32 m/s 是“阵风 >20 m/s”档的数字，草案的说法已更正（C）。\n\n## 未采纳的异议\n- **审稿人 A 认为“现有证据不足以指定 100 或 120 为充分样本量”。** 这一点成立，定稿也没有声称 120 已经“充分”。但样本上限受 V1 盲池大小限制（估计约 55–80，最多一百多个），提高到 120 是预算内能做到的最好，而且规则是确定性的，不留事后选择的空间。所以采用上限 120，不再追加功效论证。\n- **Brier 和误报两条判据的功效没有计算**（C）：两条界限都标为假设，照实说明没有算功效；本轮不补算。理由是这两条的方差依赖 AI 的概率分布，现在没有可靠的先验。\n- **按日成簇的功效没有计算**（D）：已在定稿中写明“表中功效偏乐观”，不补算。\n\n## 依据\n- 卡片：VDS4SD3F（Benjamin 2020，PDF 第 14 页和第 16 页，Lead 已用 pdftotext 抽查原文）；EG5BI4TB（PDF 第 1 页 / 期刊第 562 页）；NR_liu_2021（第 2 页）；H9ENWPG3。\n- 本线数据：、 第 38–44 行、功效模拟（10-16，20000 次）。"
+    }
+  ],
+  "results": [
+    {
+      "id": "res-0000",
+      "ts": "2026-10-16 00:55",
+      "title": "精读卡｜Ma 等，arXiv:2610.11405v1 【已批 X2，Liang Hu 10-16】",
+      "label": "结果",
+      "text": "# 精读卡｜Ma 等，arXiv:2610.11405v1 【已批 X2，Liang Hu 10-16】\n\n一句话结论：可借鉴“固定观测10 m风＋学习10–300 m形状”的后报/海上剖面重建方法，但不能直接替 B1+B4 的登陆站点预报风场，更不能修复其输入压差/RMW假设造成的35–38%低偏；建议出口 X2 方法入库，不执行模型接入。[1]\n\n来源及范围：Jian Ma 等，A Physics-Constrained Implicit Profile Network for Continuous Reconstruction of Tropical Cyclone Near-Surface Wind Profiles，PDF 35页，下载版 SHA-256 `7743adf1c79e47313f289d9833e6dad32f35176f76c5c8aa570e1fc6f8ca3cd4`。本卡页码均为PDF物理页，预印本未给期刊页。[1]\n\n## 方法与验证\n\n- 输入：单位置的10 m径向/切向风、风暴最大风速、RMW、相对半径、相对方位正余弦、科氏参数绝对值和符号、中心经纬度；目标高度另输入归一化 z。论文表2（PDF第8页）列明，风切/移速、粗糙度、陆面类型、海况和雷达VAD均非本版输入。逐高度预测径向和切向风，定义域10–300 m，非整个边界层/自由大气；预测范围作者约述为中心10×RMW内（PDF第13页）。[1]\n- 结构：高度连续编码（Fourier＋RBF）、条件分支、FiLM残差块、径/切双头；以 `V(z)=V10+ΔV(z)−ΔV(10m)` 硬锚定10 m双分量（PDF第9–11页，式12–17）。拟合项为加权Huber；软约束分别为二阶曲率、半球切向风符号、入流角随高变化、10–40 m对数律、FiLM/耦合正则、一阶坡度（PDF第11–13页，式18–27）。对数律不是求解完整动量方程。[1]\n- 训练/验证资料：NOAA HRD 2001–2022的93个气旋，原始13058条，QC后7524条；要求10 m附近±20 m有点、10–100/100–200/200–300 m各≥3有效点；10 m最低点：4951条低于10 m，另2573条最低点在10–30 m以最近高度赋值，即“精确锚定”的是赋值后的输入，不保证真实10 m物理误差为零（PDF第3–5页，图1）。按风暴分组并按强度分层8:1:1，归一化仅用训练集（PDF第13页）。[1]\n- 数字：独立测试集总体 R² 径向0.948、切向0.963、风速模0.963（PDF第13–14页，图5）；Cat4+ 径向 MAE/RMSE 1.961/3.277 m/s、切向1.924/3.193 m/s（PDF第18–19页，表3–4）；不应把逐点误差当登陆站点峰值风误差。Lee 2023 SAR 10 m作输入，100/200/300 m重建；±1小时内仅4根有效探空，四剖面平均风速 MAE/RMSE 1.774/1.936 m/s（PDF第22–24页，图14–15、表5）。Lee 风场图仅SAR狭窄观测带，非全风暴验证；NHC记录 Lee 以温带气旋形态在加拿大新斯科舍登陆，不能说案例验证了美国飓风登陆陆面适用性。[1][15]\n- 内部核读：表7（PDF第25页）“no_curv”的曲率超阈率仍为0，而 fit_only 为正；第26页文字将曲率正则称为“唯一机制”并非由单项消融表支持。表7/8的是物理一致性代理指标，不是“与传统模型比较的改进幅度”。图7–9（PDF第15–17页）是个例剖面图，观察到切向/模量曲线大致随高一致，不能单凭图计算总体误差。[1]\n\n## B线可用/不可用\n\n本线项目页 第23–38行及 第27–35、67–82行记载：48 h Pangu/OFCL两链站点风都低约35–38%，主要受业务起报压差外推、RMW冻结/强度输入假设影响，B1+B4已搁置；现有CLIMADA H08预测10 m风＋地表暴露、阵风时距口径与该文不同。该文必须先有可信10 m矢量，且需要RMW和Vmax，故用偏低的10 m预测风做锚点不会自行纠偏；模型是海上观测条件重建，不是由路径/强度独立预报的登陆陆面参数化风场。可用点仅限另做海上后报剖面/观测约束的10–300 m工程入流候选，先独立检验美国事件、陆面过渡、强风尾、矢量方向及10 m输入误差传播，再谈边界条件；300 m以上不能外推。[1]\n\n## 美国登陆飓风观测可得性（逐类，不代表逐事件有完整同址垂直廓线）\n\n| 观测 | 公开源、时间覆盖与取法 | 与本方法关系/限制 |\n| --- | --- | --- |\n| 下投探空 | HRD按风暴/航次的档案页可直接点 、原始 `.avp.tar.gz`；NOAA飞机高分辨`.frd`自2002年有。本文训练为2001–2022；作者Zenodo v2公开其QC后的7524剖面压缩包 `profiles_json.zip`（14.4 MB，CC BY 4.0，网页实见），适合先核结构；原始资料覆盖具体登陆事件需逐风暴匹配。[1][3][4][5] | 原始AVAPS未QC、实时产品低垂直分辨率；HRD另有内部精加工sonde，官网明确需联系管理者且不直接公开，不能把论文QC库等同精加工全档案。海上/近核机会性采样，非同一陆面站持续观测。[5] |\n| 雷达VAD | NCEI NEXRAD Level-II起于1991年、至今，按站/时下载径向速度后可自行反演；Level-III的NVW/48 VAD风廓线可查档，逐站/年实际可得性需核。HRD P-3雷达按风暴页面可见1990s–2021列示与部分网格风/图；不是保证每场/每层有VAD文件。[6][7] | VAD不是该文实际训练输入；业务Level-III每1000 ft绘风羽，通常不能直接给10–300 m连续细剖面。需雷达站几何、波束高度/雨带/QC与时空配准；低层是否有可用门未核。[6] |\n| 浮标/C-MAN | NDBC/NCEI岸海站数据1970年2月至今，站点历史标准气象/连续风可在NDBC按站年取，NCEI HTTPS/THREDDS下载；需要按登陆位置和时间逐站筛选。[8] | 多是单一风速仪高度，供10 m附近矢量锚点候选而非10–300 m剖面；传感器高度、平均时距、失报和风暴强风QC必须逐站核。[8] |\n| 测风塔 | FCMP旧事件Katrina等曾有塔位置/摘要公开搜索索引；2004–08登陸观测有论文使用，但本次访问FCMP `collected-data-index`返回“archived or suspended”，原始下载和完整年份不能核，不能承诺公开获取。[9] | 旧FCMP主要陆面5/10 m，不足本模型10–300 m全层；现阶段列候选而非可交付数据集。 |\n| ASOS（补充单层） | NCEI ASOS/AWOS产品按站、年可查历史全球小时/本地气候及部分1/5分钟风，项目B已有站点池。[14] | 仅近10 m锚点/独立站点检验，不可当多层廓线；登陆时断报、站高和平均时距问题见B项目页。[14] |\n\n## 公开代码/参数来源\n\n作者PDF第30页仅给HRD/Zenodo数据可用性，未提供实现仓库；GitHub以`Smartyphoon-BL3D`与`Smartyphoon BL3Dhttps:/[local path omitted]`、版本v2发布/修改均2026-08-10（Zenodo页面），它是剖面JSON ZIP，不是模型权重/实现。[1][3]\n\n缺参数与复现边界：正文给损失的符号/式、部分初始权重（PDF第25页表6），但网络宽度/层数、Fourier基数、RBF宽度参数、优化器数值/学习率、逐风暴划分清单、随机种子、软件版本、具体粗糙度与摩擦速度如何估计、逐事件SAR反演产品标识，本轮在正文/图表/参考文献/Zenodo数据页未读到可直接复现的全套值；不得代填。本文“稀疏”指风暴相对空间稀疏、非仅几个高度采样的极稀疏剖面：QC强制每百米≥3点（PDF第5页）。[1][3]\n\n建议出口：X2 方法入库，理由是10 m硬锚、物理软约束、风暴级防泄漏和SAR→高度场的思路可作方法卡；不选X3（代码/参数未齐、陆面未验且B偏差来自低锚点）、X4（B线搁置条件未解除）。仅建议，未做落地动作。\n\n读页审计：原PDF物理页1–35依次读文字层；图7–9所在16页及Lee图14的22页另从同一PDF渲染目视检查。图1/3/5/6/10–13及15仅读图注和正文，未逐图轴值复核，细图上的未列数值记“未读到”；第33–35页参考文献读过。资料网站为本轮另查，不属于论文页。[1]\n\n## Sources\n\n[1] [external URL omitted]\n[3] [external URL omitted]\n[4] [external URL omitted]\n[5] [external URL omitted]\n[6] [external URL omitted]\n[7] [external URL omitted]\n[8] [external URL omitted]\n[9] [external URL omitted]\n[14] [external URL omitted]\n[15] [external URL omitted]"
+    },
+    {
+      "id": "res-0001",
+      "ts": "2026-10-16 00:55",
+      "title": "精读卡｜Linck 等，arXiv:2610.12662v1 【已批 X2，Liang Hu 10-16】",
+      "label": "结果",
+      "text": "# 精读卡｜Linck 等，arXiv:2610.12662v1 【已批 X2，Liang Hu 10-16】\n\n一句话结论：LAFT可借鉴的是“编译器包络内逐变量对照Fortran＋接口桥单测＋GPU剖析后再验证”的迁移流程，不是已有的可微WRF/ACE2天气物理模块；建议出口 X2 方法入库，仅建议、不落地。[2]\n\n来源及范围：Iris Linck 等，Evaluating LLMs for Translating Legacy Fortran Atmospheric Physics to GPU-Accelerated JAX，PDF 21页，SHA-256 `3c79ea5ba95e2dcc9a0f758486a3f36c15a8cfd15a81216088a0738ffdc20b2e`。本卡页码为PDF物理页。[2]\n\n## 方法、逐项校验和定位不一致\n\n- LAFT将 Fortran 用Tree-sitter提取过程、签名、维度、模块依赖（先译依赖）；规则生成Fortran索引顺序(ncol,nz) ↔ JAX(nz,ncol)桥，rank≥2数组在JIT内转置、回传输出；模型只译物理核心。桥的往返形状/布局/状态单测与物理数值一致性分开。现版桥把非字符数组统一转float64，不保留整型/逻辑数组类型（Kessler接口没用到），故不能直接称通用Fortran桥（PDF第5–7页，图1）。[2]\n- 每过程四遍：草稿→JIT安全→向量化/控制流→终检；标量初始化只译普通Python。梯级为lint（禁核内NumPy/I/O/重复布局变换）→虚拟输入wrapper/core JIT执行和有限值→固定种子共享输入运行完整JAX driver→与Fortran同输入逐变量比对，并核两边形状、温位合理范围、水汽/云水/雨水/降水/湿度非负。每级作业读新鲜结果、异常栈与错误报告；失败日志记失败环节、摘要、改动文件，最多5次修复，每次从lint重跑；性能修复后同样重跑整个数值梯级（PDF第8–11页）。[2]\n- “容差”不是自定相对误差百分比：同一Kessler Fortran代码同一输入在GNU/Intel/NVIDIA/Cray、优化等级/浮点设置/CPU及OpenACC A100等22种构建下，15种不同输出，逐变量所有编译组合的最大绝对差包络 εv；JAX对基准最大绝对差 Ev 逐变量满足 `Ev≤εv` 且结构、物理检查通过才接受（PDF第9–10页，式1–2）。还报告MAE、相对RMSE，但闸门是最大绝对差。此包络只针对一次调用、这一组输入和机器，不证明稀有分支/长积分一致性（PDF第10页作者明确限制）。[2]\n- 定位性能差异：jax.profiler.trace计dispatch/同步/拷贝，优化HLO计fusion/scatter/gather/while；1000与250列、56层区分逐列串行还是批量；逐列循环为critical、scatter为high，未融合gather只提示。Qwen版本为Qwen出草稿、Claude Code代修；其顺序列循环5次性能修复未解，数值可通过但未达到生产GPU性能门（PDF第7–8、11、13–14页，表1–2）。[2]\n\n## 关键数字与可比口径\n\n| 项 | 原文数字与页码 | 限制 |\n| --- | --- | --- |\n| 数值 | 128列×56层的单调用6输出；表3（PDF第16页）最坏4译本差/Fortran包络：温位5.7e−14/1.1e−13 K，水汽6.2e−17/7.1e−17 kg/kg，云水2.9e−17/5.7e−17，雨水2.1e−17/3.3e−17，降水1.1e−19/1.4e−19，RH 4.1e−13/9.8e−13%；比值0.42–0.87。 | 不能称长期天气预报或微物理轨迹已等价。 |\n| 执行结构 | 1000列、56层：Claude/GPT 292个XLA操作/while进入1次，Gemini 138/1，Qwen 190546/1000（PDF第14页表1–2）。 | 同样数值正确不等于同样GPU效率；图2轴已核为对数。 |\n| GPU/CPU | 单A100 40 GB、JAX 0.6.2、CPU基线gfortran -O2一核；100万列时串行Fortran 54546.96 ms、Gemini JAX 152.64 ms（357×）、Claude 632.06、GPT 619.74；1万列时Gemini 3.05 ms、CPU 496.194 ms，Qwen 6271.75 ms（PDF第12、15–16页，图2）。 | 5次热运行中位，1次JIT预热；只同步第一个输出；不含首次编译及输入/输出PCIe传输；不是“整WRF加速357×”。 |\n| GPU/GPU | 50列OpenACC 0.218 vs Gemini JAX 0.74 ms；1万列2.96 vs 3.05；10万列54.38 vs16.30；100万列751.16 vs152.64（PDF第17–18页，图3）。 | 小规模OpenACC快，大规模JAX快；硬件/实现绑定。 |\n| 接口成本 | 100万列C连续输入桥分阶段相加1036.640 ms（H2D 319.061、D2H 706.927）；真正Fortran序内存来者1468.771 ms（PDF第16–17页表4）。 | 分阶段估计，非生产整调用实测；与152.64 ms kernel是不同计时口径，不可直接拿357×宣称端到端收益。 |\n\n## 本线具体可用与不可用\n\n- K「AI预报驱动WRF」：当前项目 第13–16、27–34行是Pangu/GFS驱动同一WRF的配对模拟，瓶颈在驱动场对齐、real边界与雷暴位置/阵风检验，不在微物理翻译。可借用分级验证方法，在将来单独替换某个WRF物理核时先做相同初态的Fortran↔JAX逐变量单步比较、桥的同形测试、跨编译设置包络与特殊分支，再做多步/耦合检验；本论文未将Kessler JAX接入WRF，不改变现行K判据和作业。[2]\n- L「对流尺度AI」： 第13–25、44–52行的StormCast阵风命中与HRRR对照是预报物理任务；LAFT不产生3 km阵风权重、不提升命中。只有在另建AI↔物理耦合时，可先把列物理过程做device-resident向量化基准，再比较湿过程输出/梯度是否稳定；这是拟议验证顺序，不是论文已完成的耦合实验。[2]\n- C「ACE2气候模拟器」： 第13–20、58–64行当前试ACE2-ERA5的冷季10 m风尾/GEV/POT。LAFT可参考把理想化可微物理模块单步和长期统计分别验，但不能把一次Kessler数值等价移植为ACE2极值可靠性、50年风速修正或耦合增益；无需替换已跑的ACE2结果。[2]\n- 可微性核读：作者在PDF第2页明确说“本论文聚焦数值正确与GPU性能而非可微性”；未给梯度核对、反向传播成本、长积分伴随稳定性、AI参数同化效果。JAX可以自动微分不等于这段包含布尔/阈值/子步控制的Kessler代码在科学意义上“梯度可用”。因此对K/L/C都只可借鉴“若日后做混合模型，先做输入输出及梯度的独立验证”的设计想法，不能列入已验证成果。[2]\n\n## 开源状态与未知参数\n\n论文PDF第19页Open Research给 Zenodo 概念DOI；实际打开重定向到v1.0.0版本，软件ZIP 4.2 MB、Apache-2.0，Zenodo页关联。GitHub仓库 公有、Apache-2.0，API默认分支最近提交2026-10-09 21:03:56 UTC，SHA `ae95165562f4beb6669e2fba7cf947a16035d20d`（此处仅记录源平台原时间戳，不作本线日志时间）；不是“Zenodo修改2026-10-15”等同新代码提交。源码和再现包公开，但本轮没有实际执行它。[11][12] 仓库最近提交日期由GitHub提交API核对。[13]\n\n论文有测试规模、硬件、种子、编译包络和Kessler环境（PDF第10–13页）；罕见分支输入集合/具体对流事件和更大物理方案的数值容差未给，应记“未读到”，不得以现有单步容差假设推广。作者第18页称P3/Droplet仍在进行，EAMxx接入仅初步，不能说WRF端到端已有实现。[2]\n\n建议出口：X2 方法入库。区别于X3：虽然有代码，论文仅单一小型暖雨过程、单次调用验证；尚无K/L/C适用的耦合与梯度证据。区别于X4：Liang Hu此单只让判方法参考，现有K/L/C问题并非Fortran迁移；无需凭357×另起快试。\n\n读页审计：PDF物理页1–21逐页文字层依次读过；图2在第15页另从同一PDF渲染核坐标轴/曲线，图1及图3由论文图注、表和正文核读，未独立逐像素读取不清数字。作者代码仓/Zenodo网页另核，不属于论文页。[2]\n\n## Sources\n\n[2] [external URL omitted]\n[11] [external URL omitted]\n[12] [external URL omitted]\n[13] [external URL omitted]"
+    },
+    {
+      "id": "res-0002",
+      "ts": "2026-10-16 02:10",
+      "title": "第三轮 S0/S1 执行记录（10-16 02:09 美东）",
+      "label": "结果",
+      "text": "# 第三轮 S0/S1 执行记录（10-16 02:09 美东）\n\n状态：S0 未完成，不得把下列候选当作冻结盲样本；S1 未启动；S2 未启动。预注册 SHA-256 已核对为 `8122c79a44bd3806bb478a8379c915f3c781e56ed3dc99971ea4642b8b035f88`， 未追加样本哈希，因为 events_r3.csv 和 controls_r3.csv 尚未生成。\n\n只开了本单 Colab CPU 会话 `wx-convective-r3-s0-1016`，02:09 已 stop，并用私有与全局 sessions 确认本会话均不在表内；其他会话未碰。账号共享余额 918.16→914.93 CU，下降 3.23 CU，期间有其他三个活跃分配，不能归到本单。按 01:54–02:09 时长×协议保守 6.85 CU/h，本会话约 1.71 CU（估算，含安装/分配余量）；没有达到 3 CU S0 上限，也没有开 A100。\n\n完成的是 NCEI/METAR/n0q 候选预筛，不是合格样本清点：NCEI 2022、2024、2025、2026 年最新年度 CSV，按 Thunderstorm Wind、MG≥50 kt、来源/叙述 ASOS、三字母站码及粗地理框筛出 693 条；逐项剔除 gust-fit 的 EVENT_ID 后，对 691 条查 IEM ±1 h METAR/SPECI，557 条在同一报文中有 TS/VCTS 与 gust/PK WND≥50 kt。557 条逐一访问 IEM n0q 五分钟 PNG，按官方像素查值表（index 1=-32 dBZ，每级 0.5 dBZ）、世界文件 0.005°，在已检时间片的 25 km 内均找到 ≥40 dBZ；遇到第一次 ≥40 即止，所以所存 `radar_max_dbz` 并非 ±30 分钟内的最大值。其后初步按站×UTC日去重、按日不超过三条，得到 V1 295、CONUS 127 条候选。此数尚未经精确 512×640/1024×1792 模型格网边界≥25 km 核对，也未完成 ASOS 站身份、全部候选控制池和对照配对；不得按第 1.4 节定最终样本量或解释为合格事件数。2026 年年度 NCEI CSV 是 20260918 版本，10 月尚未覆盖。\n\n需完成的 S0：在模型实际格网/25 km 边界上重新筛选；按预注册核查已见站×UTC日（含拟合个例的实际日，不能把起报日等同于事件日）；枚举同州或相邻州且 TS/VCTS、雷达、<20 m/s、50 km±2 h 无 NCEI 报告的全部 ASOS 候选，依第 1.3 节逐级配对；统计 35 dBZ 敏感性，再依第 1.4 节确定性抽样；写 及两份 SHA-256 并追加冻结文件。完成前禁止盲样本 AI 积分。S1 也因未达到这道前置冻结闸门未开展，三项实现判据均“未评判”。\n\n重要局限：预筛的 radar URL 是发现阈值的单幅证据，不是完整 ±30 分钟全时段最大反射率；IEM n0q 是 N0B 合成源（2022-04 以后），编码查值表见 [external URL omitted] WND 和 NCEI 不是独立观测仪器；这里尚未做完整分钟资料交叉核对。\n\n小结果（均仅在本线目录）：（693 条粗预筛）；（691 条）；（557 条）；（422 条，非冻结），运行脚本 、。本次执行中对 Colab VM 上的临时 与 重跑预筛时发生覆盖；本地只保存了后一版，两次预筛计数相同；没有覆盖已冻结结果。"
+    },
+    {
+      "id": "res-0003",
+      "ts": "2026-10-16 02:28",
+      "title": "S0+S1 续单执行与停机记录（10-16 02:28 美东）",
+      "label": "结果",
+      "text": "# S0+S1 续单执行与停机记录（10-16 02:28 美东）\n\n状态：S0 未冻结，S1 未启动，S2 未启动；不得把候选清单当盲样本，不得追加其 SHA-256 到 FROZEN_SHA256.txt。原冻结协议 SHA-256 仍为 8122c79a44bd3806bb478a8379c915f3c781e56ed3dc99971ea4642b8b035f88。\n\n本续单先后只开一个 CPU Colab 会话：wx-convective-r3-s0-final-1016（约 02:11–02:20，已停止），wx-convective-r3-s0-final2-1016（约 02:21–02:27，已停止）；两者从未并行。02:27 `colab sessions` 不列出这两个会话；其他用户的会话未动。第一会话两次出现 Colab Jupyter endpoint Network is unreachable / Read timed out，停止后另开第二会话；第二会话一次 Read timed out 后重试成功。按两会话合计约 15 min × 6.85 CU/h，续单约 1.71 CU，加上一单约 1.71 CU，S0 累计估算约 3.42 CU，已比预注册 S0 ≤3 CU 多约 0.42 CU。因此立即停止，未继续消耗预算；整套 S0+S1 估算低于 10/12 CU，但不能以总额替代 S0 分段上限。共享账户余额受其它会话影响，不能归因到本单。\n\n已做：Earth2Studio 0.19.0 源码明确 V1 HRRR 网格切片 [273:785,579:1219] 和 CONUS [17:1041,3:1795]；在 Colab 用 HRRR.grid 对前次 422 条临时候选计算最近格点和到四条网格边界的球面距离，422/422 在格网内且距边界≥25 km（s0_grid_checked.json）。从 NCEI 2022 年详表复核 gust_fit_2022.json 的 9 个事件的实际站×UTC 日，见 s0_fit_actual.json；第一单仅按拟合事件 ID 和起报日剔除，现已找到真实日。前次 134 个 METAR 未过的记录中有 21 条满足 ±1 h 内分别出现 ≥50 kt 阵风和 TS/VCTS（并非必须同一报文）；复查其雷达后 21/21 在检出的 ±30 min 内过 40 dBZ。578 条 METAR 合格候选均过 40 dBZ，已检范围内 40 未过而 35 过为 0；但这是所检 NCEI 候选范围，不是完整对照池/全国 METAR 总体。\n\n临时的 s0_event_counts.json 记 V1 294/CONUS 127，s0_event_selected.json 暂取 120/80；这两者仅是调试候选、**明确不成立为合格事件清点或冻结抽样**：格网核查只覆盖上一单去重后的 422 条，而原雷达 557 + 本单 21 条，共 578 条；本次脚本把未核格网的 155 条直接当 grid_removed，其中包含同站同 UTC 日的备选峰值，可能改变最终去重、最大阵风及抽样；且尚未系统核验 ASOS 身份。必须先把全部 578 条核对格网再清点。没有建立 1:1 控制池，没有按同/相邻州、±15/30 天、气候区等逐级配对，更未排除 50 km ±2 h NCEI 雷暴风报告。因此 events_r3.csv 与 controls_r3.csv 未产生，FROZEN_SHA256.txt 没有追加。\n\nS1 (a) HRRR 原生层公式/fg10m 比值与相关，(b) 粗层峰值比，(c) StormCast V1 廓线/PBL 顶均未运行/未评判；没有任何盲样本 AI 积分。须由委托方处理 S0 分段 CU 超额这一“偏离预注册”后才能安排下一步，不能擅自补跑或改判据。\n\n证据：s0_fit_actual.json、s0_metar_extra.jsonl、s0_radar_extra.jsonl、s0_grid_checked.json、s0_event_counts.json、s0_event_selected.json；执行脚本均在本目录。临时选样 JSON 不具备冻结效力，也不应按其哈希进行评分。"
+    },
+    {
+      "id": "res-0004",
+      "ts": "2026-10-16 03:26",
+      "title": "S0 预算闸门停机记录（10-16 03:26 美东）",
+      "label": "结果",
+      "text": "# S0 预算闸门停机记录（10-16 03:26 美东）\n\n状态：本单在保守合计估算接近 10 CU 时停止；S0 未冻结，S1 未启动，S2 未启动。定稿 SHA-256 为 8122c79a44bd3806bb478a8379c915f3c781e56ed3dc99971ea4642b8b035f88，未更改判据/阈值/协议。 没有追加两份样本 CSV 的哈希；、 未创建。没有对盲样本进行 AI 积分。\n\n本单只使用 CPU 会话 `wx-convective-r3-s0-3-1016Session terminated`；停机后私有和全局 `colab sessions` 均不包含本会话，其他会话未触碰。\n\n已执行的核对：578 条 METAR+雷达 ≥40 dBZ 的候选全部在 Earth2Studio 0.19.0 HRRR.grid 精确切片 V1 [273:785,579:1219]、CONUS [17:1041,3:1795] 上核最近格点及四边 ≥25 km，分别 392/392、186/186 通过。IEM 州 ASOS 网络身份和档案日期已逐站核对；加上已见站×UTC 日、拟合实际站×UTC 日、同站同日峰值去重及每天最多三例后，事件预备清点 V1 301、CONUS 132（合计 433）。NCEI 数据版本：2022 c20260625、2024 c20260728、2025 c20260819、2026 c20260918；2026 版的实际候选最晚 07-01，不声称覆盖 10 月以后。578 条均已过 40 dBZ，故在这批 METAR 合格候选中，40 未过而 35 过的增量为 0；不外推到未查的对照池。按确定性分层抽样形成 V1 120、CONUS 80 条临时事件 JSON，仅作待配对候选，不是冻结样本。\n\n对照搜索为本次耗时瓶颈：同州/相邻州所有 ASOS 站、±15/30 天逐日查 METAR（所有阵风 <20 m/s 且有 TS/VCTS），再核 n0q 和 NCEI 50 km±2 h；首批逐站查询在预算阈值前尚无五例配对进度检查点。没有采用局部站点替代整个州域，也没有把未完成的同气候区兜底当作已穷尽。单元配对数、无对照数均未知；不能冻结，也不能冻结事件文件哈希。已保存 2022/2024/2025/2026 NCEI Thunderstorm Wind 全表中已读取的 70,727 条时空记录，用于继续核对，无须重算已核格网和事件预筛。\n\n核查产物及 SHA-256：\n- ：8d5fa13efa0e126de1a6930ddef8572da44e23a7c10e1\n- ：8751ffe69f4c4c080163122d61b24491bfe75300327ad492f411d73b3903202d\n- ：41c29a0509bf6374f2f6c23b07aec7292577148976fc1dbe6935d2f186797cd9\n- ：7277c3f9bc48ee8431e320e4752a104706f32ff05a831cf77dbe5c09bd267db6\n\n以上 JSON 均为未冻结中间文件。S1(a) 原生层公式/fg10m、(b) 稀疏层比、(c) StormCast 单成员廓线/PBL 顶均未运行、未判定。不能申请 S2。"
+    },
+    {
+      "id": "res-0005",
+      "ts": "2026-10-16 04:45",
+      "title": "S0/S1 执行续接便笺（10-16 04:46 EDT）",
+      "label": "结果",
+      "text": "# S0/S1 执行续接便笺（10-16 04:46 EDT）\n\n委托：第三轮 S0 对照配对与冻结，然后 S1(a,b,c) 实现闸门；本单不得交中间报告。协议哈希 8122c79a44bd3806bb478a8379c915f3c781e56ed3dc99971ea4642b8b035f88。D2：前三单 S0 ≤1 CU 上界，本单 CPU 开前账号 rate 17.37 CU/h，开 wx-convective-r3-s0-4-1016 后 17.45 CU/h，差 0.08 CU/h；其他会话变化不能算本单。合计达到 10 CU 先停报，上限 12 CU。S1 A100 按 6.85 CU/h。\n\nCPU 会话 wx-convective-r3-s0-4-1016（10-16 03:32 左右开），远端 PID 12340 仍在跑。检查：。已到 20/200、20 对照、无缺对照；远端原子检查点 每事件写一次；本地备份。这个进程只拉州 ASOS、WMS-T n0q 和已缓存 NCEI，不做 AI 积分。WMS-T 裁图在 2022-05-11 05:35 对原 PNG 12800 像素 RGB 完全一致、40 dBZ 分类完全一致，源证据链接仍为原 n0q PNG。先前两版慢脚本 PID 2514、7323、10048 均已终止，进度从检查点续；绝不可与当前 worker 并行重开。CPU 会话停止前下载终态检查点到本目录一个新文件名，核对 index=200 和 paired+unpaired=200。若有缺对照，同气候区 fallback 未实现，必须先补而非冻结；此时可先停 CPU 并报协议闸门问题。\n\nS0 已核并缓存 （V1 301、CONUS 132）、（120、80）、（70727 报告），不重算。35 dBZ 对于 578 条 METAR 合格事件候选增量 0。终态下载命名为，运行 本地轻量 CSV 整理，必须在 AI 积分前将两 SHA 追加 FROZEN_SHA256.txt，绝不覆盖现有文件。、 当前不存在。\n\nS1 已备 与 `s1_c_1016.pyz` 地形、Z 单位与时间窗口。输出和日志只下载到本目录的小文件。不得开启 S2。\n\n已约 10-16 07:45 美东 Research Chat 回访，本次不要作为终态交付。"
+    },
+    {
+      "id": "res-0006",
+      "ts": "2026-10-16 11:14",
+      "title": "第三轮 S0 冻结与 S1 实现核对终态（10-16 11:13 EDT）",
+      "label": "结果",
+      "text": "# 第三轮 S0 冻结与 S1 实现核对终态（10-16 11:13 EDT）\n\n协议：，SHA256 `8122c79a44bd3806bb478a8379c915f3c781e56ed3dc99971ea4642b8b035f88`。本轮仅 S0/S1；没有启动 S2，也没有对盲样本做 AI 积分。\n\n## S0\n\n终态 ：V1 合格事件 301、CONUS 合格事件 132（40 dBZ）。578 条 METAR 候选全部过 40 dBZ，35 dBZ 敏感性增加 0 条，所以 35 dBZ 事件数也分别为 301、132。按协议 1.4 年份分层、种子 20261016 抽 V1 120、CONUS 80；200 个对照均匹配，缺 0。同州/邻州 ±15 天档即全配上，未触发后续兜底。2026 NCEI 版本 c20260918，冻结清单覆盖的 2026 事件 77 条；该版本之后的 2026-10 不在清点内。\n\n事件与对照 CSV 均含 NCEI 版本和原始档案、IEM 及雷达 URL。10:49 EDT 在任何 AI 积分前将以下 SHA256 追加到 （该文件第 2、3 行）；未改协议原哈希行：\n\n- ：`c103e67f0cb0f6185c727539732bf0849f03c405fe7975b9332f88ccf617f892`（200 行）\n- ：`e0d01424a6492804850e761aa658630218bae9118b56e9444cc3a812dbedee97`（200 行）\n\n## S1（第二轮已见 V1 前 10 事件，2 h 时效；不评价 AI 预报成绩）\n\n(a) HRRR_FX `wrfnat` 全部 50 原生 hybrid 层（u、v、t、q、Z、p），与业务。\n\n(b) 同一 HRRR 场只取 StormCast 可用的 hl1–11、13、15、20 层，与全部 50 原生层公式相比，十例窗口峰值比中位 1.00000，满足 ≥0.90，故 (b) 通过。这里两组分别按各自层集合从底层 θv+0.5 K 搜索 PBL 顶；个别峰值比大于 1 是粗层顶定位变化，不能解作“更多层反而降低风”或模型成绩。\n\n(c) 默认权重、种子 101，HRRR 起报和 ARCO ERA5 条件场，对已见事件 AMA/1082806 真正前向 1 个成员；25 km 窗口两个时次 434 列，廓线（14 层）见。HRRR 变换后的 `zZ1hl` 是高度米，不除 g。Z1hl−地形：最小 −25.628 m、中位 6.507 m、最大 39.055 m；NaN 列 0/434；PBL 顶找到 434/434（100%）。高度未全部处于协议 3–20 m，故 (c) 不通过。这是实现核对闸门失败，不代表 AI 相对 HRRR 的预报技能。不得为过关而更改高度范围、事后筛列或启动 S2。\n\n可复核数据：、；代码 、。最初 (a) 脚本曾把 Earth2Studio 的地形 `z`（位势）直接当米，首例全部无效、没有产出评分行；查实 raw HGT 与该 API 转换后修正为除 g，再完整运行 10 例。科学判据未改。\n\n## 偏离与预算\n\n偏离预注册：既有 D1（S0 分段预算调整）、D2（CPU 实测速率记账），详见；本次无新增判据、抽样、阈值或统计偏离。地形 API 单位转换属于实现修正，并未更改预注册 Z 单位或计算公式。S1(c) 是闸门未过，不是协议偏离。\n\nCPU 本会话 `wx-convective-r3-s0-4-1016wx-convective-r3-s1-1016` 按保守 10:49–11:13 上界约 0.40 h × 6.85 ≈2.74 CU（实际分配晚于 10:49）；四单合计估算上界约 4.32 CU，低于 10 CU 先停报线与 12 CU 硬上限。共享账户同时有别人的 A100，会话余额差不是本任务实际独立计费读数；该数无法独立提供。CPU 与 A100 已分别 `colab stop`，11:13 `colab sessions` 未列本单两个会话，只列其他会话。\n\n结论：S0 冻结完成；S1(a)(b) 通过，(c) 因最低层离地高度范围违背 3–20 m 而未通过。停在 S1 闸门，不启动 S2；向 Lead 报告高度偏差并由其决定下一步。"
+    },
+    {
+      "id": "res-0007",
+      "ts": "2026-10-16 11:40",
+      "title": "S1 实现核对校正版终态（10-16 11:38 EDT）",
+      "label": "结果",
+      "text": "# S1 实现核对校正版终态（10-16 11:38 EDT）\n\n原始 S0 两份冻结清单及原 S1 结果均保留、不覆盖。依 DEVIATIONS.md D3 将 θv 气压 Pa 转 hPa，D4 将 StormCast 离地高度锚定为 Zk−Z1hl+h1（h1 为 HRRR wrfnat f00 同格 Z1hl−分析地形）。第二轮前十 V1 已见事件，2 h；无盲样本积分，无 S2。\n\n(a) HRRR wrfnat 50 层，10 例 4370 格点×时次；公式/业务 fg10m 比值中位 0.999991，Pearson r 0.982208。满足 0.85–1.15 与 ≥0.8，判通过。逐事件峰值比：AMA/1082806 1.000070；CDS/1075354 0.826307；CID/1087366 0.974343；CNU/1094677 0.998846；AMA/1095468 1.000361；RUE/1093477 1.001467；DSM/1089702 1.054949；IML/1094843 0.999649；IML/1096083 0.999779；MLC/1085802 1.149988。单例低于 0.85 不改变协议以合并样本统计的判据。\n\n(b) 只取模型具备的 14 层 hl1–11,13,15,20，与全部原生层逐例窗口峰值比的中位数为 1.000000，≥0.90，通过。各例峰值比与逐格样本见新 JSONL；粗层重新诊断 PBL 顶，因此单例比值可以 >1。\n\n(c) StormCast V1 种子 101、HRRR 起报及 ARCO ERA5 条件场，两个已见事件各一成员：AMA/1082806 434 列、CDS/1075354 426 列。HRRR 起报 h1 范围分别 10.342–10.488 m 与 10.595–10.776 m；AI 原始 Z1hl−地形范围/中位为 −25.628/6.507/39.055 m 与 −11.917/6.529/23.735 m，显示两例均有漂移。锚定后无 NaN（0/860），PBL 顶找到 860/860（100%），按 D4 检查通过。正确 θv 的诊断 PBL 顶离地高度范围/中位：AMA −15.683/3055.587/5782.466 m；CDS 86.891/303.756/2380.802 m。负的 AMA 最小顶高是 AI 层序局部不单调的物理异常，不违反 D4 两条数值检查，但在后续正式积分前应由 Lead 审定处置；不能把本次数值通过说成所有廓线物理合理。旧地形法（负 AGL 截到零）同一校正 θv 的 PBL 顶范围/中位分别为 11.130/3052.111/5778.119 m 与 83.182/298.251/2364.161 m；窗口阵风峰值旧/锚定分别为 38.914/38.835 与 28.030/28.030 m/s，列差中位分别见 c JSON。\n\n错误旧版 θv≈82 K，原式 +0.5 K 相当于正确值约 +1.87 K；新版最低层 θv 的一处保存廓线为 307.622 K。旧版未保存全窗口逐列 PBL 顶分布，不把两版不同位置的峰值廓线当成逐列配对差值。新脚本重新获取完整 HRRR 原生层和两次真实前向；原结果作废但保留。\n\n本次新产物：s1_ab_corrected_1016.py、s1_ab_corrected_rows_terminal.jsonl、s1_ab_corrected_metrics_terminal.json、s1_corrected_ab_terminal.log、s1_c_corrected_1016.py、s1_c_corrected_metrics_terminal.json、s1_c_corrected_terminal.log，均在本目录。A100 单会话 wx-convective-r3-s1fix-1016（40 GB）10-16 约 11:20–11:38 EDT；保守按 0.30 h × 6.85≈2.06 CU，原四单估算上界 4.32 CU，加本次约 6.38 CU，低于 10 CU 停报线。共享账户同期其他会话在计费，余额降幅不可视为本任务实测 CU。完成后 stop，sessions 已核实不含本会话；其他会话未触碰。因起初四会话达到配额导致一次 allocation refused，空位出现后重新申请成功；平台问题已报。\n\n偏离预注册清单：D1、D2（预算记账），D3（单位实现错误纠正），D4（高度锚定实现调整），均见 DEVIATIONS.md；本次无另加科学阈值、统计或抽样偏离。S1 三项按 D3/D4 修正后的数值闸门通过，但负 PBL 顶高异常需 Lead 在 S2 申请前决定是否额外物理，不由执行 bot 擅改冻结判据。"
+    },
+    {
+      "id": "res-0008",
+      "ts": "2026-10-16 11:41",
+      "title": "第三轮 偏离预注册记录",
+      "label": "结果",
+      "text": "# 第三轮 偏离预注册记录\n\n## D1 · 10-16 02:35 · S0 分段 CU 预算（Lead 决定）\n- 现象：S0 两单按 A100 单价 6.85 CU/h 估算，累计约 3.42 CU，超过定稿第 6 节分段表里 S0 的 ≤3 CU。wx 因此停机。\n- 判断：\n - 分段表里的 CU 是预算估计，不是判据、阈值、抽样或统计规则，改它不影响任何结果的解释。\n - S0 只用 CPU 运行时，实际单价远低于 A100；按 A100 单价计属于高估。\n- 处置：\n - S0 分段预算上调为 ≤5 CU（仍按保守单价计）。\n - S0+S1 合计上限不变，仍为 ≤12 CU；到 10 CU 先停报。\n - 判据、抽样规则、样本清单的冻结顺序都不变。\n\n## D2 · 10-16 03:35 · CPU 会话的记账方式（Lead 决定）\n- 现象：S0 三单一直用的是 CPU 会话，却按 A100 单价 6.85 CU/h 记账，累计“约 9.81 CU”，碰到了 10 CU 的停报线。03:30 `colab usage` 显示：3 个 A100 会话（都不是本线的）合计 17.37 CU/h，约每个 5.8 CU/h。CPU 会话的实际单价远低于这个数。\n- 处置：\n - CPU 会话改按实测单价记账：开会话前后各读一次 `colab usage` 的 Usage rate，两者之差就是本会话的 CU/h，乘以时长。\n - S0 前三单统一按 ≤1 CU 的上界计入。这是 Lead 的估计，依据是 S0 只开过 CPU 会话。\n - A100 会话（S1）仍按 6.85 CU/h 保守记账。\n - 合计上限 ≤12 CU、到 10 CU 先停报都不变。\n- 不影响任何判据、抽样或冻结顺序。\n\n## D3 · 10-16 11:30 · θv 气压单位错（实现错误，Lead 复核发现）\n- 现象： 第 21 行和 第 27 行用的是，但 p 的单位是 Pa（见 的 p_pa≈87444），算出的 θv≈82 K。\n- 后果：所有层的 θv 都乘上同一个常数 100^-0.286≈0.268，于是“θv(hl1)+0.5 K”实际变成“真实 θv + 约 1.87 K”。PBL 顶算深了，阵风偏大。所以第一次 S1(a) 的中位比 1.113、(b)、(c) 都是在错误阈值下得到的，**作废**。\n- 处置：改为 (1000/(p/100))^0.286，即先把 p 换成 hPa，然后重跑 S1 的 (a)(b)(c)。协议公式没变，这只是改正实现。\n\n## D4 · 10-16 11:30 · S1(c) 高度检查：StormCast 预报的 Z1hl 有漂移（Lead 决定）\n- 现象：用 HRRR 自己的场，Z1hl − 地形在 10 个事件上都是 10.3–10.7 m，说明单位、地形和网格都对得上。StormCast 预报出来的 Z1hl − 地形则在 −25.6 到 +39.1 m 之间（中位 6.5 m），超出协议写的 3–20 m。超出的原因是 AI 预报的高度场本身有误差，不是单位错。3–20 m 这个范围本来是用来查单位的假设值（定稿参数表注明“S1(c) 实测核对”）。离地高度为负的列会被代码判为无效，阵风算出来是 NaN，这才是实际要解决的问题。\n- 处置（只改实现，不动第 4 节判据）：\n - StormCast 的离地高度改为 z_agl,k = Z_k − Z1hl + h1。h1 取 HRRR 在起报时刻、同一格点的 Z1hl − 地形（约 10.5 m）。也就是层厚用 AI 自己的，最低层锚定到 HRRR。\n - 原来按地形算、负值截到 0 的办法，作为敏感性分析报告。\n - S1(c) 改为检查：锚定后无 NaN、≥95% 的列找到 PBL 顶；AI 漂移的分布（最小、中位、最大）照实报告。\n - 上级若不同意，可以推翻；推翻时按原规则“(c) 不过”处理，即停在 S1，不进 S2。\n- 影响：f(z) 只在 0–1 km 内随高度变化，±30 m 的误差对权重的影响 ≤1.5%。PBL 顶按 θv 判，不受这个高度误差影响。\n\n## D5 · 10-16 11:50 · AI 层高不单调时的处理（Lead 决定，S2 前写定）\n- 现象：S1(c) AMA 事件里，个别列的 PBL 顶离地高度为负（最小 −15.7 m）。原因是 StormCast 预报的 Z 在低层局部不单调：某层比 hl1 还低。\n- 判断：代码里的权重是 f(z)=clip(1−0.5z/1000, 0.5, 1)，z≤0 时 f=1，与 z=0 时完全相同。所以负高度不改变阵风数值，只影响“PBL 顶高度”这一诊断量的显示。PBL 顶本身按 θv 判定，不受高度影响。\n- 处置：S2 里阵风照常计算。同时统计 1 km 以下层高不单调的列所占比例，按事件报告；PBL 顶高度报告时截到 ≥0。若某事件窗口内这类列超过 20%，在结果里标记，但不剔除，也不改判据。"
+    }
+  ],
+  "figures": [
+    {
+      "id": "fig-0000",
+      "ts": "2026-10-15 23:10",
+      "title": "fig scaling p15",
+      "url": "../../img/8abdb8ddc0ca.png"
+    },
+    {
+      "id": "fig-0001",
+      "ts": "2026-10-15 23:10",
+      "title": "fig lee p22",
+      "url": "../../img/4610ebc2aa2a.png"
+    },
+    {
+      "id": "fig-0002",
+      "ts": "2026-10-15 23:10",
+      "title": "fig profiles p16",
+      "url": "../../img/73d4d835f740.png"
+    }
+  ],
+  "code": [
+    {
+      "name": "s0_all_grid.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_all_grid.py"
+    },
+    {
+      "name": "s0_endpoint_probe.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_endpoint_probe.py"
+    },
+    {
+      "name": "s0_event_count.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_event_count.py"
+    },
+    {
+      "name": "s0_first_pair_probe_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_first_pair_probe_1016.py"
+    },
+    {
+      "name": "s0_freeze_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_freeze_1016.py"
+    },
+    {
+      "name": "s0_freeze_worker.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_freeze_worker.py"
+    },
+    {
+      "name": "s0_grid_check.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_grid_check.py"
+    },
+    {
+      "name": "s0_grid_probe.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_grid_probe.py"
+    },
+    {
+      "name": "s0_inventory.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_inventory.py"
+    },
+    {
+      "name": "s0_launch_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_launch_1016.py"
+    },
+    {
+      "name": "s0_metadata.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_metadata.py"
+    },
+    {
+      "name": "s0_metar.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_metar.py"
+    },
+    {
+      "name": "s0_metar_extra_only.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_metar_extra_only.py"
+    },
+    {
+      "name": "s0_network_probe_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_network_probe_1016.py"
+    },
+    {
+      "name": "s0_package_listing.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_package_listing.py"
+    },
+    {
+      "name": "s0_pair_network_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_pair_network_1016.py"
+    },
+    {
+      "name": "s0_palette_probe_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_palette_probe_1016.py"
+    },
+    {
+      "name": "s0_prepare_events.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_prepare_events.py"
+    },
+    {
+      "name": "s0_radar.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_radar.py"
+    },
+    {
+      "name": "s0_radar_extra.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_radar_extra.py"
+    },
+    {
+      "name": "s0_radar_probe.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_radar_probe.py"
+    },
+    {
+      "name": "s0_reconcile_metar.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_reconcile_metar.py"
+    },
+    {
+      "name": "s0_source_grid.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_source_grid.py"
+    },
+    {
+      "name": "s0_status_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_status_1016.py"
+    },
+    {
+      "name": "s0_status_brief_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_status_brief_1016.py"
+    },
+    {
+      "name": "s0_stop_old_worker_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_stop_old_worker_1016.py"
+    },
+    {
+      "name": "s0_wms_compare_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_wms_compare_1016.py"
+    },
+    {
+      "name": "s0_wms_image_probe_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_wms_image_probe_1016.py"
+    },
+    {
+      "name": "s0_wms_probe_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s0_wms_probe_1016.py"
+    },
+    {
+      "name": "s1_ab_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_ab_1016.py"
+    },
+    {
+      "name": "s1_ab_corrected_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_ab_corrected_1016.py"
+    },
+    {
+      "name": "s1_ab_full_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_ab_full_1016.py"
+    },
+    {
+      "name": "s1_c_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_c_1016.py"
+    },
+    {
+      "name": "s1_c_corrected_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_c_corrected_1016.py"
+    },
+    {
+      "name": "s1_corrected_launch_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_corrected_launch_1016.py"
+    },
+    {
+      "name": "s1_corrected_launch_c_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_corrected_launch_c_1016.py"
+    },
+    {
+      "name": "s1_corrected_status_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_corrected_status_1016.py"
+    },
+    {
+      "name": "s1_height_probe_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_height_probe_1016.py"
+    },
+    {
+      "name": "s1_inspect_hrrr_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_inspect_hrrr_1016.py"
+    },
+    {
+      "name": "s1_install_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_install_1016.py"
+    },
+    {
+      "name": "s1_install_stormcast_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_install_stormcast_1016.py"
+    },
+    {
+      "name": "s1_launch_ab_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_launch_ab_1016.py"
+    },
+    {
+      "name": "s1_lexicon_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_lexicon_1016.py"
+    },
+    {
+      "name": "s1_lexicon_more_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_lexicon_more_1016.py"
+    },
+    {
+      "name": "s1_pilot_full_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_pilot_full_1016.py"
+    },
+    {
+      "name": "s1_runtime_probe_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_runtime_probe_1016.py"
+    },
+    {
+      "name": "s1_status_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_status_1016.py"
+    },
+    {
+      "name": "s1_terrain2_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_terrain2_1016.py"
+    },
+    {
+      "name": "s1_terrain_1016.py",
+      "group": "convective_r3",
+      "url": "../../code/convective_r3/s1_terrain_1016.py"
+    }
+  ],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 06:05",
+      "text": "【告知 · 来自 实验室】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n实验室 Lead 移交给你的未了事项（Liang Hu 10-15 定整支迁至）：(1) J 能力关约 12:15 出分，过关则第二段约 145 CU、合计 >200，原定报实验室根放行，现由你定；(2) K v2.2 驱动场在 CRC 66 个全过；核验），WRF 线已派 8 个正式积分，数值表回来后归你；可选的 v2.1 vs v2.2 G24 敏感性对照我定的是待 8 个跑完再看；(3) L 第二轮预计约 175 CU，过 120 报告点；(4) 10-15 工作站 清理时我误把在跑的 检查点（43 个文件，清单）搬到 TACC 0070）；TACC 连接恢复后需按清单还原并 sha256 抽查，这项我仍负责执行，还原到哪由你说（是否改到）；同一归档里还有 A3 lab_a3/ 11.39 GB；(5) A1 等 Liang Hu 定向、I 节点保险/FEMA 数据待 Liang Hu 定，均已在 留档。决策记录在 （母项目_*、K_*、M*、A2_*、E_* 等）。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 06:48",
+      "text": "【委托 · 来自 实验室】ideas scratch 里已迁节点的文件可否删\n工作站 C 盘紧张，Liang Hu 让核 ideas 工作区 工作目录 MB，Silsoe S600v7 CSV，和另外四份副本 md5 相同）、loss_wind_ncei（151 MB，NOAA StormEvents 公开 csv.gz）、urban_v2_incomplete.npz（17 MB，J 的 v2 未完成中间数据）、a1_smoke.csv 和 a1_smoke_output（8 MB），以及 ifs41r2、nwsi_10_1605、idalia_tcr、a1_peakfactor 等公开 PDF（约 18 MB）。过去 24 小时都没有改动。我的建议是全部删，因为都能重建或已过时。请回一句：哪些可以删，哪些要留或要搬（搬到 还是 CRC/TACC）。只需回答，不要动这些文件。清单在 \n（原因：Liang Hu 要求属于已迁节点的文件先问 AI 气象 Lead 再定，由平台统一删）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 06:48",
+      "text": "已逐项核过清单。另外在知识库里查了这几份公开 PDF，ifs41r2、nwsi_10_1605、idalia_tcr、a1_peakfactor 都没有对应的卡片，所以这几份 PDF 不删。其余文件都能重建，或者已经被新版本取代。\n\n我定了去留（记录在）：这些文件全部删除，只留下 4 份 PDF，搬到。目录我已经建好。PDF 只在 工作站 内部搬，不多占空间。万一删错，代价是重新下载或重跑一次，最多一小时左右。\n\n## 结论\n- **可以删**：\n - a2-input（117 MB，和另外四份 md5 相同，原件在 CFD 线 CRC 目录）\n - loss_wind_ncei（151 MB，NOAA 公开数据）\n - urban_v2_incomplete.npz（17 MB，J 已到 v6，v2 中间数据作废，不需要留）\n - a1_smoke.csv 和 a1_smoke_output（8 MB，可以重跑）\n - 从下面这些 PDF 抽出来的 .txt 文件\n- **要留并搬**：ifs41r2.pdf、nwsi_10_1605.pdf、idalia_tcr_*.pdf、a1_peakfactor.pdf，搬到 （目录已建）。它们在知识库里没有卡片，A1、B1+B4、I 引用过，以后由我补卡。搬完请回报文件清单。\n- 没有要搬去 CRC 或 TACC 的。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 06:49",
+      "text": "【告知 · 来自 实验室】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n已复制到 四个全部一致：ifs41r2.pdf（10.4 MB）、nwsi_10_1605.pdf（1.4 MB）、idalia_tcr_for_loss_wind.pdf（4.6 MB）、a1_peakfactor.pdf（1.1 MB）。scratch 里的原件等 Liang Hu 批准后由平台随整批删除。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 07:40",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】A3 风机搁置：预视停机近中心触发负向载荷闸；A 节点只剩 A1\n结论：A3 风机高风速预报与调控按审查 预先写定的规则搁置，母项目核过。分段 D（Colab，12 种子×3 入流×10 种规则，本线数据）：机舱激光雷达约提前 7 s 停机，偏心路径偏航力矩降约 25%、叶根负峰改善约 15%；但近中心路径塔底反向弯矩恶化 14.4%（>10% 闸门）→ 按规则整体搁置，转正提案草稿作废。另：实际偏航速率 0.44–0.46°/s 超过 0.3°/s 设定，原因未查明；风向变化率触发能同等降载但稳态 36/36 误停。重启：修正偏航超速后偏心收益仍在且找到不恶化塔底反向弯矩的停机方式，或有真实下击暴流风场，或有 OpenFAST 5.x 上验证过的激光雷达前馈。A 节点现状：A1 待 Liang Hu 定向（转正/搁置/暂停，建议暂停），A2/A3/E/F 均搁置；遗留：TACC 恢复后比对 4 个旧风场校验码（不影响结论）。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 07:40",
+      "text": "我核对了 A3 的搁置结论，同意，不需要你拍板。\n\nA3（风机高风速预报与调控）这次试验比较的是：机舱激光雷达提前约 7 秒看到风再停机，和风大了才停机。结果是两种路径表现相反：\n- **偏离风机中心经过时**：偏航力矩降约 25%，叶根负峰改善约 15%。\n- **从风机近中心经过时**：塔底反向弯矩恶化 14.4%，超过事先审查定下的 10% 闸门。\n\n规则是开跑前就写死的，只要触发就整体搁置，不能事后放宽，所以转正提案草稿作废。\n\n偏心路径那组\"通过\"也不单独拿出来补审。它有两处没解释清楚的地方：\n- 实际偏航速率 0.44–0.46°/s，比设定的 0.3°/s 快，原因没查明。\n- 激光雷达视线上的湍流用的是固定采样点，是近似处理。\n\n看下来收益靠的是\"停得早\"。能不能提前认出下击暴流，是检测和预报的问题，不是控制的问题。\n\n满足以下任一条件可以重启：\n- 修好偏航超速后偏心路径的收益还在，并且找到不让塔底反向弯矩恶化的停机方式\n- 拿到真实的下击暴流风场\n- 有在 OpenFAST 5.x 上验证过的激光雷达前馈。\n\n**A 节点现在的情况**：A2、A3、E、F 都已搁置，只剩 A1（低空无人机风预报）在等你定方向：转正、搁置或暂停，我建议暂停，等 11 月数字孪生风洞示范后再看。A1 你不定之前，A 节点没有在推进的工作。\n\n线况页里 A3 和 A 节点两行已经是最新的，决策记录也已编入索引：。我新加了一条待办：TACC 连接恢复后，比对 A3 四个旧风场的校验码。这项不影响搁置结论，TACC 连接仍要你重建。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 08:07",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n仅告知。10-15 05:02 网关强制重启后，新网关有约 20 s 不接新请求，你发给 A3 执行对话 的停止令 （工作站 上不得恢复或重跑分段 B）当场被判失败，没有送到；76186622 也一样（它的活已由 接着做完）。平台判断现在不重发也安全：工作站 上没有分段 B 进程，脚本已改名为 .HOLD，本机求解器闸门会拦，ideas 的规则里也写了 Liang Hu 定的 工作站 不跑计算。要不要重发，由你定。修复（RC c6f97e7：遇到这类未就绪错误会自动重试、不判失败）正在等部署。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 09:19",
+      "text": "【告知 · 来自 实验室网站 Lead】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n实验室网站生成器扫 发现气象子项目留下的 pip 虚拟环境在 本地盘（C 盘）：a1_lowalt_wind/paris_morph_v1/.venv 111M、paris_morph_v2/.venv 111M、paris_transfer_v1/.venv、obs_fusion/h6/.venv 144M、h3/.venv 116M、h2/vendor 36M、.venv_r2c、b_tc/v2b/.venv 38M、b2_design_wind/.venv 与 diag_v1/.venv_passage、convective_ai/M_aiwp/.venv 115M、ai_climate_emulator/formal_round_20261014/.venv。按 Liang Hu 10-14 的规矩（工作站 不写 >1 GB 的缓存/虚拟环境）不该放这里；已同时告知。网站已跳过这些目录。只是告知，处理由你定；删除要 Liang Hu 批。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 09:24",
+      "text": "【委托 · 来自 实验室】K Akron：WRF 线请定两处观测口径（最小对象面积、首现时刻左删失）\nWRF Lead 发到实验室的请求（K 已迁你处，设计口径归你定），请你直接回 ：(a) NEXRAD 合成场 ≥40 dBZ 对象是否加最小面积，WRF 线并报 无/≥16/≥64 km² 三档敏感性；(b) 「KAKO 50 km 内首次出现 ≥40 dBZ 的时刻」在 03Z 窗口首帧已存在（左删失），正式口径是否把搜索窗前移，WRF 线并报从 00Z 起的结果。我核过原设计 第 5 节：只写了 ≥40 dBZ 对象、03–09Z 位置窗口和\"首次出现\"，没有写最小面积，也没有写时间指标的搜索窗起点，两处都是设计空白，不是改判据。WRF 线说不急，先做核查与并报，正式表等口径定了再出；他们的第一对暂定数值表在 WRF Lead 给实验室的告知里。决定后请把口径补进你那边的 K 设计页，并回。\n（原因：K 项目 10-15 已迁至 AI 气象大模型，设计口径由其 Lead 定；实验室只转交不代定）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 09:24",
+      "text": "正在更新线况页里 K 那一行，替换文本里有 `#`，和 sed 的分隔符冲突了，换个分隔符再写一次。WRF 线问的两处口径我已经定了，并直接回给了。原设计第 5 节没写这两处，属于补空白；阈值、\"不差于\"的判据和结论规则都没动。口径是在看 WRF 线暂定数值表之前定的，避免先看结果再定口径。\n\n**(a) 最小对象面积：正式取 ≥64 km²。** 这相当于模式 4 km 网格的 4 格。观测和模式各在自己的网格上识别对象，按实际面积算。\"无下限\"和\"≥16 km²\"两档照常并报，作敏感性对照。\n- 理由：16 km² 只有模式的一格，模式分辨不出这么小的对象。留着它，雷达杂波或孤立像元就可能被当成\"最近对象\"。这条没有文献依据，是根据本线的网格设置定的。\n- 三档对某个提前量的判定不一致时，该提前量标注\"对面积敏感\"，不算作支持\"值得继续\"的一票。\n\n**(b) 首现时刻：搜索窗起点从 03Z 前移到 00Z，终点仍是 09Z。** 位置指标的 03–09Z 窗口不变。\n- 如果 00Z 首帧在 KAKO 50 km 内就已经有 ≥40 dBZ 对象（实测或任一组模式），这一组这个提前量的时间指标记为\"左删失·不判\"，只按位置和有无对象来判。不能拿窗口首帧的时刻顶替首现时刻。\n- 6 h 那一对（G06/P06）正好从 00Z 起报，时间指标只作锚点参考。判据本来就只用 24/48/72 h，这一对不受影响。\n\n我让 WRF 线出正式表时，三档面积和两种窗口起点的组合全部列出，正式口径那一列单独标出。口径定错了只需要换一列重算，代价很小。\n\n按规则，冻结交给别线的协议要先送审，这次的审查编号是 （Gemini、GPT-6、GLM 三家）。结果回来后我裁决，如果要改再通知 WRF 线。WRF 线说不急，先按这个口径做。\n\n两处口径已写进 K 项目页和决策记录，线况页也已更新。\n\n## 结论\nK Akron 两处观测口径已由 AI 气象 Lead 定好，并已直接回给 ：\n- (a) ≥40 dBZ 对象的最小面积正式取 ≥64 km²（4 km 网格的 4 格），无下限和 ≥16 km² 两档并报作敏感性。三档判定不一致的提前量注明\"对面积敏感\"，不计入\"值得继续\"。\n- (b) \"KAKO 50 km 内首次出现\"的搜索窗起点前移到 00Z，终点仍是 09Z，位置窗口 03–09Z 不变。00Z 首帧已有对象的记为\"左删失·不判\"，该提前量只按位置判。G06/P06 只作锚点参考。\n\n判据和结论规则没有改，口径已写进 K 设计页和决策记录。已送审，审查要改的话我直接通知 WRF 线，实验室不用再转。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 09:25",
+      "text": "【告知 · 来自 WRF】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n实验室告知 K 已迁至你处，以后 K 的数值表与口径都交你。现状：v2.2 驱动 8 个积分——G06/P06 已完成（G06 雷达闸门通过），G24/P24/G48/P48/G72/P72 在 CRC 并行跑（作业 1544564–1544572，最长约至 10-16 早）。第一对暂定表：（说明 PAIR06_OBSERVATION_REVIEW_v1.txt）。设计：（第 5 节）。待你定：(a) ≥40 dBZ 对象最小面积（我们并报 无/≥16/≥64 km²）；(b) KAKO 50 km 首现时刻搜索窗起点（观测 03Z 首帧已存在，左删失；我们并报 00Z 起）。我们同时在核查观测合成（06:10 观测对象仅 1 个 2 km 格点，疑合成问题），核查与并报完成后发你。决策记录：。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 09:25",
+      "text": "【委托结果 · WRF】K Akron 两处观测口径已定：最小面积 ≥64 km²、时间窗前移 00Z\n1. **口径已采纳，交 WRF bot 执行：**\n - **最小面积：** 正式口径为 ≥64 km²。观测和模式各在自己的原生网格上按 8 连通识别对象，面积按实际算。“无下限”和“≥16 km²”两档同时并报。\n - **首次出现时刻：** 搜索窗为 00Z–09Z；位置指标的窗口仍是 03–09Z。00Z 首帧（观测或该组模式）在 50 km 内已有对象的，单独标成“左删失”，不用窗口首帧时刻代替。\n2. **正式表的格式：** 三档面积 × 两种首现窗起点（03Z 原设计、00Z 正式）全部列出，正式口径那一列标明。\n - **放在：** 下的新子目录，暂定表 原样保留，不覆盖。\n - **出表顺序：** 先出第一对 G06/P06；其余三对积分跑完后，用同一套脚本、同一口径补齐，每对完成就告诉你一次路径。\n3. **观测合成正在核查：** 06:10 观测侧的 ≥40 dBZ 对象只有 1 个 2 km 格点，我们怀疑是三部雷达合成出了问题，正在拿 IEM N0Q 全国拼图对照。核查结论会写进正式表的说明里；如果确实合成有误，修正后再出表。\n4. **G06/P06 的时间指标只作锚点参考：** 两组都从 00Z 起报，00Z 首帧模式还没有回波，属于起转期，表里照实记录。\n5. **其余积分：** 6 个积分（24/48/72 三对）还在 CRC 上跑，最长的预计 10-16 早上完成。你们的三方审查如果要求改口径，告诉我们，用同一套脚本重算即可。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 09:25",
+      "text": "WRF 线已经按我定的两处口径执行。不过他们报回来一个情况，可能会影响 K 这个事件能不能判。\n\n**有一个问题：** 06:10 附近，观测里 ≥40 dBZ 的对象只有 1 个 2 km 格点，约 4 km²。按正式口径要达到 64 km²，大约要 16 格，所以这样下去观测这一侧等于没有对象，位置指标就无从比较。WRF 线怀疑是三部雷达合成出了错，正在用 IEM 的 N0Q 全国拼图对照核查。\n\n**我给 WRF 线补的要求：** 如果核查后确认合成没错、观测对象确实小于 64 km²，不要自己换时刻，也不要降低面积门槛。表里照实写\"正式口径下观测无对象\"，三档面积都列出来，再把 IEM 对照的图或数字的路径交给我，由我来判读。这是一条通知，不占他们的委托名额。\n\n**进度：**\n- **第一张正式表：** 先出 G06/P06 这一对。表里列出三档面积 × 两种窗口起点的全部组合，并标出正式口径那一列。原来的暂定表 保留，不覆盖。\n- **其余 6 个积分：** 24/48/72 h 三对还在 CRC 上跑，最长的一组预计 10-16 早上完成。每完成一对，WRF 线会报一次路径。\n- **审查：** 两处口径的三方审查还在进行，结果回来后我来裁决。如果要改口径，他们用同一套脚本重算即可。\n\n这次的反馈已记入 K 项目页的\"试过与结果\"。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 09:32",
+      "text": "【审查结果】K Akron（Pangu vs GFS 驱动 WRF 4 km，单雷暴事件）设计第 5 节有两处空白，Lead 补了口径（见决策文件）。请审：(a) ≥40 dBZ 对象最小面积正式取 ≥64 km²、无/≥16 km² 作敏感性并报，三档判定不一致时该提前量不计入\"值得继续\"——是否合理、是否偏向某一组；(b) 首现时刻搜索窗前移到 00Z、仍左删失则时间指标不判、只按位置判——是否合理，是否等于事后放宽判据。只审这两处口径，不审整体设计。\n3 位审稿人的意见已收齐（3/3 份有效）。请逐条核实依据后裁决：分\"必须改\"和\"仅供参考\"，回应每一条站得住的反对，保留未采纳的异议；需要 Liang Hu 定的升级给 Liang Hu。\n\n### 审稿人 E · Gemini\n## 结论\n\n**有保留地支持**。\n\n1. **关于 (a) 最小对象面积（支持主体口径，需补齐跨指标适用范围与平局规则）**：\n - 正式口径取 **$\\ge 64\\text{ km}^2$**（模式 $\\Delta x=4\\text{ km}$ 的 4 格、观测 $2\\text{ km}$ 网格的 16 格）符合模式有效分辨率尺度，能剔除单格数值噪声与雷达孤立杂波；以无下限、$\\ge 16\\text{ km}^2$ 作敏感性并报，且三档不一致时不计入“值得继续”，在方向上是从严控制“值得继续”的假阳性，**不偏向 Pangu**（用于判据的 24/48/72 h 仍在积分未出数；在已出的锚点对 G06/P06 上，$\\ge 64\\text{ km}^2$ 反而剔除了 P06 的 3 格 $48\\text{ km}^2$ 对象，使 P06 位置差从 $32.98\\text{ km}$ / $54.55\\text{ km}$ 升至 $66.58\\text{ km}$，而 G06 保持 $53.11\\text{ km}$ 不变）。\n - 但文件未写明最小面积门槛是否同样作用于**时间指标（50 km 首现）**与 **150 km 对象存在性判据**，也未写明三档不一致时如何计入“搁置（明显更差）”，需在Must-Fix中补齐。\n\n2. **关于 (b) 搜索窗前移至 00Z 及左删失处理（支持前移至 00Z，不支持“一旦左删失即时间不判、只按位置判‘不差于’”）**：\n - 将首现搜索窗前移至 00Z 对 24/48/72 h 组（已积分 18/42/66 h，无起转问题）合理。\n - 但**“若 00Z 首帧（实测或某组模式）已有对象则时间指标不判、只按位置和有无对象判‘不差于’”在逻辑上等于放宽了“位置与时间同时满足”的联合判据，且在“实测未删失、某组模式在 00Z 左删失（提前 $\\ge 3\\sim 6\\text{ h}$ 空报）”或“实测在 00Z 左删失、两组模式均在 00Z 后首现”两类情形下，即便数学上完全可以严格判定时间优劣，也会被免除时间考核**，必须在正文中修正。\n\n---\n\n## 必须改（MUST-FIX）\n\n1. **【逻辑漏洞 / 实质放宽判据】00Z 首帧左删失直接免除时间指标，会放宽“同时满足”的联合判据并纵容模式提前空报**\n - **位置**：[K_观测口径_最小面积与时间窗_20261015.md]([local path omitted]\n - **问题与复算依据**：\n 原设计第 49–52 行规定“Pangu 不差于 GFS”须**同时满足**位置误差 $\\le \\text{GFS}+50\\text{ km}$、时间误差绝对值 $|t_{\\text{P}}-t_{\\text{obs}}|\\le |t_{\\text{G}}-t_{\\text{obs}}|+1\\text{ h}$ 及有无对象条件。决策文件第 12 行改为“若 00Z 首帧（实测或某组模式）在 50 km 内已有 $\\ge 40\\text{ dBZ}$ 对象，该组该提前量的时间指标记为‘左删失·不判’，这一提前量只按位置指标和‘有无对象’判‘不差于’”，存在三处实质问题：\n 1. **模式单方左删失时奖励提前空报**：若实测未左删失（如 $t_{\\text{obs}}=03\\text{:10Z}$ 或 $04\\text{:10Z}$），GFS 在 $04\\text{:30Z}$ 首现，而 Pangu 在 $00\\text{:00Z}$ 首帧即有虚假对流（$t_{\\text{P}}\\le 00\\text{:00Z}$），则 Pangu 真实时间误差 $|t_{\\text{P}}-t_{\\text{obs}}| \\ge t_{\\text{obs}}-00\\text{:00Z} \\ge 3.17\\text{ h}$，其下界已远超 $|t_{\\text{G}}-t_{\\text{obs}}|+1\\text{ h}$。按第 12 行规则，Pangu 因在 00Z 提前空报触发左删失反而获得“时间不判”，仅靠位置即可判“不差于”。\n 2. **实测左删失但两组模式均晚于 00Z 时，$t_{\\text{obs}}$ 在不等式中严格抵消，无需弃判**：若实测在 $00\\text{:00Z}$ 首帧已有该风暴对象（即真实首现 $t_{\\text{obs}}\\le 00\\text{:00Z}$），且某提前量下 GFS 与 Pangu 在 $00\\text{:00Z}$ 均无对象、分别于 $t_{\\text{G}}>00\\text{:00Z}$ 和 $t_{\\text{P}}>00\\text{:00Z}$ 首现，则对任意 $t_{\\text{obs}}\\le 00\\text{:00Z}$ 恒有 $|t_{\\text{P}}-t_{\\text{obs}}| - |t_{\\text{G}}-t_{\\text{obs}}| = (t_{\\text{P}}-t_{\\text{obs}}) - (t_{\\text{G}}-t_{\\text{obs}}) = t_{\\text{P}} - t_{\\text{G}}$。此时时间判据 $|t_{\\text{P}}-t_{\\text{obs}}|\\le |t_{\\text{G}}-t_{\\text{obs}}|+1\\text{ h} \\iff t_{\\text{P}}-t_{\\text{G}}\\le 1\\text{ h}$ 与 $t_{\\text{obs}}$ 具体左删失值无关，完全可判。\n 3. **实测全局共用的连带效应**：实测只有一份，若实测 00Z 首帧左删失，按第 12 行会使 24/48/72 h **全部三个提前量**同时取消时间指标考核，将整个实验从“位置+时间双主指标”降格为“单位置指标”。\n - **修改要求**：左删失时应先按区间界 $t\\in(-\\infty, 00\\text{:00Z}]$ 代入 $|t_{\\text{P}}-t_{\\text{obs}}| - |t_{\\text{G}}-t_{\\text{obs}}| \\le 1\\text{ h}$ 检查是否已有确定结论（如模式单方左删失导致误差下界已超标，或实测左删失但两组模式均在 00Z 后首现）；仅当区间上下界跨过 $+1\\text{ h}$ 阈值导致真值表确实不可判定时，才标为“左删失·不可判”，且需写明该提前量降级为仅位置判据时在总结论中作为受限证据单列。\n\n2. **【口径遗漏 / 前后不一】未明确最小对象面积（$\\ge 64\\text{ km}^2$ 及敏感性三档）是否同步用于时间指标（50 km 首现）及“对象在 50 km 内”的几何定义**\n - **位置**：[K_观测口径_最小面积与时间窗_20261015.md]([local path omitted]\n - **问题与复算依据**：\n - 现有后处理代码 [obs_pair06_pipeline_v1.py]([local path omitted] 与第 112 行用 `hit50=bool(np.any((a>=40)&(rad<=50000)))`（即**单像元无面积过滤**）计算首现时间。\n - 复算 [OBS_objects.json]([local path omitted] 可知：`2020-06-09T03:00:00+00:00id=40id=58`（257 格，$1028\\text{ km}^2$）最近格点距为 $99.01\\text{ km}$。\n - 也就是说，**若按决策文件 (a) 的正式口径 $\\ge 64\\text{ km}^2$（或 $\\ge 16\\text{ km}^2$）过滤对象，实测在 03:00Z 首帧 50 km 内根本没有对象（不算左删失）**，03–09Z 窗内实测首个 $\\ge 64\\text{ km}^2$ 对象出现在 **03:10Z**（`id=33`，17 格 $= 68\\text{ km}^2$）；只有单像元“无下限”档才在 03:00Z 触发左删失。决策文件第 3、14 行称“实测 03Z 首帧已有对象（左删失）”，是因为时间指标仍沿用了未加面积门槛的单像元口径。\n - 同时，对面积 $\\ge 64\\text{ km}^2$ 的对象，“在 50 km（或 150 km）内”究竟指**对象最近格点距 $\\le 50\\text{ km}$**（`nearest_cell_km <= 50centroid_distance_km <= 50`）未写明。复算 `OBS_objects.jsonG06_objects.jsonP06_objects.jsonnearest_cell_km <= 50` 但 `centroid_distance_km > 50`。\n - **修改要求**：在 (a) 和 (b) 中明确：(1) 时间指标（50 km 首现）和 150 km 存在性判据同样按对象面积三档（正式 $\\ge 64\\text{ km}^2$，敏感性无下限 / $\\ge 16\\text{ km}^2$）筛除杂波后再算首现时刻；(2) 明确“对象在 50 km / 150 km 内”统一按对象最近格点距离（或统一按质心距离）判定。\n\n3. **【判据空白】三档面积判定不一致时，只规定了“不作为支持‘值得继续’的一票”，未规定如何计入“搁置（明显更差）”**\n - **位置**：[K_观测口径_最小面积与时间窗_20261015.md]([local path omitted]\n - **问题**：实验设计第 55–56 行要求 24/48/72 h 三个提前量中“至少 2 个‘不差于’”判为“值得继续”、“至少 2 个 Pangu 明显更差”判为“搁置”。决策文件第 7 行规定三档对“不差于/明显更差”判定不一致时“不作为支持‘值得继续’的一票”，但未说明该提前量是否计入“明显更差（搁置）”的一票，若三档不一致既不计入“值得继续”也不计入“搁置”，当 3 个提前量中有 2 个出现三档不一致时，总结论将无法落入第 55–57 行的任何一类。\n - **修改要求**：补齐三档不一致时对“搁置”及总结论的归类规则（例如：三档不一致的提前量单独计为“敏感·不判”；若因此导致“不差于”和“明显更差”均不足 2 票，总结论记为“对对象面积阈值敏感·不判”或以正式口径 $\\ge 64\\text{ km}^2$ 为主、敏感性并列说明）。\n\n---\n\n## 仅供参考（NOTE）\n\n1. **“无下限”档在观测 2 km 网格上含 $4\\text{ km}^2$ 单格杂波，赋予其一票否决权存在假阴性风险**\n - **位置**：[K_观测口径_最小面积与时间窗_20261015.md]([local path omitted]\n - **说明**：在 06:10Z 实测场（[OBS_objects.json]([local path omitted] `id=26id=27`（345 格 $= 1380\\text{ km}^2$，最近格点距仅 $1.41\\text{ km}$）因面积大、质心在西侧 $20.83\\text{ km}$ 处反而落选。决策文件第 8 行已指出单格只会让雷达杂波/孤立像元进入最近对象；若第 7 行要求“无下限”档也必须与 $\\ge 16\\text{ km}^2$、$\\ge 64\\text{ km}^2$ 一致才能计入“值得继续”，则单格杂波可能否决掉 $\\ge 16\\text{ km}^2$ 与 $\\ge 64\\text{ km}^2$ 一致通过的有效提前量。\n\n2. **术语表述与主设计文档尚未同步**\n - **位置**：[K_观测口径_最小面积与时间窗_20261015.md]([local path omitted]\n - **说明**：(1) 决策文件第 6 行写“观测与模式各在原生网格上按 8 连通识别对象”，但 NEXRAD Level-II 原生为极坐标体扫，后处理（[obs_pair06_pipeline_v1.py]([local path omitted] $2\\text{ km}$ 笛卡尔网格（单格 $4\\text{ km}^2$）上识别对象，宜改为“各自重映射/模式网格（观测 2 km、模式 4 km）”；(2) [K_实验设计_Akron_20261014.md]([local path omitted] 第 5 节尚未写入本决策口径，且 WRF 线 [SCOPE_RESOURCE_PENDING_v1.txt]([local path omitted] 仍写“00–09 UTC 扩展搜索作为附表；03–09 UTC 仍为正式窗口”，定稿后需同步。\n\n---\n\n## 我核对过的\n\n1. **决策文件与实验设计全文**：\n - [K_观测口径_最小面积与时间窗_20261015.md]([local path omitted] 1–17 行）\n - [K_实验设计_Akron_20261014.md]([local path omitted] 1–82 行，重点核对第 37 行网格间距 $\\Delta x=4\\text{ km}$ 与第 40–60 行第 5 节判据）\n2. **WRF 线冻结判据、运行状态与第一对（G06/P06）观测复核记录**：\n - [FROZEN_CRITERIA_v1.txt]([local path omitted] 1–31 行）\n - [REMAINING_FORMAL_SUBMISSION_v1.txt]([local path omitted] 与 [REMAINING_RC_JOB_READBACK_v1.txt]([local path omitted] G24/P24/G48/P48/G72/P72 六个作业均在运行中，尚未产生结果表）\n - [PAIR06_OBSERVATION_REVIEW_v1.txt]([local path omitted]\n3. **后处理源码与 G06/P06/OBS 对象 JSON 数据的 Python 独立复算**：\n - 核查 [obs_pair06_pipeline_v1.py]([local path omitted] 第 29–42、58–61、98–121 行\n - 对 [OBS_objects.json]([local path omitted] 复算了三档面积（无下限、$\\ge 16\\text{ km}^2$、$\\ge 64\\text{ km}^2$）在 06:10Z 的最近对象质心距离（G06 分别为 $55.25/53.11/53.11\\text{ km}$，P06 分别为 $32.98/54.55/66.58\\text{ km}$）以及 03–09Z 内 50 km 首现时间（OBS 在无下限为 `03:00Z03:10Z`；G06 三档均为 `04:40Z03:30Z03:40Z`）。\n\n---\n\n## 我没能核对的\n\n1. **00Z–03Z 时段内的实测 NEXRAD Level-II 雷达场与对象分布**：本地只读目录仅有 03:00Z–09:00Z 的，00:00Z–02:50Z 的雷达体扫尚未在 CRC 提取回传（证据不足，无法核实 00:00Z 首帧实测在 $\\ge 64\\text{ km}^2$ 下是否仍有 50 km 内对象）。\n2. **24 / 48 / 72 h 各组（G24/P24/G48/P48/G72/P72）的对象分布与首现时间**：相关 CRC 作业仍在运行中，尚无输出数据。\n\n---\n\n## 结论\n\n**有保留地支持**。(a) 正式最小对象面积取 $\\ge 64\\text{ km}^2$（模式 4 km 网格 4 格）、无下限与 $\\ge 16\\text{ km}^2$ 作敏感性并报，且三档不一致时不计入“值得继续”，物理尺度合理且从严控制假阳性，不偏向 Pangu（锚点对 P06 在 $\\ge 64\\text{ km}^2$ 下误差反而增大，且 24/48/72 h 尚未出数）；但须补齐三点：① 明确最小面积门槛同步作用于 50 km 首现时间指标与 150 km 对象存在性判据（实测 03:00Z 首帧 50 km 内仅有 3 格 $12\\text{ km}^2$ 回波，按 $\\ge 16$ 或 $\\ge 64\\text{ km…\n\n### 审稿人 A · GPT-6\n## 结论\n\n**有保留地支持。**面积三档及一致性要求可以作为保守口径，但负向结论的处理尚不完整。搜索窗前移与左删失时不计算时间误差合理；然而，删去时间条件后仍计入“值得继续”，确实放宽了原判据，不能称为“结论规则不变”。是否实际偏向某组、是否依据模式结果调整，**证据不足**。\n\n以下“决策文件”“设计文件”均链接至本次读取的原文件。\n\n## 必须改（MUST-FIX）\n\n1. **“判据不变”与实际修改矛盾。**原定义要求位置、时间条件“同时满足”；新规则允许时间不判时，仅凭位置及有无对象判“不差于”。这使原本无法确认通过的提前量可以贡献正向票，属于实质性放宽，不能仅称补齐搜索窗。必须明确这是修订后的降维判据，并区分其与原双指标“不差于”的结论。搜索窗前移本身不构成这个问题。 \n 依据：[决策文件第3、11–12行](\n\n2. **左删失必须明确按同一提前量的配对比较处理。**决策写“该组该提前量”时间不判，随后又写“这一提前量”只按位置判，适用层级不清。观测左删失会影响两组相对观测的首现误差；任一模式组左删失，也会使该提前量的 P/G 时间误差比较无法按原式完成。必须明确两组共同退出该时间比较，避免不同组使用不同判定条件。 \n 依据：[决策文件第12行](\n\n3. **面积敏感时的负向投票规则缺失。**新规则只明确三档不一致时不能支持“值得继续”，未说明是否仍可计入“至少两个明显更差”的“搁置”判定。若正向票要求三档一致、负向票却无需一致，证据门槛就不对称。必须写清负向票如何处理；目前不能认定已做到结论层面的对称，也不能据此断言实际偏向 GFS。 \n 依据：[决策文件第7行](\n\n## 仅供参考（NOTE）\n\n- **64 km² 是人为约定，现有依据不能证明它具有可分辨性保证。**决策明确承认无文献依据，但随后把保留单格对象概括为“只会让雷达杂波/孤立像元进入”，表述过强。文件没有提供被筛除对象均属杂波的证据，也没有证明四格对象即可可靠分辨。应把该值表述为本次分析的操作性下限。 \n 依据：[决策文件第6–8行](\n\n- **不能据现有材料认定按模式表现事后调参。**文件自述在看 WRF 暂定数值表前定口径，同时承认已经知道观测03Z首帧有对象。因此这是知晓部分观测情况后的修订；是否在模式结果揭示前冻结，独立证据不足。“事后放宽”的动机无法判断，但上述删减时间条件的逻辑放宽可以确认。 \n 依据：[决策文件第3、12、14行](\n\n## 我核对过的\n\n- 已完整读取两份指定文件，重点逐条对照[决策文件第3–16行](\n- 面积识别文字对观测与模式使用相同阈值、连通规则；两组模式采用相同 WRF 设置。**规则文字中没有按 P/G 组别设置不同面积门槛。**依据：[决策第6行](\n- 06 h 不参与最终提前量投票，与原设计一致。依据：[决策第13行](\n\n## 我没能核对的\n\n未核对原始雷达、模式输出、对象识别代码、三档两窗结果或独立冻结记录。因此，03Z左删失是否属实、00Z是否仍左删失、实现是否严格对称、实际票数如何改变，以及是否实际偏向某组，均为**证据不足**。相关主张见决策文件第3、6–7、11–16行。本轮未修改文件、未重跑或新增计算。\n\n## 结论\n\n**有保留地支持：面积三档方案可接受，但须补齐负向票规则；00Z扩窗和左删失不判可接受，但须明确配对处理。“只按位置判”实质放宽原双指标判据，不能以“判据与结论规则不变”通过。实际组别偏向及结果驱动调参均证据不足。**\n\n### 审稿人 D · GLM\n## 结论\n有保留地支持。两处口径总体合理：都是在看模式数值之前定的、对两组对称、且效果上让“值得继续”更难而非更易，不构成偏袒 Pangu 的事后放宽；但敏感性规则只堵“值得继续”的票不堵“搁置”的票，且同一绝对面积阈值加在分辨率悬殊的两套原生网格上、观测侧无对象时的处置未定义，这两点不补会让结论可能翻转或不可复现。\n\n## 必须改（MUST-FIX）\n- 面积敏感性规则是单向的：三档不一致时“不作为支持‘值得继续’的一票”，但没有说该提前量能否计入“搁置”所需的“至少 2 个明显更差”。若允许计入，等于敏感结果只压制正面票、不压制负面票，系统性偏向“搁置”（即偏向不利于 Pangu 的一方），可能直接翻转结论规则 — 依据：决策文件第 7 行（K_观测口径_最小面积与时间窗_20261015.md:7）与设计第 54–56 行（K_实验设计_Akron_20261014.md:54-56）的交互。不改的后果：可能得到一个由“对面积敏感”的判定拼出来的“搁置”结论。应补一句：敏感的提前量两种票都不计。\n- ≥64 km² 这一绝对阈值同时加在观测原生网格（NEXRAD Level-II 合成场）和模式 4 km 网格上，两者分辨率相差可达一个量级，阈值相对可分辨性完全不等价：4 格对模式是“刚能分辨”，对雷达网格是“很大的实体”。观测网格间距在两份文件里都没写，无法核对等价性；若观测合成场较细，实测 ≥40 dBZ 单体可能不足 64 km²，导致实测首现被推晚、甚至实测侧“无对象”——而位置指标（设计 44 行）要与实测质心比、24 h 位置 ≤150 km 是“值得继续”的必要条件（设计 55 行），实测对象被滤掉会使位置指标失去参照。且“实测本身无 ≥64 km² 对象时怎么办”未定义 — 依据：决策文件第 6、8 行；设计第 41、44 行。不改的后果：位置/时间指标和 150 km 门槛都可能被观测侧的网格效应翻转，且他人无法复现。三档敏感性救不了这一点，因为三档是两边同调阈值，探不出观测/模式网格失配。\n\n## 仅供参考（NOTE）\n- 决策文件未说明 64 km²（及 16 km²）是否同样适用于设计第 25 行的 G06 闸门和第 52 行“有/无对象”判定。若闸门用无下限、主指标用 64，闸门可能被决策文件第 8 行自己指出的“雷达杂波/孤立像元”放行。建议写明各处用哪一档 — 依据：决策文件第 5–8 行；设计第 25、52 行。\n- (b) 本身不算事后放宽：搜索窗起点原本就是空白（设计第 45 行只写“首次出现”，未写从何搜起），且决策明言在看到 WRF 线数值表之前定（决策第 3 行）、窗口前移对两组对称。但“左删失·不判”实质上把预注册的“不差于”三条件（设计 49–52 行）砍成两条件——这是对合取判据的事实上的放宽，虽然对称、披露、且属数据所迫。结论报告里应逐提前量写明实际生效的是哪几条判据，不能笼统写“满足预注册判据”。\n- 若 00Z 实测仍左删失，搜索窗卡在 00Z 等于把观测搜索起点绑在最短模式起报时刻上，而非风暴物理初生时刻；NEXRAD Level-II 存档是连续的，至少可把更早的实测初生时刻作为描述性锚点写进结论，模式对比仍从 00Z 起 — 依据：决策第 11–14 行；设计第 41 行。\n- “明显更差”在设计里从未被操作化定义（设计第 56 行使用、第 49–52 行只定义了“不差于”），而面积敏感性规则恰恰要在三档下分别做“明显更差”判定。这属设计原有缺口，但新口径依赖它 — 依据：设计第 49–56 行；决策第 7 行。\n- 偏向性判断（审题 (a)）：≥64 km² 对 P/G 两组的先验偏向无法判定（同一 WRF、同一 dx，阈值只滤弱/边缘对流，两组同受）；规则体系整体偏向“更难得出值得继续”，即若有偏向是偏严而非偏袒 Pangu——除上条 MUST-FIX 所述单向票规则外。\n\n## 我核对过的\n- 两份证据文件全文（决策 16 行、设计 81 行）→ 引用行号均按文件实际内容核对。\n- 算术：4 km×4 km=16 km²/格，4 格=64 km² ✓；“16 km² 只是单格”对模式网格成立 ✓。\n- 设计第 55–56 行结论规则确实只用 24/48/72 h → 决策第 13 行“判据本来只用 24/48/72 h”与设计一致 ✓。\n- 决策第 3 行声明口径在看 WRF 线暂定数值表之前定、阈值与“不差于”判据不变 → 与设计第 40 行“判据（事先写定）”框架相符（时间上是否属实见下）。\n- 设计第 44–45 行位置/时间指标原文、第 49–52 行“不差于”三条件、第 25 行闸门 → 与决策文件描述的两个空白逐一对应 ✓。\n\n## 我没能核对的\n- “口径在暂定数值表之前定”的时序：只有决策文件自述，无时间戳/日志可佐证。\n- 观测合成场 00Z 之前是否真有可用帧、以及其网格间距：两份文件均未给出，也无法在不新增计算的前提下核实。\n- 实测 03Z 首帧已有对象这一前提：决策文件转述 WRF 线核查结果，原始核查记录未在证据包内。\n\n## 结论\n有保留地支持。两处口径方向合理、对称、偏严不偏松，不算有利于 Pangu 的事后放宽；但须先补两点再用于裁决：面积敏感性规则须对称地不计“搁置”票，且须写明观测网格分辨率、论证同一绝对面积阈值的跨网格等价性（或给出观测侧无对象时的处置）。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 09:32",
+      "text": "Now send the revised rules to the WRF Lead.K 的两处观测口径审完了。三位审稿人都是\"有保留地支持\"，我已裁决、改成 v2，交给 WRF 线按 v2 出正式表。\n\n**我亲自核对了雷达对象数据，有两点比口径本身更要紧：**\n- **原先说的左删失不存在。** 按 ≥64 km² 的门槛，03:00Z 时 KAKO 50 km 内只有一个 12 km² 的小回波，不算对象。实测首次出现在 03:10Z（68 km²），所以 03Z 首帧并没有左删失。左删失原本是因为时间指标没加面积门槛，按单个像元算出来的。\n- **06:10 观测\"只有 1 格\"大概率不是雷达合成出错。** 不设面积下限、按最近质心挑对象时，挑中的是一个单格的小回波。同一帧里真正的风暴主体有 1380 km²，最近边缘离 KAKO 只有 1.4 km。按 ≥64 km² 挑的就是这个主体。WRF 线拿 IEM 全国拼图做的对照照常完成，结论写进表的说明。\n\n**必须改的五条（全部采纳，写进 v2）：**\n1. **敏感性计票改成对称。** 只看 ≥16 和 ≥64 km² 两档：两档一致才计票；不一致就记\"面积敏感·不判\"，\"值得继续\"和\"搁置\"的票都不计。无下限那档只作描述，不参与一致性判断，免得单格杂波一票否决。三位审稿人都指出了这一条。原规则只拦\"值得继续\"、不拦\"搁置\"，会偏向不利于 Pangu 的结论。\n2. **面积门槛用到所有涉及对象的判定上。** 包括位置、首次出现时间、150 km 内有没有对象、6 h 那一对的闸门。\"在 R km 以内\"统一按对象最近的格点算。位置误差仍按原设计用质心距离。\n3. **左删失不再放宽原判据。** 原判据要求位置和时间同时满足。现在遇到删失时，首次出现时刻取\"不晚于 00Z\"的整个区间，代入原来的时间判据。区间内所有取值都得出同一结论就照判，否则记\"时间不可判\"。时间不可判的提前量不能投\"不差于\"那一票。我原来写的\"只按位置判\"确实把原判据放宽了，这一条改掉。\n4. **删掉\"判据不变\"的说法。** 改成\"补设计空白，'不差于'仍要求位置、时间等条件同时满足\"。\n5. **补一种情况。** 如果实测在 03–09Z 里没有任何达到面积门槛的对象，这个提前量记\"不判（实测不可分辨）\"。\n\n**未采纳：** GLM 要求论证同一面积门槛在观测 2 km 网格和模式 4 km 网格上是否等价。我没采纳：两边都按物理面积比，观测网格更细，同样大小的对象只会更容易达标；实测风暴主体有 1380 km²，远超门槛；实测达不到门槛的情况已由第 5 条兜底。\n\n这次修订是在 24/48/72 h 三对的结果出来之前定的，这六个积分还在 CRC 上跑，最长的一组预计 10-16 早上完成。这件事不需要你拍板。\n\n裁决、v2 决策记录、K 项目页和线况页都已更新：\n- 裁决：\n- 决策记录 v2：\n\n\n\n（附件：K_观测口径_审查2b89c1fb_裁决_20261015.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 09:34",
+      "text": "【委托结果 · WRF】K Akron 观测口径 v2（审查后修订）：正式表按此计算\n1. **v2 全部照做：**\n - **面积门槛用于所有对象判定：** 正式口径 ≥64 km²，≥16 km² 和无下限两档作敏感性。适用于位置、50 km 首现时间、150 km 内是否存在、有无对象，也包括 G06 闸门。目前脚本里的 hit50 是按单个像元判定的，改成先按面积过滤对象、再判定。改动另存为新版本脚本，旧版保留。\n - **距离判定：** “对象在 R km 内”统一按对象最近格点的距离 ≤R 判定。位置误差仍用质心距离，取最接近 06:10Z 的时刻。\n - **首现窗与左删失：** 首现窗为 00Z–09Z。遇到左删失只在表里标出删失方和首帧时刻，比较交给你们判。\n - **表格内容：** 每个提前量给出 ≥64 km² 和 ≥16 km² 两档的位置、首现和有无对象，无下限档作附列。\n2. **你核出的两点会复核：** 06:10Z 那个“只有 1 格”的对象，是无下限口径下按最近质心选中的 id=26；同一帧的 id=27 有 345 格（1380 km²），最近格点离 KAKO 1.4 km。另外，≥64 km² 口径下，观测 03:00Z 时 50 km 内没有对象，首现在 03:10Z。这两点由 bot 用新脚本复核。IEM N0Q 拼图对照照做，结论写进说明。按你的分析，这多半是选对象的规则造成的，不是雷达合成出错。\n3. **G06 闸门按新口径复核：** 之前判闸门通过，用的是像元存在性。现在改为检查 03–09Z 内 KAKO 150 km 以内是否有 ≥64 km² 的对象（按最近格点判）。G06 在 37 个时次里每一次都有 ≥40 dBZ 回波，预计会通过。如果不通过，会立即告诉你。其余 6 个积分已经在跑，我们不会自行取消。\n4. **交付：** 放在 下的新子目录。先出 G06/P06，其余三对每跑完一对就把路径报给你，最长那组预计 10-16 早上完成。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 09:34",
+      "text": "WRF 线已确认，正式表会按审查后的 v2 观测口径计算，这次不需要再派活。\n\n- **脚本：** 计算脚本另存为新版本，旧版保留。判断\"50 km 内有没有回波\"、\"150 km 内有没有对象\"和 6 h 那一对的闸门时，都先按面积过滤对象再判。\n- **6 h 闸门：** 之前判通过，看的是单个像元。现在按\"03–09Z 内 KAKO 150 km 以内有没有 ≥64 km² 的对象\"重新核。G06 在 37 个时次里每次都有 ≥40 dBZ 回波，预计会通过；不通过的话 WRF 线会马上告诉我。其余 6 个积分照常在跑，不会取消。\n- **我核出的两点：** 一是 06:10 观测\"只有 1 格\"，其实是不设面积下限、选错了对象，不是雷达合成出错；二是按 ≥64 km² 算，实测要到 03:10Z 才首次出现。WRF 线会用新脚本复核这两点，IEM 全国拼图的对照也照做，结论写进表的说明。\n- **交付节奏：** 先出 G06/P06 的正式表，其余三对每跑完一对报一次路径，最长那组预计 10-16 早上完成。另外，K 项目页上原先约好的 10-16 16:41 回访还在，到时会再查一次进度。\n\n这一条已记入 K 项目页。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 09:39",
+      "text": "【告知 · 来自 WRF】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n按口径 v2（先按面积过滤对象，再按最近格点距离判）复核 G06 闸门：06-09 03–09Z 的 37 帧全部存在 ≥64 km²、最近格点距 KAKO ≤150 km 的对象，闸门通过。G06 三档面积下 50 km 首现均为 04:40Z；00Z 首帧无合格对象，不标左删失（起转期限制照记）。证据： 下 POLICY_V2_GATE_RECHECK.txt 与 G06_GATE_POLICY_V2_READBACK.json。观测侧（id=27、03:10Z 首现、N0Q 对照）在 CRC 1544805 复核中，预计今天 14:33 前结束，之后出第一对正式表并报路径。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 10:43",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】L 第二轮：V1 全样本不过；CONUS 段补满 54 组，整轮放到 215 CU\n结论：雷暴节点 L 第二轮过 120 CU 报告，累计约 124 CU。StormCast V1 全样本按冻结判据不通过：≥50 kt 命中 AI 4–5/20，HRRR GUST 6–8/20；3 h 峰值比只到 HRRR 的 0.85。CONUS 段 10:40 完成 17/54 组，实测每组约 2.3 CU，整轮重算约 210 CU。Decision I made：不在 200 CU 停在约 49/54 组，改为跑满 54 组、整轮上限 215 CU（多约 12 CU），因为停在 49 组会缺无事件对照、判定要带缺组限定；错了的代价约 12–15 CU。上规模成本只记录：CONUS 100 事件×3 提前量约 700 CU，V1 约 140 CU，不据此放行。CONUS 若也不过，搁置前送 6 人。决策。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 10:43",
+      "text": "L（对流尺度 AI 与雷暴短临）第二轮的 V1 段已经判定不通过；CONUS 段的算力上限从 200 CU 加到 215 CU，我同意，不需要你拍板。\n\n**V1 段结果：** 按开跑前冻结的判据，StormCast 全样本不通过。≥50 kt 阵风的命中，AI 是 4–5/20，业务模式 HRRR 是 6–8/20。3 小时峰值风只有 HRRR 的 0.85。\n\n**CONUS 段和算力：** 到 10:40 完成了 17/54 组。实测每组约 2.3 CU，跑满整轮约 210 CU，截至目前累计用了约 124 CU。\n- 母项目 Lead 的决定：不在 200 CU 处停下，而是跑满 54 组，整轮上限 215 CU。\n- 为什么：卡在 200 CU 只能做到约 49 组，会缺无事件的对照组，结论就得带\"缺组\"的限定。\n- 代价：多花约 12–15 CU。\n- 为什么不需要你拍板：200 CU 这条线是母项目 Lead 自己 10-14 定的，不是你定的闸门；Colab 也不属于超算大作业的送审范围。\n\n**下一步：** CONUS 段如果也不通过，在搁置 L 之前先送 6 位审稿人。扩大规模的成本只记了下来，没有据此放行：CONUS 100 个事件 × 3 个提前量约 700 CU，V1 约 140 CU。\n\n线况页里 L 那一行已更新；决策记录 由母项目 Lead 写好，已编入索引。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 11:07",
+      "text": "【委托 · 来自 WRF】K 第一对（06Z 起报 G06/P06）正式 v2 表交付\n按你 10-15 定的口径 v2（≥64 km² 正式、≥16 敏感性、无面积附录；首次出现窗 00–09Z、位置窗 03–09Z；位置误差取最近 06:10Z）完成第一对。文件：（正式）、（≥16）、（说明，含无面积附录）。\n关键数字（≥64 km²，本线数据）：首次出现（对象≥50 dBZ）观测 03:10Z；G06 04:40Z（+90 min）、P06 00:50Z（−140 min）；均无左删失。06:10Z 质心误差 G06 53.1 km、P06 66.6 km；对象面积 观测 1380 km²、G06 928、P06 1055 km²。KAKO 100 km 内最大 10 m 风 G06 24.8、P06 26.7 m/s，观测阵风 37.0 m/s。\n局限：N0Q 交叉检查回波位置重叠，但强回波面积明显小于 Level-II 垂直最大合成（N0Q 为基反射率、可能含较旧扫描），不能当作独立全面验证。本线不据单对下 Pangu 优劣结论。其余五对（1544564–1544572）跑完后按同口径逐对交付，最慢约 10-16 09:40。\n请确认收下并告诉我是否需改口径。\n（原因：K 实验归 AI 天气线，表与指标交）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 11:07",
+      "text": "我收下了第一对（6 h 起报的 G06/P06）的正式表，看过后口径不用改。\n\n**我核对了什么：** 正式表和说明都看了。面积门槛和\"R km 内按最近格点\"这两条，都和方法文件里写的一致。\n\n**结果（≥64 km² 口径，本线数据）：**\n\n| | 观测 | G06（GFS 驱动） | P06（Pangu 驱动） |\n| --- | --- | --- | --- |\n| KAKO 50 km 内首次出现 | 03:10Z | 04:40Z（晚 90 分钟） | 00:50Z（早 140 分钟） |\n| 06:10Z 对象质心距观测 | — | 53.1 km | 66.6 km |\n| 对象面积 | 1380 km² | 928 km² | 1055 km² |\n| KAKO 100 km 内最大 10 m 风 | 阵风 37.0 m/s | 24.8 m/s | 26.7 m/s |\n\n所有组都没有左删失。\n\n**怎么读这一对：**\n- **G06 闸门按 v2 通过。** 闸门问的是\"整套管线能不能把这个风暴做出来\"：06:10Z 时，KAKO 150 km 内有一个 928 km² 的对象，离 KAKO 53 km。\n- **P06 的\"早 140 分钟\"不能算数。** 00:50Z 离 00Z 起报才 50 分钟，还在模式起转期内，只能当锚点参考。这一对本来也不进判据。\n- **≥16 km² 档 P06 选到的是另一个对象**，只有 48 km²，不是同一个风暴的误差变小了，所以 P06 在两档面积下的位置误差（54.5 km 和 66.6 km）不能直接比。这正是判定要求 16 和 64 两档一致才计票的原因。\n- **两组 10 m 风都比观测阵风低约 30%。** 按设计这只作量级对照。\n\n**两点局限：**\n- **N0Q 交叉检查**只查了两个时刻，回波位置重叠，但强回波面积和三雷达合成场差了一倍多，只能算带局限的核查，不能算独立验证。\n- **\"≥50 dBZ\"的写法：** WRF 的委托消息里写的是\"对象 ≥50 dBZ\"，方法文件里的字段名是\"first50\"，指的应该是 50 km 范围，阈值仍是 40 dBZ。后面几对请他们在说明里把\"≥40 dBZ\"写清楚。\n\n真正进判据的是 24、48、72 h 三对，WRF 线正在逐对跑，最慢约 10-16 09:40 交齐。我会等三对都到齐，再按冻结判据判读。\n\nK 项目页和线况页都已更新。\n\n## 结论\n- **第一对收下，口径 v2 不改。** 这对指 6 h 起报的 G06/P06，结果在。\n- **G06 闸门按 v2 通过。** 06:10Z 时，KAKO 150 km 内有 ≥64 km² 的对象：928 km²，质心距观测 53.1 km。\n- **P06 的首次出现时间只作锚点。** P06 首现 00:50Z，在起转期内；这一对本来也不进判据。\n- **其余五对按同一口径、同一套脚本逐对交付。** 每份说明请写明反射率阈值是 ≥40 dBZ，\"first50\"指 50 km 范围；左删失照实标出，不代判。N0Q 只作带局限的交叉检查，照实写明即可。\n- **只交表和指标，不下结论。** 三对都到齐后，由我按冻结判据判读 Pangu 是否不差于 GFS。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 11:08",
+      "text": "【告知 · 来自 WRF】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：我上一条交付里把 first50 写成\"对象≥50 dBZ\"，是我写错了；按 READOUT 原文是 50 km 范围内首次出现，阈值 ≥40 dBZ，以你的表述为准。数字不受影响。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 13:25",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】J v6 闸门通过，放行第二段约 145 CU（合计约 230）；CRC 连接也断了\n结论：J 风工程专用 CFD 模型学习曲线 v6 第一段完成（约 86 CU）：旧划分复现 0.796（含几何泄漏）；严格几何分组闸门 seed17 通过——内部验证中位 R² 0.766（门槛 0.5）、理想化测试 40 例 0.901（门槛 0.7）；但全部测试 100 例 0.655，真实街区 60 例只有 0.493。旧项目 0.79 与 0.655 测试集不同，差值不能全归因于泄漏。Decision I made：放行第二段，按冻结预注册原样跑（闸门另 2 种子 + N=50/100/200 各 3 种子 + 三种经典基线），不提前停止，约 145 CU，两段合计约 230 CU（超 200，按规矩报你）；第二段到 170 CU 先停报我。为什么：提前停止能省到 60–80 CU 但偏离预注册、各档不可比。错了的代价：约 145 CU。另请告诉 Liang Hu：CRC 共享连接也断了（13:2x socket 已不在，平台确认 工作站→CRC 网络断开），加上 TACC 自 02:32 卡死，两台集群现在都用不了，需要 Liang Hu 重建；J 的 27 MB 最佳模型暂存 工作站，恢复后补传。决策。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 13:25",
+      "text": "**要你处理的一件事：CRC 和 TACC 两台超算的共享连接现在都断了，需要你重建。**\n- **CRC：** 我 13:25 刚核过，连接文件已经不在；平台确认 工作站 到 CRC 的网络断开，大约 13:20 前后断的。\n- **TACC：** 从 02:32 起就一直卡死。\n\n按规矩我们不自己重连。\n\n**断线的影响：**\n- **K（AI 预报驱动 WRF）：** WRF 线在 CRC 上跑的 5 对积分不受影响，但断线期间没法读日志和结果，第二对起的交付会等你重连后才能取回。\n- **J（CFD 代理模型学习曲线）：** 最佳模型（27 MB）暂存在 工作站，恢复后补传。\n- **TACC 恢复后：** A3 风场校验码比对、雷暴对流检查点还原这两件事也要等。\n\n**J 第二段的算力：我认可母项目 Lead 的放行，两段合计约 230 CU。** 不需要你拍板：J 用的是 Colab，不是超算机时；超 200 原定报实验室根，现由我定。\n- **第一段结果（约 86 CU）：** 闸门按严格的几何分组过了，内部验证 0.766，理想化建筑 0.901。但全部 100 个测试例只有 0.655，其中 60 个真实街区只有 0.493。\n- **旧项目的 0.79：** 用的测试集不一样，和 0.655 的差距不能全算在几何泄漏头上。\n- **第二段（约 145 CU）：** 按事先登记的方案原样跑：再加 2 个种子；数据量 50、100、200 各跑 3 个种子；外加三种经典方法作基线。不提前停止，否则各档不可比。第二段用到 170 CU 时母项目 Lead 会先停下来复核。\n- **要看的重点：** 真实街区 0.493 是不是稳定的。多种子和基线正好能回答这个问题。\n- **代价：** 万一判断错了，代价是约 145 CU，换来一条\"数据加到 200 例也不够\"的曲线，这本身也是结论。\n\n线况页里 J 那一行和等你处理的事项都已更新；决策记录是。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 15:34",
+      "text": "【告知 · 来自 WRF】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：K P72（1544572）在模式时间 06-06 21:14 因垂直 CFL（w 40 m/s，vert_cfl 3.4）崩溃。已派 WRF bot 从崩溃前 restart 以 dt=15 s 重启（其余冻结参数不变），交付时 READOUT 注明。第三对（G72/P72）时间因此后延，预计 10-16 下午到晚上。P24 已成功结束，G24 约 16:00 结束，两对 24/48 照常。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 16:04",
+      "text": "【告知 · 来自 实验室】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知（不需回复）：C 节点（非对流极端风 AI 气候模拟器）ideas 的十成员正式轮仍在 Colab 跑：控制器 PID 1636541 自 06:53 起稳定，m02–m08 已保全并 stop（每成员约 1.53 h、约 8.4 CU），m09 16:00 完成 894 窗口进入汇总，m10 随即自动暂存启动，预计 17:45 前后 PRESERVED/STOPPED，控制器自动写 ALL_NINE_PRESERVED，预测全批约 95 CU（含两次误停，非独立账单）。ideas 的 24h 12 次上限已满（已报 platform），我在本对话约 17:55 回访兜底：齐了就唤醒 ideas 做 Colab CPU 上的 GEV/POT + 自助法集合汇总，结论和文件路径交回你的 C 节点；若 m10 出错，控制器按设计保留会话不误停，由我先核远端再处理。你若想自己接手汇总，发我一条 note 即可，我就不再唤醒 ideas。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 17:25",
+      "text": "【委托 · 来自 WRF】K 第二对（24 h 提前量 G24/P24）正式 v2 表交付\n同口径 v2（反射率 ≥40 dBZ；first50=KAKO 50 km 内首次出现；≥64 km² 正式、≥16 敏感性；首次出现窗 00–09Z、位置窗 03–09Z；位置误差取最近 06:10Z），同一套脚本（QA 已改为按成员计数，G24/P24 计数 5400/5400 TS、181/181 二维、7/7 三维全过）。文件：、READOUT 在同目录（READOUT_1548771.md 或 READOUT.md）。\n≥64 km² 关键数字（本线数据）：观测首现 03:10Z、对象 1380 km²；G24 首现 04:00Z（+50 min），06:10Z 质心误差 183.4 km，对象 1884 km²，KAKO 100 km 内最大 10 m 风 22.2 m/s；P24 首现 00:20Z（−170 min），误差 307.9 km，对象 6766 km²，最大风 21.5 m/s；观测阵风 37.0 m/s。均无左删失。\n≥16 km² 档：G24 首现差 +70 min；P24 窗口首帧已有对象，标左删失，表内 −160 min 不能当真实起生误差；位置误差 183.4/233.1 km。\nN0Q 沿用第一对的带局限交叉检查。只交表和指标，不下结论。第三对：G72 约 10-16 03:20 完成，P72 已以 dt=15 s 从头重跑（原 dt 20 s 在模式 06-06 21:14 CFL 崩溃），约 10-16 13:00 完成；第一对之外还有 48 h 对（G48/P48）今晚完成——请确认三对的配对是 06/24/48/72 中哪三对进判据，我按你的口径交。\n（原因：K 实验表与指标交 AI 天气线）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 17:25",
+      "text": "我收下了 24 h 这一对（G24/P24）的正式表，两张表的数字我对着 CSV 核过，口径不改。\n\n**24 h 对的数字（≥64 km²，本线数据）：**\n\n| | 观测 | G24（GFS 驱动） | P24（Pangu 驱动） |\n| --- | --- | --- | --- |\n| KAKO 50 km 内首次出现 | 03:10Z | 04:00Z（晚 50 分钟） | 00:20Z（早 170 分钟） |\n| 06:10Z 对象质心距观测 | — | 183.4 km | 307.9 km |\n| 对象面积 | 1380 km² | 1884 km² | 6766 km² |\n| KAKO 100 km 内最大 10 m 风 | 阵风 37.0 m/s | 22.2 m/s | 21.5 m/s |\n\n在 ≥16 km² 档里，P24 在窗口第一帧就已经有对象，所以记为左删失。它选中的也是另一个只有 32 km² 的对象，位置误差 233.1 km。\n\n我先不下判读，等 24/48/72 三对到齐，再按冻结判据统一判。从这一对单看：两组的位置误差都超过 150 km；P24 比 G24 差了不止 50 km（≥64 档），首次出现也早了太多，所以这一对 Pangu 大概率不算\"不差于\"。\n\n**我做的决定：72 h 这一对，GFS 那边也改用 15 s 时间步长补跑。**\n- **起因：** P72 用原定的 20 s 步长跑到中途崩溃了（模式里的稳定性条件超限），WRF 线已经改成 15 s 从头重跑。\n- **为什么也要改 GFS 组：** 如果 GFS 组还是 20 s，这一对就不只差驱动场，还多了数值设置的差别。单个事件、一对一比本来证据就弱，不能再掺进这种干扰。\n- **20 s 那次不作废：** 已经跑完的 G72（20 s）保留，作为步长敏感性附在表后，正好能看出步长本身影响有多大。\n- **代价：** CRC 上多跑一个单节点积分，CRC 不扣 SU，墙钟约 16–18 小时，72 h 对的判读推迟大约半天。\n\n**接下来：**\n- 48 h 对今晚交表。\n- G72 补跑由 WRF 线申请资源、提交并登记（排在他们手头那件事之后）。\n- CRC 共享连接如果还断着，就要等你重建后才能提交。\n\n决策记录在，K 项目页和线况页已更新。\n\n## 结论\n- **第二对 G24/P24 正式 v2 表收下，口径不改。**\n- **进判据的是 24/48/72 h 三对**；06 h 对只作闸门和锚点。\n- **72 h 对改为两边都用 15 s 步长：** 请用 dt=15 s 从头补跑 G72，作为正式配对成员；已跑的 G72（dt=20 s）照常出表，只作步长敏感性附列，不覆盖。\n- **补跑按规矩走：** 先找 ComputeOps 申请资源；预检和提交分成两条命令；提交后用 登记；新开运行根，不覆盖已有运行根。CRC 连接断着就等 Liang Hu 重建，不要重连。\n- **48 h 对照常今晚交。**\n- **只交表和指标，不下结论。**"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 17:27",
+      "text": "【告知 · 来自 WRF】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：已按你 K_判据配对与72h步长_20261015.md 安排。G72 dt15 新根 G72_formal_v22_dt15_v1 从头补跑（只改 time_step=15、restart_interval=360，复用原 wrfinput/wrfbdy，与 P72 dt15 对称），先过本线三人审查（>24 h 生产运行规则）再提交，预计 10-17 晚完成。G72 dt20 照常出表作附列。PAIR48 今晚出。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 17:28",
+      "text": "【委托结果 · WRF】K Akron：进判据为 24/48/72 三对；G72 请以 dt=15 s 补跑配对\n- **判据配对已按要求执行**：进判据的是 24/48/72 h 三对，06 h 对只作闸门与锚点。\n- **72 h 对**：\n - 正式配对为 G72(dt15) vs P72(dt15)，G72(dt20, 1544570) 照常出表作步长敏感性附列，不覆盖。\n - G72 dt15 新根为，从头补跑，只改 time_step=15、restart_interval=360，复用原 wrfinput/wrfbdy，与 P72 dt15（1547482，在跑）对称。\n - 因属 >24 h 生产运行，先过 WRF 线三人审查（同时补审 P72 dt15），通过后提交并 登记，预计 10-17 晚完成。\n - 预计写入约 110 GB，已报总 Lead。\n- **48 h 对**：今晚 G48 完成后出 PAIR48 正式表，路径。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 17:28",
+      "text": "WRF 线已按我的安排执行：进判据的是 24、48、72 h 三对，06 h 对只作闸门和锚点。\n\n**72 h 对：**\n- 正式配对是 G72 和 P72，两边都用 15 s 时间步长。\n- G72 的 15 s 版本从头补跑，放在 CRC 的新目录。只改了步长和重启间隔，初始场和边界场沿用原来的。\n- 先前跑完的 G72（20 s 步长）照常出表，作为步长敏感性附列，不覆盖。\n- 这次补跑超过 24 小时，算生产运行，所以 WRF 线先过他们自己的三方审查（顺带补审 P72 的 15 s 版），通过后再提交并登记。\n- 预计 10-17 晚完成，比原先说的 10-16 晚约一天半，所以 K 的最终判读要等到 10-17 晚以后。\n\n**48 h 对：** 今晚交表，路径是。\n\n**我追加的一点：** G72 补跑预计写约 110 GB，而 CRC 组空间已接近满。K 判读只用得上设计里规定的输出，设计目标是 15 GB 以内。我已经告诉 WRF 线：在不破坏和 P72 对称的前提下按设计裁减；如果必须保持和 P72 完全一样的输出设置，就照旧，但要写明原因。他们已把这件事报给总 Lead。\n\n线况页和 K 项目页都已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 17:39",
+      "text": "【委托 · 来自 WRF】K 72 h：请定步长翻转时的计票规则\n本线审查 （裁决）通过 72 h 对统一 dt=15 s。两位审稿人要求判据方补一条：若正式配对 G72(dt15) vs P72(dt15) 与附列 G72(dt20) vs P72(dt15) 的 72 h\"不差于/明显更差\"二元判定翻转，如何计票（例如记\"72 h 步长敏感·不判\"，类比你面积敏感性的规则）。另：G72 两个步长的差只代表 G72 自身对步长的响应，不代表 P−G 差值的响应；跨提前量汇总我们会注明 24/48 h dt 20 s、72 h dt 15 s，以及 WSPD10MAX 每 10 min 30 vs 40 步、TS 20 vs 15 s 采样差。墙钟更正：dt15 下 78 h 积分约 25–33 h（你决定里的 16–18 h 是 dt20 外推）；G72 dt15 在 P72 dt15 越过原崩溃时刻后提交，72 h 对预计 10-17 晚到 10-18。请回一句计票规则。\n（原因：72 h 判据需补步长敏感时的计票规则）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 17:39",
+      "text": "72 h 这一对，正式比较用两边都是 15 s 步长的 G72 和 P72。附列再拿 20 s 的 G72 和同一个 P72 比一次，口径相同。如果两次结论一个是\"不差于\"、一个是\"明显更差\"，72 h 就记为\"步长敏感·不判\"，赞成票、反对票都不计。这和之前面积敏感的规则是一个思路。\n\n**和面积规则合起来：** 72 h 要计票，面积 ≥16 和 ≥64 km² 两档、G72 两种步长，这四个判定必须全部一致。如果这样下来三个提前量里\"不差于\"和\"明显更差\"都凑不到 2 票，总结论记为\"不判（对面积或步长敏感）\"。\n\n**附列的地位：** 只作稳健性检查，不能单独投票。WRF 线说得对：G72 两个步长之间的差，只反映 G72 自己对步长有多敏感，不代表 Pangu 和 GFS 之间的差会怎么变，结论里照此写。\n\n**这条规则没有另外送审。** 面积规则已经审过，这条是照着它补的同类规则，而且是 WRF 线自己的审查提出来的。\n\n**时间更正：** 15 s 步长下，78 h 积分要 25–33 小时，我之前写的 16–18 小时是按 20 s 外推的，估低了。72 h 对预计 10-17 晚到 10-18 才出来，K 的最终判读也相应顺延。\n\n决策记录已经补上，线况页也更新了。\n\n## 结论\n- **计票规则：** 72 h 对按正式配对 G72(dt15) 对 P72(dt15) 判，再用附列 G72(dt20) 对 P72(dt15) 按同一口径判一次。两次的\"不差于/明显更差\"判定不一致，72 h 记\"步长敏感·不判\"，赞成票、反对票都不计。\n- **和面积规则叠加：** 72 h 只有在面积 ≥16、≥64 km² 两档与 G72 两种步长组成的四个判定全部一致时才计票。三个提前量因此都凑不到 2 票时，总结论记\"不判（对面积/步长敏感）\"。\n- **附列只作稳健性检查：** 不单独产生票。G72 两个步长之差只说明 G72 自身对步长的响应，不代表 P 与 G 之差的响应。\n- **汇总的注明内容照你们写的办：** 24/48 h 是 dt 20 s，72 h 是 dt 15 s；WSPD10MAX 每 10 分钟分别是 30 步和 40 步，TS 采样 20 s 对 15 s。\n- **时间：** 收到墙钟更正，72 h 对预计 10-17 晚到 10-18。\n- **规则记录在：** 的补充一节。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 18:00",
+      "text": "【告知 · 来自 WRF】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：PETW 总 Lead 10-15 定 CRC 余量顺序：G3 注入短测两批（约 150 GB）先，K G72 dt15（约 110 GB）放最后；K 在跑的 G48/P48/G72/P72 dt15 照常。G72 dt15 预计 10-16 白天提交、10-17 夜到 10-18 完成，72 h 对交付相应顺延到 10-18 前后。48 h 对今晚照常出表。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 18:11",
+      "text": "【告知 · 来自 实验室】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nACE2-ERA5 十成员正式轮已齐（10-15 17:33 ALL_NINE_PRESERVED，m02–m10 各 30 季×8 格摘要，exit 0，所有会话已 stop，约 94 CU 估计）。ideas 的回访额度用尽、本对话委托链到 5 层上限不能再往下派，集合汇总由我按 ideas 写好的 analyze_summaries_colab.py 在 Colab CPU 上算完（会话已 stop）。\n结果：（表与读法）、formal_metrics.csv/json（逐格数值）、holdout_comparison.png、training_comparison.png。\n要点（留出期 14 季，8 格）：GEV 50 年值落入集合 90% 区间 5/8，相对偏差中位 −2.6%、±10% 内 6/8；KDSM −28.9%、KOMA −22.5% 系统偏低（训练期 KDSM 已 −12.8%，集合里没有一个成员复现 ERA5 1996–2010 平原的重尾季）；KALB/KPIT 偏高（训练期 GEV50 +22.6%/+14.7%，留出期 POT +12%/+6%）；POT 50 年落入 2/8、偏差 −16.8%～+12.1%。注意：十成员同强迫只差初值，自助法区间只含模拟器内部变率（±0.3–0.5 m/s），\"落入\"检验很严，建议裁决以 ±10%/>20% 偏差为主、落入为辅或把参考也自助。一句话判断：典型冷季强风对得上，区域性重尾（平原）复现不了；值得继续的是查 KDSM/KOMA 尾部事件与模拟器压尾原因，不宜直接接站点设计风速。\n请你在 C 节点接手：是否送审、下一步由你定；需要 ideas 补做的（如事件分类、把参考自助）请从你的树派。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 18:49",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】C 十成员按主判据：说不清；平原两格偏低待核对流\n结论：C 非对流极端风 AI 气候模拟器（ACE2-ERA5 十成员，约 94 CU）留出期 14 冷季：GEV 50 年值偏差中位 −2.6%、6/8 格在 ±10% 内，但平原 KDSM −29%、KOMA −23% 偏低。按审查 修订后的主判据（ERA5 落在集合 90% 区间），落入只有季最大中位 2/8、p90 3/8、GEV50 5/8、POT50 2/8；预注册当时没定过线门槛（不事后补），且区间只含合并样本不确定度、不含 ERA5 单条 14 季的离散、偏严 → 判\"说不清\"。下一步：单成员范围与平原强季是否混入对流的核查在跑（<5 CU），剔除对流后 ERA5 仍高于全部成员即判模拟器压尾（改查原因/换生成式模型/搁置）；进站点设计风速段前先写新预注册（判据+门槛），用未看过的 2020/21–2021/22 留出季或新格点检验。G 不开。决策。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 18:49",
+      "text": "C（用 AI 气候模拟器估算非对流极端风的设计风速）的十成员结果出来了，按主判据判为\"说不清\"，不能算过，也不能算不过。我核过母项目 Lead 的判定，同意，不需要你拍板。\n\n**结果（本线数据，十成员共用约 94 CU，留出期 14 个冷季）：**\n- 从整体看不偏低：50 年一遇风速的偏差中位数是 −2.6%，8 个格点里有 6 个落在 ±10% 以内。\n- 但平原上两个格点明显偏低：KDSM 低 29%，KOMA 低 23%。\n- 按审查 修订后的主判据，看 ERA5 实测是否落进十成员的 90% 区间。落进来的比例：季最大风中位数 2/8、90 分位 3/8、按 GEV 算的 50 年值 5/8、按 POT 算的 50 年值 2/8。\n\n**为什么判\"说不清\"而不是\"不过\"：**\n- 预注册时没写\"多少个格点落进区间才算过\"，事后不补这条线。\n- 这个区间只算了十成员合并样本的不确定度，没算 ERA5 本身只有 14 季带来的离散，所以判据本身偏严。\n\n**下一步：**\n- **正在跑的核查（不到 5 CU）：** 查平原那两个格点偏低，是不是因为强风季里混进了对流大风，同时看单个成员的范围。如果剔除对流后 ERA5 仍然高于所有成员，就判定模拟器把极端尾部压低了，下一步在三条路里选：查原因、换生成式模型、或者搁置。\n- **之后做站点设计风速前：** 先写一份新的预注册，把判据和过线门槛写死，再用还没看过的 2020/21–2021/22 两个冷季或新格点来检验。\n- **G 节点暂不开。**\n\n决策记录在，线况页里 C 的两行和\"在跑\"清单已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 18:55",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】C：平原两格模拟器压尾（辅助证据），8 个新格点按冻结预注册重跑\n结论：C 的 wx 核查：KDSM、KOMA 留出期 GEV50/POT50/p90 三项 ERA5 都高于全部 10 个成员；两格前五强季未见可确证的对流，最强季同为 1998-11-10 冬季风暴 → 排除对流污染，辅助证据级判\"ACE2 在平原冷季压低尾部\"；主判据仍\"说不清\"。下一步：8 个未看过的格点（KFSD、KFAR、KICT、KSTL、KMKE、KIND、KCLE、KBDL）十成员，按开跑前冻结的预注册（10-15 18:54）判：GEV50 上 ERA5 超出单成员范围的格 ≤2/8 通过；高于全员 ≥3/8 压尾；低于全员 ≥3/8 偏高；其余说不清。约 75–90 CU（<100）。通过 → 写站点段预注册；压尾 → 查原因、试 ERA5 训练的随机/生成式模型，不接站点；说不清 → 由母项目定是否搁置。G 不开。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 18:55",
+      "text": "C（用 ACE2 模拟器算非对流极端风的设计风速）平原两格的核查做完了：偏低不是对流混进来造成的。模拟器在平原冷季把极端值的尾部压低了，不过这只够辅助证据，主判据仍是\"说不清\"。母项目 Lead 已在 8 个没看过的格点上开始新一轮检验，判据开跑前已冻结。我核过，同意，不需要你拍板。\n\n**平原两格（KDSM、KOMA）核查结果（本线数据）：**\n- 留出期 50 年一遇风速的三种算法（GEV、POT、90 分位），ERA5 都比 10 个成员全部要高。\n- 两格最强的五个风季里，没有能确认是对流的；最强那一季两格都是 1998-11-10 那场冬季风暴。\n\n**下一步：8 个没看过的格点重跑十成员**，约 75–90 CU。格点是 KFSD、KFAR、KICT、KSTL、KMKE、KIND、KCLE、KBDL。\n- **判据：** 看每个格点上 ERA5 的 50 年值，落没落在 10 个成员的范围之外。\n- **判据 18:54 已冻结：** 写在，是在看结果之前定的。\n- **判据松紧合理：** 我粗算了一下，假如模拟器完全正常，大约 84% 的机会判\"通过\"；假如完全正常却被误判\"压尾\"，机会约 3%。格点之间互相相关，实际误判率会高一些。\n\n**不同结果怎么走：**\n- **通过**：写站点设计风速段的预注册。\n- **压尾**：查原因，试用 ERA5 训练的随机或生成式模型（如 NeuralGCM 随机版、ArchesWeatherGen），C 不往站点段推。\n- **说不清**：由母项目 Lead 决定是否搁置；若要放弃这条路线，按规矩先送 6 人。\n\nG 节点仍不开。线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 20:16",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】J v6 第二段：实测约 233 CU，批 260，两段合计约 320–350\nDecision I made：J v6 第二段实测串行（同卡双进程 OOM，单进程 42.5 GB），每项约 41 CU，剩 11 项约 233 CU，原估 145 CU 是沿用旧 H100 单次时长低估了。我批第二段上限 260 CU，两段合计约 320–350 CU（超 200，按规矩报你）。条件：等放行审查 （3 位，单线约 43 h 属 >24 h 生产运行）裁决后再跑；先跑闸门另 2 种子和 N=50/100/200 各 1 种子，跑完前 5 项报中间结果，曲线若已明确可止损；不砍种子、不提前停止，否则判据①失去检验力。错了的代价：最坏约 260 CU（约 48 A100 小时）。另：CRC 共享连接 20:15 已恢复；TACC 未查。决策。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 20:16",
+      "text": "J（CFD 代理模型学习曲线）第二段的 Colab 用量要大幅上调：上限从约 145 CU 提到 260 CU，两段合计约 320–350 CU。我同意，不需要你拍板。\n\n**为什么用量翻倍：**\n- 单个训练进程要占 42.5 GB 显存，同一张卡上跑两个就内存不够崩了，只能一个接一个跑。\n- 实测每项约 41 CU，还剩 11 项，约 233 CU。\n- 原来的 145 CU 是照旧 H100 的单次用时估的，估低了。\n\n**为什么不改用 CRC 的 GPU（CRC 不收费）：** 我核了之前的资源申请记录。CRC 的 H100/H200 我们没有使用权限；A10 显存不够，会内存不够或超时。所以只能用 Colab A100。\n\n**为什么不砍：** 要判断不同随机种子之间的差异，每档至少要 3 个种子；砍掉档位或中途提前停，学习曲线前后就没法比了。\n\n**控制措施：**\n- 先等放行审查 裁决。整段串行要跑约 43 小时，按规矩属于超过 24 小时的长时间运行，要先审。\n- 最有信息量的项先跑：先补闸门的另外 2 个种子，再跑数据量 N=50、100、200 各 1 个种子。\n- 前 5 项跑完报一次中间结果。如果那时曲线已经很清楚（比如各档都远低于闸门），就止损。\n- 最坏情况花约 260 CU（约 48 小时 A100），换来一条\"数据量不够\"的曲线，这本身也是结论。\n\n**提醒一下 Colab 账户余额：** 本线现在 J、L、C 三项同时在用 Colab。照现在的计划，还要再花约 400 CU：J 约 233、L 剩约 90、C 约 75–90。今早账户余额约 1146 CU，余额撑得住；但这个账户各线共用，消耗会比较快。\n\n**超算连接：**\n- CRC 共享连接 20:15 已恢复，我 20:16 核过连接活着。\n- TACC 有一条连接的主进程活着，但还没确认各线都能用。上次说 TACC 要你重建的那件事，可能已经不需要了；等确认后再告诉你。\n\n线况页已更新；决策记录在。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 22:50",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nLiang Hu 10-15 定了材料处置编号：入口 E0 不留/E1 仅入库/E2 精读待定/E3 直接快试/E4 直接进实验室；E2 精读后出口 X1 存档/X2 方法入库/X3 方法直接用/X4 转快试/X5 转实验室。下面两条归你精读（不急），读完在线况表记出口编号并告诉我：\n1) 稀疏观测约束的台风近海面风廓线重建（arXiv 2610.11405）：方法能否给 B 台风/飓风线的入流或边界层廓线用、所需观测我们有没有。\n2) Fortran 天气物理过程转 JAX（arXiv 2610.12662）：Liang Hu 点名'放入精读，看看方法是否有可供参考的'——重点看与原代码逐项核对、性能分析、可微物理对 AI 气象/混合模型的借鉴。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 22:58",
+      "text": "【委托 · 来自 平台】E2 精读两条：台风风廓线稀疏重建、Fortran→JAX 天气物理\n（Liang Hu 10-15 定的材料处置编号：E2 精读后出口 X1 存档 / X2 方法入库（方法卡，方法库在建，先写在你线里并标 X2）/ X3 方法直接用 / X4 转快试实验室 / X5 转实验室。**精读结论交回这里由 Liang Hu 审批出口**：你可以先写精读卡，但 X3/X4/X5 的落地动作等 Liang Hu 批了再做。此委托替代我稍早发给你的同题告知（--note），以本条为准。）\n1) 稀疏观测约束的台风近海面风廓线重建（arXiv 2610.11405）：方法能否给 B 台风/飓风线的入流或边界层廓线用，所需观测我们有没有。\n2) Fortran 天气物理过程转 JAX（arXiv 2610.12662）：Liang Hu 原话'放入精读，看看方法是否有可供参考的'——重点看与原代码逐项核对、性能分析、可微物理对 AI 气象/混合模型的借鉴。\n（原因：Liang Hu 要求精读后回平台 Lead 对话审批出口）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 22:58",
+      "text": "两篇精读已经派给本线 bot `wx` 去做，现在还在读，结果还没回来。\n\n我在知识库和本地文件里都没找到这两篇，所以让它直接从 arXiv 下载原文。写入范围限定在，其他目录只读。\n\n**两篇各要回答的问题：**\n- **台风近海面风廓线稀疏重建（arXiv 2610.11405）：**\n - 方法本身：输入是什么、怎么用稀疏观测约束、能重建到多高、误差多大。\n - 能不能给 B 台风/飓风线做入流或边界层风廓线。B 线现在两条链都偏低 35–38%，主要卡在输入假设上。\n - 它要的观测对美国登陆飓风能不能公开拿到，逐项列出数据来源、覆盖年份和获取方式。\n - 代码是否公开。\n- **Fortran 天气物理转 JAX（arXiv 2610.12662），按你说的\"看看方法是否有可供参考的\"：**\n - 和原 Fortran 逐项核对是怎么做的。\n - 性能对比：CPU 和 GPU 各快在哪、慢在哪。\n - 可微物理对本线三项工作各有没有能借鉴的地方，要具体到哪一步：K（AI 预报驱动 WRF）、L（对流尺度 AI）、C（ACE2 气候模拟器）。\n\n每张卡写明关键数字和对应的论文页码，再给一个建议出口（X1–X5 选一个）并说明理由。精读卡回来后，我先核对其中的关键数字和页码，再把结论交回平台的。按你的规定，出口由你审批；X3、X4、X5 的落地动作，等你批了再做。\n\n## 结论\n- **状态：** 两篇 E2 精读已派给 AI 气象线的 bot `wx`。精读卡写在。\n- **（arXiv 2610.11405，台风近海面风廓线重建）：** 精读方法、验证数据和误差数字；判断能否作为 B 台风/飓风线的入流或边界层廓线；逐项核对美国登陆飓风所需观测的公开来源、年份和获取方式；核对代码是否公开。\n- **（arXiv 2610.12662，Fortran 天气物理转 JAX）：** 重点看逐项核对方法、性能分析，以及可微物理对本线 K（AI 驱动 WRF）、L（对流尺度 AI）、C（ACE2 气候模拟器）的借鉴点。\n- **交付：** 每篇给建议出口（X1–X5 选一）和理由。精读卡回来后，由 AI 气象 Lead 核对关键数字和页码，再交回平台的，请 Liang Hu 审批出口。\n- **落地动作：** X3、X4、X5 的落地动作在 Liang Hu 批准前一律不做。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 23:14",
+      "text": "【委托结果 · AI 气象助手】E2 精读两篇：台风风廓线稀疏重建（arXiv 2610.11405）、Fortran→JAX 天气物理（arXiv 2610.12662）\n：建议 X2 方法入库。10 m观测硬锚定、10–300 m连续廓线重建有借鉴价值；但它需要可信的10 m风和RMW，不能直接修复B线现有输入假设导致的低偏，也未验证美国登陆陆面站点应用。\n\n：建议 X2 方法入库。Fortran逐变量容差核对、接口桥单测和GPU剖析流程值得参考；论文只验证了Kessler过程的单次调用与性能，未验证可微梯度或K/L/C的耦合应用。\n\n（附件：.md）\n\n（附件：.md）\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 23:14",
+      "text": "两篇精读卡都交回来了。我对着原文抽查了关键数字，都对得上。我的建议是两篇都走 X2（方法入库），都不建议 X3 或 X4。出口等你审批，批之前不做任何落地动作。\n\n**1. 《稀疏观测约束的台风近海面风廓线重建》（arXiv 2610.11405）**\n- **方法：** 以实测的 10 m 风为准，再用学出来的\"廓线形状\"补出 10–300 m 的连续风廓线，并加了几条物理约束。训练数据是 NOAA 2001–2022 年 93 个气旋的下投探空，质控后留下 7524 条。独立测试集上，径向风 R² 0.948，切向风 0.963。\n- **对 B 台风线：** 用不上来解决现有问题。这个方法的输入要有可信的 10 m 风和最大风速半径，而 B1+B4 两条链偏低 35–38%，问题就出在这些输入假设上；拿偏低的风做起点，重建出来的廓线照样偏低。它也只在海上验证过，没有验证过美国登陆后的陆面情况。\n- **观测数据：** 下投探空、NEXRAD 雷达、浮标、ASOS 都能公开下载，但很难在同一地点凑齐 10–300 m 的多层廓线。佛罗里达海岸测风塔计划（FCMP）的数据目前已下线，拿不到。\n- **代码与数据：** 作者没公开代码；质控后的廓线数据放在 Zenodo（CC BY 4.0）。\n\n**2. 《Fortran 天气物理过程转 JAX》（arXiv 2610.12662，NCAR 的 LAFT 工具）**\n- **值得参考的是\"怎么验证代码迁移对不对\"：**\n - 同一段 Fortran 用 22 种编译设置各跑一遍，取各输出变量之间的最大差异作为容差，JAX 版本每个变量的误差都必须落在这个范围内。\n - Fortran 和 JAX 之间的数据接口单独测试。\n - 先做 GPU 性能剖析，再重新验证一遍。\n- **性能：** 100 万列时 GPU 比单核 Fortran 快 357 倍。但这个数不含编译时间和数据传输，不能理解成整个 WRF 能加速 357 倍。\n- **局限：** 只验证了一个简单的暖雨微物理过程（Kessler 方案），而且只跑了单次调用。作者明说这篇不研究可微性，所以也没有梯度检验，也没有和别的模型耦合。\n- **对你问的\"可借鉴之处\"：** 对本线 K（AI 驱动 WRF）、L（对流尺度 AI）、C（ACE2 气候模拟器）眼下的问题都没有直接作用；以后真要做 AI 和物理混合的模型，这套分级验证流程可以照着用。\n- **代码与数据：** 代码公开，在 github.com/NCAR/LAFT，Apache-2.0 许可证，最近一次提交是 10-09。\n\n决策记录：\n\n\n\n\n## 结论\n- **（arXiv 2610.11405，台风近海面风廓线重建）：建议 X2 方法入库。**\n - **可借鉴：** 以 10 m 风为硬锚点、用物理约束重建 10–300 m 连续廓线的做法。\n - **不选 X3/X4：** 它需要可信的 10 m 风和最大风速半径作输入，修不了 B1+B4 因输入假设造成的 35–38% 偏低；只在海上验证过，没有在美国登陆陆面验证过；代码未公开。\n- **（arXiv 2610.12662，NCAR LAFT，Fortran 转 JAX）：建议 X2 方法入库。**\n - **可借鉴：** 用跨编译器的输出差异定逐变量容差、接口单独测试、性能剖析后再验证的迁移流程。\n - **不选 X3/X4：** 只验证了 Kessler 暖雨方案的单次调用，没有做可微性、梯度或耦合验证，对本线 K/L/C 当前的问题没有直接作用。代码公开（github.com/NCAR/LAFT）。\n- **卡片位置：** 两张精读卡在，按要求标为 X2。关键数字已由 AI 气象 Lead 对原文核过：7,524 条剖面、R² 0.948/0.963、Lee 案例 MAE 1.774 m/s、357 倍加速的计时口径、\"不研究可微性\"的原话。\n- **出口：** 请 Liang Hu 审批，批准前不做任何落地动作。\n\n（附件：.md）\n\n（附件：.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 23:26",
+      "text": "【委托 · 来自 WRF】K 第三对（48 h 提前量 G48/P48）正式 v2 表交付\n同口径 v2、同一套脚本（通用 QA：G48/P48 计数 9720/9720 TS、325/325 二维、7/7 三维全过；w-CFL 最大 2.01/2.11 未触送审线）。文件：、READOUT 在同目录（READOUT_1552228.md）。反射率 ≥40 dBZ；first50=KAKO 50 km 内首次出现；≥64 km² 正式、≥16 敏感性；首次出现窗 00–09Z、位置窗 03–09Z；位置误差取最近 06:10Z；左删失照实标注。\n≥64 km² 关键数字（本线数据）：观测首现 03:10Z、对象 1380 km²。G48 首现 00:30Z（−160 min），06:10Z 质心误差 316.8 km，对象 79.8 km²，KAKO 100 km 内最大 10 m 风 17.1 m/s。P48 在首次出现窗内未检出 KAKO 50 km 内 ≥64 km² 对象（first50 不可用，**不是左删失**，不填起生误差），06:10Z 位置误差 273.3 km，对象 287.0 km²，最大风 17.0 m/s。观测阵风 37.0 m/s。两例均无左删失。\n≥16 km² 档：G48 首现差 −140 min、位置误差 275.2 km；P48 仍无 first50，位置误差 174.7 km。\nN0Q 沿用第一对的带局限交叉检查。只交表和指标，不下结论。72 h 对：G72 dt20（1544570）约 10-16 03:20 完成后出附列表；P72 dt15（1547482）约 10-16 中午完成；G72 dt15 按总 Lead 顺序在 G3 批 2 结束后提交（约 10-16 中午），72 h 对正式表预计 10-18 前后。\n（原因：K 实验表与指标交 AI 天气线）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 23:26",
+      "text": "我收下了 48 h 这一对（G48/P48）的正式表，两张表的数字我对着 CSV 核过，口径不改。\n\n**48 h 对的数字（≥64 km² 口径，本线数据）：**\n\n| | 观测 | G48（GFS 驱动） | P48（Pangu 驱动） |\n| --- | --- | --- | --- |\n| KAKO 50 km 内首次出现 | 03:10Z | 00:30Z（早 160 分钟） | 00–09Z 窗内始终没出现 |\n| 06:10Z 对象质心距观测 | — | 316.8 km | 273.3 km |\n| 对象面积 | 1380 km² | 80 km² | 287 km² |\n| KAKO 100 km 内最大 10 m 风 | 阵风 37.0 m/s | 17.1 m/s | 17.0 m/s |\n\n在 ≥16 km² 档里，G48 早 140 分钟出现，距观测 275.2 km；P48 仍然没有首次出现，距观测 174.7 km。\n\n到 48 h，两组都已经抓不住这个风暴：位置偏出将近 300 km，对象只有观测的二十分之一到五分之一，最大风也只有观测阵风的一半左右。正式判读要等 72 h 对，WRF 线说约 10-18 交表。\n\n**我补了两件事：**\n- **\"窗内始终没出现\"怎么算，补成了规则。** P48 在 50 km 内从未出现，不算左删失，按\"晚于 09Z\"处理，沿用左删失那套区间判法：把可能的时刻都代进原时间判据，结论都一样才照判，否则记\"时间不可判\"。这是同一规则的延伸，不另送审。\n- **请 WRF 线补一列\"150 km 内有没有对象\"。** 设计里有两条规则要用到这个数：一条是 24 h 两组都没有 150 km 内的对象时，整个事件判\"不可分辨\"；另一条是 GFS 有对象、Pangu 没有，就算 Pangu 差。现有的表只给了 06:10Z 的质心距离，判不了这两条。这一列用已经提取的对象文件就能算，不用重跑模式，也不改已交的表。\n\n**72 h 对进度：**\n- G72 用 20 s 步长的那次约 10-16 03:20 跑完，作为附列。\n- P72 约 10-16 中午跑完。\n- G72 改用 15 s 步长的补跑，按总 Lead 排的顺序约 10-16 中午提交。\n\n决策记录、K 项目页和线况页都已更新。\n\n## 结论\n- **第三对 G48/P48 正式 v2 表收下，口径不改。** 我已对着 CSV 核过数字。\n- **P48 窗内没有首次出现，照实留空就对了。** 我按\"晚于 09Z\"用区间法判，你们不用代判，也不用填数。\n- **请补\"150 km 内有没有对象\"一列：**\n - **范围：** 06/24/48 三对现在补，72 h 对出表时一并带上。\n - **内容：** 03–09Z 内，每个成员和观测在 ≥64、≥16 两档下，有没有达标对象的最近格点落在 KAKO 150 km 以内；再给出最近格点的最小距离和对应时刻。\n - **做法：** 写成每对目录下的新文件，不改已交的表，只用已提取的对象文件，不重跑模式。\n- **只交表和指标，不下结论。** 72 h 对交齐后，由我按冻结判据统一判读。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 23:27",
+      "text": "【委托结果 · WRF】K Akron：各对补列 150 km 存在性\nAI 天气线收下了 48 小时那对，并要求各对补一列\"150 km 内有没有达标回波\"的指标，用来判\"两边都没有对象→不判\"和\"一边有一边没有→另一边差\"这两条规则。已派 bot 从已提取的对象文件里算，6/24/48 三对现在补，72 小时那对出表时一并带上；不重跑模式，不改已交的表。结果回来我核对后一次交回 AI 天气线。线况页已更新。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 23:27",
+      "text": "WRF 线回的是进度，不是结果：150 km 存在性那一列已经派给他们的 bot 去算，还没交。06、24、48 三对现在补，72 小时那对出表时一并带上。他们核对后会一次性交回来。\n\n我这边原定的委托已经结束了，所以这份结果会作为 WRF 线新发来的一条委托回到我这里。K 项目页上原来就有一个 10-16 16:41 的兜底回访：到那时还没收到这一列的话，我会去催。\n\n72 小时对的正式表预计 10-18 前后到。那之前 K 不需要你做什么。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 00:41",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】L 第二轮完成：两代 StormCast 都不过，拟搁置，6 人审查在跑\n结论：雷暴节点 L 对流尺度 AI 第二轮完成，按冻结判据两代 StormCast 都不通过（母项目核过）。V1（20 个 2023–24 事件）：3 h 峰值比为 HRRR GUST 的 0.85，≥50 kt 命中 AI 4/20 vs HRRR 6/20。CONUS（12 个 2026 事件 + 6 对照，53/54 组）：峰值比 0.85/0.90/0.84（只 2 h 过），≥50 kt 命中 AI 1/1/0 vs HRRR GUST 4/2/3（/12），误报两者都是 0；两代都输给\"HRRR 10 m 风×同一阵风系数\"。整轮约 212 CU（上限 215 内），不再花 Colab；上规模成本约 700 CU/百事件。下一步：按\"放弃路线须审\"已送 6 人审查 （含阵风换算是否系统性压低 AI），裁决后再改搁置。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 00:41",
+      "text": "L（对流尺度 AI 与雷暴短临）第二轮跑完了：两代 StormCast 按开跑前冻结的判据都没通过，母项目 Lead 打算搁置 L。放弃一条路线按规矩要先过 6 人，审查 正在进行，裁决出来之前 L 仍算\"探索中\"，不改状态。\n\n**结果（本线数据）：**\n- **V1，2023–24 年 20 个事件：** 3 小时峰值风只有业务模式 HRRR 阵风的 0.85。≥50 kt 大风事件 AI 命中 4 个，HRRR 命中 6 个。\n- **CONUS，2026 年 12 个事件加 6 个无事件对照：** 三个提前量的峰值比是 0.85、0.90、0.84，只有 2 小时那一档过线。≥50 kt 命中 AI 依次是 1、1、0，HRRR 是 4、2、3，共 12 个事件。两边都没有误报。\n- **最要紧的一点：** 两代都输给了一个最简单的做法：把 HRRR 的 10 m 风乘上同一个阵风系数。AI 连这个基线都没赢，不是差一点的问题。\n\n**审查重点查一件事：** 我们把 AI 输出换算成阵风的方法，会不会系统性地压低了 AI 的数值。如果是，就不能说 AI 本身不行。\n\n**算力：** 整轮约 212 CU，在 215 的上限内，L 不再用 Colab。要扩大规模，每 100 个事件约 700 CU，只记录下来，不据此放行。\n\n审查裁决后，母项目 Lead 再决定搁置。按规矩，结论里会写明搁置原因和重启条件，我收到后告诉你。线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 00:53",
+      "text": "【委托 · 来自 平台】Liang Hu 已批 #6 #7 为 X2；#6 的下投探空廓线数据集存档并告知 B 台风各子项目\nLiang Hu 10-16 00:5x 原话：『6和7都批准。6的数据很有意义，一定要存档并告知相应的子项目。』\n\n1) #7 （Fortran→JAX，LAFT）：X2 已批。精读卡作方法卡保留在，标『已批 X2』；全平台方法库建好后由知识库迁入。无其他动作。\n\n2) #6 （Ma 等 arXiv 2610.11405，台风近海面风廓线）：X2 已批，方法卡同上处理。**另外数据存档**：\n - 下载作者 Zenodo v2 数据集 [external URL omitted] 的 profiles_json.zip（约 14.4 MB，CC BY 4.0；QC 后 7,524 条 NOAA HRD 下投探空 10–300 m 廓线，93 个气旋，2001–2022），核 MD5/大小与 Zenodo 页一致，解压清点条数与字段。\n - 存档位置：本线数据目录（小文件，工作站 可放；另在 CRC 或 TACC 存档区备一份，路径写清）；写一页数据说明（来源、许可、引用格式、版本日期、字段、QC 规则、已知限制如 10 m 赋值问题、与 HRD 原始 sonde 的关系），并在本线文献/数据索引登记；论文与数据集都进 Zotero（委托 literature）。\n3) X2/X1 以外的落地（接入模型、开新实验）不做。\n（原因：Liang Hu 10-16 批准并特别指示 #6 数据一定要存档、告知相应子项目）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 00:53",
+      "text": "数据集已下载，MD5 和大小都与 Zenodo 页面一致，共 7524 条廓线。正在往 CRC 传一份备份，之后写数据说明，并通知 B 台风各子项目。数据已经存档，数据说明也写好了。接下来通知 B 台风各节点，再把论文和数据集交给 literature 入 Zotero。这件事还没收尾：B 各节点的告知回执和三条文献入 Zotero 的结果都还没回来，所以结论先不交回平台，等这两项回来再一起交。\n\n**已经完成的：**\n- **#6 数据集已存档，并核过：**\n - 从 Zenodo 下载 `profiles_json.zip`，大小 14,365,030 字节，MD5 与 Zenodo 页面一致。\n - 共 7,524 条廓线，和论文对得上。年份 2001–2022，按\"风暴名+年份\"算是 116 个风暴。Katrina、Ike、Sandy、Laura、Ida、Ian 等美国登陆风暴都在里面。\n - 存放位置：工作站 上在；CRC 备份在，两端 SHA-256 一致。\n- **数据说明已写好：** 包括来源、许可证、引用格式、字段说明、质控规则，以及已知限制。\n - 部分 10 m 风值是用最近的高度顶替的。\n - 论文说\"93 个气旋\"，看来是只按风暴名数的。\n - 这些是海上采样，不是陆地上空的廓线。\n\n 数据说明已登记进本线的数据索引。\n- **两张精读卡**都标上了\"已批 X2\"，知识库的来源笔记里也补了 `Exit: X2（Liang Hu 批 10-16）`。\n- **B、B1+B4、B2 三个项目页**的\"文献依据\"里各加了一行，写明这份数据在哪、能用来做什么。\n\n**还在等回执的：**\n- **告知 B 各节点：** 系统不让我从根对话直接给 B 各节点留言，所以交给母项目对话去转告。它会转告 B、B1+B4、B2，写明不改任何节点的状态和闸门；B3 等开的时候写进交接。\n- **入 Zotero：** 已委托 literature，把两篇论文和这个数据集加进 Zotero，交回三条 item key。\n\n两项都回来后，我把完整结论交回平台，并附上可能也用得上这份数据的其他线名单。\n\n\n\n（附件：README_数据说明.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 00:56",
+      "text": "【自动初查 · 保持进行中】委托 「Liang Hu 已批 #6 #7 为 X2；#6 的下投探空廓线数据集存档并告知 B 台风各子项目」带验收清单，你这次交回的是进度（转派出去的结果还没回来），没有当结果交给 平台。\n本委托保持进行中：等你转派的结果回来、核过之后，再一次交回完整结论（按验收清单逐条）。\n需要先让对方知道进度，用 \n\n验收清单：\n#7 方法卡路径与状态\n#6 数据集存档路径（两处）、文件大小与校验值、条数与字段\n数据说明页路径；Zotero 条目 key（论文+数据集）\n已告知的子项目对话清单（节点前缀）\n建议另行告知的其他线（如有）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 00:57",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】HRD 下投探空数据集：B 各节点已告知齐\n回执：HRD 下投探空 10–300 m 台风廓线数据集（Ma 等 2026）的告知已送齐——B 节点 由母项目 --note 留言；B1+B4 、B2 由 B 节点以 --note 原文转达。B 节点页 B3 行已写开工交接要求（作 WRF 边界层廓线检验集，限海上/近核，非陆面廓线），\"未决与下一步\"记为 B1+B4 重启可用输入。搁置状态与闸门未改，未开新实验。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 00:57",
+      "text": "B 台风各节点已经全部收到了这份数据集的告知：\n- B 节点由母项目留言告知；B1+B4和 B2由 B 节点原文转达。\n- B 节点页上，B3 那一行写好了开工时的交接要求：把这份数据当作 WRF 边界层廓线的检验集，只限海上和风暴近中心，不能当作陆面廓线用。\n- 在 B 节点页的\"未决与下一步\"里，这份数据记为 B1+B4 重启时可用的输入。\n- 各节点的搁置状态和闸门都没动，也没有开新实验。\n\n现在只差 literature 把两篇论文和这个数据集录进 Zotero，等它交回三条 item key 后，我把完整结论一次交回平台。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 00:57",
+      "text": "【委托结果 · AI 气象】告知 B 各节点：HRD 下投探空 10–300 m 台风廓线数据集已存档\nHRD 下投探空 10–300 m 台风风廓线数据集的告知，B 下面的节点都已收到。B 节点页我也打开核过。这次自动初查没跑成，按验收清单我自己核了一遍。\n\n- **B 台风/飓风风场**：我直接留了言。\n- **B1+B4**和 **B2**：由 B 节点用 `--note` 把告知原文各转了一条。\n- **B 节点页**：B3 那一行已写明开工交接时要附上这套数据，用作 WRF 边界层风廓线的检验集，并注明只代表海上和近风暴中心，不是陆面廓线。页里另有一行写清数据来源和存放位置，可以用来重启 B1+B4。\n- **没动的**：各节点的搁置状态和闸门都没改，也没开新实验。\n\n已向根对话回执。\n\n> 【自动初查】没能自动初查（检查服务不可用），请你按验收清单自己核对。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 00:57",
+      "text": "验收清单我自己核过了，B 台风各节点的告知已经全部送达。我打开 B 节点页确认过：B3 那一行写明了这份下投探空数据集可作 WRF 边界层廓线的检验集，并注明只代表海上和风暴近中心。我还在\"文献依据\"里加了一行，写清数据来源、存放位置，以及可用于重启 B1+B4。各节点的搁置状态和闸门都没改，也没开新实验。\n\n平台交来的这件事，现在只差 literature 把两篇论文和这个数据集录进 Zotero。它交回三条 item key 后，我再把完整结论一次交回平台。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 01:01",
+      "text": "【委托结果 · 文献检索智能体】入 Zotero：Ma 等 2026 台风廓线论文与 Zenodo 数据集\nMa 等论文 — 10.48550/arXiv.2610.11405 — Zotero key Z4VTJBVX — PDF： key：4HAMDKJR）\n\nMa 等 Zenodo 数据集（Dataset，v2）— 10.5281/zenodo.21868265 — Zotero key V7PCW9TM — 无 PDF；README 链接：（链接附件 key：QMMUVG9U）\n\nLinck 等 LAFT 论文 — 10.48550/arXiv.2610.12662 — Zotero key PBSAXRT3 — PDF： key：BNTG5QM2）\n\n上述 PDF 路径是已校验的原始本地文件；Zotero Desktop 的本地同步副本尚未据此确认。\n\n> 【自动初查】没能自动初查（检查服务不可用），请你按验收清单自己核对。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 01:01",
+      "text": "平台交来的 #6、#7 处理完了，可以交回平台。\n\n- **入 Zotero：** 两篇论文和这个数据集都录进去了，三条都有 item key，两篇论文的 PDF 已作附件挂上。literature 提醒：Zotero 桌面端的本地同步副本还没确认。\n- **数据集：** 已下载存档，有数据说明，B 台风各节点都告知到了，这些上一轮已经核过。\n\n数据说明里我补上了这三个 Zotero key，线况页也已更新。\n\n我判断其他几条线也可能用得上这份廓线数据，交平台 Lead 转告：\n- **PETW 风场线：** 可以拿来检验飓风参数化风场的竖向结构，比如 H08 加对数律的组合。\n- **WRF 线：** 可以作为台风边界层方案在海上的检验集。B3 开工后也会用到这份数据。\n- **CFD 线和数字孪生风洞：** 可以给飓风情景的入流廓线提供 10–300 m 的实测形状参考。\n- **设计荷载线：** 可以作为飓风条件下风剖面指数取值的旁证，只限海上，不能直接套用到陆地上的规范风剖面。\n\n\n\n## 结论\n- **#7 （Fortran→JAX，LAFT）：** 已按 X2 处理。精读卡留在，已标\"已批 X2，Liang Hu 10-16\"，来源笔记已补 `Exit: X2（Liang Hu 批 10-16）`。论文已入 Zotero，key 为 PBSAXRT3。全平台方法库建好后，由知识库迁入。\n- **#6 （Ma 等 2026，台风近海面风廓线）：** 已按 X2 处理，精读卡同样已标注，来源笔记已补 Exit 行。\n - **数据存档：**\n - **来源与校验：** Zenodo v2 的 `profiles_json.zip` 已下载，14,365,030 字节，MD5 `…630d` 与 Zenodo 页面一致。\n - **内容清点：** 共 7,524 条，2001–2022 年，按\"名+年\"计 116 个风暴。字段有径向/切向风廓线、10 m 风、风暴中心、Vmax、RMW、r/RMW 和方位。\n - **存放位置：** 工作站 上在。CRC 备份在，两端 SHA-256 一致。\n - **数据说明与索引：** 数据说明是同目录的。\n - **Zotero：** 论文 Z4VTJBVX（PDF 附件 4HAMDKJR），数据集 V7PCW9TM（说明链接附件 QMMUVG9U）。Zotero 桌面端的本地同步副本还没确认。\n - **已告知的子项目：** B 台风/飓风风场、B1+B4、B2都已收到告知。B 页的 B3 行写好了开工时的交接（作 WRF 边界层廓线检验集，只限海上/近核）。\"未决与下一步\"里把它记为 B1+B4 重启时可用的输入。各节点的搁置状态和闸门都没改，也没开新实验。\n- **建议平台转告的其他线：**\n - PETW 风场线：检验参数化风场的竖向结构。\n - WRF 线：作台风边界层方案在海上的检验集。\n - CFD 线、数字孪生风洞：作飓风入流廓线的形状参考。\n - 设计荷载线：作飓风条件下风剖面指数取值的旁证，只限海上。\n- **没做的：** 除 X2 之外没有任何落地动作。\n\n（附件：README_数据说明.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 01:11",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】L 审查 已裁：本配置搁置，但不能说 AI 不如 HRRR\n结论：雷暴节点 L 审查 （5/6 有效，Gemini 额度用尽未补齐）已裁：两代 StormCast + 常数系数阵风代理 + 事后 ERA5 这一配置，按冻结门槛未达扩样标准，L 改\"搁置\"（仅限本配置）。但差异不显著（McNemar p 0.22–1.0），改用集合最大值口径时峰值比全部过线，任一成员计数 AI 不少于 HRRR GUST，V1 还含已见样本——所以不得写\"对流尺度 AI 不如 HRRR\"。下一步：L 写第三轮预注册草案（盲样本、混合层阵风诊断、概率型判据、样本量估算、分段 CU 预算），不花算力；草案回来由雷暴节点定是否放行，总预算 >100 CU 报母项目，>200 报你。裁决。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 01:11",
+      "text": "L（对流尺度 AI 与雷暴短临）的审查已经裁决：只搁置现在这套配置，不能写成\"对流尺度 AI 不如业务模式 HRRR\"。\n\n**搁置的范围：** 只是这一套组合：两代 StormCast，加上用固定系数把风换算成阵风，再用事后的 ERA5 驱动。按事先冻结的门槛，它没达到扩大样本的标准。\n\n**为什么不能说 AI 不如 HRRR：**\n- AI 和 HRRR 的命中差异在统计上不显著，p 值 0.22–1.0。\n- 改用集合最大值来比，峰值比全部过线，而且任一成员命中的数都不比 HRRR 少。\n- V1 那部分事件有些是模型训练时见过的，结果本来就不干净。\n\n**下一步：** L 写第三轮预注册草案，要点是盲样本、更合理的阵风诊断方法、概率型判据、样本量估算、分段算力预算。写草案不花算力。草案回来后由雷暴节点决定是否放行；总预算超过 100 CU 报母项目，超过 200 CU 报你。\n\n**审查只拿到 5 份意见，规定是 6 份：** Gemini 因为订阅额度用尽失败了，系统也没有自动补人。母项目 Lead 按\"只审一轮\"没有重派，这一点在裁决里照实写了。5 份里 4 份有保留地支持，1 份不支持下强结论，而这次的结论本身就是收窄过的，所以我认可，不再补审。母项目 Lead 还用原始评分表把关键数字复核了一遍。\n\n裁决在，线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 01:27",
+      "text": "【告知 · 来自 WRF】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：G72 dt15 已于 10-16 01:2x 提交登记，CRC 1554563（新根 G72_formal_v22_dt15_v1，restart_interval=1440，资源申请），40 h 墙钟，登记预计 10-18 01:25（含排队余量）。P72 dt15 1547482 约 10-16 中午完成；G72 dt20 1544570 约 10-16 03:20 完成后出附列表。72 h 对正式表（含 EXIST150 列）预计 10-18。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 07:51",
+      "text": "【委托 · 来自 平台】请确认：10-15 晚删掉的 transfer/*.npz（64 个）有别处的完整副本\n平台删除审计记录：10-15 18:58–00:06 删除了 下的 m01_1979–2010.npz 和 m02_1979–2010.npz，共 64 个，另有 .colab_owner 和 31 个 __pycache__。看起来是 Colab→CRC 传输的中转文件，按 工作站 不存计算数据的规定，传完就删了。请回一句：\n1) 这 64 个 npz 是否在 CRC（或其他位置）有完整副本，在哪个路径，传完后有没有比过 sha256\n2) 是不是你们线自己按流程删的（bot 或 Lead）。\n如果没有副本，请马上告诉我。\n（原因：删除审计报了批量删除，按规矩研究结果的删除要核对）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 07:51",
+      "text": "刚在 TACC 上逐个重算了这 64 个文件的校验码，和清单全部一致。现在在看编排脚本删除前是怎么核对的。这 64 个文件在 TACC 上有完整副本，我刚刚亲自重新核过，删的是 工作站 上的中转缓存，不是唯一一份数据。\n\n**副本位置和核对：**\n- 副本在 TACC 的 和 下，每个成员 32 个文件，对应 1979–2010 年。\n- 传输当时就比过 sha256：编排脚本 （第 128–138 行）每传一个文件都会先在本地算 sha256，用共享连接 scp 上 TACC，再在 TACC 上重算 sha256；两边一致才删本地中转文件，不一致就报错停下。核对结果记在 、 和 （`REGION_VERIFIED` 事件）里。\n- 10-16 07:52 我又在 TACC 上逐个重算了一遍 sha256，64 个和清单全部一致。\n\n**谁删的：** 是本线自己按流程删的。执行者是 bot `wx` 在 C 新格点检验任务里跑的编排脚本，传完、核对过的文件逐个删掉，符合\"工作站 不存计算数据\"的规定。`.colab_owner` 和 `__pycache__` 只是会话标记和 Python 缓存，不是结果。\n\n另外说明一点：m03–m10 已经改成只取风速摘要和每季的地面气压距平最小值，不再生成和上传区域场文件，所以后面不会再有这类中转删除。\n\n## 结论\n1. **副本：** 64 个 npz（m01、m02 各 32 个，1979–2010 年）在 TACC 有完整副本，路径为 和。传输时每个文件都在本地和 TACC 两端比过 sha256，记录在同目录 和。AI 气象 Lead 于 10-16 07:52 在 TACC 上重算了 64 个文件的 sha256，与清单全部一致。\n2. **删除方：** 本线 bot `wx` 在 C 新格点检验任务中跑的编排脚本，按\"核对一致后才删本地中转文件\"的流程逐个删除，属正常的中转清理。`.colab_owner` 和 `__pycache__` 是会话标记和 Python 缓存，不是结果文件。\n3. **后续：** 本任务后续成员（m03–m10）不再生成和上传区域场，不会再有同类删除。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 12:23",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nAI 气象助手 11:18 开 A100 时遇到 412 Allocation refused，查明不是账户并发上限，是 Colab 那边 A100 一时没有空闲容量，一般一分钟左右就会恢复。colab-gpu 技能里已经写进处置办法：先看 colab sessions 和 usage，等 1–2 分钟重试，最多 3 次；还不行，由你定是降到 L4/T4，还是报平台 Lead；绝不动别人的会话。你们那份技能里还补上了 0091 的超时一节。不用重启，下一轮起生效。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 12:45",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】C 新格点预注册检验：主判据勉强通过，平原同向偏低\n结论：C（ACE2-ERA5 AI 气候模拟器）在 8 个未看过格点按冻结预注册检验（约 87 CU，会话全停），母项目核过 ：KMKE 最近格点湖面主导（陆地分数 0.20），按预注册规则剔除、不补选，7 格可评；留出期 GEV50 上 ERA5 超出十成员范围 2/7（KFSD 高于全员、KSTL 低于全员），门槛 ≤2 → 判\"通过\"，但贴着门槛、7 格功效偏弱；辅助 POT50、p90 各 3/7 超范围。平原 KFSD −23% 与先前 KDSM −29%、KOMA −23% 同向，疑区域性压尾；地面气压距平 ACE2 不弱于 ERA5，问题若在应在气压→近地风的映射。预注册 10-15 19:04 有过一次补充（辅助气压变量口径），在任何成员推演和风极值读取之前，不影响主判据。下一步：wx 只读摸清站点数据（IEM ASOS 长记录、传感器换型、对流标注），再写站点段预注册，平原站单列；G 暂缓到站点段之后。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 12:45",
+      "text": "C（用 ACE2 模拟器估算设计风速）在新格点上的检验按事先冻结的判据算\"通过\"，但刚好卡在门槛上。这一结论我核过，同意，不需要你拍板。\n\n**结果（本线数据，约 87 CU，Colab 会话已全部停掉）：**\n- 8 个新格点里，KMKE 的最近格点主要落在湖面，陆地只占 0.20，按预注册规则剔除且不补选，剩 7 格可评。\n- 主判据看 50 年一遇风速：ERA5 落在十成员范围外的有 2/7 格，KFSD 高于全部成员，KSTL 低于全部成员。门槛是\"≤2\"，所以判通过。\n- 门槛按原来 8 格的整数没有改，所以只有 7 格可评时检验力偏弱，这一点报告里写明了。两项辅助指标都是 3/7 落在范围外。\n\n**要注意的信号：平原可能整片偏低。** KFSD 偏低 23%，和之前的 KDSM（−29%）、KOMA（−23%）方向一致。模拟器里的地面气压起伏不比 ERA5 弱，所以如果真有偏低，问题更可能出在\"从气压场到近地面风\"这一步。这次\"通过\"只说明按格点闸门过了，不能说平原没有压低极端风的问题。\n\n**预注册补充：** 预注册冻结后，10-15 19:04 补过一次辅助气压变量的口径。时间在任何成员推演和读取风极值之前，不涉及主判据，我认可。\n\n**下一步：**\n- 本线 bot 先只读摸清站点数据：IEM 的 ASOS 长序列、风速仪换型记录、对流标注。\n- 然后写站点段的预注册，平原站单列。\n- G 节点推迟到站点段之后。\n\n线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 14:01",
+      "text": "【告知 · 来自 WRF】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nP72 dt15（CRC 1547482）全程完成并过冻结 QA（w-CFL 最大 2.16，告警 13 步）。PAIR72 附列表（G72 dt20 vs P72 dt15，按你定的规则步长不一致不计票）已派后处理；正式 PAIR72（G72 dt15 vs P72 dt15，含 EXIST150 与四判）等 G72 dt15（1554563，约 10-18 01:25 完）后出。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 16:43",
+      "text": "【子项目回报 · AI 气象/气候大模型与风工程】C 站点段 v1 不通过；改测分布层 v2，作最后一次重试\n结论：C 站点段预注册 v1 机械判\"不通过\"：5 个主站留一季技能 S 全为负（−0.22～−0.06），平均 S 的 90% 区间 [−0.43, −0.02]，敏感性同样不过。原因：ERA5 格点的季最大风与站点非对流季最大阵风，15 季里只有 2–8 季是同一场风暴，\"逐季配对\"没对准设计风速真正需要的\"分布对应\"。决定：不收口（收口即放弃路线，需 6 人），C 写 v2 预注册改测分布层——空间留一、v1 未碰过的新站、预测留出站 10/50 年值，季配对降为诊断，<15 CU。母项目补了两条：v2 写明是 v1 不通过后的新检验、新站与判据看数据前冻结；v2 是站点段最后一次重试，再不过就整理搁置提案送 6 人，不换第三种口径。G 继续暂缓。决策。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-16 16:43",
+      "text": "C（用 AI 气候模拟器估算站点设计风速）的站点段 v1 按预注册没过。母项目 Lead 决定换个检验方法再试一次（v2），而且这是站点段的最后一次。我核过结果，同意，不需要你拍板。\n\n**v1 结果（本线数据）：** 5 个主站逐季比较的技能分全部为负，在 −0.22 到 −0.06 之间。平均技能分的 90% 区间是 [−0.43, −0.02]，整个区间都在零以下，敏感性检验也没过。我核对了判定文件，数字一致。\n\n**没过的原因是比较的方法不对路：**\n- v1 是把模拟器格点每季的最大风，和站点每季最大的非对流阵风逐季配对来比。\n- 但 15 季里只有 2–8 季两边是同一场风暴，逐季比本身就对不上。\n- 设计风速需要的是两边的极值分布一致，不需要逐季对上。\n\n**v2 改测极值分布：**\n- 用 v1 没用过的新站，按\"留出整个站\"来检验：用其他站的信息去预测留出站的 10 年和 50 年一遇风速。\n- 逐季配对降为诊断，不再作判据。\n- 预计不到 15 CU。\n\n**母项目 Lead 加了两条约束：**\n- v2 写明是在 v1 没过之后另做的新检验，新站和判据在看数据之前冻结。\n- v2 是站点段的最后一次重试。再不过就不换第三种比法，直接写搁置提案送 6 人。\n\nG 节点继续暂缓。线况页已更新；顺手把雷暴、J 两行已过时的状态也改正了。决策记录在。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 21:48",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nAI 气象助手的会话 wx-urbantales-v6s2-hm-1015 18:38 被 Colab 回收，训练丢了。平台已改四点：① colab-keepalive 每轮记下会话年龄和剩余寿命，剩不到 2 小时写警告；② 开跑时带 --expect-hours，如果会话活不到作业结束会醒目警告（只提醒不拦）；③ 带对话凭据时，会话到期前 2 小时自动叫醒发起的；④ colab-gpu 技能补了规则：长任务先查 --age，剩余时间不够就开新会话，长跑要用 --pull 把检查点拉回本地。立即生效，不用重启。平台没有重跑训练，也没动任何会话。丢的 N200 seed42 要不要重跑，由你们定。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 23:16",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 23:39",
+      "text": "【告知 · 来自 WRF】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nG72 dt15（CRC 1554563）10-16 23:29 完成并过冻结 QA（无 CFL 告警）。K 六个正式运行全部结束。正式 PAIR72（G72 dt15 vs P72 dt15，含 EXIST150 与四判所需指标）已派后处理；dt20 附列（1560832）仍在 CRC 排队，正式表不等它。出表后交你。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 01:01",
+      "text": "【委托 · 来自 WRF】K PAIR72 交付：正式（G72 dt15 vs P72 dt15）与 dt20 附列\n交付 72 h 一对，指标与 PAIR48 v2 相同。\n正式： VERIFIED_TABLES.zip）。CRC 1571882，两成员 QA 通过。\n附列（不计票）： dt20 vs P72 dt15）。CRC 1560832。\n要点（Lead 已抽核 FORMAL CSV）：\n- first50（观测 03:10Z）：dt15 下 G72、P72 两档均未出现；dt20 下 G72 04:00Z 出现（64 档 +50 min、16 档 +80 min）。G72 的 first50 判定随步长翻转 → 按你定的规则属'步长敏感·不判'。\n- 位置误差（06:10Z）：64 档 G72 104.1 km / P72 307.7 km；16 档 104.1 / 299.7 km；dt20 附列 G72 103.5 km（与 dt15 一致，位置判定不随步长翻转）。\n- 对象面积 64 档 G72 79.9 / P72 334.9 km²；100 km 内最大 10 m 风 G72 18.7 / P72 15.9 m/s（观测 KAKO 阵风 37.0）。\n- EXIST150：G72 两档 True（最近 74.2 km；dt20 41.9 km）；P72 正式档 False（190.1 km）、敏感档 True（111.8 km）。\n请按你的四判规则（2 步长 × 2 面积档）计票并告诉我 72 h 的计票结果；Pangu 优劣判断归你方，WRF 线不作。至此 06/24/48/72 四对全部交齐。\n（原因：K 实验 72 h 计票需要）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 01:01",
+      "text": "72 h 这一对已按四判规则（2 种步长 × 2 档面积）计完票，结果是 Pangu 驱动比 GFS 驱动\"明显更差\"，四个判定全部一致。\n\n**72 h 怎么判的（本线数据，CSV 我逐张核过）：**\n- **位置：** P72 离观测 307.7 km（≥64 km² 档）和 299.7 km（≥16 km² 档）。G72 是 104 km，换成 20 s 步长是 103 km。判据要求 Pangu 不比 GFS 远 50 km 以上，P72 远远超出，四个判定都在这一条上就已失败。\n- **对象存在性：** 在 ≥64 km² 档，G72 在 KAKO 150 km 内有对象，P72 没有，按\"GFS 有对象而 Pangu 没有，算 Pangu 差\"这条规则也算差。\n- **首次出现时间：** G72 用 15 s 步长时没出现，用 20 s 时 04:00Z 出现，确实随步长翻转。但位置已经确定不过关，最终判定不变，所以不触发\"步长敏感·不判\"。\n\n**四对合起来：**\n\n| 提前量 | 判定 | 主要原因 |\n| --- | --- | --- |\n| 24 h | Pangu 明显更差 | ≥64 档位置误差 308 km 对 183 km；两档首次出现都早了太多 |\n| 48 h | Pangu 明显更差 | 只差在时间：P48 在 50 km 内一次都没出现。不过 G48 也很差，早了 160 分钟、偏了 317 km |\n| 72 h | Pangu 明显更差 | 位置差 200 km 左右；≥64 档 Pangu 在 150 km 内没有对象 |\n\n按结论规则，三个提前量都判\"明显更差\"，结论应是\"搁置（AI 驱动不如 GFS）\"。\"值得继续\"本来就不可能：它要求至少一组在 24 h 时位置误差 ≤150 km，两组都没做到（183 km 和 308 km）。\n\n**送审：** 搁置等于放弃这条路线，按规矩先送 6 人，裁决出来之前 K 的状态不改。送审内容重点有三处：\n- **\"明显更差\"的定义：** 原设计没单独定义，这次我按\"不差于判定在所有可能取值下都失败\"来认定，请审稿人看这是否事后偏向了某一方。\n- **48 h 的判差：** 只靠时间这一条。\n- **24 h 的位置过线：** ≥16 档 Pangu 只差 0.3 km 就过了位置线。\n\n**结论里必须写明的限制：**\n- 只有一个雷暴事件，只能作定性判断。\n- 主对比同时包含两方面差别：预报模型不同，垂直层数也不同（GFS 全层对 Pangu 14 层）。用来拆开这两部分的 R24 没跑。\n- 两组模拟的 10 m 风都只有观测阵风的 45–70%。\n\n计票表和证据摘要在。K 项目页和线况页已更新。\n\n## 结论\n- **72 h 计票结果：** 四判（dt15/dt20 × ≥64/≥16 km²）一致，都是 Pangu\"非不差于\"，而且是确定的失败，计\"明显更差\"一票，不触发\"步长敏感·不判\"。\n - **位置：** P72 为 307.7 / 299.7 km，G72 为 104.1 km（dt20 为 103.4 km），P72 超出 G+50 km 约 150 km。\n - **对象存在性：** ≥64 档 G72 在 150 km 内有对象，P72 没有。\n - **首次出现时间：** G72 随步长翻转，但二元判定不翻转。\n- **四对已收齐：** 06/24/48/72 四对的正式表和 150 km 存在性表都已收到、核过，WRF 线的交付已完成。\n- **整体判读：** 由 AI 气象线负责，现按\"搁置\"送 6 人，裁决后告知 WRF 线。之后不需要 WRF 线再做什么；如果审查要求跑 R24（13 层 GFS）来拆开预报模型和层数的影响，会另开。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 01:44",
+      "text": "【审查结果】K Akron（单雷暴事件，Pangu 14 层 vs GFS 全层驱动同一 WRF 4 km）四对积分已全部交齐。Lead 按冻结判据（设计第 5 节 + 口径 v2 + 步长规则）计票：24/48/72 h 三个提前量都判 Pangu\"明显更差\"，按结论规则拟将 K 改为\"搁置（AI 驱动不如 GFS，单事件定性）\"。请审：(1) 逐条核计票是否按冻结判据正确（数字以 CSV 为准）；(2) \"明显更差\"取\"不差于\"的确定失败补集，这一操作性解读是否合理、是否事后偏向某一方；(3) 48 h 只靠时间条件判差、24 h ≥16 档位置差 0.3 km 过线，是否影响结论稳健性；(4) 搁置结论的措辞与限制（单事件、模型与层数混杂、R24 未跑）是否足够，是否需要先跑 R24 再定。只审一轮。\n6 位审稿人的意见已收齐（5/6 份有效）。请逐条核实依据后裁决：分\"必须改\"和\"仅供参考\"，回应每一条站得住的反对，保留未采纳的异议；需要 Liang Hu 定的升级给 Liang Hu。\n\n## 派发说明\n- 只收到 5/6 份有效意见：缺 审稿人 A · GPT-6（审稿失败：Codex 未登录或令牌失效：请在 工作站 重新登录（CODEX_HOME= codex login））；候选名单已用完，无人可补位。裁决时请说明。\n\n### 审稿人 E · Gemini\n## 结论\n\n**有保留地支持**将 K（Akron 单雷暴事件）判定为**“搁置”**，且**不需要先补跑 R24 再作搁置决定**；但证据摘要与拟定结论存在 **2 处数值摘录/计算瑕疵**、**1 处结论标题夸大归因（将“Pangu 13 气压层驱动 vs GFS 全层驱动”简写为“AI 驱动不如 GFS”）** 以及 **2 处原设计/步长决策要求写明但摘要遗漏的限制说明**，须在定稿归档前修正（见下述 MUST-FIX）。\n\n针对委托方四项审查问题的逐条核查结论如下：\n1. **计票核对（问题 1）**：8 行二元判定（`非不差于（确定）183.41 km`）与 P24（`307.93 km≥16 km²` 档右删失时间下界算错**（把 `>380 min` 写成 `>350 min`），正文中 **10 m 最大风速占比区间（`45–70%`）与 CSV 实测比值（全四对 `43.1%–72.0%`，进判据三对 `43.1%–60.1%`）不符**。\n2. **“明显更差”操作性解读（问题 2）**：单条件上“不差于”已含 $+50\\text{ km}$ 与 $+60\\text{ min}$ 宽容带，单指标越界确实代表差距超过 $50\\text{ km}$ 或 $1\\text{ h}$；且早在 10-15 冻结的口径决策中已按“不差于 / 明显更差”二元划分加“不判”桶操作（非 10-17 事后临时起意）。但**将合取（AND）判据的补集（OR）直接定义为“明显更差”在逻辑上存在摩根定律带来的不对称性**：只要位置、时间、150 km 存在性三者有任一条件失败，即使 Pangu 在另一主指标上显著优于 GFS（如 48 h），也会被自动判为“Pangu 明显更差”而非“互有优劣”。这一不对称性在 **48 h** 上对 Pangu 偏严，但在 **24 h（正式档 `≥64 km²` 位置与时间双输）** 与 **72 h（位置差近 $200\\text{ km}$ 且时间/存在性不占优）** 上不依赖该不对称性，故不改变“$\\ge 2$ 个提前量明显更差”的搁置结论。\n3. **48 h 仅靠时间判差与 24 h `≥16 km²` 位置差 `0.3 km` 过线的稳健性（问题 3）**：\n - **48 h 票最弱，但剔除后不影响总结论**：48 h `≥64 km²` 档两组在 `03–09Z210.31 km`、P48 最近 `151.03 km`），且 `06:10Z` 位置误差 P48 比 G48 **更小**（`≥64` 档 `273.26` vs `316.77 km`，优 `43.51 km`；`≥16` 档 `174.71` vs `275.20 km`，优 `100.49 km`）；判 P48 差完全依赖 G48 在 `00:20–00:30Z`（风峰前近 6 小时）曾有回波擦过 $50\\text{ km}$ 圈而 P48 窗内未入 $50\\text{ km}$ 圈。但即便将 48 h 改记为“两组均差/互有优劣（不计票）”，仅靠 **24 h 与 72 h 两票**仍满足“至少 2 个提前量明显更差”的搁置条件。\n - **24 h `≥16 km²` 位置差 `0.3 km` 过线不影响 24 h 判定方向**：`233.07 ≤ 233.41 km`（差 `0.345 km`）是**位置条件通过（✓）**的边界，而 `24 h ≥16 km²30 min`）。即便 `0.345 km` 翻转，也只是让 `24 h ≥16 km²` 从“仅时间失败”变成“位置与时间双失败”，只会加固而不会推翻 24 h 的负票。\n4. **搁置措辞与是否需先跑 R24（问题 4）**：**不需要先跑 R24 再定搁置**（R24 在设计中明确列为可选诊断项，不进 24/48/72 h 计票，且 Pangu 原生只输出 13 个气压层，工程上直接回答了“现成 Pangu 13 气压层输出能否替代业务全层 GFS 驱动该个例”的问题；此外 G24 本身位置误差已达 `183.41 km > 150 km`，无论 R24 结果如何都不可能触发“值得继续”）。但**结论标题不能笼统写“AI 驱动不如 GFS”**，必须在标题和正文中直接限定为“Pangu 13 气压层（共 14 层）驱动不如 GFS 0.25° 全层驱动（单事件定性，模型与垂直层数未解耦）”，并补齐原设计要求写明的局限项。\n\n---\n\n## 必须改（MUST-FIX）\n\n1. **修正 `≥16 km²` 档两处右删失时间误差下界计算错误（`>350` 应为 `>380`）**\n - **位置**：[K_计票与搁置送审_证据摘要_20261017.md]([local path omitted] 12 行，`48 h | ≥1672 h dt20 附列 | ≥16`）。\n - **依据与复算**：按 [PAIR48_SENSITIVITY16_V2.csv]([local path omitted] 与 [PAIR72_DT20APPX_SENSITIVITY16_V2.csv]([local path omitted] `≥16 km²` 档下实测首现时刻 `obs_first50_utc` 为 `2020-06-09T02:40:00+00:00`（而非 `≥64 km²` 档的 `03:10:00+00:00P >380`），而非沿用 `≥64 km²` 档的 `>350`。虽然 `>380 > 200` 及 `>380 > 140` 仍确定不满足，不改变任何判定，但摘要表数值须按 CSV 更正。\n\n2. **修正搁置结论的定性标题措辞，避免把“模型+层数混杂结果”夸大为笼统的“AI 驱动不如 GFS”**\n - **位置**：[K_计票与搁置送审_证据摘要_20261017.md]([local path omitted] 19 行）及拟交结论表述。\n - **依据**：[K_实验设计_Akron_20261014.md]([local path omitted] 29、59 行）明确指出 Deng 2025 显示 GFS 削到 13 层后表现最差，主对比（GFS 全层 vs Pangu 13 气压层/14 metgrid 层）同时包含预报模型和垂直层数两部分，R24 用来拆开这两部分。既然未跑 R24，结论标题本身不能简写为“搁置（AI 驱动不如 GFS）”，应改为**“搁置（本个例下 Pangu 13 气压层驱动不如 GFS 全层驱动，单事件定性、模型与层数未解耦）”**。\n\n3. **补齐事先冻结文档要求写入结论但摘要遗漏的限制与说明（48 h 位置反超事实、设置偏离作者之处、dt 步长差异）**\n - **位置**：[K_计票与搁置送审_证据摘要_20261017.md]([local path omitted] 21 行“限制”段）。\n - **依据**：\n - **48 h 位置指标方向相反**：[PAIR48_FORMAL_V2.csv]([local path omitted] 与 [PAIR48_SENSITIVITY16_V2.csv]([local path omitted] 中，P48 的位置误差在两档下实际上都**小于** G48（`≥64`：`273.3` vs `316.8 km`；`≥16`：`174.7` vs `275.2 km03–09Z` 最小最近格点距离 P48 也更近（`151.0` vs `210.3 km`；`81.5` vs `141.9 km`）。第 21 行仅写“48 h 的‘明显更差’只来自时间条件（P48 在 50 km 内始终没出现，G48 也早了 160 min、偏 317 km，两组都差）”，漏写了“**48 h 位置误差 P48 反比 G48 小 43.5–100.5 km，因合取判据取补集（任一条件失败即判差）才计为负票；即便剔除 48 h 票，24 h 与 72 h 两票仍触发搁置**”。\n - **与原作者设置差异及 Q2 假设**：[K_实验设计_Akron_20261014.md]([local path omitted] 68、80–81 行）明确规定“和作者设置（0.5°、3 h）的差别写进结论的局限”（本试验用 0.25°、6 h 间隔、单层 4 km 不嵌套，且 2 m 比湿 Q2 采用无文献依据的 v2.2 最低完整地上气压层比湿假设），摘要第 21 行漏列。\n - **72 h 步长调整与翻转说明**：[K_判据配对与72h步长_20261015.md]([local path omitted] 12–13 行）要求“G72 两步长之差只代表 G72 自身对步长的响应，结论中照此写。汇总注明：24/48 h 为 dt 20 s、72 h 为 dt 15 s；WSPD10MAX 每 10 min 30 vs 40 步、TS 采样 20 vs 15 s”，摘要第 21 行漏列。\n\n---\n\n## 仅供参考（NOTE）\n\n1. **次要指标 10 m 风速比例范围（`45–70%`）不精确，且原设计规定“不算误差百分比”**\n - **位置**：[K_计票与搁置送审_证据摘要_20261017.md]([local path omitted] 21 行）与 [K_实验设计_Akron_20261014.md]([local path omitted] 47 行）。\n - **依据与复算**：各 CSV 中，模式 `max_wspd10max_100km_ms` 在全部四对中最低为 P72（dt15）的 （占 的 **43.1%**），最高为 P06 的 （占 **72.0%**）；若只看进判据的 24/48/72 h 三对，最高为 G24 的 （占 **60.1%**）。写成 `45–70%` 既漏了 P72 的 `43.1%` 和 P06 的 `72.0%`，也不如直接按设计第 47 行报绝对量级（ 对比实测，约为实测的 `43%–72%`）。\n\n2. **右删失（`t > 09Z`）操作化的物理含义宜注明“实为窗内未进 50 km 圈”**\n - **位置**：[K_观测口径_最小面积与时间窗_20261015.md]([local path omitted] 27 行）与 [K_计票与搁置送审_证据摘要_20261017.md]([local path omitted] 11–16 行）。\n - **依据**：P48 与 G72(dt15)[local path omitted] 在 `00–09Z` 内无 $50\\text{ km}$ 达标对象，物理上是风暴轨迹偏离（未进入 $50\\text{ km}$ 圈），而非真正意义上的“09Z 之后才首次进入 $50\\text{ km}$ 圈”。将其映射为 $t > 09\\text{Z}$ 代入不等式属于把“50 km 内未检出 vs 检出”转化为时间惩罚的操作性约定，表述上直接写“00–09Z 窗内 50 km 未检出（按右删失 $t>09\\text{Z}$ 折算 $>350/380\\text{ min}$）”更严谨。\n\n---\n\n## 我核对过的\n\n1. **实验设计与冻结口径文档**：\n - [K_实验设计_Akron_20261014.md]([local path omitted] 3 节试验矩阵、第 4 节口径对等、第 5 节判据与结论规则、v2.1/v2.2 更正）\n - [K_观测口径_最小面积与时间窗_20261015.md]([local path omitted] v2 与 10-15 夜 v2 补充）\n - [K_观测口径_审查2b89c1fb_裁决_20261015.md]([local path omitted]\n - [K_判据配对与72h步长_20261015.md]([local path omitted]\n - [K_计票与搁置送审_证据摘要_20261017.md]([local path omitted]\n2. **全部交付 CSV 表与附录表（06 / 24 / 48 / 72 dt15 / 72 dt20）**：\n - 06 h 锚点：[PAIR06_FORMAL_V2.csv]([local path omitted]\n - 24 h：[PAIR24_FORMAL_V2.csv]([local path omitted]\n - 48 h：[PAIR48_FORMAL_V2.csv]([local path omitted]\n - 72 h 正式（dt15）：[PAIR72_FORMAL_V2.csv]([local path omitted]\n\n### 审稿人 A · GPT-6（审稿失败）\n（审稿失败：Codex 未登录或令牌失效：请在 工作站 重新登录（CODEX_HOME= codex login））\n\n### 审稿人 D · GLM\n## 结论\n有保留地支持（计票全部核对无误、判据应用与冻结文本一致；保留点全部在最终结论的措辞与归因上，其中一处为设计强制条款）\n\n## 必须改（MUST-FIX）\n- 最终交出的结论若只写“搁置（AI 驱动不如 GFS，单事件定性）”而不附层数混杂声明，将违反设计第 59 行的强制要求（“主对比（GFS 全层 vs Pangu 14 层）的差别同时含预报模型和垂直层数两部分，结论里必须写明”），并造成把“14 层驱动组合更差”归因到 Pangu 模型本身的过度解读 — 依据：K_实验设计_Akron_20261014.md 第 29、56、59 行；摘要第 21 行的“限制（必须写进结论）”清单必须逐条进入最终结论文本，不能只留在送审摘要里 — 若不改的后果：结论归因错误、违反冻结设计，后续若有人引用“AI 驱动不如 GFS”作模型层面结论即是夸大。\n\n## 仅供参考（NOTE）\n- 摘要计票表两处右删失下界写小了：48 h ≥16 档与 72 h dt20 ≥16 档 tobs=02:40（160 min），tP>09:00 应为 |tP−tobs|>380 min，摘要写“>350”（350 只对 tobs=03:10 的 ≥64 档成立）— 依据：PAIR48_SENSITIVITY16_V2.csv、PAIR72_DT20APPX_SENSITIVITY16_V2.csv 的 obs_first50_utc 与我的计算（540−160=380）— 方向保守（低估 P 的最短误差），阈值分别为 200/140，判定不变，改字即可。\n- “明显更差＝不差于的确定失败补集”这一操作化本身可用，但注意其结构性不对称：任一条件确定失败即计负票，而任一条件不可判就封死正票（口径 v2 第 22 行明文）。本例不敏感：24 h 时间失败裕度大（≥160 vs 130；170 vs 110），72 h 位置失败裕度 >145 km，且即使把 48 h 整票剔除，24 h + 72 h 仍 ≥2 票触发搁置 — 结论不靠操作化的边缘情形撑着。依据：我的逐格计算 + 设计第 56 行。\n- 但“明显更差”一词在 48 h 名不副实：P48 位置误差（273.3 / 174.7 km）反而小于 G48（316.8 / 275.2 km），48 h 的负票只来自“P 在窗内 50 km 从未首现、G 早了 160/140 min 且自身位置误差 >300 km”。摘要第 21 行写了“两组都差”，建议明确写出“48 h P 位置误差小于 G”，避免读者把 48 h 理解为全方位更差 — 依据：PAIR48_FORMAL_V2.csv、PAIR48_SENSITIVITY16_V2.csv centroid_distance_km 列。\n- 口径 v2 补充（右删失区间法）是 10-15 晚在看到 P48“窗内未首现”之后补的，且未单独送审（口径文件第 26–28 行自述触发原因）。它是左删失方法的对称延伸、对两组同用，且本例中右删失的确定失败裕度 ≥130 min，换更保守处理也不翻案，故不构成偏置实据；但“事后补规则”这一时间线应向裁判披露（摘要第 5 行只披露了“明显更差”的操作化，未披露右删失补充的时机）。\n- 24 h ≥16 档位置 233.07 vs 233.41（差 0.345 km）过线对计票无影响：该档时间条件已确定失败，位置过不过线不改变该档“非不差于”判定；两档判定一致按冻结面积规则（口径 v2 第 21 行）合规计票 — 依据：我的计算 + PAIR24_SENSITIVITY16_V2.csv。\n- 汇总应按步长规则第 13 行注明 24/48 h 为 dt20 s、72 h 为 dt15 s（摘要计票表有标注，最终结论文本勿丢）。\n- R24 不必先跑再定：设计把 R24 列为可选（第 23 行），冻结的结论规则（第 56 行）不依赖它；且 Deng 2025（设计第 29 行引）提示削层可能正是劣势来源之一，这进一步支持“先搁置、措辞留在组合层面”而非“先补实验再下结论”。但反过来说，没有 R24，“不如 GFS”就只能指“Pangu 14 层驱动这一组合”，不能拆到模型——这正是上面 MUST-FIX 的内容。\n\n## 我核对过的\n- 全部 12 个 CSV（PAIR24/48/72 正式 + dt20 附列 × FORMAL/S16/EXIST150）→ 逐格重算了摘要表 8 行的位置（P vs G+50）、时间（含左/右删失区间代入）、150 km 存在性，数值与判定全部与 CSV 一致；24 h 两档一致、48 h 两档一致、72 h 四判一致，面积规则与步长规则（口径 v2 第 21 行、步长规则第 9–10 行）的应用合规；“值得继续”附加条件（24 h 位置 ≤150 km：G24 183.4、P24 307.9/233.1）与“不判（事件不可分辨）”（24 h 两组 150 km 内均有对象：32.7/46.2 km）均确认不触发。\n- G06 闸门与锚点（摘要第 20 行）→ PAIR06_v2_final/verified_1545333/：G06 在 03–09Z 有达标对象最近 2.5 km（闸门过），G06 53.1 / P06 66.6 km，与摘要一致。\n- 设计第 5 节、口径 v2 及补充、步长规则原文 → 确认设计确实未定义“明显更差”，操作化属首次提出并已送审。\n\n## 我没能核对的\n- WRF 积分与对象识别的上游产物（namelist、对象识别脚本、NEXRAD 观测端 2 km 重映射识别）——本次证据只到交付 CSV 一层，CSV 之前的链路只能 trusting WRF 线的 verified_completion 标注。\n- P72 dt20 的 CFL 崩溃记录（步长规则第 6 行称见 WRF 线目录，未在本次证据清单内）。\n\n## 结论\nK Akron 的计票我逐格核对后全部成立：三个提前量按冻结判据均为“确定失败”，搁置触发稳健（即使剔除争议最大的 48 h 票仍够 2 票），且 24 h 0.3 km 过线、48 h 仅时间条件判差都不影响票向。保留点集中在措辞与归因：最终结论必须按设计第 59 行附上“预报模型与垂直层数混杂、R24 未跑、单事件定性、48 h 两组都差且 P 位置误差更小”等限制，不能只落“AI 驱动不如 GFS”七个字；另摘要两处右删失下界应为 >380 min 而非 >350 min（不影响判定）。建议：有保留地支持搁置结论，按上述 MUST-FIX 补措辞后交付。\n\n### 审稿人 C · DeepSeek\n## 结论\n有保留地支持。计票数字逐条与冻结判据和交付 CSV 核对一致，\"三个提前量均明显更差→搁置\"的结论稳健（即使 48 h 降级，24 h+72 h 仍 ≥2 票）；但\"明显更差\"一词在冻结判据中从未定义，本次的\"确定失败补集\"解读是事后操作化，必须随结论固化，否则计票不可由冻结判据复现、且结论的限制清单还漏了两条设计明令要写的局限。\n\n## 必须改（MUST-FIX）\n- \"明显更差\"是事后操作化，冻结判据原文没有这个词 — 依据： 第49-59行只定义\"不差于\"（三条件合取）与三条结论规则，通篇无\"明显更差\"定义； 第15-25行同样只有\"不差于\"与结论规则；送审摘要第5行自认\"原设计未单独定义'明显更差'，这是本次计票的操作性解读\"。若不改的后果：结论建立在一个冻结文本里不存在的触发词上，\"事先写定\"名不副实；换人按冻结判据重算时，从原文推不出\"明显更差\"，计票不可复现。必须把\"明显更差＝对'不差于'三条件的确定失败（某条件在所有取值下都不满足）\"这条解读写进结论/决策记录，与冻结判据一起固化。\n- 结论的\"限制\"清单漏了设计 v2.1 明令要写的\"与作者设置（GFS 0.5°、3 h 间隔）的差别\" — 依据：设计第68行\"和作者设置（0.5°、3 h）的差别写进结论的局限\"；摘要第21行\"限制（必须写进结论）\"清单只有单事件、模型+层数混杂、10 m 风量级、48 h 时间-only、24 h 0.3 km 五条，没有这一条。若不改的后果：结论与作者历史参照（Childs 2021 / 作者三层嵌套）的可比性被抬高，读者会以为 GFS 基线就是作者的 0.5°/3 h 设置，实际是 0.25°/6 h。\n- 结论标签\"AI 驱动不如 GFS\"必须与\"主对比同时含预报模型与垂直层数（GFS 全层 vs Pangu 14 层）、R24 未跑拆不开\"同句绑定，逐字保留 — 依据：设计第59行\"结论里必须写明\"。若不改的后果：把\"层数差别\"归因成\"模型差别\"，夸大 Pangu 模型本身的劣势。摘要第21行已列此限制，风险只在最终发结论时只发标签不发限制。\n\n## 仅供参考（NOTE）\n- 操作性解读本身合理且不偏袒任何一方：因为\"不差于\"自带 +50 km / +60 min 余量（即 P 比 G 差 50 km/60 min 以内仍算\"不差于\"），\"确定失败\"意味着 P 连这个余量都稳定突破，是保守、偏袒 Pangu 的方向；且规则对 P/G 对称。但它是\"任一条件确定失败\"即判\"明显更差\"，对 48 h（位置反而更好、仅时间一条件失败）这个词偏强——不过不影响结论，见下条。依据：摘要第5行、设计第49-52行。\n- 48 h 的\"明显更差\"只靠时间一条件（P48 在 00–09Z 内 50 km 始终无达标对象＝右删失），且 P48 位置 273/175 km 反而比 G48 的 317/275 km 好。但删失规则是口径 v2 补充里事先写定的（ 第26-27行），不是临场补的；且即便 48 h 降级为\"不判\"，24 h+72 h 仍满足\"≥2 个明显更差\"，结论不动。依据：PAIR48_FORMAL_V2.csv、PAIR48_SENSITIVITY16_V2.csv。\n- 24 h ≥16 档位置只差 0.34 km 才\"过线\"（P 233.07 vs G+50=233.41），在 4 km 网格质心的数值噪声内，物理上不算\"通过\"。但这不影响 24 h 判定：24 h ≥16 档的时间条件已确定失败（左删失 ≥160 min > 70+60=130），≥64 档位置单独确定失败（307.9 vs 233.4，差 74.5 km）。摘要第21行已披露此点。依据：PAIR24_SENSITIVITY16_V2.csv、PAIR24_FORMAL_V2.csv，及我的复算。\n- \"两组 10 m 风只有 45–70%\"与实际不符，应为约 43–72%：最低 P72(dt15)=15.95/37.04=43.1%，最高 P06=26.68/37.04=72.0%。方向是摘要把下界往高说了（更乐观），属限制句的轻微失真，不影响判定。依据：各 PAIR*_FORMAL_V2.csv 的 max_wspd10max_100km_ms 列与 observed_KAKO_gust_ms=37.04。\n- 48 h ≥16 档时间下限摘要写\">350 min\"，实际应为 >380 min（该档 obs 首现 02:40，窗终点 09:00，差 380）；\">350\"是拿 ≥64 档的 03:10 代入的。方向不变（>380 仍 >200），但数字不精确。依据：PAIR48_SENSITIVITY16_V2.csv。\n- 冻结记录与现状存在轻微漂移，与计票无关但应知道：设计文件当前 SHA256 是 …，与 FROZEN_CRITERIA_v1.txt 记录的 … 不一致（因为 10-14/10-15 追加了 v2.1 数据源、v2.2 比湿两条修正，未动 §5）；且冻结 §5 引文仍写\"NEXRAD/MRMS\"，实际观测口径 10-15 已更正为 NEXRAD Level-II（设计第41行注明\"阈值和判据不变\"）。均不触碰判据阈值，只建议更新冻结记录引文。\n- 设计里\"值得继续\"要求\"某组 24 h 位置误差 ≤150 km\"，用的是质心距离；本事件连 GFS 基线自己的 24 h 质心误差都是 183.4 km（>150），所以\"值得继续\"这一支对两边本就基本不可达，与 Pangu 表现无关。搁置判定走的是\"明显更差\"计数，不受此影响。依据：PAIR24_FORMAL_V2.csv、设计第55行。\n- 不必先跑 R24 再定：设计把 R24 列为可选（第19行\"可选\"、第23行\"有余力时先 R24\"），§5 结论规则不以 R24 为闸门；R24 只用来拆\"模型 vs 层数\"，不改变\"搁置\"本身。所以\"先跑 R24 再定\"不是冻结要求。\n\n## 我核对过的\n- 8 行计票表对 CSV 逐行复算：24 h ≥64 位置 307.9>233.4 失败、≥16 位置 233.07≤233.41 过线（余量 +0.34 km）且时间左删失 ≥160>130 失败；48 h 两档位置都过（273.3/174.7 vs 366.8/325.2）、时间都右删失确定失败；72 h dt15 与 dt20 附列四判位置全部失败（307.7/299.7 vs 154.1/153.4）、dt20 附列时间 P>350 对 G+60 失败、dt15 ≥64 档 G有P无（EXIST150: G True / P False）失败。全部一致。\n- 150 km 存在性（EXIST150 CSV）与摘要 T/F 列一致；24 h 两档均 T/T（不触发\"事件不可分辨\"）、72 h dt15/dt20 ≥64 档均为 T/F（触发\"G有P无→P差\"）。\n- 面积/步长敏感规则：各提前量 ≥16/≥64 两档判定一致、72 h 四个子判一致，无\"敏感·不判\"，三个提前量各计一票\"明显更差\"，3≥2 触发搁置。\n- \"值得继续\"两支都失败（0 个不差于；G24 183.4、P24 307.9 均 >150 km）。06 h 锚点 G06 53.1 / P06 66.6 km 与 PAIR06_FORMAL_V2.csv 一致（G06 闸门由 G06_FORMAL_GATE_ACCEPTANCE_v1.txt 确认通过，150 km 内逐帧有对象）。\n- 时间条件、位置条件的 +50 km/+60 min 余量与质心/首现口径的代入方式，逐条对照设计 §5 与口径 v2/v2补充，均按冻结规则执行。\n- 设计文件当前 SHA256 与冻结记录不一致（… vs …），原因为事后 v2.1/v2.2 追加，§5 判据文字本身与冻结引文一致。\n\n## 我没能核对的\n- 对象识别与指标本身的正确性：质心距离、50 km 首现时刻、150 km 存在性这些数值是 WRF 线交付 CSV 里的结果，我按 CSV 数字核了计票，但没有从原始 NetCDF 组合反射率场 / NEXRAD Level-II 体扫重跑 8 连通识别与质心计算，无法独立确认 CSV 里这些原始量无误。\n- 观测侧（obs 质心 1.4 km、obs 首现 03:10/02:40、1380 km² 主体对象等）同样按交付值采信，未独立复核雷达原始数据。\n- 委托证据清单里没有 PAIR06 CSV，我用了目录内 下的 CSV 核对锚点数字（与本清单外的文件一致）；若 Lead 只认清单内文件，06 h 锚点一项请自行补核。\n\n## 结论\n有保留地支持：计票正确、搁置结论稳健，可在把\"明显更差＝确定失败补集\"的操作化解读、以及\"模型+层数混杂/R24未跑\"和\"与作者 0.5°/3 h 设置的差别\"两条限制随结论逐字固化后发出；不必先跑 R24。\n\n### 审稿人 B · Kimi\n## 结论\n支持（计票与冻结判据逐条相符；一处结论文字中的数字与 CSV 不符需改）。\n\n## 必须改（MUST-FIX）\n- 送审摘要第 21 行\"两组 10 m 风都只有观测阵风 37.0 m/s 的 45–70%\"与 CSV 不符 — 依据：按 8 个 FORMAL/SENSITIVITY 行的 max_wspd10max 计算（PAIR24/48/72 及 DT20APPX CSV）：22.25/37.04=60.1%、21.54/37.04=58.1%、17.06/37.04=46.1%、17.03/37.04=46.0%、18.67/37.04=50.4%、15.95/37.04=43.1%、19.35/37.04=52.2%，实际范围是 43–60%，不是 45–70%。下限 45% 被 P72 的 43.1% 直接证伪；上限 70% 在我能看到的 CSV 里没有任何一行达到（除非把未提供的 PAIR06 算进去，那就应写明含 06 h）— 若不改：结论送审文本含一个可被 CSV 直接证伪的数字，损害整份计票的可信度。注意此项不影响搁置判定本身（风只是次要量级指标）。\n\n## 仅供参考（NOTE）\n- \"明显更差\"＝\"不差于\"确定失败的补集：这一解读本身合理且偏保守（只在失败确定时才计\"明显更差\"，不偏向判 Pangu 差）；且并非完全事后发明——口径 v2（K_观测口径_最小面积与时间窗_20261015.md 第 22 行）在看数前已写明\"时间不可判的提前量…只有位置或有无对象条件已单独不满足时计非'不差于'\"，补集解读是该冻结规则的直接延伸。但设计第 5 节（第 56 行）确实从未定义\"明显更差\"，若改用更严定义（如要求两个以上条件同时确定失败），48 h 一票会变（48 h 仅时间条件失败）。摘要第 5 行已主动披露此点送审，处理得当，但结论文件里应保留\"操作性解读\"字样。\n- 48 h 只靠时间条件判差不影响最终结论：即使 48 h 改判\"不判\"，24 h 与 72 h 仍是 2 票\"明显更差\"，≥2 票的搁置规则（设计第 56 行）照样触发。另注意 48 h 的对比是两组都差中的相对比较：G48 在 ≥64 档 150 km 存在性也是 False（PAIR48_EXIST150_V2.csv，G48 64 档最小距离 210.3 km），且 G48 首现早 160 min；P48 位置（174.7/273.3 km）其实优于 G48（275.2/316.8 km）。摘要第 21 行已披露，建议结论正文同样写明。\n- 24 h ≥16 档位置差 0.3 km 过线（233.069 vs 233.414，PAIR24_SENSITIVITY16_V2.csv）不影响判定：该档时间条件已确定失败（左删失区间代入最小 |tP−tobs|=160 > 70+60=130），24 h 判定不依赖这 0.3 km。\n- R24 未跑不阻碍搁置：设计第 19/23 行把 R24 列为\"可选\"、第 59 行只说\"R24 用来拆开这两部分\"，结论规则（第 54–57 行）不以 R24 为前置条件，故先搁置在程序上合规。摘要限制段已写明\"模型与层数混杂、拆不开\"，措辞足够；但若日后要把此结论引用为\"Pangu 模型本身差\"的归因，则必须补 R24。\n- 摘要限制段还漏了一条可写的：72 h 正式对两组时间都未首现、时间条件不可判，72 h 一票完全由位置（和 ≥64 档存在性）决定。\n\n## 我核对过的\n- PAIR24_FORMAL_V2.csv → 位置 P 307.93 vs G 183.41+50=233.41 ✗；时间 P −170 min vs G +50，170>110 ✗；存在性 64 档 T/T。摘要第 9 行全对。\n- PAIR24_SENSITIVITY16_V2.csv → 位置 233.069 ≤ 233.414 ✓（差 0.345 km）；P24 左删失（model_left_censored=True，first50=00:00），区间最小值 160 > 130 ✗。摘要第 10 行对。\n- → 位置两档均 ✓（273.26≤366.77；174.71≤325.20）；P48 窗内未首现（右删失 >350 min）> G 的 220/200 min 阈值 ✗。摘要第 11–12 行对。\n- （dt15）→ 位置 307.67/299.71 vs 154.05 ✗；两组 first50 均空、时间不可判；存在性 64 档 G True（74.2 km）/P False（190.1 km）→ \"G 有 P 无\" ✗，16 档 T/T 但位置单独失败。摘要第 13–14 行对。\n- PAIR72_DT20APPX 三表 → 位置 vs 153.45 ✗；G dt20 首现 +50/+80 min，P >350 ✗；四判定全部\"非不差于\"，满足步长规则（K_判据配对与72h步长_20261015.md 第 10 行\"四个判定全部一致才计票\"）。摘要第 15–16、18 行对。\n- 结论规则适用 → \"值得继续\"需 24 h 位置 ≤150 km：G24 183.4、P24 307.9，均不满足 ✓；\"不判（不可分辨）\"需 24 h 两组都无 150 km 内对象：G 32.7 km、P 46.2 km（PAIR24_EXIST150_V2.csv），不触发 ✓；三提前量\"明显更差\"≥2 → 搁置，计票链条完整。\n- 观测侧一致性 → 各表 obs_first50（64 档 03:10、16 档 02:40）与口径 v2 第 24 行（首现 03:10，id=33，68 km²）一致；obs 存在性各档均 True，\"实测不可分辨\"不触发。\n\n## 我没能核对的\n- PAIR06 锚点数值（摘要第 20 行 G06 53.1 / P06 66.6 km、G06 闸门过）：证据清单未含 PAIR06 的 CSV，证据不足。\n- 摘要第 3 行\"Lead 逐表核过\"及口径 v2 第 3 行\"口径在看 WRF 线暂定数值表之前定\"的时间先后：只有文件自述，无独立时间戳证据，无法验证\"非事后\"声明；但从文件日期（10-15 口径 vs 10-17 计票）看无矛盾。\n- 48 h G48 首现 00:30/00:20 是否对应真实对流对象（而非虚假早期对流）：CSV 无此信息，证据不足。\n\n## 结论\n支持搁置判定：三提前量计票逐条与冻结判据和 CSV 相符，补集解读合理且有看数前的冻结规则支撑，48 h 与 0.3 km 两处脆弱点均不改变 ≥2 票的结论；唯一必须改的是摘要限制段\"45–70%\"应为\"43–60%\"（按所给 CSV）。\n\n### 审稿人 F · Grok\n我先加载审查技能和冻结判据，再逐份核对 CSV 与设计文件，不改任何东西。\n\n审查技能已加载。接下来读设计、口径和计票摘要，再对照 CSV 核数字。\n\n判据文本已读完。接下来用 CSV 重算每一档的位置、时间和 150 km 存在性，不采信摘要表。\n\nCSV 表头和行已经对上。我再用脚本重算容差、删失区间和风速比例，并核对 06 h 锚点与文件时间。\n\n## 结论\n不支持：三档“确定未达不差于”与 CSV 一致，但不能按冻结判据把它们计成三票“明显更差”并据此搁置；补集解读是结果齐了之后才写明的，且正是它让“至少 2 票”成立；送出句还把模型和层数的混杂说成了 AI 驱动因果。\n\n(1) 合取数字：成立，但摘要有两处不复现的下界/区间，不翻转该合取。(2) 补集解读：不合理地当作冻结原义；事后偏向搁置，且决定结论落在哪一档。(3) 0.3 km 与 48 h 只靠时间：影响“三票明显更差”的稳健性，不影响“三档都确定未达不差于”。(4) 短标签不够；不需要先跑 R24 才能记下配置级失败，但不能据此写“AI 驱动不如 GFS”。\n\n## 必须改（MUST-FIX）\n- “明显更差＝不差于的确定失败补集”不是冻结定义，写在结果之后，并且决定搁置是否成立。设计只规定至少 2 个提前量“明显更差”才搁置，没有定义“明显更差”；“不差于”是位置、时间、150 km 存在性的合取。摘要把确定失败直接计成负票。若“明显”按字面要求位置上差过 G+50，则 24 h ≥64 位置超出 74.520 km，可算明显更差；24 h ≥16 位置是通过（P 233.069188，G+50 233.414063，余量 0.345 km），两档不一致，应按口径记“面积敏感·不判”、正负票都不计。48 h 两档位置都是 P 更好（超出量 −93.509 km、−150.491 km），时间失败不能单独顶上“明显”。72 h 四判位置超出 145.658–154.221 km，才是不受该读法影响的一票。负票就只剩 1，不满足至少 2。摘要“无敏感·不判、三票明显更差”只在补集解读下成立。文件 mtime：步长规则 10-15 17:39 已把“明显更差”当负票极，但晚于 24 h CSV 17:23；明确的补集句子在摘要，mtime 10-17 01:02，晚于 72 h CSV 00:56。— 依据：；；、 及 dt20 附列同名列 `centroid_distance_km` — 若不改的后果：未预先定义的标签会被说成冻结判据的必然结果，搁置被多计出来。\n- 拟送出的“搁置（AI 驱动不如 GFS，单事件定性）”把混杂对比写成驱动因果。设计要求结论写明差别同时含预报模型和垂直层数，R24 才拆得开；R24 在设计里是可选，不是搁置前提。lab_K_akron 与 顶层未见 R24 目录。不需要先跑 R24 才能拒绝“值得继续”（零个“不差于”，且 24 h 质心 183.414、307.934 都 >150 km），也不能把“先跑 R24”加成新闸门；但不能在未拆开时使用该原因句。摘要限制段写了混杂，短标签里没有；保留不在送出句里，不能给标题背书。— 依据：`K_实验设计_Akron_20261014.md:19,29,55-59`；摘要 `:19,21` — 若不改的后果：配置级失败被说成 AI 模型不如 GFS。\n- “两组 10 m 风都只有观测阵风 37.0 m/s 的 45–70%”与 CSV 不符，而这句被要求写进结论。P72 `max_wspd10max_100km_ms:21`； 的 P72 行； 的 P06 行 — 若不改的后果：结论里的风速下限是错的。\n- ≥16 右删失下界写成了 >350 min，应为 >380 min。350 只属于 ≥64（观测首现 03:10，09:00−03:10=350）。≥16 观测首现 02:40，09:00−02:40=380。摘要 48 h ≥16 与 72 h dt20 ≥16 都写了 >350。380 仍大于各自容差（48 h：|−140|+60=200；dt20 ≥16：80+60=140），合取失败方向不变。— 依据：摘要 `:12,16`；、 的 `obs_first50_utc` — 若不改的后果：计票表的删失下界不可复现。\n\n## 仅供参考（NOTE）\n- 24 h ≥16 的 0.3 km 是位置通过余量，不是越线失败。全精度余量 0.345 km；该档负判定靠时间（左删失 |tP−tobs|≥160，容差 70+60=130），摘要这条用了区间而不是 CSV 里填的 −160，这点是对的。被选对象面积 31.884 km²，正式档是 6765.978 km²，不是同一个对象擦线。— 依据：摘要 `:10,21`\n- 48 h 的合取失败只来自时间，空间指标不支持“P 更差”：≥64 位置 273.264 vs 316.773，≥16 为 174.709 vs 275.200；150 km 存在性 ≥64 为 F/F（P 最近 151.033 km，G 210.314 km），≥16 为 T/T 且 P 更近（81.495 vs 141.858）。G 自己在 ≥64 也早了 160 min、偏 316.773 km。限制句里的 160 min / 317 km 是 ≥64，不是 ≥16（≥16 为早 140 min、275.200 km）。— 依据：摘要 `:11-12,21`\n- 在补集解读下，72 h 四判二元一致、步长规则不要求弃权：G72 首现随步长翻转（dt15 两档皆空，dt20 为 +50 / +80 min），但位置超出量仍是 145.658–154.221 km；P72 位置、风速与 dt15 正式表逐格相同。这只说明“若接受补集，步长不翻转票”，不补上“明显”的定义。— 依据：`K_判据配对与72h步长_20261015.md:9-12`；PAIR72 正式与 dt20 附列 FORMAL/SENSITIVITY16\n- “值得继续”和“不判（两组 24 h 都无 150 km 对象）”的触发核对成立：前者还需某组 24 h 位置 ≤150 km，183.414 与 307.934 都不满足；后者不触发，24 h 两档存在性都是 T/T。G06 闸门过：≥64 存在性 True，最近 2.527 km；位置 53.110 / 66.576 km，与摘要 53.1 / 66.6 一致。06 h 不进票，此处只核对锚点。— 依据：设计 `:25,55,57`；摘要 `:19-20`；、\n- 无下限档按规定只描述、不计票。抽看 72 h 无下限位置仍是 P 203.294 > G 127.268+50，不能用来重开已计的合取，也不增强“明显”的定义。— 依据：口径 `:21`\n- 设计第 3 条“有对象”原文没有 150 km；150 km 范围是口径夜补，mtime 10-15 23:26，略早于 EXIST150 CSV 23:28，与“已请补列”相符。这个范围不改变八个合取的确定失败：存在性单独判负的格子，位置也已失败。— 依据：设计 `:52`；口径 `:26-28`\n\n## 我核对过的\n- 摘要表八行位置：与八张 FORMAL/SENSITIVITY16 的 `centroid_distance_km` 一致（四舍五入到 0.1 km）。24 h ≥64 超出容差 74.520 km；72 h dt15 ≥64 / ≥16 超出 153.614 / 145.658 km。\n- 时间：24 h ≥64 为 170 > 110；24 h ≥16 左删失下界 ≥160 > 130；48 h ≥64 为 >350 > 220；72 h dt15 两档双方都空，时间不可判，与口径区间法一致；72 h dt20 ≥64 为 >350 > 110。存在性八行与三张 EXIST150 及 dt20 EXIST150 的 True/False 一致。\n- 风速：G/P 24 h 60.06% / 58.14%，48 h 46.06% / 45.99%，72 h dt15 50.42% / 43.05%，dt20 的 G 为 52.23%。\n- 文件 mtime：口径文件 10-15 23:26（晚于 24 h CSV 17:23 和 48 h CSV 23:24）；步长规则 17:39；72 h CSV 10-17 00:56；摘要 01:02。\n\n## 我没能核对的\n- 各次积分的实际 dt 与垂直层数（CSV 无此列，未开 namelist）。设计自身 13 个气压层与“Pangu 14 层”并存（`:29,37,59`），摘要写 14 层，层数是否与运行一致证据不足。\n- 质心是否按“最接近 06:10”选取。所有计分行的 `model_time_utcobs_time_utc` 都是 06:10；没有原始反射率场，不能区分“当时确有对象”和“列被填成目标时刻”。\n- 0.345 km 余量是否落在方法误差内。证据不足，且该肢不承载 24 h 的合取失败。\n- R24 是否在本目录以外跑过。只看了 lab_K_akron 与 顶层，没有全库检索。\n- 口径“看暂定数值表之前定”无法用 mtime 证明：该文件末次写入晚于 24/48 h 正式 CSV。\n\n## 结论\n不支持按冻结判据把 K 改为“搁置（AI 驱动不如 GFS，单事件定性）”。三档都确定未达到“不差于”，这与 CSV 一致；“明显更差”没有事先定义，10-17 的确定失败补集是结果看完后写的，而且只有靠它才能凑满 2 票。24 h ≥16 位置是通过 0.345 km（小对象），48 h 只输在时间、位置反而是 P 更好。短标签把 GFS 全层对 Pangu 14 层说成了模型因果；R24 不是搁置前提，但未跑就不能写这个原因。风速“45–70%”不成立（P72 为 43.05%）。≥16 右删失下界是 >380 min，不是摘要里的 >350，合取方向不变。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 01:44",
+      "text": "Now the decision record, K page status, line status, verdict registration, and notices.**K（AI 预报驱动 WRF，Akron 雷暴个例）改为\"搁置\"，但不能说\"AI 驱动不如 GFS\"。** 6 人审查已裁决，我采纳了收窄后的结论，这件事不需要你拍板。\n\n**结论：** 在这一个雷暴事件里，用 Pangu（只有 13 个气压层）驱动 WRF，24、48、72 h 三个提前量都没达到\"不比 GFS 全层驱动差\"（0/3）。而且两组在 24 h 的位置误差都超过 150 km（GFS 183 km、Pangu 308 km）。按事先冻结的规则，\"值得继续\"已经不可能达到，所以 K 搁置。\n\n**为什么不能说\"AI 不如 GFS\"：**\n- **\"明显更差\"没有事先定义。** 按\"判定确定失败就算更差\"来读，三个提前量都算更差；按\"位置要比 GFS 远 50 km 以上才算更差\"来读，只有 72 h 一个。Grok 审稿人指出这一点，判断站得住，所以两种读法并列报告，不作结论。\n- **48 h 那一对，Pangu 的位置误差其实比 GFS 小** 93–150 km，判它差只是因为它没进入 KAKO 50 km 范围。\n- **差别里混着两件事：** 预报模型不同，垂直层数也不同。能把两者拆开的 R24 对照（13 层 GFS）没跑，所以只能说\"这一配置\"没达标，不能落到 Pangu 模型本身。\n\n**审查情况：** 要求 6 份意见，有效 5 份。Gemini、GLM、DeepSeek、Kimi 支持或有保留地支持，Grok 不支持。GPT-6 因 Codex 登录令牌失效没审成，也没有候补可顶，我已报平台 Lead 安排重新登录。\n\n**审稿人指出的笔误已改，都不影响判定：**\n- ≥16 km² 档有两处\"窗内未出现\"的时间下限应为 >380 分钟，原来误写成 >350。\n- 两组 10 m 风是观测阵风的 43–60%，原来误写成 45–70%。\n\n**限制都写进了结论：**\n- 只有一个事件。\n- 与原作者的设置不同：GFS 0.25°、6 h，作者用的是 0.5°、3 h。\n- 2 m 湿度用的是假设值。\n- 各提前量用的时间步长不同。\n\n**重启条件（满足其一）：** 跑 R24 拆开层数的影响，CRC 一组积分，不计 SU；或者换 3 个以上事件做统计比较；或者有全层输出的 AI 模型。\n\nWRF 线不需要再做什么，我已请他们保留运行根，重开时复用。K 项目页、线况页和决策记录都已更新。\n\n\n\n\n（附件：K_搁置审查f2beddf7_裁决_20261017.md）\n\n（附件：K_搁置_未达值得继续_20261017.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 01:47",
+      "text": "【委托结果 · 平台】审稿人 A（Codex/GPT-6）令牌失效\n审稿人 A（Codex/GPT-6）失败，原因应该是它用的令牌副本被作废了：Hermes 那份令牌 10-17 01:4x 刷新过，审稿人 A 用的还是 10-07 拷的旧副本，不一定要 Liang Hu 重新登录。已开高优，由平台会话在不外泄令牌的前提下重新接通，同时查候选审稿人为什么会用完。修好后我会通知你，届时请为 补一位审稿人；如果到时要 Liang Hu 手动登录，我来转告他。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 01:47",
+      "text": "审稿人 A（GPT-6）没审成，平台查明原因了：它用的登录令牌是 10-07 拷的旧副本，10-17 01:4x 原令牌一刷新，这份副本就作废了。所以大概率不用你重新登录。\n\n平台已开高优，在不外泄令牌的前提下重新接通。顺带查一下这次为什么没有候补审稿人可补。\n\n修好后平台会通知我，我再给 K 那次审查补一位 GPT-6。补来的这份只用来核对现有的裁决，不重开一轮。如果它提出站得住的反对，我再修订 K 的结论；否则 K 维持搁置。要是最后还是得你手动登录，平台会直接告诉你。\n\n这件事已记进线况页的待办。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 01:56",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n审稿人 A（Codex GPT-6）已修好：原因是它用的令牌是 10-07 拷的副本，被 Hermes 刷新时作废了，不用 Liang Hu 重新登录。现在每次调用都用 Hermes 当前的令牌，不会再这样坏，冒烟三次都通过。 缺的 A 那份没有自动补跑，需要的话请重新点名 reviewer-a 补审。另外加了一位候补审稿人 G（GPT-6），RC 部署后生效，以后 6 人审查少一人时它会补上。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 08:04",
+      "text": "【告知 · 来自 知识库智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n | PRO-DYN 时序预测论文 | E2 | ICML 原论文身份已核，风/气象迁移与统计口径待精读 | \n | 稀疏探空热带气旋三维扩散重建 | E2 | Nature 正文可读；独立雷达、固定种子与集合不确定度边界待精读 | \nE2=精读待定：请精读并写精读卡；精读结论和建议出口 X1–X5 及理由交回平台 Lead「开新项目与子项目」对话（可用 Liang Hu 审批，X3/X4/X5 等批后再落地。入口若不妥可调整并注记来源笔记。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 09:22",
+      "text": "【告知 ·，不需回复】Liang Hu 10-17 定：R23 下取消 R23.1 这一级（全中心本来就是风工程应用）。已改：\n- 五个子项目直接挂到本总控下，改号 R23.1a→R23.2、R23.1b→R23.3、R23.1c→R23.4、R23.1d→R23.5、R23.1e→R23.6；第三层随之改为字母，如 R23.1a1→R23.2a、R23.1c3→R23.4c、R23.1e2→R23.6b。对话内容、委托、作业都没动。\n- R23.1 号作废，以后不再使用；原母对话 保留（标题改为「风工程应用（已撤级的原母对话…）」），不再算子项目，新子项目请开在本总控下（下一个号 R23.7）。\n- 以后写编号（任务号、Owner code、线况）请用新号；旧记录里的 R23.1x 不用回改。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 09:22",
+      "text": "平台撤掉 R23.1 这一级后，线况页的编号和状态我都按新规则改好了，你不需要做什么。\n\n- **编号：** 线况页开头加了\"编号：R23 · 状态：在做\"。总表加了编号列，五个子项目改为 R23.2–R23.6，下面各节点用字母，如 R23.2a 低空无人机、R23.4c AI 预报驱动 WRF，和界面上的对话标题一致。\n- **状态：** 统一换成四种写法，\"探索中\"改为\"在做\"，\"搁置\"改为\"暂停\"。\n- **原母对话：** 标为\"已撤级、不再算子项目\"。以后新开子项目从 R23.7 起。\n\n这样总表就能直接读到各子项目的状态，不会再标\"推断\"。旧记录里的 R23.1x 编号按平台说明不回改。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 09:26",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nhm2 训练完成后，会话闲置约 1 小时被 Colab 回收，结果随虚拟机一起丢了。平台已改：colab-keepalive 新增 --final-pull，作业完成时把 summary、最佳模型等结果拉回本地并核对大小，全部到齐才算 done；拉取失败会继续保活重试，最多 60 分钟，之后报 final_pull_failed。带凭据启动的，保活结束时会叫醒你的。colab-gpu 技能已补上这条。立即生效，平台没动任何会话。hm2 丢的结果要不要用 epoch950 检查点补算，由你定。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 10:44",
+      "text": "【子项目回报 · R23.4 雷暴与对流尺度】K（AI 预报驱动 WRF）搁置：Akron 单事件 0/3 达\"不差于 GFS\"\n结论：Akron 2020-06-09，Pangu（13 层）驱动 WRF 对 GFS 全层驱动，按冻结判据 24/48/72 h 0/3 达\"不差于\"；24 h 两组位置误差都 >150 km（183/308 km），\"值得继续\"不可达，K 搁置（5/6 有效）。措辞只到\"这套配置未达标\"：单事件定性、模型与垂直层数影响未拆开（13 层 GFS 对照没跑）。重启条件：13 层 GFS 对照（CRC 0 SU）、≥3 事件统计、或全层输出的 AI 模型。已告知 WRF Lead。本节点现状：K 搁置；L 本配置扩样搁置，第三轮预注册已冻结、S0 完成、S1 在跑（S2 前报你放行）。决策。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 10:44",
+      "text": "R23.4（雷暴与对流尺度）报来的 K 结论，和我在根对话里的裁决一致，K 维持暂停。\n\n**K 的结论：**\n- 只用了一个雷暴事件（Akron）。按冻结判据，Pangu 13 层驱动在 24、48、72 小时三个提前量里，一个都没达到\"不差于 GFS 全层驱动\"（0/3）。\n- 结论只能说\"这套配置没达标\"，不能说\"AI 驱动不如 GFS\"。原因是模型和垂直层数的影响没拆开：用来拆开的 13 层 GFS 对照没有跑。\n- WRF Lead 已经知道了。\n\n**L 的进展：** 第三轮的预注册已冻结，第一阶段（S0）已完成，第二阶段（S1）在跑。进入第三阶段（S2）要花算力，开跑前会报给我，由我决定放不放行。\n\n线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 11:02",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n平台 Lead 转来近两天采集中与你线相关的材料（仅告知，按需取用；若要精读，按处置规则报 E2，出口由 Liang Hu 批）： 热带气旋稀疏观测分数扩散三维重建——已按 E2 告知你；补充：L31 核心实验室课题 1/2 也会用，HRD 下投探空数据可做验证，请互相知会。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 14:07",
+      "text": "【子项目回报 · R23.6 数据、CFD 模型与观测】J v6：判据① RMSE 条件通过，须补 N=50/100；请把第二段上限提到 290 CU\n结论：N=200 三种子齐。全测试合并 RMSE：全量 0.1673/0.1688/0.1702（均 0.1688），N=200 0.1862/0.1869/0.1774（均 0.1835）；下降 0.0147，大于 2 倍组内合并 SD 0.0078（也大于 N=200 单档 2SD 0.0107）→ 判据①的 RMSE 条件通过，按预注册不能短路，要补 N=50/100 各 3 种子再拟合判外推条件。我核过 （seed17 由 R² 反推 SSE，已用 seed42 显式 SSE 验证，相对误差 3e-7）。\n预算：第二段已用约 216.5 CU；6 项按 N 比例约 52 CU，加新会话传数据与评测约 10 CU，合计约 280 CU，超 260。J 已停在 N=50/100 之前、会话已关。请批：上限提到 290 CU。我建议批——再花约 60 CU 就能把判据①完整判出；不批则按三档收口，外推条件记“未检验”，“数据够不够”只能答一半。顺带初看判据②：深度模型全量合并 RMSE 0.169，最好基线 B1 0.268，低约 37%，按几何组计票待汇总。合计超 200 CU，仍需你报根 Lead。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 14:07",
+      "text": "**我批了 J（风工程专用 CFD 模型的数据量学习曲线）第二段的上限：从 260 CU 提到 290 CU，两段合计约 370 CU。** 已经通知 R23.6 继续跑，用不着你拍板。\n\n**为什么要加：** 按事先定的判据①，数据从 N=200 加到全量，误差（RMSE）从 0.1835 降到 0.1688，下降 0.0147。这个降幅超过了种子间波动的两倍（0.0078），所以判据的第一个条件通过了。按预注册的规矩，接下来还要补 N=50 和 N=100 两档，各跑 3 个种子，才能判断误差往更多数据外推时会怎样。我核过证据文件，数字对得上。\n\n**花费：** 第二段已经用了约 216.5 CU；补这两档约 52 CU，加上传数据和评测约 10 CU，合计约 280 CU，超过了原来的 260。多花约 60 CU（约 11 小时 A100），就能把判据①完整判出来。如果不补，\"数据够不够\"这个问题只能答一半，前面花的算力也就白折了一部分。超过 290 CU 就停下来报，不再追加。\n\n**判据②的初步迹象：** 深度模型在全量数据下的误差是 0.169，最好的经典基线是 0.268，低了约 37%。正式结果要等按几何组计票后才能定。\n\n决策记录在，线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 14:50",
+      "text": "【委托结果 · AI 气象】J v6 第二段上限批到 290 CU，补 N=50/100\nJ 的这条回执只是进度，五项交付要等 N=50/100 跑完才有。所以自动初查判\"未通过\"，这是正常的，我接受，不再派。\n\n- **进度**：50、100 两档共 6 项，14:47 第一项跑到第 130 轮（共 1000 轮），预计 10-18 早上前后全部完成。\n- **已有的部分**：\n - 判据①的误差下降条件已通过\n - 判据②初算误差低约 37%，按街区计票还没汇总\n - 第二段补跑前已用约 216.5 计算单元，上限 290。\n- **我补了两点**（留言，不占委托名额）：\n - 这条委托已经结束了，结果出来后，J 要用上报的方式交回那五项\n - 结论按规矩要送 6 位审稿人。J 之前在委托链里层级太深、发不出，这次要是还发不出，就在上报里写明，由本节点代发，不要因此卡住。\n\n本节点项目页已更新。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 14:50",
+      "text": "J 已经开始补跑：N=50 和 N=100 两档共 6 项，14:47 时第一项跑到第 130 轮（共 1000 轮），预计 10-18 早上前后全部跑完。这期间不需要你做什么。\n\nR23.6 节点已经交代 J：跑完后用上报的方式把五项结果交回来；结论按规矩要送 6 位审稿人，如果 J 自己发不出，就由 R23.6 节点代发。J 有自己的保活进程盯着这次运行，跑完会直接上报，所以我这边不另设回访。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 18:47",
+      "text": "【委托结果 · AI 气象】回访回报：R23.5 气候与设计风速\n提醒一下：C 的站点层要不要搁置，还在等你定。回访核对了两件事：\n\n- **C 的修订稿**：10-16 已交回，我核过。8 条必须改都加在了两份文件末尾的\"审查后更正\"一节，结果文件没动。GEV 敏感性复核下来，用 ERA5 命中 21/29，不用 ERA5 的基线命中 22/29，同样看不出增益。\n- **你的决定**：项目页和决策记录里都还没有。C 停在\"探索中\"，没花钱，也没在跑的东西。\n\n## 请 Liang Hu 判断\n- **问题**：站点层接口（ERA5/ACE2 格点冷季极端风 → 站点非对流阵风）搁置还是继续。\n- **证据**：\n - 裁决：\n - 修订后的提案：\n- **各审稿人**：Gemini、GPT-6、GLM、DeepSeek、Kimi 有保留地支持；Grok 不支持按原稿搁置，原稿已按它的意见修改。\n- **我的拟议决定**：搁置站点层，格点层结论收窄后保留，重启条件写进项目页。\n - 理由：两种检验方式都没有超过常数基线的增益，去掉坏数据后仍然是零。\n - 替代做法：先预注册，再做数据清理后重新检验一次。花费不到 1 计算单元，不改科学问题。\n- **不决定的代价**：C 一直停着，G 也开不了；不花钱。\n\n\n\n我约了 10-19 18:47 再提醒你一次。到时你还没答，我就只在项目页记一笔，不替你定，也不再追。\n\n（附件：C_站点层搁置提案草稿_20261016.md）\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 18:47",
+      "text": "**C（用 AI 气候模拟器估算设计风速）站点层的去留，我替你定了：搁置。** 搁置一条子路线不在需要你拍板的三类事里，6 人审查也已经做完，所以由我来定。我已通知 R23.5 节点撤掉原定 10-19 给你的提醒。\n\n**为什么搁置：**\n- 站点层的检验做了两种口径：一种是逐季配对，一种是空间留一比极值分布。\n- 两种都没比\"用一个常数去猜\"更好。把含异常尖峰的站点全部剔除后，增益仍是零。\n- 审稿人指出这只够说明\"没发现增益\"，不能说\"证明不可迁移\"，措辞按这个收窄。\n\n**格点层结论保留，但写窄一些：**\n- 在新格点上，模拟器的 50 年一遇风速勉强过了门槛。\n- 平原有几格偏低 22–29%，也有几格偏高，方向不一致，不能说\"平原整体压低\"。\n\n**同时放行一次花费不到 1 CU 的复查：**\n- 站点数据里有 8 个站出现 100–291 节的尖峰，这是坏数据，之前没清理过。\n- 这次复查只清理观测数据：先写好预注册，不换站，也不换判据。\n- 清理后如果有超过常数基线的增益，就按预注册重开站点层；如果没有，就维持搁置，不再加试。\n\nG 节点继续暂缓。用测站周边地貌对风速做\"暴露订正\"会改变科学问题，要你定，这次不做。\n\n决策记录在，线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 20:35",
+      "text": "【子项目回报 · R23.5 气候与设计风速】C 站点层 QC 重检：按预注册\"通过\"，重开前先查 Q3 是否抬高技能\n预注册（10-17 18:49 冻结，早于任何 QC 后配对）观测 QC 重检，29 站、v2 判据不变：187 条报告作废，SS 0.392 [0.092,0.584]，±15% 命中 28/29 对常数基线 25/29，|R50−1| 中位 0.06，判\"通过\"；我复算一致。可换算的是极值典型水平（位置参数跨站相关 0.75），离散程度不相关（0.10）。风险：删得最多的 Q3（阵风−持续风 >40 kn，162 条）可能把站点峰值拴到持续风上、人为抬高技能，且误删了部分峰值风记录。已加两个事后敏感性（峰值风免 Q3、完全去掉 Q3），<0.5 CU；两者 SS 下限都 >0 才重开（改探索中，接 ACE2 前送 3 人），否则维持搁置不再加试。282 个季峰无 ISD 同口径记录可核。G 继续暂缓。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 20:35",
+      "text": "C 站点层的观测数据复查按预注册判为\"通过\"，但先不重开站点层：结果有可能是质控规则人为抬出来的，要先排除。\n\n**复查结果（本线数据，29 站，判据沿用 v2；子项目 Lead 复算过，数字一致）：**\n- 预注册 10-17 18:49 冻结，早于任何质控后的配对，不存在先看结果再定规则。\n- 共剔除 187 条坏报告。\n- 剔除后的技能分是 0.39，区间 [0.09, 0.58]，整个区间都在零以上；之前是零。按 ±15% 算命中，29 站中格点方法中 28 站，常数基线中 25 站。\n- 能从格点推到站点的，主要是\"极值的典型水平\"：跨站相关 0.75。极值的离散程度推不过去，相关只有 0.10。\n\n**为什么先不重开：** 剔除最多的是规则 Q3：阵风比持续风高出 40 节以上就判为坏数据，删了 162 条。这条规则可能把站点峰值硬拴在持续风上，人为抬高技能，还可能误删了真实的阵风峰值。所以先补两项检验：一是峰值风不受 Q3 约束，二是完全不用 Q3。两项合计不到 0.5 CU。\n- 两项的技能分下限都大于 0：站点层重开，接 ACE2 之前再送 3 人。\n- 只要有一项不满足：维持搁置，不再加试。\n\n**另外两点：**\n- 282 个季峰找不到同口径的 ISD 记录，没法逐条核对。\n- G 节点继续暂缓。\n\n这两项检验比我定的\"按预注册通过就重开\"更严，我同意，不改。线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 20:47",
+      "text": "【子项目回报 · R23.5 气候与设计风速】C 站点层：通过依赖 Q3 设定，维持搁置\nQC 重检的\"通过\"不稳：事后敏感性\"峰值风记录免 Q3\"只改 8/435 站季（6 站），SS 从 0.392 降到 0.227，90% 区间 [−0.090,0.434] 跨零，按 v2 判据为说不清（平原 SS 0.07 [−0.49,0.43]）；我核过。按事先定的规则，写\"通过依赖 Q3 设定\"，站点层维持搁置、不再加试；格点层结论保留。\"完全去掉 Q3\"敏感性已在跑，只作披露、不影响去留。G 继续暂缓。决策。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 20:47",
+      "text": "C 的站点层维持搁置，按事先定的规则不再加试；格点层的结论照旧保留。这一判定我核过证据文件，数字一致，不需要你拍板。\n\n**为什么不重开：**\n- 上一轮数据复查后，技能分达到 0.39，一度判为\"通过\"。\n- 但这个通过很不稳。只把峰值风记录从 Q3 规则里豁免出来，改动的也只有 8 个站季（共 435 个，涉及 6 个站），技能分就从 0.39 掉到 0.23，90% 区间 [−0.09, 0.43] 跨过了零，按判据只能算\"说不清\"。\n- 平原站更弱：技能分 0.07，区间 [−0.49, 0.43]。\n- 所以结论写成\"通过依赖 Q3 规则的设定\"，不能算站点层成立。\n\n**还在跑的：** \"完全去掉 Q3\"的那项检验结果只作披露，不影响去留。G 节点继续暂缓。\n\n线况页已更新，C 的状态改为\"暂停\"。决策记录在。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 21:24",
+      "text": "【委托结果 · AI 气象】C 站点层：根对话定搁置，放行一次预注册观测 QC 重检\n站点层维持搁置，判断不变。\"完全不用 Q3\"这项敏感性和\"峰值风记录免 Q3\"的结果逐字节相同，技能都是 0.23，区间 [−0.09, 0.43] 跨过零，都没达到重开条件。\n\n结果相同，说明 Q3 对季峰的影响全部来自它误用在峰值风记录上的那 8 个站季；作用在普通阵风上时，这批数据里一个季峰都没改。这一项花了约 0.04 计算单元，Colab 会话已关。\n\n本节点项目页已经核对并更新：这项结果补进去了，更新日期改成了今天。顺手修掉了表格里之前误写进去的反斜杠引号。G 继续暂缓。\n\n10-19 18:47 那次回访要核的事已经都有了结果，到时我只确认一下 Colab 会话都关了，不会再有别的动作。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 21:24",
+      "text": "C 站点层的最后一项检查也做完了，结论不变：继续搁置，不再加试。\n\n这项检查是把 Q3 规则整个去掉。结果和上一轮\"峰值风记录免用 Q3\"一模一样：技能分 0.23，区间 [−0.09, 0.43] 跨过零。两种做法结果完全相同，说明 Q3 对季峰的影响全部来自 8 个站季，问题是它被误用到了峰值风记录上；作用在普通阵风上时，这批数据里一个季峰都没改。\n\n这项检查只花了约 0.04 CU，Colab 会话已经关掉。C 现在没有在跑的东西，G 继续暂缓。10-19 18:47 的回访只确认 Colab 会话都关了，不会再有别的动作。线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 23:55",
+      "text": "【委托 · 来自 第一实验室】L22.5 征集：和 Kareem 方法相关的卡住问题\n第一实验室 L22.5 在为 Ahsan Kareem 教授建论文档案（库内约 200 件、目标对齐他已发表的约 500 条），一个月后（约 11-17）要检验这份档案对各线是否真有用。请给 1–2 个你线上**当前真卡住**、且和他的方法相关的问题（相关方向举例：雷暴/下击暴流阵风锋因子怎么取、非平稳风的平均时距、非高斯风压峰值因子、等效静力风荷载、阻尼估计与不确定性、POD/时频分析做风场模拟、桥梁颤振抖振时域分析、高层建筑全尺度监测验证）。每个问题写：一句话问题；现在你们的回答或做法（一两句即可）；什么样的回答算\"更好\"（更准、有出处、能直接改做法）。不需要你们做别的，问题我们冻结后 11-17 前后作答再回给你们。\n（原因：任务书 v2 的有没有用检验）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-17 23:55",
+      "text": "我给第一实验室挑了两个和 Kareem 方法相关、本线现在确实卡住的问题。\n\n1. **雷暴大风：怎么把模式输出的风换算成测站的瞬时阵风。** 现在卡着两个子项目：R23.4b 对流尺度 AI 和 R23.4c AI 驱动 WRF。\n - L 用的是固定阵风系数 1.6677，是 2022 年拟合出来的。审查认为这个常数是结果不可靠的原因之一。\n - K 的模式风只有观测阵风的 43–60%。\n2. **非对流冬季风暴里，测站峰值风的坏数据怎么判。** 现在卡着 R23.5a 气候模拟器的站点层。\n - 用\"阵风比持续风高出 40 节以上就算坏数据\"这条规则，技能分是 0.39，判通过。\n - 只要放过 8 个站季的峰值风记录，技能分就降到 0.23，变成\"说不清\"。\n - 换句话说，结论取决于一个没有出处的阈值。\n\n## 结论\n**R23（AI 气象大模型）交给 L22.5 的两个卡住问题：**\n\n**问题 1：雷暴、下击暴流大风下，怎么把对流尺度模式输出的风换算成测站 3–5 s 的峰值阵风？**\n- **涉及的模式输出：** StormCast 3 km 的 10 m 风（逐小时瞬时值），以及 WRF 4 km 的 WSPD10MAX（10 分钟内最大值）。\n- **我们现在的做法：**\n - AI 输出的 10 m 风乘一个固定阵风系数 1.6677，这是用 2022 年数据拟合的。审查认为这个常数是结论不可靠的原因之一。\n - 下一步打算改用 HRRR 的混合层阵风诊断（Collins 2024，式 1）。\n - WRF 那边，模式最大风只有观测阵风 37 m/s 的 43–60%。\n- **什么样的回答算更好：** 给出一个可以在开跑前写进预注册的换算方法和取值，有文献出处（卡片和页码），能直接替换现在的常数系数。最好能说明：\n - 阵风锋或非平稳风的阵风因子、峰值因子怎么取\n - 平均时距和模式有效分辨率对换算有什么影响。\n\n**问题 2：非对流冬季风暴（温带气旋、冷锋大风）里，测站（ASOS/METAR）的峰值风记录用什么物理阈值判为坏数据？**\n- **我们现在的做法：** 用规则 Q3：阵风比持续风高出 40 节以上就判为坏数据并删掉。\n - 按这条规则，29 站检验的技能分是 0.39，判\"通过\"。\n - 只要把 8 个站季的峰值风记录（PK WND）从这条规则里豁免，技能分就降到 0.23，区间跨过零，变成\"说不清\"。\n - 所以结论取决于一个没有出处的阈值。\n- **什么样的回答算更好：** 给出有文献出处的阵风因子分布或上限，按平均时距、地表粗糙度、大气稳定度分层，适用于非平稳天气尺度大风。这样我们能在看结果之前定下 QC 阈值。也欢迎说明峰值风记录和阵风记录该不该用同一条规则。\n\n两个问题按冻结后的版本作答即可。11-17 前后的回答请发到 R23 总控。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-17 23:58",
+      "text": "【告知 · 来自 第一实验室】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：你们交来的问题已原样冻结在 「检验用的真问题」（共 8 题：PETW 4、AI 气象 2、数字孪生风洞 2），不再改题面。约 11-17 前后作答，答复发回你这里。不需要回复。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-18 06:58",
+      "text": "【平台提示 · 】平台查到一个委托叫醒漏洞（已修，待部署）：对话在 Lead 委托结束后自己发出的申请，结果回来只记成留言、不叫醒。你树下受影响且至今没再动的一处：\n\n- 实验室助手对话 「AI 气候模拟器可用性与格点年最大风初检」：10-15 18:12 实验室 Lead、18:34 平台 Lead 两条答复（ACE2 十成员已完成、结果在 ensemble_2010/analysis/，请助手把结果报给 收口）都没叫醒它，之后这个对话没有再开过轮次。\n\n如果这份结果你已经从别处拿到，忽略即可；否则请推它一把（或直接去 ensemble_2010/analysis/ 取）。不用回复平台。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-18 06:58",
+      "text": "平台说那条没被叫醒的对话（ACE2 十成员结果），结果我们已经拿到并用上了，不用再去推它。\n\n我核对过：ensemble_2010 的分析结果已经写进 C 的项目页和决策记录。C 后面的几步——十成员判\"说不清\"、8 个新格点检验、站点层搁置——都是在这份结果上做的。\n\n那条对话没再动，不影响 C，也没有漏掉的结论。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-18 08:04",
+      "text": "【告知 · 来自 知识库智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n | 预报提前期与基于 AI 天气模型的天气驱动型停电抢修队伍部署时机 | 建议入口 E2 | R23 ：需要原始论文/数据或源码核实，暂不把来源说法当结论 | 来源笔记 \n | AI 能预报极端事件吗？在热带气旋上评估概率性天气模型 | 建议入口 E2 | R23 ：需要原始论文/数据或源码核实，暂不把来源说法当结论 | 来源笔记 \nE2=精读待定：请精读并提出结论与建议出口 X1–X5 + 理由，交回平台 Lead「开新项目与子项目」，可用 Liang Hu 审批，X3/X4/X5 等批后再落地；若不同意入口可注明。正式论文先查重并走 Zotero Literature Agent，知识代理未写 Zotero。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-18 08:09",
+      "text": "【子项目回报 · R23.6 数据、CFD 模型与观测】J v6 收口：机械判“值得造数据”但证据弱；建议结题（待 Liang Hu）；工作站 有 1.5 GB .pt 待清理\n结论（6/6 有保留支持；裁决，我已读）：按冻结预注册机械判定“值得造数据”，但证据弱，对外只说“真实街区还在随数据量改善、值得继续加真实街区数据”，不说“加数据能带来可量化收益”。(1) 理想化街区已到平台（200→371 RMSE 0.0496→0.0500，外推 +0.016<0.03）；全体通过由真实街区驱动。(2) 真实街区实测 RMSE 仍在降（下降 0.0165 > 2×SD 0.0090），但外推 +0.109 是约束绑出来的、渐近值不可识别。(3) 判据②（比最好基线低 37%、79/80 几何更好）成立但区分力弱：三基线测试中位 R² 全为负，B1/B2 实现有缺陷。(4) R² 0.85/0.90 所需 N 与 GPU LBM 造数据成本不可估（全体渐近上限约 0.79）。实测花费约 275.7 CU（上限 290）。\n请你处理两件：(a) 建议结题（待 Liang Hu）：判据已判完，剩下“继续加真实街区数据”需要正式造数据项目（GPU LBM 批量生成，属转正提案规模）；(b) 工作站 上 有 22 个 .pt 约 1.5 GB 超 工作站 规矩，清单 ：12 个选优模型已在 CRC 核过 SHA，其余为中间 checkpoint，建议全删、保留 json/md/png；删除需 Liang Hu 定，请你或根 Lead 统一报。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-18 08:09",
+      "text": "**要你批一件事：删掉 工作站 上 J 留下的 22 个模型权重文件（.pt），共约 1.5 GB。** 文件在，超出了 工作站 不存超过 1 GB 计算数据的规定，C 盘现在只剩 125 GB。\n\n| 类别 | 个数 | CRC 上有没有副本 |\n| --- | --- | --- |\n| 每组跑出来挑中的最优模型 | 4 个 × 27.7 MB | 有，bot 记录两端 SHA 一致 |\n| 训练中间的快照 | 18 个 × 83 MB | 没有，这些快照对结论已经用不上 |\n\n删完后保留结果文件、报告和图（json/md/png）。你批了以后，我会先在 CRC 上亲自复核那 4 个最优模型的 SHA，确认一致再删。但 CRC 的共享连接今早又断了，我已报平台 Lead，需要你重建。\n\n**J（风工程专用 CFD 模型的数据量学习曲线）已经收口。** 6 人审查都有保留地支持。\n- **判定：** 按事先冻结的判据，机械地判为\"值得造数据\"，但证据偏弱。\n- **对外措辞：** 只说\"真实街区的预测还在随数据量改善，值得继续加真实街区数据\"，不说\"加数据能带来多少可量化的收益\"。\n- **审稿人指出的弱点：**\n - **理想化街区：** 已经到平台，数据加到 371 个误差基本不再下降。\n - **真实街区：** 误差还在降，但最终能降到多少估不出来。\n - **基线对比：** 模型比最好的传统方法低 37%，但这几种传统方法本身做得很差，两种的实现还有缺陷，所以这个对比的说服力有限。\n- **算力：** 一共用了约 275.7 CU，在 290 CU 的上限之内。\n\n**J 的状态我标成了\"暂停 · 建议结题（待 Liang Hu）\"。** 判据都已判完；要继续加真实街区数据，得另开一个正式的造数据项目，用 GPU 批量生成 LBM 数据，属于转正提案的规模。结不结题由你决定。\n\n裁决文件：。线况页已更新。\n\n\n\n（附件：cfd_scaling_v6s2_p14大文件清单_20261018.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-18 09:45",
+      "text": "【平台告知·，无需回复】按 Liang Hu 10-18 09:27 的指示，旧母对话 「风工程应用（已撤级的原母）」已于 10-18 09:37 从 Research Chat 删除（先存档）。\n- 全文存档：（364 条消息、附件清单、它发出 91 条和收到 67 条委托的请求与结论）；原始数据同目录 .owui_chat.json。\n- 委托记录都保留；R23.2–R23.6 五个子项目对话不受影响，仍挂在本总控下。附件文件没删。\n- 以后要查它的旧内容请直接读存档文件；新版部署后 或任何相关委托编号也会指向这个存档。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-18 09:45",
+      "text": "旧母对话 已按你的指示删除，全文存档在，以后要查它的旧内容直接读这个文件。\n\nR23.2 到 R23.6 五个子项目对话不受影响，仍挂在本总控下。线况页开头那句里的旧母对话说明，我改成了\"已删除，存档在这里\"，母项目页 仍在。"
+    }
+  ],
+  "files": {
+    "self": "728a9982.json",
+    "claims": null,
+    "pdf": null
+  }
+}

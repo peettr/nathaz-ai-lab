@@ -1,0 +1,3977 @@
+{
+  "schema_version": "1.0.0",
+  "notice": "AI-generated, not peer reviewed; exploratory results.",
+  "groups": [
+    {
+      "key": "lab",
+      "zh": "第一实验室（试验场）",
+      "en": "First Lab (proving ground)"
+    },
+    {
+      "key": "qtl",
+      "zh": "快试实验室",
+      "en": "Quick-Trial Lab"
+    },
+    {
+      "key": "wx",
+      "zh": "AI 气象 / 气候大模型与风工程",
+      "en": "AI Weather & Climate Models for Wind Engineering"
+    },
+    {
+      "key": "uwind",
+      "zh": "城市风场 GPU-LBM（LUW）",
+      "en": "Urban Wind GPU-LBM (LUW)"
+    },
+    {
+      "key": "uav",
+      "zh": "低空飞行器平台",
+      "en": "Low-Altitude Aircraft Platform"
+    },
+    {
+      "key": "uwp",
+      "zh": "城市建筑风压预测",
+      "en": "Urban Building Wind-Pressure Prediction"
+    },
+    {
+      "key": "ansys",
+      "zh": "Ansys 结构仿真工具",
+      "en": "Ansys Structural Simulation Tools"
+    },
+    {
+      "key": "fluent",
+      "zh": "Fluent 流体仿真工具",
+      "en": "Fluent Flow Simulation Tools"
+    },
+    {
+      "key": "better",
+      "zh": "美丽新世界实验室（正本清源）",
+      "en": "Make World Better Place (Back to Fundamentals)"
+    },
+    {
+      "key": "hw_auto",
+      "zh": "硬件实验室 · 风洞自动化",
+      "en": "Hardware Lab · Wind-Tunnel Automation"
+    },
+    {
+      "key": "hw_vib",
+      "zh": "硬件实验室 · 振动控制",
+      "en": "Hardware Lab · Vibration Control"
+    },
+    {
+      "key": "hw_cal",
+      "zh": "硬件实验室 · 风洞标定",
+      "en": "Hardware Lab · Wind-Tunnel Calibration"
+    },
+    {
+      "key": "core",
+      "zh": "核心实验室（核心构想）",
+      "en": "Core Lab (Core Ideas)"
+    },
+    {
+      "key": "petw",
+      "zh": "PETW 总控",
+      "en": "PETW Master Control"
+    },
+    {
+      "key": "petw1",
+      "zh": "PETW · R16.1 事件分类与重建",
+      "en": "PETW · R16.1 Event Classification & Reconstruction"
+    },
+    {
+      "key": "petw2",
+      "zh": "PETW · R16.2 CM1",
+      "en": "PETW · R16.2 CM1"
+    },
+    {
+      "key": "petw3",
+      "zh": "PETW · R16.3 统计与极值 EVA",
+      "en": "PETW · R16.3 Statistics & Extreme-Value Analysis (EVA)"
+    },
+    {
+      "key": "petw4",
+      "zh": "PETW · R16.4 WRF",
+      "en": "PETW · R16.4 WRF"
+    },
+    {
+      "key": "petw5",
+      "zh": "PETW · R16.5 CFD",
+      "en": "PETW · R16.5 CFD"
+    },
+    {
+      "key": "petw6",
+      "zh": "PETW · R16.6 风场特征",
+      "en": "PETW · R16.6 Wind-Field Characterization"
+    },
+    {
+      "key": "petw7",
+      "zh": "PETW · R16.7 结构响应",
+      "en": "PETW · R16.7 Structural Response"
+    },
+    {
+      "key": "petw8",
+      "zh": "PETW · R16.8 设计风荷载",
+      "en": "PETW · R16.8 Design Wind Loads"
+    },
+    {
+      "key": "petw9",
+      "zh": "PETW · R16.9 风洞试验",
+      "en": "PETW · R16.9 Wind-Tunnel Testing"
+    },
+    {
+      "key": "lbm",
+      "zh": "数字孪生风洞",
+      "en": "Digital Twin Wind Tunnel"
+    },
+    {
+      "key": "teach",
+      "zh": "AI 教学实验室",
+      "en": "AI Teaching Lab"
+    },
+    {
+      "key": "mesh",
+      "zh": "建模与网格（CAD）",
+      "en": "Modeling & Meshing (CAD)"
+    },
+    {
+      "key": "plat",
+      "zh": "日常运维与平台",
+      "en": "Daily Operations & Platform"
+    }
+  ],
+  "projects": [
+    {
+      "id": "c0fa237e",
+      "slug": "c0fa237e",
+      "number": null,
+      "title": {
+        "zh": "第一实验室总线",
+        "en": "First Lab mainline"
+      },
+      "group": "lab",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-13 00:02",
+      "end": null,
+      "updated": "2026-10-18 13:38",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/c0fa237e.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "84cfbb7e",
+      "slug": "latticeurbanwind-guangzhou",
+      "number": "L22.1",
+      "title": {
+        "zh": "L22.1 广州城市风场 GPU-LBM（LatticeUrbanWind）复现可行性",
+        "en": "L22.1 Feasibility of reproducing the Guangzhou urban wind GPU-LBM (LatticeUrbanWind)"
+      },
+      "group": "lab",
+      "parent": "c0fa237e",
+      "depth": 1,
+      "status": {
+        "zh": "已转正",
+        "en": "Promoted"
+      },
+      "status_class": "done",
+      "done": true,
+      "start": "2026-10-13 00:15",
+      "end": "2026-10-15 17:40",
+      "updated": "2026-10-15 17:40",
+      "conclusion": {
+        "zh": "10-15 转正为正式项目「城市风场 GPU-LBM（LUW）」；材料已复制到新项目，已确认接收（2564 个文件逐条一致）并归入，先做近壁处理工作包；实验室不再派 LUW 计算、不再跟进",
+        "en": "10-15 Promoted to formal project \"Urban Wind GPU-LBM (LUW)\"; materials have been copied to the new project, receipt confirmed (2564 files verified identical item by item) and archived, starting with the near-wall treatment work package; the Lab will no longer dispatch LUW compute jobs or follow up"
+      },
+      "files": {
+        "project": "projects/latticeurbanwind-guangzhou.json",
+        "claims": "projects/latticeurbanwind-guangzhou.claims.json",
+        "pdf": {
+          "zh": "../pdf/latticeurbanwind-guangzhou.zh.pdf",
+          "en": "../pdf/latticeurbanwind-guangzhou.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "b4e6d3fb",
+      "slug": "strata-qwen-local-inference",
+      "number": "L22.2",
+      "title": {
+        "zh": "L22.2 Strata + Qwen3.8-Flash-Next 本地推理（Colab A100）",
+        "en": "L22.2 Strata + Qwen3.8-Flash-Next local inference (Colab A100)"
+      },
+      "group": "lab",
+      "parent": "c0fa237e",
+      "depth": 1,
+      "status": {
+        "zh": "已转正",
+        "en": "Promoted"
+      },
+      "status_class": "done",
+      "done": true,
+      "start": "2026-10-13 00:15",
+      "end": "2026-10-18 05:41",
+      "updated": "2026-10-18 05:41",
+      "conclusion": {
+        "zh": "10-18 Liang Hu 批准并入 L32.0 自有教学大模型；10-17：G4 跑 Strata v0.1.45 快约 2 倍；Drive 缓存把 Colab 新会话准备从约 32 min 缩到约 12–14 min，方法已交平台和 ComputeOps，约 27 CU；此前： 能做到：Colab A100 不降档跑通 32K，输出 35–59 tok/s，needle 3/3，约 5 CU；每个新会话约 40 min/4 CU 准备，暂无用例故搁置",
+        "en": "10-18 Approved by Liang Hu to merge into L32.0 In-House Teaching Large Language Model; 10-17: G4 runs Strata v0.1.45 ~2x faster; Drive caching cuts new Colab session setup from ~32 min to ~12–14 min, method handed over to the platform and ComputeOps, ~27 CU; previously: Feasible: Colab A100 runs 32K without downgrading at 35–59 tok/s output, needle 3/3, ~5 CU; each new session requires ~40 min / 4 CU of setup, Shelved for lack of an active use case"
+      },
+      "files": {
+        "project": "projects/strata-qwen-local-inference.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/strata-qwen-local-inference.zh.pdf",
+          "en": "../pdf/strata-qwen-local-inference.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "333621ea",
+      "slug": "fulltext-kb-data-extraction",
+      "number": "L22.2a",
+      "title": {
+        "zh": "L22.2a 文献库全文检索 + 风工程数据抽取",
+        "en": "L22.2a Full-text search of the literature library + wind-engineering data extraction"
+      },
+      "group": "lab",
+      "parent": "b4e6d3fb",
+      "depth": 2,
+      "status": {
+        "zh": "已转正",
+        "en": "Promoted"
+      },
+      "status_class": "done",
+      "done": true,
+      "start": "2026-10-13 18:16",
+      "end": "2026-10-17 17:33",
+      "updated": "2026-10-17 17:33",
+      "conclusion": {
+        "zh": "10-14 已转正为平台工具 pages：验收五组全过线，二期非首页事实题 22/27 到页；三期盲测 10-14：到页 21/30（中文 9/10、中译英 8/10、书 4/7、扫描书 0/3），书籍偏弱经平台 0062 改进后 round3 书籍到页 4/10→7/10（达标）、round4 8/12 不变；台式机 I 盘已连通并清点：净新增约 1.25 万 PDF/42 万页，第一阶段已抽 28.9 万页有文字页（工作站 1.8 GB）；台式机语料 0069 已上线（10-16），台式机来源盲测到页 11/30（两库 24/30），改进线索已交平台；10-15 全部推进：剩余 10.5 万页 OCR 10-16 02:38 完成（105,336 页，已交 0069）、三库元数据与作品去重、djvu/pdg 书 31,365 页已交平台（472 页超星格式未解）、litwiki/knowledge 试用已回；入库等 0051 与 C 盘处理。10-13 结论：只做检索。两库 4,691 PDF/12.9 万页本地按页索引；非首页事实题前 5 精确到页约一半（英文 8/14、中文原文 5/5、中文问英文译问题后 3/5、书 4/6）， 论文级 1/27；平台已接入（三期，一期本周内），原型冻结作对照；` pages` 一期已上线（10-13 22:40 实测）；扫描件 OCR 79 份/5,422 页已交二期。廓线抽取搁置（单页文本 6/78 错、27/78 需限定，图页常定位错）；0 CU；另一台电脑上的书待 Liang Hu 给信息",
+        "en": "10-14 Promoted to the platform tool pages: all five acceptance groups passed, and Phase 2 non-first-page fact questions reached the target page on 22/27; Phase 3 blind test on 10-14: 21/30 reached the page (Chinese 9/10, Chinese-to-English 8/10, books 4/7, scanned books 0/3); books were weak, and after platform improvement 0062, round3 book page hits rose from 4/10 to 7/10 (meeting the target) while round4 remained 8/12; the desktop I drive is connected and inventoried: net new ~12.5k PDFs / 420k pages, with Phase 1 extracting 289k text-layer pages (1.8 GB on the workstation); desktop corpus 0069 went live (10-16), hitting the target page on 11/30 in the 台式机 blind test (vs. 24/30 for the two libraries), with improvement leads handed to the platform; 10-15 all tracks pushed forward: OCR of the remaining 105k pages completed at 10-16 02:38 (105,336 pages, handed to 0069), three-library metadata and work-level deduplication, 31,365 pages of djvu/pdg books handed to the platform (472 Chaoxing-format pages unresolved), and litwiki/knowledge trial results returned; ingestion awaits 0051 and C drive cleanup. 10-13 conclusion: retrieval only. Two libraries with 4,691 PDFs / 129k pages indexed locally by page; for non-first-page fact questions, top-5 results hit the exact page about half the time (English 8/14, Chinese originals 5/5, Chinese queries on English papers 3/5 after query translation, books 4/6), paper-level 1/27; platform integration underway (three phases, Phase 1 within the week), prototype frozen as baseline; `pages` Phase 1 is live (tested 10-13 22:40); OCR of 79 scanned documents / 5,422 pages handed to Phase 2. Profile extraction is Shelved (single-page text had 6/78 errors and 27/78 requiring qualification, with figure pages often mislocated); 0 CU; books on the other computer await information from Liang Hu"
+      },
+      "files": {
+        "project": "projects/fulltext-kb-data-extraction.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/fulltext-kb-data-extraction.zh.pdf",
+          "en": "../pdf/fulltext-kb-data-extraction.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "0ea24620",
+      "slug": "own-llm-use-cases",
+      "number": "L22.3",
+      "title": {
+        "zh": "L22.3 自建/本地模型对我们研究的用途",
+        "en": "L22.3 Uses of self-built / local models for our research"
+      },
+      "group": "lab",
+      "parent": "c0fa237e",
+      "depth": 1,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-13 06:06",
+      "end": "2026-10-15 17:58",
+      "updated": "2026-10-15 17:58",
+      "conclusion": {
+        "zh": "不做自己的语言大模型（继续预训练/全量微调），LoRA 暂不做。评测 200 题摘要初筛：本地 Qwen3-32B 82.0%、Claude Sonnet 80.5%、Gemini 3.8 Flash 85.5%（置信区间重叠）；50 题 PDF 单值抽取：本地 92%、前沿 96%。建议成批筛选/抽取交 Gemini 3.8 Flash 批量通道或 Colab 本地 Qwen3-32B，Claude 只做复核；约 6.8 CU。物理场代理部分另留档搁置",
+        "en": "Do not build our own large language model (continued pre-training / full fine-tuning); LoRA not for now. Evaluation on 200 abstract-screening questions: local Qwen3-32B 82.0%, Claude Sonnet 80.5%, Gemini 3.8 Flash 85.5% (confidence intervals overlap); 50 single-value PDF extraction questions: local 92%, frontier 96%. Recommendation: send batch screening/extraction to the Gemini 3.8 Flash batch channel or local Qwen3-32B on Colab, with Claude used only for re-checking; about 6.8 CU. The physical-field surrogate part is archived separately and shelved"
+      },
+      "files": {
+        "project": "projects/own-llm-use-cases.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/own-llm-use-cases.zh.pdf",
+          "en": "../pdf/own-llm-use-cases.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "24b802b5",
+      "slug": "24b802b5",
+      "number": "L22.4",
+      "title": {
+        "zh": "L22.4 文献图库与句级检索",
+        "en": "L22.4 Literature figure gallery and sentence-level retrieval"
+      },
+      "group": "lab",
+      "parent": "c0fa237e",
+      "depth": 1,
+      "status": {
+        "zh": "待转正",
+        "en": "Pending promotion"
+      },
+      "status_class": "pend",
+      "done": true,
+      "start": "2026-10-15 17:58",
+      "end": "2026-10-18 01:26",
+      "updated": "2026-10-18 01:26",
+      "conclusion": {
+        "zh": "10-17 结论：A 图注检索值得做成平台工具（配对 96%，英文找图 19/20、中文 12/20，10-17 审查 5/5 有条件同意， figs 已上线；10-18 复判配对 92% 过、英文找图 13/20 未过，暂不全中心开放，待平台改后新题复测，8 项上线条件含修复后复判；严格口径英文 16–17/20）；A2 以图找图 5/10 不做；B 句级聚类三题都不如页级（分话题不分立场、参考文献淹没结论句），不做，全库编码已停",
+        "en": "10-17 Conclusion: A figure-caption retrieval is worth promoting into a platform tool (96% pairing accuracy, English figure search 19/20, Chinese 12/20; 5/5 conditional approval in the 10-17 review, `figs` is live; 10-18 re-evaluation passed pairing at 92% but failed English figure search at 13/20, so center-wide release is on hold pending platform fixes and re-testing on new questions, with 8 launch conditions including post-fix re-evaluation; 16–17/20 in English under the strict criterion); A2 image-to-image search (5/10) will not be pursued; B sentence-level clustering underperformed page-level retrieval on all three questions (clusters by topic rather than stance, and reference entries drown out conclusion sentences), will not be pursued, and full-corpus encoding has been stopped"
+      },
+      "files": {
+        "project": "projects/24b802b5.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/24b802b5.zh.pdf",
+          "en": "../pdf/24b802b5.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "572bf879",
+      "slug": "572bf879",
+      "number": "L22.5",
+      "title": {
+        "zh": "L22.5 Kareem 教授专业判断提炼",
+        "en": "L22.5 Distilling Prof. Kareem's Expert Judgments"
+      },
+      "group": "lab",
+      "parent": "c0fa237e",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-17 17:10",
+      "end": null,
+      "updated": "2026-10-18 16:37",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/572bf879.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "bd040db3",
+      "slug": "bd040db3",
+      "number": null,
+      "title": {
+        "zh": "快试实验室总线",
+        "en": "Quick-Trial Lab mainline"
+      },
+      "group": "qtl",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "值得用",
+        "en": "Promoted"
+      },
+      "status_class": "done",
+      "done": true,
+      "start": "2026-10-15 23:46",
+      "end": "2026-10-17 11:40",
+      "updated": "2026-10-17 11:40",
+      "conclusion": {
+        "zh": "首选 K-Dense，Academic 作样式参考；只管样式和导出，排版要手写、结构要人核",
+        "en": "Primary choice is K-Dense, with Academic as a style reference; covers styling and export only—layout must be hand-coded and architecture manually verified"
+      },
+      "files": {
+        "project": "projects/bd040db3.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/bd040db3.zh.pdf",
+          "en": "../pdf/bd040db3.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "728a9982",
+      "slug": "728a9982",
+      "number": null,
+      "title": {
+        "zh": "AI 气象总线",
+        "en": "AI Weather mainline"
+      },
+      "group": "wx",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-15 05:57",
+      "end": null,
+      "updated": "2026-10-18 09:45",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/728a9982.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "9bdbe67b",
+      "slug": "a-forecast-driven-wind-engineering",
+      "number": "R23.2",
+      "title": {
+        "zh": "R23.2 天气预报驱动的风工程应用",
+        "en": "R23.2 Weather-forecast-driven wind-engineering applications"
+      },
+      "group": "wx",
+      "parent": "728a9982",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-14 14:33",
+      "end": null,
+      "updated": "2026-10-16 15:16",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a-forecast-driven-wind-engineering.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "3d246fee",
+      "slug": "a1-low-altitude-uav-wind-forecast",
+      "number": "R23.2a",
+      "title": {
+        "zh": "R23.2a 低空无人机风预报",
+        "en": "R23.2a Low-altitude UAV wind forecasting"
+      },
+      "group": "wx",
+      "parent": "9bdbe67b",
+      "depth": 2,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-14 14:21",
+      "end": null,
+      "updated": "2026-10-15 02:04",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a1-low-altitude-uav-wind-forecast.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "7177e9b2",
+      "slug": "a2-building-highwind-forecast-control",
+      "number": "R23.2b",
+      "title": {
+        "zh": "R23.2b 建筑高风速预报与主动控制",
+        "en": "R23.2b High-wind forecasting and active control for buildings"
+      },
+      "group": "wx",
+      "parent": "9bdbe67b",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 14:35",
+      "end": "2026-10-14 16:49",
+      "updated": "2026-10-14 16:49",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a2-building-highwind-forecast-control.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/a2-building-highwind-forecast-control.zh.pdf",
+          "en": "../pdf/a2-building-highwind-forecast-control.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "77cfbda3",
+      "slug": "a3-wind-turbine-highwind-forecast-control",
+      "number": "R23.2c",
+      "title": {
+        "zh": "R23.2c 风机高风速预报与调控",
+        "en": "R23.2c High-wind forecasting and control for wind turbines"
+      },
+      "group": "wx",
+      "parent": "9bdbe67b",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 14:35",
+      "end": "2026-10-16 15:16",
+      "updated": "2026-10-16 15:16",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a3-wind-turbine-highwind-forecast-control.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/a3-wind-turbine-highwind-forecast-control.zh.pdf",
+          "en": "../pdf/a3-wind-turbine-highwind-forecast-control.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "e47a2a82",
+      "slug": "e-complex-terrain-wind-warning",
+      "number": "R23.2d",
+      "title": {
+        "zh": "R23.2d 复杂地形风预警",
+        "en": "R23.2d Wind warnings over complex terrain"
+      },
+      "group": "wx",
+      "parent": "9bdbe67b",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 15:03",
+      "end": "2026-10-14 21:03",
+      "updated": "2026-10-14 21:03",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/e-complex-terrain-wind-warning.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/e-complex-terrain-wind-warning.zh.pdf",
+          "en": "../pdf/e-complex-terrain-wind-warning.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "437b7e25",
+      "slug": "f-wind-sensitive-operations-warning",
+      "number": "R23.2e",
+      "title": {
+        "zh": "R23.2e 风敏感作业与结构预警",
+        "en": "R23.2e Warnings for wind-sensitive operations and structures"
+      },
+      "group": "wx",
+      "parent": "9bdbe67b",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 18:16",
+      "end": "2026-10-14 19:04",
+      "updated": "2026-10-14 19:04",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/f-wind-sensitive-operations-warning.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/f-wind-sensitive-operations-warning.zh.pdf",
+          "en": "../pdf/f-wind-sensitive-operations-warning.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "03475f82",
+      "slug": "b-tropical-cyclone-wind-field",
+      "number": "R23.3",
+      "title": {
+        "zh": "R23.3 台风/飓风风场",
+        "en": "R23.3 Typhoon and hurricane wind fields"
+      },
+      "group": "wx",
+      "parent": "728a9982",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-14 14:33",
+      "end": null,
+      "updated": "2026-10-16 00:57",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/b-tropical-cyclone-wind-field.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "aedd5f57",
+      "slug": "b1b4-landfall-hurricane-ai-track-wind",
+      "number": "R23.3a",
+      "title": {
+        "zh": "R23.3a 登陆飓风：AI 路径与集合到站点峰值风",
+        "en": "R23.3a Landfalling hurricanes: AI tracks and ensembles to site peak winds"
+      },
+      "group": "wx",
+      "parent": "03475f82",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 14:37",
+      "end": "2026-10-16 00:57",
+      "updated": "2026-10-16 00:57",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/b1b4-landfall-hurricane-ai-track-wind.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/b1b4-landfall-hurricane-ai-track-wind.zh.pdf",
+          "en": "../pdf/b1b4-landfall-hurricane-ai-track-wind.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "34ddae7f",
+      "slug": "b2-ai-synthetic-tc-design-wind",
+      "number": "R23.3b",
+      "title": {
+        "zh": "R23.3b AI 混合合成台风到沿海设计风速",
+        "en": "R23.3b AI-hybrid synthetic typhoons to coastal design wind speeds"
+      },
+      "group": "wx",
+      "parent": "03475f82",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 19:18",
+      "end": "2026-10-16 00:57",
+      "updated": "2026-10-16 00:57",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/b2-ai-synthetic-tc-design-wind.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/b2-ai-synthetic-tc-design-wind.zh.pdf",
+          "en": "../pdf/b2-ai-synthetic-tc-design-wind.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "d0f7457a",
+      "slug": "thunderstorm-convective-scale",
+      "number": "R23.4",
+      "title": {
+        "zh": "R23.4 雷暴与对流尺度",
+        "en": "R23.4 Thunderstorms and the convective scale"
+      },
+      "group": "wx",
+      "parent": "728a9982",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-14 14:33",
+      "end": null,
+      "updated": "2026-10-17 10:44",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/thunderstorm-convective-scale.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "eeee055e",
+      "slug": "ai-weather-model-use",
+      "number": "R23.4a",
+      "title": {
+        "zh": "R23.4a 预报用途（强风背景场、风电、CFD）",
+        "en": "R23.4a Forecast uses (high-wind background fields, wind power, CFD)"
+      },
+      "group": "wx",
+      "parent": "d0f7457a",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-13 11:30",
+      "end": "2026-10-13 13:42",
+      "updated": "2026-10-13 13:42",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/ai-weather-model-use.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/ai-weather-model-use.zh.pdf",
+          "en": "../pdf/ai-weather-model-use.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "9b35e6de",
+      "slug": "l-convective-scale-ai-nowcast",
+      "number": "R23.4b",
+      "title": {
+        "zh": "R23.4b 对流尺度AI与雷暴短临",
+        "en": "R23.4b Convection-scale AI and thunderstorm nowcasting"
+      },
+      "group": "wx",
+      "parent": "d0f7457a",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 14:21",
+      "end": "2026-10-16 11:59",
+      "updated": "2026-10-16 11:59",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/l-convective-scale-ai-nowcast.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/l-convective-scale-ai-nowcast.zh.pdf",
+          "en": "../pdf/l-convective-scale-ai-nowcast.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "0e55794a",
+      "slug": "k-ai-driven-wrf-thunderstorm",
+      "number": "R23.4c",
+      "title": {
+        "zh": "R23.4c 雷暴：AI预报驱动WRF",
+        "en": "R23.4c Thunderstorms: AI forecasts driving WRF"
+      },
+      "group": "wx",
+      "parent": "d0f7457a",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 14:38",
+      "end": "2026-10-17 10:43",
+      "updated": "2026-10-17 10:43",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/k-ai-driven-wrf-thunderstorm.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/k-ai-driven-wrf-thunderstorm.zh.pdf",
+          "en": "../pdf/k-ai-driven-wrf-thunderstorm.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "282ae162",
+      "slug": "climate-design-wind-speed",
+      "number": "R23.5",
+      "title": {
+        "zh": "R23.5 气候与设计风速",
+        "en": "R23.5 Climate and design wind speeds"
+      },
+      "group": "wx",
+      "parent": "728a9982",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-14 14:34",
+      "end": null,
+      "updated": "2026-10-17 21:24",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/climate-design-wind-speed.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "6dff50c7",
+      "slug": "c-nonconvective-extreme-wind-ai-climate-emulator",
+      "number": "R23.5a",
+      "title": {
+        "zh": "R23.5a 非对流极端风设计风速：AI气候模拟器",
+        "en": "R23.5a Non-convective extreme-wind design speeds: AI climate emulators"
+      },
+      "group": "wx",
+      "parent": "282ae162",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 14:21",
+      "end": "2026-10-18 16:54",
+      "updated": "2026-10-18 16:54",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/c-nonconvective-extreme-wind-ai-climate-emulator.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/c-nonconvective-extreme-wind-ai-climate-emulator.zh.pdf",
+          "en": "../pdf/c-nonconvective-extreme-wind-ai-climate-emulator.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "50648743",
+      "slug": "data-cfd-models-observations",
+      "number": "R23.6",
+      "title": {
+        "zh": "R23.6 数据、CFD 模型与观测",
+        "en": "R23.6 Data, CFD models and observations"
+      },
+      "group": "wx",
+      "parent": "728a9982",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-14 14:34",
+      "end": null,
+      "updated": "2026-10-18 08:10",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/data-cfd-models-observations.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "9373fdc1",
+      "slug": "j-cfd-surrogate-data-scaling",
+      "number": "R23.6a",
+      "title": {
+        "zh": "R23.6a 风工程专用CFD模型：数据量学习曲线",
+        "en": "R23.6a Wind-engineering CFD surrogates: data-size learning curves"
+      },
+      "group": "wx",
+      "parent": "50648743",
+      "depth": 2,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-14 14:21",
+      "end": null,
+      "updated": "2026-10-18 08:09",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/j-cfd-surrogate-data-scaling.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "36026b43",
+      "slug": "i-loss-wind-database",
+      "number": "R23.6b",
+      "title": {
+        "zh": "R23.6b 风灾损失与风速数据库",
+        "en": "R23.6b Wind-damage loss and wind-speed databases"
+      },
+      "group": "wx",
+      "parent": "50648743",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 14:36",
+      "end": "2026-10-15 02:32",
+      "updated": "2026-10-15 02:32",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/i-loss-wind-database.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/i-loss-wind-database.zh.pdf",
+          "en": "../pdf/i-loss-wind-database.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "de3061e5",
+      "slug": "h-obs-model-fusion-wind",
+      "number": "R23.6c",
+      "title": {
+        "zh": "R23.6c 观测与模拟融合重建风场",
+        "en": "R23.6c Wind-field reconstruction fusing observations and simulation"
+      },
+      "group": "wx",
+      "parent": "50648743",
+      "depth": 2,
+      "status": {
+        "zh": "搁置",
+        "en": "Shelved"
+      },
+      "status_class": "pause",
+      "done": true,
+      "start": "2026-10-14 14:36",
+      "end": "2026-10-15 02:32",
+      "updated": "2026-10-15 02:32",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/h-obs-model-fusion-wind.json",
+        "claims": null,
+        "pdf": {
+          "zh": "../pdf/h-obs-model-fusion-wind.zh.pdf",
+          "en": "../pdf/h-obs-model-fusion-wind.en.pdf"
+        }
+      }
+    },
+    {
+      "id": "72d38776",
+      "slug": "72d38776",
+      "number": null,
+      "title": {
+        "zh": "城市风场 LBM 总线",
+        "en": "Urban wind-field LBM mainline"
+      },
+      "group": "uwind",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-15 16:18",
+      "end": null,
+      "updated": "2026-10-17 19:04",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/72d38776.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "9675c98f",
+      "slug": "9675c98f",
+      "number": null,
+      "title": {
+        "zh": "低空飞行器总线",
+        "en": "Low-altitude aircraft mainline"
+      },
+      "group": "uav",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-15 23:46",
+      "end": null,
+      "updated": "2026-10-16 23:16",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/9675c98f.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "548d771a",
+      "slug": "548d771a",
+      "number": null,
+      "title": {
+        "zh": "城市风压总线",
+        "en": "Urban wind-pressure mainline"
+      },
+      "group": "uwp",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 01:16",
+      "end": null,
+      "updated": "2026-10-17 16:21",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/548d771a.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "9741f50a",
+      "slug": "9741f50a",
+      "number": "R25.1",
+      "title": {
+        "zh": "R25.1 数据与基准（TPU 等）",
+        "en": "R25.1 Data and benchmarks (TPU, etc.)"
+      },
+      "group": "uwp",
+      "parent": "548d771a",
+      "depth": 1,
+      "status": {
+        "zh": "待开工",
+        "en": "Not started"
+      },
+      "status_class": "todo",
+      "done": false,
+      "start": "2026-10-16 20:44",
+      "end": null,
+      "updated": "2026-10-16 20:47",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/9741f50a.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "ae4ca290",
+      "slug": "ae4ca290",
+      "number": "R25.2",
+      "title": {
+        "zh": "R25.2 高保真 CFD（LES/LBM）",
+        "en": "R25.2 High-fidelity CFD (LES/LBM)"
+      },
+      "group": "uwp",
+      "parent": "548d771a",
+      "depth": 1,
+      "status": {
+        "zh": "待开工",
+        "en": "Not started"
+      },
+      "status_class": "todo",
+      "done": false,
+      "start": "2026-10-16 20:44",
+      "end": null,
+      "updated": "2026-10-16 20:47",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/ae4ca290.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "8fcb6542",
+      "slug": "8fcb6542",
+      "number": "R25.3",
+      "title": {
+        "zh": "R25.3 AI 风压代理模型",
+        "en": "R25.3 AI wind-pressure surrogate models"
+      },
+      "group": "uwp",
+      "parent": "548d771a",
+      "depth": 1,
+      "status": {
+        "zh": "待开工",
+        "en": "Not started"
+      },
+      "status_class": "todo",
+      "done": false,
+      "start": "2026-10-16 20:44",
+      "end": null,
+      "updated": "2026-10-16 20:47",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/8fcb6542.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "e5d0196d",
+      "slug": "e5d0196d",
+      "number": null,
+      "title": {
+        "zh": "Ansys 总线",
+        "en": "Ansys mainline"
+      },
+      "group": "ansys",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-15 23:47",
+      "end": null,
+      "updated": "2026-10-17 13:12",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/e5d0196d.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "10875afa",
+      "slug": "10875afa",
+      "number": null,
+      "title": {
+        "zh": "Fluent 总线",
+        "en": "Fluent mainline"
+      },
+      "group": "fluent",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-15 23:47",
+      "end": null,
+      "updated": "2026-10-18 10:12",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/10875afa.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "36dc6fbe",
+      "slug": "36dc6fbe",
+      "number": "T28.1",
+      "title": {
+        "zh": "T28.1 Fluent 学习库（教程与算例）",
+        "en": "T28.1 Fluent Learning Library (Tutorials and Cases)"
+      },
+      "group": "fluent",
+      "parent": "10875afa",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-17 19:54",
+      "end": null,
+      "updated": "2026-10-18 03:47",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/36dc6fbe.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "05a74edc",
+      "slug": "05a74edc",
+      "number": null,
+      "title": {
+        "zh": "美丽新世界实验室总线",
+        "en": "Make World Better Place mainline"
+      },
+      "group": "better",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 12:38",
+      "end": null,
+      "updated": "2026-10-18 15:14",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/05a74edc.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "d4f69313",
+      "slug": "d4f69313",
+      "number": "L29.1",
+      "title": {
+        "zh": "L29.1 抗风设计中的结构非线性",
+        "en": "L29.1 Structural nonlinearity in wind-resistant design"
+      },
+      "group": "better",
+      "parent": "05a74edc",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-18 16:41",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/d4f69313.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "e17ff784",
+      "slug": "e17ff784",
+      "number": "L29.2",
+      "title": {
+        "zh": "L29.2 气候变化与设计风速",
+        "en": "L29.2 Climate change and design wind speeds"
+      },
+      "group": "better",
+      "parent": "05a74edc",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-17 05:37",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/e17ff784.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "5d312ba1",
+      "slug": "5d312ba1",
+      "number": "L29.3",
+      "title": {
+        "zh": "L29.3 Performance 与 Resilience 为何进不了最终设计",
+        "en": "L29.3 Why performance and resilience cannot enter final design"
+      },
+      "group": "better",
+      "parent": "05a74edc",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-17 05:35",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/5d312ba1.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "70e43b2d",
+      "slug": "70e43b2d",
+      "number": "L29.4",
+      "title": {
+        "zh": "L29.4 结构优化与拓扑优化的工程采用",
+        "en": "L29.4 Engineering adoption of structural and topology optimization"
+      },
+      "group": "better",
+      "parent": "05a74edc",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-18 16:57",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/70e43b2d.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "ae1ba4dc",
+      "slug": "ae1ba4dc",
+      "number": "L29.5",
+      "title": {
+        "zh": "L29.5 UQ 到底能完成什么",
+        "en": "L29.5 What UQ can actually accomplish"
+      },
+      "group": "better",
+      "parent": "05a74edc",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-18 13:09",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/ae1ba4dc.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "0af99e16",
+      "slug": "0af99e16",
+      "number": "L29.6",
+      "title": {
+        "zh": "L29.6 方法泛滥的聚合与比较",
+        "en": "L29.6 Aggregation and comparison of proliferating methods"
+      },
+      "group": "better",
+      "parent": "05a74edc",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 22:40",
+      "end": null,
+      "updated": "2026-10-18 03:11",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/0af99e16.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "9df4c64c",
+      "slug": "9df4c64c",
+      "number": "L29.6a",
+      "title": {
+        "zh": "L29.6a 风速时程随机模拟",
+        "en": "L29.6a Stochastic simulation of wind-speed time histories"
+      },
+      "group": "better",
+      "parent": "0af99e16",
+      "depth": 2,
+      "status": {
+        "zh": "在做",
+        "en": "In progress"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 22:41",
+      "end": null,
+      "updated": "2026-10-17 14:53",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/9df4c64c.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "21bf1ee9",
+      "slug": "21bf1ee9",
+      "number": "L29.6b",
+      "title": {
+        "zh": "L29.6b 台风路径与强度模型",
+        "en": "L29.6b Typhoon track and intensity models"
+      },
+      "group": "better",
+      "parent": "0af99e16",
+      "depth": 2,
+      "status": {
+        "zh": "在做",
+        "en": "In progress"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 22:41",
+      "end": null,
+      "updated": "2026-10-18 10:56",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/21bf1ee9.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "4908ef15",
+      "slug": "4908ef15",
+      "number": "L29.6c",
+      "title": {
+        "zh": "L29.6c 结构优化算法",
+        "en": "L29.6c Structural optimization algorithms"
+      },
+      "group": "better",
+      "parent": "0af99e16",
+      "depth": 2,
+      "status": {
+        "zh": "在做",
+        "en": "In progress"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 22:41",
+      "end": null,
+      "updated": "2026-10-18 00:40",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/4908ef15.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "b9e31a7b",
+      "slug": "b9e31a7b",
+      "number": "L29.6d",
+      "title": {
+        "zh": "L29.6d 动力与CFD代理模型",
+        "en": "L29.6d Structural dynamics and CFD surrogate models"
+      },
+      "group": "better",
+      "parent": "0af99e16",
+      "depth": 2,
+      "status": {
+        "zh": "在做",
+        "en": "In progress"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 22:41",
+      "end": null,
+      "updated": "2026-10-17 02:59",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/b9e31a7b.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "a1c17359",
+      "slug": "a1c17359",
+      "number": null,
+      "title": {
+        "zh": "风洞自动化总线",
+        "en": "Wind-tunnel automation mainline"
+      },
+      "group": "hw_auto",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 11:58",
+      "end": null,
+      "updated": "2026-10-17 11:40",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a1c17359.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "0e3d6c1e",
+      "slug": "0e3d6c1e",
+      "number": "L30.1d",
+      "title": {
+        "zh": "L30.1d 数字链原型",
+        "en": "L30.1d Digital chain prototype"
+      },
+      "group": "hw_auto",
+      "parent": "a1c17359",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-16 20:44",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/0e3d6c1e.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "83ca27be",
+      "slug": "83ca27be",
+      "number": "L30.1a",
+      "title": {
+        "zh": "L30.1a 合作风洞接口与安全方案",
+        "en": "L30.1a Partner wind-tunnel interface and safety protocol"
+      },
+      "group": "hw_auto",
+      "parent": "a1c17359",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-16 20:44",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/83ca27be.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "c9c88d7a",
+      "slug": "c9c88d7a",
+      "number": "L30.1b",
+      "title": {
+        "zh": "L30.1b 可变形状模型闭环试验",
+        "en": "L30.1b Closed-loop experiments with shape-changing models"
+      },
+      "group": "hw_auto",
+      "parent": "a1c17359",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-16 20:44",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/c9c88d7a.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "b6145c3e",
+      "slug": "b6145c3e",
+      "number": "L30.1c",
+      "title": {
+        "zh": "L30.1c 机械臂换模论证",
+        "en": "L30.1c Feasibility study of robotic model exchange"
+      },
+      "group": "hw_auto",
+      "parent": "a1c17359",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-16 20:45",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/b6145c3e.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "d84a6be7",
+      "slug": "d84a6be7",
+      "number": null,
+      "title": {
+        "zh": "振动控制总线",
+        "en": "Vibration control mainline"
+      },
+      "group": "hw_vib",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 11:58",
+      "end": null,
+      "updated": "2026-10-17 11:40",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/d84a6be7.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "2ad4efc8",
+      "slug": "2ad4efc8",
+      "number": "L30.2a",
+      "title": {
+        "zh": "L30.2a 惯容文献第二版",
+        "en": "L30.2a Inerter literature review (2nd edition)"
+      },
+      "group": "hw_vib",
+      "parent": "d84a6be7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-16 21:13",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/2ad4efc8.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "2df26e40",
+      "slug": "2df26e40",
+      "number": "L30.2b",
+      "title": {
+        "zh": "L30.2b 大跨屋盖惯容风振控制",
+        "en": "L30.2b Inerter-based wind vibration control for long-span roofs"
+      },
+      "group": "hw_vib",
+      "parent": "d84a6be7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-16 20:45",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/2df26e40.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "819c6090",
+      "slug": "819c6090",
+      "number": "L30.2c",
+      "title": {
+        "zh": "L30.2c 风洞实时混合试验闭环验证方案",
+        "en": "L30.2c Closed-loop validation plan for real-time hybrid wind-tunnel testing"
+      },
+      "group": "hw_vib",
+      "parent": "d84a6be7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-16 20:45",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/819c6090.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "c1b2cec9",
+      "slug": "c1b2cec9",
+      "number": "L30.2d",
+      "title": {
+        "zh": "L30.2d 风机惯容鲁棒设计与疲劳评估",
+        "en": "L30.2d Robust design and fatigue assessment of inerter systems for wind turbines"
+      },
+      "group": "hw_vib",
+      "parent": "d84a6be7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-16 20:45",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/c1b2cec9.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "4fd0fd67",
+      "slug": "4fd0fd67",
+      "number": "L30.2e",
+      "title": {
+        "zh": "L30.2e 惯容装置特性标准化测试",
+        "en": "L30.2e Standardized characterization testing of inerter devices"
+      },
+      "group": "hw_vib",
+      "parent": "d84a6be7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-16 20:45",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/4fd0fd67.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "2a74c2cb",
+      "slug": "2a74c2cb",
+      "number": null,
+      "title": {
+        "zh": "风洞标定总线",
+        "en": "Wind-tunnel calibration mainline"
+      },
+      "group": "hw_cal",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 12:21",
+      "end": null,
+      "updated": "2026-10-17 20:07",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/2a74c2cb.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "97834c6e",
+      "slug": "97834c6e",
+      "number": "L30.3a",
+      "title": {
+        "zh": "L30.3a 规程与虚拟比对",
+        "en": "L30.3a Protocol and virtual round-robin comparison"
+      },
+      "group": "hw_cal",
+      "parent": "2a74c2cb",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:44",
+      "end": null,
+      "updated": "2026-10-16 21:33",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/97834c6e.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "e07a0f1d",
+      "slug": "e07a0f1d",
+      "number": "L30.3b",
+      "title": {
+        "zh": "L30.3b 受控试点设计（2–3 家）",
+        "en": "L30.3b Controlled pilot design (2–3 laboratories)"
+      },
+      "group": "hw_cal",
+      "parent": "2a74c2cb",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:44",
+      "end": null,
+      "updated": "2026-10-16 20:46",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/e07a0f1d.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "3bd6aef7",
+      "slug": "3bd6aef7",
+      "number": "L30.3c",
+      "title": {
+        "zh": "L30.3c 正式轮（≥10 家）",
+        "en": "L30.3c Formal round-robin campaign (≥10 laboratories)"
+      },
+      "group": "hw_cal",
+      "parent": "2a74c2cb",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:44",
+      "end": null,
+      "updated": "2026-10-16 20:46",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/3bd6aef7.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "6fbad1e4",
+      "slug": "6fbad1e4",
+      "number": null,
+      "title": {
+        "zh": "核心实验室总线",
+        "en": "Core Lab mainline"
+      },
+      "group": "core",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 11:59",
+      "end": null,
+      "updated": "2026-10-18 14:13",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/6fbad1e4.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "ba6a6a4a",
+      "slug": "ba6a6a4a",
+      "number": "L31.1",
+      "title": {
+        "zh": "L31.1 登陆台风内边界层",
+        "en": "L31.1 Internal boundary layer of landfalling typhoons"
+      },
+      "group": "core",
+      "parent": "6fbad1e4",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-18 14:20",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/ba6a6a4a.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "d09c72fd",
+      "slug": "d09c72fd",
+      "number": "L31.2",
+      "title": {
+        "zh": "L31.2 台风微气象特征",
+        "en": "L31.2 Typhoon micrometeorological characteristics"
+      },
+      "group": "core",
+      "parent": "6fbad1e4",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-18 10:28",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/d09c72fd.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "9352e115",
+      "slug": "9352e115",
+      "number": "L31.3",
+      "title": {
+        "zh": "L31.3 入流生成方法等效性",
+        "en": "L31.3 Equivalence of inflow generation methods"
+      },
+      "group": "core",
+      "parent": "6fbad1e4",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-18 09:40",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/9352e115.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "11ea2dbc",
+      "slug": "11ea2dbc",
+      "number": "L31.4",
+      "title": {
+        "zh": "L31.4 非高斯风压与幕墙",
+        "en": "L31.4 Non-Gaussian wind pressures and curtain walls"
+      },
+      "group": "core",
+      "parent": "6fbad1e4",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-17 11:27",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/11ea2dbc.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "a6273d2c",
+      "slug": "a6273d2c",
+      "number": "L31.5",
+      "title": {
+        "zh": "L31.5 抗风规范演进",
+        "en": "L31.5 Evolution of wind-resistant design codes"
+      },
+      "group": "core",
+      "parent": "6fbad1e4",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 20:43",
+      "end": null,
+      "updated": "2026-10-17 01:38",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a6273d2c.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "47a09552",
+      "slug": "47a09552",
+      "number": "L31.6",
+      "title": {
+        "zh": "L31.6 概率方法用进风工程",
+        "en": "L31.6 Probabilistic methods in wind engineering"
+      },
+      "group": "core",
+      "parent": "6fbad1e4",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 22:40",
+      "end": null,
+      "updated": "2026-10-17 02:16",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/47a09552.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "227f89a6",
+      "slug": "227f89a6",
+      "number": null,
+      "title": {
+        "zh": "PETW 总线",
+        "en": "PETW mainline"
+      },
+      "group": "petw",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-12 20:13",
+      "end": null,
+      "updated": "2026-10-18 01:53",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/227f89a6.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "106bef67",
+      "slug": "106bef67",
+      "number": "R16.1",
+      "title": {
+        "zh": "R16.1 事件分类与重建 总线",
+        "en": "R16.1 Event Classification & Reconstruction mainline"
+      },
+      "group": "petw1",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:25",
+      "end": null,
+      "updated": "2026-10-18 00:48",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/106bef67.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "b256d335",
+      "slug": "b256d335",
+      "number": "R16.1a",
+      "title": {
+        "zh": "R16.1a 孤立下击暴流候选普查与观测对照包",
+        "en": "R16.1a Isolated-Downburst Candidate Census and Observation Comparison Package"
+      },
+      "group": "petw1",
+      "parent": "106bef67",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 13:37",
+      "end": null,
+      "updated": "2026-10-15 12:18",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/b256d335.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "526d6f99",
+      "slug": "526d6f99",
+      "number": "R16.1b",
+      "title": {
+        "zh": "R16.1b S1 可探测性普查（德州四城子集）",
+        "en": "R16.1b S1 Detectability Census (Four-City Texas Subset)"
+      },
+      "group": "petw1",
+      "parent": "106bef67",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 13:37",
+      "end": null,
+      "updated": "2026-10-14 09:31",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/526d6f99.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "187a3c52",
+      "slug": "187a3c52",
+      "number": "R16.2",
+      "title": {
+        "zh": "R16.2 CM1 总线",
+        "en": "R16.2 CM1 mainline"
+      },
+      "group": "petw2",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "结论已出，待办随 B/C",
+        "en": "Conclusion reached; to-dos follow in B/C"
+      },
+      "status_class": "pend",
+      "done": false,
+      "start": "2026-10-06 16:58",
+      "end": null,
+      "updated": "2026-10-18 02:24",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/187a3c52.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "672af432",
+      "slug": "672af432",
+      "number": "R16.2a",
+      "title": {
+        "zh": "R16.2a Moore 40 例",
+        "en": "R16.2a Moore 40-Case Set"
+      },
+      "group": "petw2",
+      "parent": "187a3c52",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-07 03:34",
+      "end": null,
+      "updated": "2026-10-15 17:45",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/672af432.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "ca524b67",
+      "slug": "ca524b67",
+      "number": "R16.2b",
+      "title": {
+        "zh": "R16.2b Schumacher 2023",
+        "en": "R16.2b Schumacher 2023"
+      },
+      "group": "petw2",
+      "parent": "187a3c52",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-07 03:34",
+      "end": null,
+      "updated": "2026-10-14 23:05",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/ca524b67.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "4e15a9e2",
+      "slug": "4e15a9e2",
+      "number": "R16.2c",
+      "title": {
+        "zh": "R16.2c D420 耦合",
+        "en": "R16.2c D420 Coupling"
+      },
+      "group": "petw2",
+      "parent": "187a3c52",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-07 03:34",
+      "end": null,
+      "updated": "2026-10-14 19:35",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/4e15a9e2.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "dea545b2",
+      "slug": "dea545b2",
+      "number": "R16.2d",
+      "title": {
+        "zh": "R16.2d 自提炼背景场（Wister/BREC/BESSIE）",
+        "en": "R16.2d Self-Derived Background Environments (Wister/BREC/BESSIE)"
+      },
+      "group": "petw2",
+      "parent": "187a3c52",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-07 03:34",
+      "end": null,
+      "updated": "2026-10-18 03:00",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/dea545b2.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "08a24f4f",
+      "slug": "08a24f4f",
+      "number": "R16",
+      "title": {
+        "zh": "R16.2d1 阵风因子专题调研",
+        "en": "R16.2d1 Thematic Survey on Gust Factors"
+      },
+      "group": "petw2",
+      "parent": "dea545b2",
+      "depth": 2,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-12 21:15",
+      "end": null,
+      "updated": "2026-10-14 19:31",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/08a24f4f.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "0353bd7b",
+      "slug": "0353bd7b",
+      "number": "R16",
+      "title": {
+        "zh": "R16.2d2 多事件统计验证（B）",
+        "en": "R16.2d2 Multi-Event Statistical Validation (B)"
+      },
+      "group": "petw2",
+      "parent": "dea545b2",
+      "depth": 2,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-12 21:15",
+      "end": null,
+      "updated": "2026-10-18 16:23",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/0353bd7b.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "57b2ed71",
+      "slug": "57b2ed71",
+      "number": "R16",
+      "title": {
+        "zh": "R16.2d3 真实三维驱动与雷达同化（C）",
+        "en": "R16.2d3 Real 3D Driving and Radar Assimilation (C)"
+      },
+      "group": "petw2",
+      "parent": "dea545b2",
+      "depth": 2,
+      "status": {
+        "zh": "暂停 · 建议结题（待 Liang Hu）：C2 生产四分支已验收并经 6 方审查得出带限定的负结果",
+        "en": "Paused · conclusion proposed (pending the PI): the four C2 production branches passed acceptance and a six-party review gave a qualified negative result"
+      },
+      "status_class": "pend",
+      "done": false,
+      "start": "2026-10-12 21:15",
+      "end": null,
+      "updated": "2026-10-18 02:23",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/57b2ed71.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "907416cd",
+      "slug": "907416cd",
+      "number": "R16.3",
+      "title": {
+        "zh": "R16.3 统计与极值 EVA 总线",
+        "en": "R16.3 Statistics & Extreme-Value Analysis (EVA) mainline"
+      },
+      "group": "petw3",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:25",
+      "end": null,
+      "updated": "2026-10-18 00:49",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/907416cd.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "ad99e427",
+      "slug": "ad99e427",
+      "number": "R16.3a",
+      "title": {
+        "zh": "R16.3a 参考情景 Vhat_3s 试算",
+        "en": "R16.3a Reference-Scenario Vhat_3s Trial Calculation"
+      },
+      "group": "petw3",
+      "parent": "907416cd",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:33",
+      "end": null,
+      "updated": "2026-10-13 19:32",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/ad99e427.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "e31ace62",
+      "slug": "e31ace62",
+      "number": "R16.3b",
+      "title": {
+        "zh": "R16.3b EVA 输入合同与机制分层定稿",
+        "en": "R16.3b Finalization of EVA Input Contract and Mechanism Stratification"
+      },
+      "group": "petw3",
+      "parent": "907416cd",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:33",
+      "end": null,
+      "updated": "2026-10-14 18:01",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/e31ace62.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "e67b1521",
+      "slug": "e67b1521",
+      "number": "R16.4",
+      "title": {
+        "zh": "R16.4 WRF 总线",
+        "en": "R16.4 WRF mainline"
+      },
+      "group": "petw4",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-06 22:37",
+      "end": null,
+      "updated": "2026-10-18 07:11",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/e67b1521.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "b73484d2",
+      "slug": "b73484d2",
+      "number": "R16.4a",
+      "title": {
+        "zh": "R16.4a exp-A 复现与对比",
+        "en": "R16.4a exp-A Replication and Comparison"
+      },
+      "group": "petw4",
+      "parent": "e67b1521",
+      "depth": 1,
+      "status": {
+        "zh": "待收口（等 Liang Hu 定对外表述）",
+        "en": "Pending wrap-up (awaiting the PI on public wording)"
+      },
+      "status_class": "pend",
+      "done": false,
+      "start": "2026-10-08 21:47",
+      "end": null,
+      "updated": "2026-10-15 17:48",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/b73484d2.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "32959999",
+      "slug": "32959999",
+      "number": "R16.4b",
+      "title": {
+        "zh": "R16.4b 扰动成员 E1/E2",
+        "en": "R16.4b Perturbed Members E1/E2"
+      },
+      "group": "petw4",
+      "parent": "e67b1521",
+      "depth": 1,
+      "status": {
+        "zh": "待收口（等 Liang Hu 定对外表述）",
+        "en": "Pending wrap-up (awaiting the PI on public wording)"
+      },
+      "status_class": "pend",
+      "done": false,
+      "start": "2026-10-08 21:47",
+      "end": null,
+      "updated": "2026-10-10 08:44",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/32959999.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "d11f6b29",
+      "slug": "d11f6b29",
+      "number": "R16.5",
+      "title": {
+        "zh": "R16.5 CFD 总线",
+        "en": "R16.5 CFD mainline"
+      },
+      "group": "petw5",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-06 22:37",
+      "end": null,
+      "updated": "2026-10-18 14:23",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/d11f6b29.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "f616222b",
+      "slug": "f616222b",
+      "number": "R16.5a",
+      "title": {
+        "zh": "R16.5a M1 D420",
+        "en": "R16.5a M1 D420"
+      },
+      "group": "petw5",
+      "parent": "d11f6b29",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-07 03:34",
+      "end": null,
+      "updated": "2026-10-18 12:08",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/f616222b.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "872243e2",
+      "slug": "872243e2",
+      "number": "R16.5b",
+      "title": {
+        "zh": "R16.5b AutoCFD 验证阶梯",
+        "en": "R16.5b AutoCFD Validation Ladder"
+      },
+      "group": "petw5",
+      "parent": "d11f6b29",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-07 03:34",
+      "end": null,
+      "updated": "2026-10-18 14:23",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/872243e2.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "43da19bb",
+      "slug": "43da19bb",
+      "number": "R16",
+      "title": {
+        "zh": "R16.5b1 CAARC",
+        "en": "R16.5b1 CAARC"
+      },
+      "group": "petw5",
+      "parent": "872243e2",
+      "depth": 2,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-07 22:19",
+      "end": null,
+      "updated": "2026-10-17 11:35",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/43da19bb.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "038e055d",
+      "slug": "038e055d",
+      "number": "R16",
+      "title": {
+        "zh": "R16.5b2 Silsoe",
+        "en": "R16.5b2 Silsoe"
+      },
+      "group": "petw5",
+      "parent": "872243e2",
+      "depth": 2,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-07 22:20",
+      "end": null,
+      "updated": "2026-10-18 15:14",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/038e055d.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "15af7679",
+      "slug": "15af7679",
+      "number": "R16.5c",
+      "title": {
+        "zh": "R16.5c CFD 学习库（教程与 WE-UQ）",
+        "en": "R16.5c CFD Learning Library (Tutorials and WE-UQ)"
+      },
+      "group": "petw5",
+      "parent": "d11f6b29",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-18 00:56",
+      "end": null,
+      "updated": "2026-10-18 12:18",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/15af7679.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "841575f7",
+      "slug": "841575f7",
+      "number": "R16.6",
+      "title": {
+        "zh": "R16.6 风场特征 总线",
+        "en": "R16.6 Wind-Field Characterization mainline"
+      },
+      "group": "petw6",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:25",
+      "end": null,
+      "updated": "2026-10-16 23:16",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/841575f7.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "22e501a4",
+      "slug": "22e501a4",
+      "number": "R16.6a",
+      "title": {
+        "zh": "R16.6a 真实风场包接入（CM1 D420 → R0/R1 packet）",
+        "en": "R16.6a Real Wind-Field Package Intake (CM1 D420 → R0/R1 packet)"
+      },
+      "group": "petw6",
+      "parent": "841575f7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:37",
+      "end": null,
+      "updated": "2026-10-09 20:11",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/22e501a4.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "4f60b642",
+      "slug": "4f60b642",
+      "number": "R16.6b",
+      "title": {
+        "zh": "R16.6b 来源内核修复与基准（Dang guard / Moeini / 九模型）",
+        "en": "R16.6b Source-Kernel Fixes and Benchmarks (Dang guard / Moeini / 9 Models)"
+      },
+      "group": "petw6",
+      "parent": "841575f7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:37",
+      "end": null,
+      "updated": "2026-10-09 20:03",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/4f60b642.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "a998db4f",
+      "slug": "a998db4f",
+      "number": "R16.6c",
+      "title": {
+        "zh": "R16.6c 事件谱与下游接口（D420 谱 + EVA/CFD 读包 dry run）",
+        "en": "R16.6c Event Spectra and Downstream Interfaces (D420 Spectra + EVA/CFD Package-Read Dry Run)"
+      },
+      "group": "petw6",
+      "parent": "841575f7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 12:08",
+      "end": null,
+      "updated": "2026-10-09 14:44",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a998db4f.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "fe8df97c",
+      "slug": "fe8df97c",
+      "number": "R16.7",
+      "title": {
+        "zh": "R16.7 结构响应 总线",
+        "en": "R16.7 Structural Response mainline"
+      },
+      "group": "petw7",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:25",
+      "end": null,
+      "updated": "2026-10-17 08:04",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/fe8df97c.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "91263161",
+      "slug": "91263161",
+      "number": "R16.7a",
+      "title": {
+        "zh": "R16.7a 程序加固与独立核对",
+        "en": "R16.7a Code Hardening and Independent Checks"
+      },
+      "group": "petw7",
+      "parent": "fe8df97c",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:31",
+      "end": null,
+      "updated": "2026-10-09 20:02",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/91263161.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "9645f965",
+      "slug": "9645f965",
+      "number": "R16.7b",
+      "title": {
+        "zh": "R16.7b D420 情景响应敏感性",
+        "en": "R16.7b D420 Scenario Response Sensitivity"
+      },
+      "group": "petw7",
+      "parent": "fe8df97c",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:31",
+      "end": null,
+      "updated": "2026-10-14 23:39",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/9645f965.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "7b92eb9c",
+      "slug": "7b92eb9c",
+      "number": "R16.7c",
+      "title": {
+        "zh": "R16.7c 设计荷载候选交接",
+        "en": "R16.7c Design-Load Candidate Handover"
+      },
+      "group": "petw7",
+      "parent": "fe8df97c",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:31",
+      "end": null,
+      "updated": "2026-10-14 23:43",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/7b92eb9c.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "89e5f807",
+      "slug": "89e5f807",
+      "number": "R16.8",
+      "title": {
+        "zh": "R16.8 设计风荷载 总线",
+        "en": "R16.8 Design Wind Loads mainline"
+      },
+      "group": "petw8",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:25",
+      "end": null,
+      "updated": "2026-10-16 23:16",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/89e5f807.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "d9400e21",
+      "slug": "d9400e21",
+      "number": "R16.8a",
+      "title": {
+        "zh": "R16.8a ASCE 7-22 方程审计与计算器接口修复",
+        "en": "R16.8a ASCE 7-22 Equation Audit and Calculator Interface Fix"
+      },
+      "group": "petw8",
+      "parent": "89e5f807",
+      "depth": 1,
+      "status": {
+        "zh": "已收口",
+        "en": "Wrapped up"
+      },
+      "status_class": "pend",
+      "done": false,
+      "start": "2026-10-09 10:44",
+      "end": null,
+      "updated": "2026-10-09 13:09",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/d9400e21.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "a5486ad0",
+      "slug": "a5486ad0",
+      "number": "R16.8b",
+      "title": {
+        "zh": "R16.8b 共同事件气动输入通路",
+        "en": "R16.8b Common-Event Aerodynamic Input Path"
+      },
+      "group": "petw8",
+      "parent": "89e5f807",
+      "depth": 1,
+      "status": {
+        "zh": "等待（CFD 子域 LES 面压）",
+        "en": "Waiting (CFD sub-domain LES surface pressures)"
+      },
+      "status_class": "pend",
+      "done": false,
+      "start": "2026-10-09 10:44",
+      "end": null,
+      "updated": "2026-10-09 11:56",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a5486ad0.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "a7029645",
+      "slug": "a7029645",
+      "number": "R16.9",
+      "title": {
+        "zh": "R16.9 风洞试验 总线",
+        "en": "R16.9 Wind-Tunnel Testing mainline"
+      },
+      "group": "petw9",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:25",
+      "end": null,
+      "updated": "2026-10-16 23:16",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a7029645.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "d695bf41",
+      "slug": "d695bf41",
+      "number": "R16.9a",
+      "title": {
+        "zh": "R16.9a UF 联合配置与同步 pilot",
+        "en": "R16.9a UF Joint Configuration and Synchronized Pilot"
+      },
+      "group": "petw9",
+      "parent": "a7029645",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:51",
+      "end": null,
+      "updated": "2026-10-10 08:43",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/d695bf41.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "5b2f76bc",
+      "slug": "5b2f76bc",
+      "number": "R16.9b",
+      "title": {
+        "zh": "R16.9b 文献科学可采纳性闭合",
+        "en": "R16.9b Closure on Scientific Admissibility of Literature Data"
+      },
+      "group": "petw9",
+      "parent": "a7029645",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:51",
+      "end": null,
+      "updated": "2026-10-09 12:46",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/5b2f76bc.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "ffe2f0cf",
+      "slug": "ffe2f0cf",
+      "number": "R16.9c",
+      "title": {
+        "zh": "R16.9c 模型与测压布局制造放行",
+        "en": "R16.9c Model and Pressure-Tap Layout Release for Fabrication"
+      },
+      "group": "petw9",
+      "parent": "a7029645",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-09 10:51",
+      "end": null,
+      "updated": "2026-10-09 14:06",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/ffe2f0cf.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "73e07782",
+      "slug": "73e07782",
+      "number": null,
+      "title": {
+        "zh": "数字孪生风洞总线",
+        "en": "Digital Twin Wind Tunnel mainline"
+      },
+      "group": "lbm",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-12 14:28",
+      "end": null,
+      "updated": "2026-10-18 14:26",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/73e07782.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "c9ddb7c8",
+      "slug": "c9ddb7c8",
+      "number": "R21.1",
+      "title": {
+        "zh": "R21.1 LBM 平台与验证",
+        "en": "R21.1 LBM Platform and Validation"
+      },
+      "group": "lbm",
+      "parent": "73e07782",
+      "depth": 1,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-12 17:48",
+      "end": null,
+      "updated": "2026-10-18 14:25",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/c9ddb7c8.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "63d881b8",
+      "slug": "63d881b8",
+      "number": "R21.2",
+      "title": {
+        "zh": "R21.2 Urban Field 城市低空风场",
+        "en": "R21.2 Urban Field — Urban Low-Altitude Wind Field"
+      },
+      "group": "lbm",
+      "parent": "73e07782",
+      "depth": 1,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-12 17:48",
+      "end": null,
+      "updated": "2026-10-17 05:18",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/63d881b8.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "7eefcffe",
+      "slug": "7eefcffe",
+      "number": "R21.3",
+      "title": {
+        "zh": "R21.3 自研 GPU 代码（Warp LBM）",
+        "en": "R21.3 In-House GPU Code (Warp LBM)"
+      },
+      "group": "lbm",
+      "parent": "73e07782",
+      "depth": 1,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-12 17:48",
+      "end": null,
+      "updated": "2026-10-18 14:21",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/7eefcffe.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "9b07f124",
+      "slug": "9b07f124",
+      "number": null,
+      "title": {
+        "zh": "AI 教学实验室总线",
+        "en": "AI Teaching Lab mainline"
+      },
+      "group": "teach",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 22:56",
+      "end": null,
+      "updated": "2026-10-18 01:23",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/9b07f124.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "d0e5bf64",
+      "slug": "d0e5bf64",
+      "number": "L32.1",
+      "title": {
+        "zh": "L32.1 课程·风工程",
+        "en": "L32.1 Course: Wind Engineering"
+      },
+      "group": "teach",
+      "parent": "9b07f124",
+      "depth": 1,
+      "status": {
+        "zh": "在做",
+        "en": "In progress"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 23:07",
+      "end": null,
+      "updated": "2026-10-17 11:36",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/d0e5bf64.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "9fae6a16",
+      "slug": "9fae6a16",
+      "number": "L32.2",
+      "title": {
+        "zh": "L32.2 课程·结构力学",
+        "en": "L32.2 Course: Structural Mechanics"
+      },
+      "group": "teach",
+      "parent": "9b07f124",
+      "depth": 1,
+      "status": {
+        "zh": "待开工",
+        "en": "Not started"
+      },
+      "status_class": "todo",
+      "done": false,
+      "start": "2026-10-16 23:07",
+      "end": null,
+      "updated": "2026-10-16 23:08",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/9fae6a16.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "e64e42ae",
+      "slug": "e64e42ae",
+      "number": "L32.3",
+      "title": {
+        "zh": "L32.3 课程·结构动力学",
+        "en": "L32.3 Course: Structural Dynamics"
+      },
+      "group": "teach",
+      "parent": "9b07f124",
+      "depth": 1,
+      "status": {
+        "zh": "待开工",
+        "en": "Not started"
+      },
+      "status_class": "todo",
+      "done": false,
+      "start": "2026-10-16 23:07",
+      "end": null,
+      "updated": "2026-10-16 23:08",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/e64e42ae.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "843159ff",
+      "slug": "843159ff",
+      "number": "L32.4",
+      "title": {
+        "zh": "L32.4 课程·随机振动",
+        "en": "L32.4 Course: Random Vibration"
+      },
+      "group": "teach",
+      "parent": "9b07f124",
+      "depth": 1,
+      "status": {
+        "zh": "待开工",
+        "en": "Not started"
+      },
+      "status_class": "todo",
+      "done": false,
+      "start": "2026-10-16 23:07",
+      "end": null,
+      "updated": "2026-10-16 23:08",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/843159ff.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "0aaee916",
+      "slug": "0aaee916",
+      "number": "L32.0",
+      "title": {
+        "zh": "L32.0 自有教学大模型",
+        "en": "L32.0 In-House Teaching Large Language Model"
+      },
+      "group": "teach",
+      "parent": "9b07f124",
+      "depth": 1,
+      "status": {
+        "zh": "在做",
+        "en": "In progress"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 23:18",
+      "end": null,
+      "updated": "2026-10-18 01:23",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/0aaee916.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "a56d8fe7",
+      "slug": "a56d8fe7",
+      "number": null,
+      "title": {
+        "zh": "建模与网格（CAD）总线",
+        "en": "Modeling & Meshing (CAD) mainline"
+      },
+      "group": "mesh",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 22:40",
+      "end": null,
+      "updated": "2026-10-18 03:48",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/a56d8fe7.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "5c0d0f62",
+      "slug": "5c0d0f62",
+      "number": "T13.1",
+      "title": {
+        "zh": "T13.1 参数化几何",
+        "en": "T13.1 Parametric Geometry"
+      },
+      "group": "mesh",
+      "parent": "a56d8fe7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 23:20",
+      "end": null,
+      "updated": "2026-10-17 14:43",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/5c0d0f62.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "46a4df63",
+      "slug": "46a4df63",
+      "number": "T13.2",
+      "title": {
+        "zh": "T13.2 CFD 网格",
+        "en": "T13.2 CFD Meshing"
+      },
+      "group": "mesh",
+      "parent": "a56d8fe7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 23:20",
+      "end": null,
+      "updated": "2026-10-17 08:00",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/46a4df63.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "03690a3e",
+      "slug": "03690a3e",
+      "number": "T13.3",
+      "title": {
+        "zh": "T13.3 FEA 网格",
+        "en": "T13.3 FEA Meshing"
+      },
+      "group": "mesh",
+      "parent": "a56d8fe7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 23:20",
+      "end": null,
+      "updated": "2026-10-16 23:20",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/03690a3e.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "908b02d7",
+      "slug": "908b02d7",
+      "number": "T13.4",
+      "title": {
+        "zh": "T13.4 风洞模型加工图",
+        "en": "T13.4 Wind-Tunnel Model Fabrication Drawings"
+      },
+      "group": "mesh",
+      "parent": "a56d8fe7",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-16 23:20",
+      "end": null,
+      "updated": "2026-10-16 23:20",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/908b02d7.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "39257059",
+      "slug": "39257059",
+      "number": null,
+      "title": {
+        "zh": "日常运维与平台总线",
+        "en": "Daily Operations & Platform mainline"
+      },
+      "group": "plat",
+      "parent": null,
+      "depth": 0,
+      "status": {
+        "zh": "进行中",
+        "en": "Ongoing"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-12 20:13",
+      "end": null,
+      "updated": "2026-10-18 11:58",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/39257059.json",
+        "claims": null,
+        "pdf": null
+      }
+    },
+    {
+      "id": "7aef9ffc",
+      "slug": "7aef9ffc",
+      "number": null,
+      "title": {
+        "zh": "督办：批后行动与工单",
+        "en": "Follow-Up Supervision: Post-Approval Actions and Tickets"
+      },
+      "group": "plat",
+      "parent": "39257059",
+      "depth": 1,
+      "status": {
+        "zh": "探索中",
+        "en": "Exploring"
+      },
+      "status_class": "run",
+      "done": false,
+      "start": "2026-10-17 21:49",
+      "end": null,
+      "updated": "2026-10-17 22:09",
+      "conclusion": {
+        "zh": "",
+        "en": ""
+      },
+      "files": {
+        "project": "projects/7aef9ffc.json",
+        "claims": null,
+        "pdf": null
+      }
+    }
+  ]
+}

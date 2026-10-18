@@ -1,0 +1,542 @@
+{
+  "id": "841575f7",
+  "slug": "841575f7",
+  "number": "R16.6",
+  "title": {
+    "zh": "R16.6 风场特征 总线",
+    "en": "R16.6 Wind-Field Characterization mainline"
+  },
+  "group": "petw6",
+  "parent": null,
+  "depth": 0,
+  "status": {
+    "zh": "进行中",
+    "en": "Ongoing"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-09 10:25",
+  "end": null,
+  "updated": "2026-10-16 23:16",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [
+    {
+      "id": "dec-0000",
+      "ts": "2026-10-09 10:29",
+      "title": "风场线首轮：子项目划分与授权口径（10-09）",
+      "label": "决定",
+      "text": "# 风场线首轮：子项目划分与授权口径（10-09）\n\nDecision I made：\n1. 采用平台方案三子项目：真实风场包接入（2.1）、来源内核修复与基准（2.2）、事件谱与下游接口（2.3）。2.1、2.2 立即开；2.3 依赖 2.1 的 packet，推迟分叉，项目页标\"暂停\"。— 为什么：2.3 现在开只会空转。— 错了的代价：下游 dry run 晚几天起步。\n2. 2.1 首源用 CM1 D420 子窗口源（已复制入，哈希 6/6 OK），Wister v2 / WRF exp-A 等审计后再定。— 为什么：同位 u/v/w、1 s、有 receipt，最省事。— 代价：D420 是 CFD 边界面产品（侧面 29 层 + 顶面 + 首帧全体积），profile/水平均值定义受限，可能需第二源补。\n3. 2.2 顺序 Dang guard → Moeini 逐步推导对照表 → 九模型基准；禁止调参凑 41.6 m。— 依据：决策表 A2、E3。— 代价：若 Moeini 原文本身有误，对照表会显示，需另议。\n4. 09-25 决策表 A1–A4、E1–E3、F2 按默认同意执行（Liang Hu 10-09 指示）；STATE.md 中\"远端只读除非授权 / 长作业需 Liang Hu 批准\"以公共规则为准。\n5. LEAD_DIRS.txt 已含本线目录，无需改。\n\n科学判断：无，本记录为组织决定。"
+    },
+    {
+      "id": "dec-0001",
+      "ts": "2026-10-09 10:47",
+      "title": "runner 测试环境固定为 NumPy 2 venv（10-09）",
+      "label": "决定",
+      "text": "# runner 测试环境固定为 NumPy 2 venv（10-09）\n\nDecision I made：建 WSL 本地 venv （anaconda 3.12 基底，numpy 2.5.3、scipy 1.18.1、matplotlib、pytest），本线 runner/测试一律用。不改代码。\n- 为什么：bot 10-09 在 anaconda numpy 1.26.4 下得 63/70，失败原因是代码用了 NumPy 2 才有的 `np.trapezoid`（`epsd_wind_field_generator.py:123,394`、`source_profile_models.py:93tools/`，否则包导入测试会假失败）。\n- 错了的代价：低；若某处依赖 NumPy 1 行为会在测试中暴露。\n科学判断：无。"
+    },
+    {
+      "id": "dec-0002",
+      "ts": "2026-10-09 10:52",
+      "title": "D420 首个真实 packet：走\"数据取参数\"路线、z star 改用半速高度（10-09 11:10）",
+      "label": "决定",
+      "text": "# D420 首个真实 packet：走\"数据取参数\"路线、z_star 改用半速高度（10-09 11:10）\n\n## 审计裁决\n- 采纳：哈希链、坐标/时间/网格、各面峰值（与 Lead 自测逐项一致：四侧 29.19/30.94/29.45/29.35 m/s，首帧 31.799 m/s @ (8850,10250,50)）、R0–R3 标注、剖面 A/水平 A 推荐、缺证据清单。\n- **必须改**：审计把 Wood/Verhoff 的 `z_star_m` 取为 50 m（峰高）。runner 的 `woodverhoff`（ L26、L97）中 η=z/z_star，f(η) 峰在 η≈0.18、η=1 时降到峰值一半，所以 z_star 是**半速高度**，不是峰高。若取 z_star=50 m，150 m 处模型风速 0.2 m/s，而实测为 27.3 m/s。按峰值柱实测（50/150/250/350 m 处为 31.8/27.3/17.3/8.7 m/s）线性插值，半速高度约 266 m；由此推得模型峰高 0.184×266≈49 m，和\"峰在首层 50 m\"自洽。\n- 依据：无文献依据，基于本线数据和 runner 公式本身。\n\n## Decision I made\n1. 首个真实 packet 走路线 a：从数据取参数喂给现有模型，**不改 runner**。实测柱剖面、边界时程放进 packet 目录旁的 sidecar NPZ，并写入 `source_manifest` 的哈希。为什么：路线 b 估计要改 200–350 行，validator 也得重审；验收要求的 profile/horizontal_mean/time_modulation 用路线 a 就能交。错了的代价：packet 里只有模型曲线，下游要看实测数组得去读 sidecar；以后要做路线 b 时，再单独开项目。\n2. Xhelaj 的移动参数（触地点、半径、平移）一律标 proxy（R2）。只从首帧 50 m 场和四侧峰值到达时刻做估计，不叫校准。\n3. delta 没有可分离的湍流分量，用来源默认值并标 `assumed`。"
+    },
+    {
+      "id": "dec-0003",
+      "ts": "2026-10-09 11:07",
+      "title": "Dang 来源常数覆盖保护验收（10-09 11:10）",
+      "label": "决定",
+      "text": "# Dang 来源常数覆盖保护验收（10-09 11:10）\n\n- 决定：验收 windfield bot 的 Dang override guard（项目「来源内核修复与基准」第①项）。\n- 证据：Lead 用 复跑 76 passed / 31 subtests；手动传 `kappa=0.40` 未开开关 → `ValueError: source constants require allow_source_constant_override=True: kappa`。bot 报默认 Coles/Pfeil/loglaw 输出改前后 SHA-256 一致。\n- 范围：`dang_2024_coles_no1dang_2024_radial_closuredang_2024_vertical_profilefeature_interface_packet.py:177` 标志改取自 diagnostics。\n- 未做： 更新并入九模型基准一次完成。\n- 依据：无文献依据，基于本线代码与测试（Dang 2024 卡片待 litwiki 补；原文 Zotero XTJGTTMB）。\n- 错了的代价：若某下游脚本依赖静默改常数，会在调用时报错，需显式开开关；不影响默认数值。"
+    },
+    {
+      "id": "dec-0004",
+      "ts": "2026-10-09 11:19",
+      "title": "Moeini & Romanic 2023 Eq.43 符号裁决（10-09 11:19）",
+      "label": "决定",
+      "text": "# Moeini & Romanic 2023 Eq.43 符号裁决（10-09 11:19）\n\n- 决定：印刷 Eq.43 第二括号扰动项的正号判为排版错误；finite-ABL 峰高改用原文印刷式链 Eq.12c+19b+35（g0−j0=2.6，Eq.40）+Eq.26 实现并解除 evidence_blocked。不使用印刷 Eq.43，也不用改号 Eq.43 做生产计算。输出仍 scientific_status=not_approved。\n- 依据（卡片；PDF Zotero BE9LAZ5U，SHA …）：\n - PDF p.9（期刊309）Eq.35：δ′/H=0.046(r/H)²[0.098−0.868(g0−j0)]/[√c_w(D/H)λ_J]，括号为负 → δ′=−80.04 m（Lead 用 pdftotext 亲自核对负号）。\n - PDF p.8 Eq.26 → z_m=41.705 m；Eq.41 数值求峰 41.705 m；原文正文 p.10 \"zm 5 53.6 m when uH 5 0 to zm 5 41.6 m when uH 5 5\"（差 +0.25%）。\n - PDF p.10 正文\"ABL velocities tend to deflect … decreasing zm\"支持半高减小。\n - 印刷 Eq.43（p.10）正号 → 77.83 m（+87%），与上述三者均矛盾；改号 → 41.75 m。\n- 证据文件：、（Lead 用 工作目录 复跑数值一致）。\n- 未送外审：数值可复现、PDF 符号已亲自核对、三条独立途径一致；输出仍 not_approved。\n- 错了的代价：若作者本意是 Eq.43 正号（则正文 41.6 m 与 Eq.35 均错），finite-ABL 峰高会低估约 36 m；该分支仅用于来源核对，不进对外结论，可回退为 blocked。\n- 附带：卡片 Eq.19a 散文转写错误（√c_w D/(4H) 应为 √(πD²c_w/4)/H），已派 litwiki 更正。"
+    },
+    {
+      "id": "dec-0005",
+      "ts": "2026-10-09 11:35",
+      "title": "EVA 输入合同 v2 风场字段确认 + packet schema v1.1 补字段（10-09 11:40）",
+      "label": "决定",
+      "text": "# EVA 输入合同 v2 风场字段确认 + packet schema v1.1 补字段（10-09 11:40）\n\n委托方：EVA Lead。对照 §(b) 与本线 、runner 实际输出（ L790–810、 L150–215）。\n\n## 核对结果\n- **同名一致**（schema v1 已有）：packet_type, schema_version, run_id, event_id, input_source, source_manifest, qa_status, severe_wind_footprint_area, footprint_threshold, radius_of_max_wind, resolution_adequacy, resolution_sensitivity_note, allowed_downstream_use, not_allowed_downstream_use, step3_eva_link, not_for_use_warnings, do_not_use_warnings, terrain_or_exposure_note, coordinate_system, pi_review_required。\n- **别名**（EVA 带单位名 ← packet 原名）：spatial_resolution_m←spatial_resolution；time_resolution_s←time_resolution；height_levels_agl_m←height_levels；analysis_window_utc←analysis_window。packet 内保留原名并写明单位。\n- **schema v1 只有规则、没有字段名**（Minimum packet rule 要求但未命名）：resolution_status、uncertainty_note、proxy_only，且 v1 是包级结构，无 feature 级块；feature_id、feature_name、feature_source_uri、feature_source_sha256、review_resolution_ref、target_wind_product_id、simulation_status、simulation_validation_note、target_wind_definition、postprocessing_method_to_vhat3s、vhat3s_estimate_mps、vhat3s_uncertainty_mps 均不存在。\n- **runner 实际输出与 schema 不一致**：resolution_status 取值为 `R2_proxy_only`（合并值，非 R0–R3 枚举）；用 `requires_pi_review`（非 pi_review_required）；用 `coordinate_frame`（非 coordinate_system）；哈希只在 array_artifact 级。\n\n## Decision I made\n1. 采用 EVA v2 字段名为 packet **schema v1.1** 的 feature 级字段（新增 `features[]R2_proxy_only`→resolution_status=R2 + proxy_only=true；`requires_pi_review`→pi_review_required；coordinate_frame 保留并加 coordinate_system 同值。v1 文件不覆盖，v1.1 另写。— 为什么：下游只认一套名字，EVA 合同已过两方，本线改名成本最低（首个真实 packet 尚未产出）。— 错了的代价：若 S0 v1 冻结时改名，再出一次 v1.2 映射，packet 未发布，无返工数据。\n2. 本线**不产出 Vhat_3s 目标风产品**：target_wind_product_id、target_wind_definition、postprocessing_method_to_vhat3s、vhat3s_estimate_mps、vhat3s_uncertainty_mps 一律显式 null + 原因 `windfield_does_not_produce_vhat3s`；所有风场 feature 对 EVA 都是附属 feature。10 m 诊断峰按审计表 R2 proxy-only。\n3. 首个 D420 packet 的 step3_eva_link（每 feature）：`{\"link\": null, \"reason\": \"CM1_simulation_no_observed_event\", \"event_id\": \"CM1-D420-job3372048-t2120-2380-inner4km\", \"eva_use\": \"U5_U6_sensitivity_descriptor_only\"}`；R2 feature 另加 proxy_only=true；R3（建筑压力类）不出。Wister v2 源若能对上 events 的 event_id，再填真实链接。\n依据：无文献依据，基于本线数据、packet schema v1 与 D420 审计表（ L64–70）。"
+    },
+    {
+      "id": "dec-0006",
+      "ts": "2026-10-09 11:52",
+      "title": "九模型静态基准验收与公式清单 v2（10-09 12:00）",
+      "label": "决定",
+      "text": "# 九模型静态基准验收与公式清单 v2（10-09 12:00）\n\n- 决定 1：验收九模型静态回归（bot 运行在交 inventory 前 terminated，表、bench.py、代码修复、测试已落盘）。Lead 复跑：bench.py 11 行 Python=GUI 逐字值；pytest 94 passed / 31 subtests。\n - 修复两处 Python 转写错误：chay 漏 GUI Chay.mlapp:122 平移切向分量；li 内侧 r≤r_max 负底数分数幂得 NaN，改为 GUI Li.mlapp:100-110 分段。\n - 局限：8 个模型只是 Python 对 GUI 源码的静态一致（同一 bot 转写），多数原文无数值锚点；独立锚点改由 MATLAB 实跑 GUI 取值。\n- 决定 2：不覆盖 08-12 归档 （该文件列在同目录 HASHES.sha256，覆盖即改已有结果）；改为新写 v2 （含 supersedes 指向 v1 与其 SHA …），加入 Dang guard、Moeini 新状态与锚点、九模型逐模型状态。\n- 依据：GUI 卡片 （Table 1 pp.3–5）；其余无文献依据，基于本线代码与 GUI 源码。\n- 错了的代价：下游若硬读 v1 路径会看不到新状态；需改读 v2 路径。"
+    },
+    {
+      "id": "dec-0007",
+      "ts": "2026-10-09 12:04",
+      "title": "D420 真实 packet v2 验收与项目收口（10-09 12:04）",
+      "label": "决定",
+      "text": "# D420 真实 packet v2 验收与项目收口（10-09 12:04）\n\n## 证据\n：packet sha256 `…`，validator VALID，not_approved；EVA sidecar v1.2 指向；v1与 v1.1 原件未动（哈希复核）。剖面、gamma、delta、谱与 v1 逐对象相同。\n\n## 裁决\n- **采纳**：v2 参数（触地点 (7250,11950)、半径 1167 m、平移 8.65 m/s 来自 276°、背景 4.37 m/s、径向峰 18.1 m/s），模型全程峰值 28.7 m/s，不再超过实测 31.8 m/s（v1 为 66.8）。\n- **bot 对比表的定义错误（仅供参考，不返工）**： 用模型 t=0 与实测首帧比较。但 Xhelaj 在 t=0 时径向强度为 0，只剩背景场，所以表中\"模型峰值 5.24/4.37 m/s\"只是背景风速，RMS 没有意义。\n- **Lead 复核**（在 4 km 窗内对每个模型时刻比较实测首帧 50 m 场，取 RMS 最小的时刻）：v1 为 5.09 m/s（t=4 s，窗内峰 20.0），v2 为 7.69 m/s（t=40 s，窗内峰 13.2）。实测窗内均值 11.4 m/s，峰 31.8 m/s。\n- **结论**：两套参数都不能再现首帧空间结构。D420 只有首帧内部场、没有触地时刻，Xhelaj 的相位和强度在这份数据上不可辨识。v2 的长处只在于参数取法在物理上自洽、峰值不超标，不在于贴合度。horizontal_mean 维持 R2 proxy-only，下游**不得**把它当 R0/R1 场；需要 50 m 水平场时，用 sidecar 里的实测首帧场。\n- 依据：无文献依据，基于本线数据。\n\n## Decision I made\n本项目按验收收口：真实 packet（v2）、审计表、和合成包的差异记录、v2 对 v1 的对比都已交付。剖面（R1，峰速为下界）和 gamma（R1/R2）可供下游 dry run 试读；水平均值只作代理。错了的代价：下游若需要可用的移动场，要等逐时内部场（CM1 另出）或换数据源，比如 Wister v2。"
+    },
+    {
+      "id": "dec-0008",
+      "ts": "2026-10-09 12:10",
+      "title": "开第三个子项目：事件谱与下游接口（10-09 12:08）",
+      "label": "决定",
+      "text": "# 开第三个子项目：事件谱与下游接口（10-09 12:08）\n\nDecision I made：真实风场包接入以 D420 packet v2 收口（Lead 复核 validator VALID、sha 、not_approved；v1/v1.1 哈希 / 未变）；随即分叉「事件谱与下游接口」。谱的主数据用 D420 四侧 1 s × 261 s 时程，Wister v2（60 s）只做慢变调制与站点对照；EVA/CFD dry run 由子项目 Lead 跨线派。\n- 为什么：剖面与 gamma 已可用，谱和下游读包是 Step 2 剩下的唯一门；Xhelaj 移动场在 D420 上不可辨识，不等它。\n- 错了的代价：261 s 记录过短，低频谱和积分尺度不确定性大，结果只能标 candidate；若 CM1 后续给出更长内部 50 m 切片需重算。\n科学判断：记录长度限制低频分辨率——无文献依据，基于本线数据（采样定理）。"
+    },
+    {
+      "id": "dec-0009",
+      "ts": "2026-10-09 12:13",
+      "title": "事件谱子项目首轮派活（10-09 12:09）",
+      "label": "决定",
+      "text": "# 事件谱子项目首轮派活（10-09 12:09）\n\nDecision I made：\n1. 谱主数据只用 D420 四侧 1 s×261 s 时程；可分辨频带两端都要量化——低端受记录长度（261 s），高端受 CM1 网格滤波（侧面点距约 100 m，不是 Nyquist 0.5 Hz）。任务书要求 bot 从谱上量出 -5/3 失效频率作 f_high。— 为什么：LES 时程的高频端由网格决定，按 Nyquist 报频带会高估可用谱宽。— 错了的代价：若有效带比预期宽，只是多给了保守标注。\n2. 相干做三档 Davenport 指数衰减敏感性（C=7/10/16 或文献三档），实测 coherence 只在可分辨频带内对比。并派 litwiki 做谱/相干模型页码索引。\n3. 这一轮不改 validator： L1132 硬性要求 spectrum=evidence_blocked；升 event_candidate 的 schema addendum v1.2 与 validator 改动在谱结果核完后另派。\n4. EVA/CFD dry run 直接派给两线 Lead（29283339），对象是 packet v2（谱仍 blocked）；并告知下一版谱块会变，请指出读包器对 spectrum.status 的硬判断。\n依据：可分辨频带与网格滤波——无文献依据，基于本线数据与采样定理；相干模型页码待 litwiki 索引。\n委托：windfield；litwiki；29283339。\n\n## 补记 10-09 12:12：CFD dry run 回执\nCFD 线：packet v2 能读（哈希、形状、单位、坐标、时间原点都对上），但本线从未产出过 CFD_Interface_Packet v1 格式（runner 出 Run_Packet，feature_interface_packet.py 出 Feature_Interface_Packet，都不是该 schema）。\nDecision I made：不为此单独出 v2.1，并入 v3（与谱块同批）：声明 sidecar 轴序 [y,x]；event_duration/intensification 标 assumed；另出 CFD_Interface_Packet v1 映射文件，缺项填 null+原因，用途写死\"M1 50 m 层与锚点对照参考，非入口/边界条件\"。— 为什么：一次版本变更让 EVA/CFD 只补读一次。— 错了的代价：CFD 在 v3 前若要用 sidecar 需自行按 [y,x] 读（它已反推出来，无实际阻碍）。\n依据：无文献依据，基于本线数据与 CFD 回执。\n\n## 补记 10-09 12:13：EVA dry run 回执\nEVA 线：v2 能读，无阻断；6 特征全 proxy_only，哈希全过，合同字段无缺。非阻断 3 处（特征级分辨率字段、Xhelaj 特征 200 m 与包级 100 m 矛盾、qa_status 枚举）。\nDecision I made：两份 dry run 验收项②达成（\"能读\"回执各一份）。上述 3 处与 CFD 的 3 处一起并入 v3；谱块在 v3 中以 features[] 一项出现（带全套特征级字段，最高 proxy_only），不只放在 runner 的 representations.spectrum。— 错了的代价：多一个特征项，EVA 已确认读包器不受影响。\n依据：无文献依据，基于本线数据与 EVA 回执。"
+    },
+    {
+      "id": "dec-0010",
+      "ts": "2026-10-09 12:18",
+      "title": "事件谱数据源：A、C 由 Lead 定，B 报 Liang Hu（10-09 12:18）",
+      "label": "决定",
+      "text": "# 事件谱数据源：A、C 由 Lead 定，B 报 Liang Hu（10-09 12:18）\n\n背景：D420（CM1 100 m 网格、261 s）可分辨带 0.0077–0.022 Hz，结构频带 0.05–3 Hz（ p.10）在外，事件谱不可达 →。\n\nDecision I made：\n- A 文献约化谱作 `literature_candidate` 先行；C 向 events 线查 ≥1 Hz 实测记录清单。— 为什么：子项目把三者都列为\"改科学方向\"，但 A 是重启基线第六层原计划\"先接受外部提供的谱\"的执行，且明确不称事件特定；C 只是数据清单询问。科学问题（事件谱）不变。— 错了的代价：若 Liang Hu 认为下游不应看到任何非事件谱，撤回 A 的 v1.2 状态即可，evidence_blocked 路径保留。\n- B 嵌套 10–20 m LES：新模拟方向且耗 HPC，报 Liang Hu。\n依据：重启基线 §13 第六层；其余无文献依据，基于本线数据。"
+    },
+    {
+      "id": "dec-0011",
+      "ts": "2026-10-09 12:44",
+      "title": "D420 不能给湍流谱：谱块保持 evidence blocked，v3 只加可分辨尺度描述（10-09 12:17）",
+      "label": "决定",
+      "text": "# D420 不能给湍流谱：谱块保持 evidence_blocked，v3 只加可分辨尺度描述（10-09 12:17）\n\n## 证据\n（windfield）。CM1 原生网格 100 m；可分辨频带 [0.0077 Hz（261 s 两周期）, 0.013–0.022 Hz（Umean/8Δx，四侧）]，每侧只有 1–2 个 Welch 频点。Lead 复核：west 50 m σu=2.33 m/s（一致）；0.02–0.2 Hz 谱斜率 −8.6，远陡于 −5/3，为网格滤波衰减，无惯性子区。三档 Davenport C=7/10/16 中 C=7 的 RMSE 最小，但只有 1–2 个频点，且东/南侧高相干可能是公共事件斜坡，不构成标定。\n结构相关频带 0.05–3 Hz（Roncallo & Solari 2020 SDOF 范围， p.10）完全在可分辨带之外。\n\n## 裁决\n- 采纳：50/100/200 m 的 σu（1.4–5.1 m/s）、I（0.13–0.39）、积分时间 T0 31–45 s / 长度 L0 222–461 m，作为\"可分辨尺度变异度\"描述，R2 proxy_only；261 s 截断和事件斜坡都会使其偏差，不作湍流尺度。\n- 不采纳：任何 PSD/EPSD/相干参数进 packet 谱块；C=7 排序不外推。\n- runner `spectrum.status` 保持 evidence_blocked，validator 不改。v3合并 EVA/CFD 六处修正 + resolved_scale_variability_d420 特征 + CFD 接口映射文件。\n\n## Decision I made\n项目目标①\"spectrum 升 event_candidate\"在 D420 上判为不可达，不硬升。— 为什么：可信频带内 1–2 个点，任何谱形/相干结论都无法与网格滤波区分。— 错了的代价：若有更细网格内部时程可推翻，但当前数据下不会出错误标定。\n要真正拿到事件谱需要换数据源，属于改科学方向，已提请 Liang Hu 选：A 用文献标定约化谱（Roncallo & Solari）作 literature_candidate，不再叫\"事件特定\"；B 申请 CM1 嵌套细网格（~10–20 m）LES 内部时程；C 向 events 线找 ≥1 Hz 实测风速记录。Lead 推荐 A 先行、C 并查。\n依据：网格滤波判据 6–8 倍格距——无文献依据，基于本线数据；SDOF 频带 6EBHGKV3 p.10。\n\n## 补记 10-09 12:18：根对话裁定数据源\nA（文献约化谱 literature_candidate）、C（events 线查 ≥1 Hz 记录）属执行层直接做；B（CM1 嵌套细网格 LES）由根对话报 Liang Hu。\nDecision I made：A 派 windfield （排在 v3 后，出 v4 + schema v1.2 + validator 分支与测试）。相干主选 Chen & Letchford 2005 RFD 竖向实测拟合（XTG39MSC Eq.34–36, p.23–24），C_z=10（STEG93YR p.6）[local path omitted]=8（G7E2KVJN p.9）作敏感性；水平 C_y 库内无雷暴标定，填 null。谱幅用文献 L、I（6EBHGKV3 p.17；3E2M4J4I p.14），D420 只给 v_max 下界与 gamma——D420 可分辨 σu 含事件斜坡且缺网格以下湍流，不作谱幅。— 错了的代价：literature_candidate 只是参数化占位，若 C 找到实测记录需替换。C 派 events Lead （只要清单）。\n依据：（litwiki）。\n\n## 补记 10-09 12:19：C 路结果\nevents Lead：所有登记事件（含 Wister 783115 = D420 对应事件）只有 Mesonet 5 min / ASOS 1 min，无 ≥1 Hz 记录。公开候选：Canepa 2024 意大利港口 10 Hz 开放库（29 事件、99×10 h，GZN57G7D 第 72 行）；次选 Reese 2002 Lubbock Tower 4（1 Hz，2 例，需向 Texas Tech 索取，XTG39MSC 第 99 行）。\nDecision I made：派 litwiki 核对 Canepa 库的 URL/许可/大小/格式/测高/站距/事件清单，只要信息；核完再定是否下载做\"实测谱/相干 candidate\"（非 Wister 事件，只作谱形与相干参数来源，与 A 路文献谱并列对照）。Reese 不追（2 例、无公开途径）。— 错了的代价：多一轮文献核对，约 1 小时。\n\n## 补记 10-09 12:39：Canepa 2024 开放库已接入\nlitwiki 核实：Zenodo 10.5281/zenodo.10688746（concept 7495115），CC BY 4.0，99 条 10 h×10 Hz u/v[+w] 文本，16 台超声测风仪（LI 七台三轴，LI01–04 同高 20 m，站距约 0.8–2 km），原文未给 PSD/尺度/相干（GZN57G7D pp.5–15）。\nDecision I made：Lead 直接从 Zenodo 下载到 （312 MB，三文件 MD5 与 Zenodo 一致，MANIFEST.md5），派 windfield （排在 v3、v4 后）算单点约化谱、积分尺度、LI 同高台站水平相干与 C_y，来源标 observed_external_candidate，结果作为 v4 文献谱参数的实测对照/替换候选。— 为什么：公开、许可明确、<5 GB，是库内唯一可得的 10 Hz 雷暴多点实测。— 错了的代价：意大利沿海港口雷暴与 Oklahoma 下击暴流气候/地形不同，参数可迁移性要在结果里标注；台站距离大，C_y 可能只在很低频可估。\n注意：工作站 本地盘 余量仅 35 GB（10-09 12:28 df），本次 312 MB 低于 5 GB 门槛，可拷；后续任何大拷贝须先请 Liang Hu 判断。\n\n## 补记 10-09 12:44：v3 验收\nwindfield 进程被终止（terminated），但交付物已在 12:40 前全部写完。Lead 自行复核：validator VALID；runner 、EVA v1.3 、CFD 映射 、谱 sidecar 28474416（与 event_spectrum_d420_v1 一致）；7 个 feature 字段齐，Xhelaj 200 m；全套 94 passed；v2 未变。\nDecision I made：按 v3 验收，不重派——文件与哈希齐全，重跑只会再生成一份同内容目录。已请 EVA、CFD补读。— 错了的代价：若 bot 在终止前有未落盘的自检项，补读回执会暴露。"
+    },
+    {
+      "id": "dec-0012",
+      "ts": "2026-10-09 13:28",
+      "title": "D420 packet v4（文献谱 literature candidate）验收（10-09 13:26）",
+      "label": "决定",
+      "text": "# D420 packet v4（文献谱 literature_candidate）验收（10-09 13:26）\n\n## 证据\n（windfield）。Lead 复核：validator VALID；全套 100 passed（新增 blocked/literature_candidate 两条路径与缺来源、sidecar 篡改负例）；runner 、谱 sidecar （1024 频点，0.0001–2 Hz，单位方差归一）、竖向相干 56607012、EVA v1.4 36826766、CFD 映射；v2 、v3 未变。schema；validator 原 evidence_blocked 分支保留。\n\n## 裁决\n- 采纳：spectrum.status=literature_candidate；谱形 von Kármán，取自 Liu 2023 Eq.(30)（P75A95JC，PDF p.14–15，见 Spectrum_Coherence_models_index.md 第 33 行）；L_u=25.66 m（3E2M4J4I p.14 Table 7）；I_v=0.12（6EBHGKV3 p.17）；竖向相干主选 Chen & Letchford 2005 RFD 实测 k=11.5+28/min(z)（XTG39MSC pp.23–24），C_z=10（STEG93YR p.6）[local path omitted]=8（G7E2KVJN p.9）为敏感性；水平 C_y=null。\n- 仅供参考：相干里用 D420 v_max（31.8 m/s）代两高度平均风速，会把频率尺度往高处推（高处实际风速更低）；只作示例，已禁止入口/荷载使用。\n- 不是\"事件特定\"谱，scientific_status=not_approved。\n## Decision I made\n按 v4 验收，项目目标①按\"literature_candidate\"口径达成（谱块不再 evidence_blocked，但非 event_candidate）。— 为什么：D420 网格给不出湍流谱，根对话已裁定 A 路。— 错了的代价：Canepa 10 Hz 实测若给出明显不同的 L/I/C_y，换参数出 v5。\n待并入：sidecar 轴序、source_manifest 与警告改写，之后请 EVA/CFD 对 v4 补读一次。"
+    },
+    {
+      "id": "dec-0013",
+      "ts": "2026-10-09 13:49",
+      "title": "Canepa 2024 10 Hz 外部实测谱验收：只作 v4 对照，不替换参数（10-09 13:49）",
+      "label": "决定",
+      "text": "# Canepa 2024 10 Hz 外部实测谱验收：只作 v4 对照，不替换参数（10-09 13:49）\n\n## 证据\n（windfield）：99 条中 89 条/28 事件过连续性门；30 s 滑动均值分解（6EBHGKV3 pp.3,6, Eq.39–45 pp.11–12）；I_v 均值 0.179（P10–P90 0.091–0.271）；L_v 均值 18.6 m（8.8–26.8 m，积分到 R≤0.05 + Taylor，3E2M4J4I p.14 定义）；0.05–2 Hz 中位谱拟合 Liu 2023 Eq.30 von Kármán 形（P75A95JC p.14），L=22.0 m、log-MSE 0.004。LI 同高 20 m 站对 36 组，距 1.5–4.7 km，0.05–0.5 Hz 相干落入噪底，C_y 全部触上界、不可识别；异高 35 组同样饱和。\n## 裁决\n- 采纳为外部实测对照：v4 的 I_v=0.12（6EBHGKV3 p.17）与 L_u=25.66 m（3E2M4J4I p.14）均在 Canepa P10–P90 内；von Kármán 形在 0.05–2 Hz 与实测中位谱吻合。v4 参数不改、不出 v5。\n- 不采纳：C_y 上界值 60 作参数；水平 C_y 维持 null。\n- 只是意大利北地中海港口雷暴集合，含非纯下击暴流记录（GZN57G7D p.4），不是 Wister/D420 事件。\n## Decision I made\nCanepa 作 observed_external_candidate 对照写进 v4 文献谱特征的不确定性说明（追加，与轴序/manifest/警告三项同批）。— 为什么：实测区间支持 v4 取值，换参数只会多一轮下游补读。— 错了的代价：若下游需要偏保守的湍流强度，应取 Canepa 均值 0.18 而非 0.12，届时出 v5。"
+    },
+    {
+      "id": "dec-0014",
+      "ts": "2026-10-09 14:44",
+      "title": "事件谱与下游接口 收口（10-09 14:44）",
+      "label": "决定",
+      "text": "# 事件谱与下游接口 收口（10-09 14:44）\n\n## 证据\n- 定稿包：，runner 、EVA v1.4 、CFD 映射 、实测 sidecar 、文献谱 、竖向相干 56607012；validator VALID，100 passed；v1/v2/v3 原件未动。schema。\n- 下游回执：EVA8 特征全 proxy_only、哈希全过、无阻断；CFD全部可读、轴序自描述满足、23 字段映射可解析、无阻断。v2、v3 各有一轮回执，均\"能读\"。\n- 谱证据：D420 侧面谱 （可分辨带 0.0077–0.022 Hz，网格滤波，给不出湍流谱）；Canepa 2024 10 Hz 外部实测 （I_v 0.179、L_v 18.6 m、C_y 不可识别）。\n\n## 验收对照\n- ① 谱：**按 literature_candidate 口径达成**，不是原定的 event_candidate。spectrum.status 已离开 evidence_blocked；谱形 von Kármán（P75A95JC Eq.30, PDF p.14–15）、L_u 25.66 m（3E2M4J4I p.14）、I_v 0.12（6EBHGKV3 p.17）、竖向相干 Chen & Letchford 2005 RFD（XTG39MSC pp.23–24）、C_y=null；Canepa 区间对照支持取值。scientific_status=not_approved。\n- ② 下游 dry run：**达成**，EVA、CFD 各交\"能读\"回执（v2/v3/v4 三轮）。\n- 未做（边界内）：CFD 入口、设计荷载、Vhat_3s。\n\n## 遗留（下次出包顺手修，不为此补读）\n1. 第 8 特征 not_allowed_downstream_use 补\"Vhat_3s 目标风产品\"（EVA）。\n2. 第 8 特征 height_levels_agl_m 改为相干实际高度 [50,150,250]，spatial_resolution_m=null+原因（EVA）。\n3. CFD 映射 turbulence_residual_assumptions 现为 null+文字，可补文献谱 sidecar 路径与哈希（CFD）。Lead 自身失误：给 CFD 的任务书把它说成\"已指向\"、把竖向相干路径写成 result/ 下，实际在 v4 根目录——包本身无误。\n4. 真正的事件特定谱需新数据：CM1 嵌套 10–20 m LES（B 路，根对话报 Liang Hu）。\n\n## Decision I made\n本子项目收口。— 为什么：两项验收都有文件与哈希为证，剩余仅元数据瑕疵。— 错了的代价：若下游要求 event_candidate 级别的谱，需等 B 路数据重开。"
+    },
+    {
+      "id": "dec-0015",
+      "ts": "2026-10-09 15:38",
+      "title": "真实风场包接入：第二源选择（10-09 10:58）",
+      "label": "决定",
+      "text": "# 真实风场包接入：第二源选择（10-09 10:58）\n\nDecision I made：并行接 CM1 Wister 事件对齐 v2 作第二源；WRF exp-A 暂不接。\n\n为什么：\n- D420 只有 261 s × 1 s 窗口（源 2120–2380 s），给不出整个事件的强度包络，gamma/delta 的 duration、floor_ratio 只能在 261 s 内截断估计。Wister v2 是 CM1 Job 3575014 的 0–7200 s、60 s 历史，覆盖完整生命周期，并有 WIST 站 60 s 观测对照（WMAX 25.9 m/s）。可作时间调制的第二个来源，也能做观测锚点。体量小：两个分片 npz 共约 24 MB，再加 csv/json。\n- D420 风速峰全在最低层 50 m（四侧 29.2–30.9 m/s，首帧 31.8 m/s），剖面峰高度落在 0–50 m 数据空洞里。Wister v2 用同一 CM1 框架，这个问题解决不了，但能给出 10 m 诊断时程，补上近地时间演化。\n- WRF exp-A 是中尺度，分辨率不属于同一类，接进来主要回答别的问题，先不占 bot 带宽。\n\n错了的代价：多复制约 25 MB，多派一次审计；Wister v2 是“部分复现”（点值 4/6、邻域 5/6），用它做的特征要单独标明来源，不能和 D420 混成一个事件。\n\n依据：无文献依据，基于本线数据（D420 实测数字见；Wister v2 见 CM1 线）。\n\n附带发现（转 CM1）：v2 目录下 `history.npz` 为 0 字节（10-07 10:47），实际数据在 `history_001_061.npz`、`history_062_121.npz`，且含 pickle 对象。\n\n更正（10-09 15:38）：上文“history.npz 为 0 字节、分片含 pickle”经根对话核实，结论如下：0 字节的 history.npz 不在 DELIVERY_MANIFEST 里，是废弃残留；两个分片用 allow_pickle=False 能全部读出，并不含 pickle 对象（qa_json 是 0 维字符串）。所以我原先那条附带发现不成立，不转 CM1。另一个限制：Wister v2 只有近地 10 m 等诊断量和 dbz，没有三维廓线，所以只用于时间调制和站点锚点。"
+    },
+    {
+      "id": "dec-0016",
+      "ts": "2026-10-09 19:58",
+      "title": "D420 packet v1 验收与 v2 派工（10-09 11:59）",
+      "label": "决定",
+      "text": "# D420 packet v1 验收与 v2 派工（10-09 11:59）\n\n## 事故记录：Lead 误覆盖 bot 交付件，已恢复\n11:55 后台重派一直失败，Lead 决定自己出 packet，没先看目标目录就写了 、sidecar、input JSON，还两次删除。实际上 bot 在 11:08 前已在同一目录交付 v1，11:45 又加了 EVA v1.1 sidecar。11:58 发现后，从平台上传存档 原样恢复 bot 的 6 个文件。复核：packet sha256 `…`、sidecar `…` 与 EVA v1.1 内的引用一致，validator VALID， 用 input JSON 原样补回后通过快照校验。Lead 版本移到，只作参考。\n先例：动手写任何输出目录前先 `ls`；bot 的执行对话可能已在推进，以文件为准。\n\n## v1 验收\n- 采纳：剖面（Wood/Verhoff，Umax 31.799 m/s 为下界，z_star 265.74 m 为半速高度，29 层 RMS 6.81/6.79 m/s）、gamma（西侧 50 m 点，floor 0.325，T 131 s，标 proxy）、sidecar 20 个数组、差异表、EVA v1.1 的 R0/R1/R2 划分。\n- **必须改**：Xhelaj 模型场峰值 66.8 m/s，是实测首帧 31.8 m/s 的 2.1 倍。原因：radial_max 没扣背景和平移；平移 30.9 m/s 来自四侧峰时拼接，各面峰不是同一结构；触地点和半径只在 4 km 窗内找，而下沉核在窗外西北（50 m 散度最大在 (7250,11950)，w 最小在 (6050–7150,11950–12550)）。Lead 参考取法得到的模型峰值为 28.7 m/s。\n- 依据：无文献依据，基于本线数据。\n\n## Decision I made\n派 v2，放新目录，只换 Xhelaj 参数和网格；EVA sidecar 升 v1.2 指向 v2。v1 和 v1.1 一字不动。为什么：v1 已被 EVA v1.1 按哈希引用，覆盖会断链。代价：两版并存，下游要认 v2；Xhelaj 参数仍是 R2 代理。\n\n补记（10-09 19:58）：EVA v1.1 sidecar 是正式产物。它的来源：EVA Lead 委托核对输入合同 v2 字段，本线据此定为 packet schema v1.1，见 、。v1.2 按这一 schema 升级。另外，根对话已认可误覆盖事故的处理和先例，并已向 Liang Hu 报备。"
+    },
+    {
+      "id": "dec-0017",
+      "ts": "2026-10-09 20:02",
+      "title": "来源内核修复与基准 收口（10-09 12:20）",
+      "label": "决定",
+      "text": "# 来源内核修复与基准 收口（10-09 12:20）\n\n- 决定：子项目三项验收完成，收口。\n 1. Dang 来源常数覆盖保护 → \n 2. Moeini finite-ABL 按 Eq.12c/19b/35/26 解锁（41.705 vs 41.6 m）→ \n 3. 九模型回归：windfield bot 的 Python 与 MATLAB bot 独立从 .mlapp 转写的 .m 脚本在 GNU Octave 6.4.0 执行结果 11/11 一致（|差|<5e-13）→；公式清单 v2 → \n- 为何接受 Octave 代替 MATLAB：本机 MATLAB R2026a 连 `disp(version)` 都在启动时崩溃（Access violation 0xc0000005，mwhomesessionmanager_impl.dll），MATLAB bot 报告见。脚本只含标量算式，Octave 执行等价；两份转写出自不同 bot，构成独立核对。Lead 为此在 WSL 安装 octave-cli（apt）。\n- 残留（不阻断）：App Designer 界面本身未在 MATLAB 实例化运行；多数原文无独立数值锚点；所有输出 scientific_status=not_approved。\n- 依据：GUI 卡片 Table 1 pp.3–5；Moeini 卡片 DEPR4HXR PDF pp.7–10；其余无文献依据，基于本线代码。\n- 错了的代价：若 GUI 运行时有表达式之外的行为（回调里的默认值/单位换算）未被转写，九模型表会漏掉；可在 MATLAB 修好后用同一 .m 复核。\n\n## 根对话补记（10-09 12:06）\nDecision I made：收口时九模型测试仍从 加载代码，只拷 时收集报错。Lead 复制为 （ROOT 改 parents[1]，产物仍写回 原目录），测试改为直接 import；原 bench.py 未动。复跑：原位与独立拷贝均 94 passed。— 代价：两份同逻辑文件，以 tools/ 版为准。\n\n## 补记 15:45 收口前小修（根对话）\n- 九模型基准逻辑移入； 只依赖 tools/； 改为薄包装（重跑后 benchmark_table.md 逐字不变）。新增测试 `test_python_matches_independent_octave_transcription`（Octave 10 个独立值硬编码，atol 1e-9）。\n- 验证：本目录 101 passed / 31 subtests；只拷 tools/ 到 [local path omitted] 复跑：九模型测试通过，剩 1 项失败为别的项目的 （13:17 新增，依赖 tools/ 外的哈希绑定源文件，windfield_run.py:1283 ValueError），不属本子项目。\n\n## 根对话补记（10-09 15:43）\n九模型解耦验收：原位 101 passed。只拷 tools/ 时 test_literature_spectrum_packet 的 1 项失败不是缺陷——validator 有意核对文献卡片在 下真实存在（windfield_run.py:1142–1144，fail-closed），脱离工作区自然找不到。Decision I made：不改、不转派；\"tools/ 独立拷贝全过\"的验收口径作废，以原位全过为准。\n\n## 补记 10-09 20:15 真 MATLAB 实跑（临时重开后再收口）\n- MATLAB R2026a（26.1.0.3203278）经 、`matlab_runtime_run.m`。\n- 残留（不阻断）：用 App Designer 类本身（`app=Verhoff`）实例化在 batch 下崩溃 0xc0000005，GUI 回调路径未实跑；推测 batch 无图形会话，未查证。需要时在 Liang Hu 的交互 MATLAB 里手动跑一次。"
+    },
+    {
+      "id": "dec-0018",
+      "ts": "2026-10-09 20:11",
+      "title": "Wister v2 全程时间调制验收（10-09 20:11）",
+      "label": "决定",
+      "text": "# Wister v2 全程时间调制验收（10-09 20:11）\n\n证据：（wister_gamma.json / wister_vs_d420.md / wister_gamma.py）。输入 10/10 哈希一致。D420 v1/v2/v4 packet 哈希不变（ / /）。\n\n## 裁决\n- **采纳**：\n - 站点 10 m 峰值 14.45 m/s，出现在模式 2880 s；峰前 30 min 基线与峰值之比 0.296。Lead 用 STATION_60S.csv 独立复算，三项一致。≥50% 峰值的连续段在 60 s 样本上是 2520–3300 s（780 s），插值后 852 s，和 bot 一致。\n - 邻域代表点峰值 20.19 m/s，基线比 0.163，半峰宽 690 s，衰减/上升比 4.0。\n - 对观测 25.9 m/s 的比值：站点原值 0.558，×1.4 后 0.781；邻域原值 0.780，×1.4 后 1.092。站点原值落在冻结判据 [12.95, 24.05] m/s 内。\n- **使用口径**：对称 rational 型拟合的 T（固定 alpha=0.5 时为 64/51 s；放开 alpha 后站点退化到 6.1/889 s）不稳，RMSE 约 3 m/s，只作描述。下游的时间尺度用**半峰持续时间**（站点约 850 s，邻域约 690 s）和**前后不对称比**（1.2 / 4.0），不用 T。\n- **不合并**：D420（50 m、1 s、261 s 截断，T 是半峰宽代理）和 Wister（10 m、60 s、全程，T 是最小二乘拟合）的定义不同，不能合成一个参数范围，只并列给出。\n- **等级**：Wister 10 m、60 s 时程标 R1；迁移到 3 s 阵风、其他高度或机制总体一律 R2 proxy-only。Wister 本身是部分复现（站点 4/6，邻域 5/6）。\n- 依据：无文献依据，基于本线数据。gamma 形式取自 （Roncallo–Solari 2020 的转写）。\n\n## Decision I made\n接受上述结果，本项目再次收口。错了的代价：下游如果把 T 当时间尺度用，会低估持续时间约一个量级。所以写死用半峰持续时间。"
+    }
+  ],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-09 10:25",
+      "text": "【Liang Hu】你是风场研究线新任 Lead，本对话是这条线的根对话（只放线况与跨项目决定）。第一轮请做：\n2. 派本线 bot 做一次只读汇报（它 09-25 以来做了什么、在跑什么、停在哪、有哪些未交付物），结果回来后核对方案\n4. 用 建立子项目（至少一个，按方案；你认为方案不对可以改，改了记决策记录），每个子项目写项目页 <名>.md；方案里指明“现有对话应成为执行对话”的，在回答里列出 topic 前缀，我来挂；写“新开”的由子项目 Lead 第一次派活自动建立\n5. 09-25 决策表里“你的选择”为空的项一律按默认同意执行，不要再问我。\n\n只有三类事问我：改科学方向、删除/覆盖已有结果、对外结论。其余自己定、先做再说。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 10:25",
+      "text": "正在读本线历史文件、找 09-25 决策表，随后派 bot 只读汇报并建线况和项目页。Copy the CM1 source into inbox and verify hashes; at the same time send the bot its read-only status report task.项目页已写好，正在写线况页和决策记录。第一轮做完了一部分。子项目这轮还没分出来：本对话还没有一条完成的回答，系统不让分叉。我会在 bot 汇报回来叫醒我时补上。\n\n**已完成**\n2. **复制数据**：把 CM1 的 D420 内截面源产品整目录复制到本线，6 个文件哈希全部对上。这份数据其实是给 CFD 用的五面边界产品：\n - 四个侧面 29 层 × 261 帧（1 s 间隔），顶面 1000 m\n - 全三维体积只有第一帧\n - 最低一层在 50 m，50 m 以下没有数据。\n \n 所以接成风场包时，剖面和水平均值怎么定义要在审计表里写清楚。\n3. **派了 bot 只读汇报**：问它 09-25 以来做了什么、有没有在跑的东西、卡在哪、欠什么没交，并现场重跑 70 个测试。限 60 行以内，不许再写重启基线。结果回来后我对照方案核对。\n4. **建了线况页 **：一页，按三个问题列各自进度——真实事件包能不能进线、内核和原文是否一致、下游能不能读。\n5. **写了三个项目页**：\n - 真实风场包接入：进行中\n - 来源内核修复与基准：进行中\n - 事件谱与下游接口：暂停，要等第一个项目交出真实风场包。\n6. **决策表**：A1–A4、E1–E3、F2 全部按默认同意执行。STATE.md 里\"写远端要授权、长作业要你批准\"的旧口径已改成按公共规则办。\n\n**子项目怎么建（下一轮执行）**\n- 先分两个子项目：真实风场包接入、来源内核修复与基准。两个都是新开执行，由子项目 Lead 第一次派活时自动建立。\n- **没有要你挂的现有对话**：方案里三个都写的是新开。`` 是群发汇报话题，不适合当执行。\n- 事件谱与下游接口要等第一个项目交出风场包，那时再分。\n\n**Decision I made**\n- **事件谱子项目推迟分叉**：现在开只会空转。错了的代价是下游试读晚几天起步。\n- **第一个数据源用 D420**：Wister / WRF exp-A 等审计结果再定要不要并行接。代价是 D420 只有边界面，可能还得再接一个源。\n- **内核修复按 Dang 保护 → Moeini 逐步推导对照表 → 九模型基准的顺序做**，不许靠调参去凑 41.6 m。\n- **派文献 bot 补 Dang 2024 的卡片**：现在文献库里搜不到，而改内核时引用固定常数要写卡片和页码。\n- **给 CM1 Lead 发了\"已接收 D420\"的告知**：跨线消息系统要你点一下批准才会送到。\n\n**另外两点**\n- **线目录登记**：方案要求把本线目录加进，现在已经在里面了，不用再动。\n- **文件位置**：决策记录写在。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 10:32",
+      "text": "【委托结果 · CM1 Lead】告知：风场线已接收 D420 内截面源产品\nCM1 线确认风场线 10-09 10:30 收下了 （核对 6/6 一致）。CM1 这边这个原件目录已冻结，不改不删。审计发现字段或坐标问题，直接告诉 CM1 Lead，我们派 cm1 核查后回复。这件事不需要再回执。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 10:32",
+      "text": "Now try the forks again.两个子项目已经分出来，各自开始干活了：\n\n| 子项目 | 对话编号 | 第一件事 |\n| --- | --- | --- |\n| 真实风场包接入 | `` | 派 bot 对 D420 数据做只读审计，交审计表 |\n| 来源内核修复与基准 | `` | 先修 Dang 内核常数被悄悄覆盖的漏洞，再做 Moeini 逐步推导对照表 |\n\n这两个子项目的执行对话都是新开的，由各自的 Lead 第一次派活时自动建立，**没有要你手动挂的对话**。\n\nCM1 Lead 已回话：收到我们接收 D420 的告知，原件目录冻结，不改不删。审计如果发现字段或坐标问题，我直接转给 CM1 Lead。\n\n线况页和两个项目页已经填上对应的子项目。还没回来的有两件：bot 的只读汇报和文献 bot 补的 Dang 2024 卡片。回来后我对照方案核对汇报内容，卡片转给内核子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 10:37",
+      "text": "【委托结果 · 风场智能体】09-25 以来工作只读汇报\n本 bot 自 09-25 重启基线后没有交付新的科学结果或真实事件 packet。D420 源已在本线 Inbox，但尚未审计或接入；Dang、Moeini、九模型三项仍未闭合。今天测试在 NumPy 1.26.4 环境为 63/70，不能沿用历史 70/70 声称现场全过。Decision I made：将缺少 np.trapezoid 记为本次测试环境阻断，而非判定七项科学回归——未改环境或代码，代价是尚不能确认兼容环境下的当前全套通过状态。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 10:37",
+      "text": "70/70 已在 NumPy 2 环境复现通过，正在把这个环境通知子项目并记决策。bot 的只读汇报回来了，和启动方案对得上：09-25 以来它没有交出任何新的科学结果，三条线都停在原地。\n\n- **真实风场包**：D420 数据已在本线，但还没审计、没接入。\n- **内核三项**：Dang 内核常数可被悄悄覆盖的漏洞、Moeini 77.8 m 与原文 41.6 m 对不上、九模型逐个基准，三项都没有闭合。\n- **没在跑的任务**，除了上面这些也没有欠交的东西。\n\n**汇报里唯一的新情况：测试只过了 63/70，但这是电脑上的软件版本问题，不是模型算错了。**\n\n- **原因**：代码里用了一个只有新版 NumPy（2.x）才有的积分函数。bot 跑测试的环境是旧版 NumPy 1.26，所以掉了 7 项。\n- **验证**：我在本机单独建了一个新版 NumPy 的运行环境，在副本上重跑，70/70 全过，不用改代码。\n- **Decision I made**：本线以后跑模型和测试一律用这个环境，已写进本线规则、线况页和决策记录，也已告知两个子项目 Lead，让他们给 bot 派活时写明。如果有哪段代码其实依赖旧版行为，测试会暴露出来，代价很小。\n\n**现在的进度**\n- 两个子项目已在推进：真实风场包接入（``），来源内核修复与基准（``）。\n- 还在等文献 bot 补 Dang 2024 的文献卡片，回来后转给内核子项目。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 10:47",
+      "text": "【子项目回报 · 真实风场包接入（CM1 D420 → R0/R1 packet）】D420 审计已派；第二源要 Wister v2，WRF exp-A 暂不接\n结论：\n1) 只读审计已派 windfield，交付 + audit_d420.py。\n2) Lead 自测：D420 四侧水平风速最大 29.2–30.9 m/s、首帧体积 31.8 m/s，峰全在最低层 50 m；1000 m 顶面 w 最小 −17.1 m/s，像下击暴流外流。剖面峰高度落在 0–50 m 空洞，z_max/z_star 只能给上界，最多标 R2 proxy-only。\n3) runner 只吃模型参数、不吃观测数组。“真实 packet”要么从数据取参数喂模型，要么给 runner 加 empirical 表示。等审计表给出改动量我再定。\n4) 第二源：请把 SP2_CM1_PathC_Simulation/ 里的 history_001_061.npz、history_062_121.npz、STATION_60S.csv、METRICS.json、MODEL_TRACK.csv、RESULT.md、DELIVERY_MANIFEST.json 复制到本线，约 25 MB。用途：D420 只有 261 s，补一条 0–7200 s 全程时程做 gamma/delta，并接站点观测锚点。WRF exp-A 暂不接。决策：。\n5) 转 CM1 Lead：v2 下 history.npz 是 0 字节（10-07 10:47），实际数据在两个分片里，且含 pickle 对象，请确认哪个是正式交付件。\n下一步：审计表回来后核对数字，再派 runner 出 R0/R1 packet。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 10:47",
+      "text": "「真实风场包接入」子项目报上来两件事：第一份数据 D420 的审计已经派给 bot；它要 Wister v2 作第二份数据，WRF exp-A 暂时不接。第二份数据我已经复制过来交给它了。\n\n**子项目的初步发现**\n- **数据像下击暴流外流**：D420 侧面最大风速 29–31 m/s，峰值都在最低一层 50 m；1000 m 顶面有 −17 m/s 的下沉气流。\n- **最大风速出现的高度定不准**：峰值大概在 50 m 以下，那一段没有数据，只能给个上限，标成\"代用量\"。\n- **程序吃不进实测风场数组**：现有风场包程序只接受模型参数。要么先从数据里拟合出参数，要么给程序加一种直接读数据的方式。子项目 Lead 等审计表算出改动量再定。\n\n**我这边做了什么**\n- **复制第二份数据**：Wister v2 的 10 个文件（约 25 MB）放进了本线。除清单文件本身外，9 个文件的哈希都和 CM1 的交付清单一致。\n- **CM1 的疑问已自行查清，不转 CM1**：子项目怀疑里面的 0 字节 `history.npz` 有问题。CM1 交付清单里列的是两个分片，0 字节那个不在清单上，是废弃残留。两个分片完整可读，不含 pickle 对象。\n- **提醒了子项目这份数据的局限**：Wister v2 共 121 帧，每帧间隔 60 s，覆盖 0–7200 s，但只有 10 m 和近地层的风，没有垂直剖面。它只能补风速随时间的起伏，并和站点观测对照，补不了剖面。\n\n**Decision I made**：同意接 Wister v2，WRF exp-A 暂不接。原因是 D420 只有 261 s，需要一条完整的事件时程。代价是 Wister v2 补不了剖面，剖面上限的问题仍要靠 D420 自己处理。\n\n线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 10:51",
+      "text": "【委托结果 · 文献 Wiki 智能体】补 Dang et al. 2024 下击暴流模型卡片到 windfield_step2\nwindfield_step2 已有 Dang et al. (2024) 卡片，Zotero key 为 XIRSM6BV；我没有重复建卡或改动原卡。原卡路径。已依据库内 PDF 补写方程与固定常数页码索引，并从 Paper_Index.md 链接。以下页码均为论文印刷页；索引文件同时列出 PDF 页。\n\n固定常数清单：径向峰值 Eq. (1) 为 1.095、−1.858、−1.949（p. 405；其中 −1.858 除以 r/D，并非幂）；Eq. (2) 为 2.242，R_u,max/D 为 Dang 推荐的 1.13，Li 原值为 1.007（p. 405、410）。半峰高度 Eq. (5) 为 −0.0362、0.0818、1.0062、−2.742（p. 406）；Eq. (6) 的 χ=0.280、η=1.134、R_zmin/D=1.473（Li 原值，p. 407），Dang CFD 对比值 R_zmin/D=1.451（p. 410）。\n\n边界层与分段式：δ 式的 0.37、Re_l 指数 −1/5（p. 411）；Anderson c_f 式的 0.02296、0.139，以及 von Karman–Schoenherr c_f 式的 17.08、25.11、6.012（p. 412）；δ*/δ≈0.3，Eq. (14) 拟合系数 C_st=1.0213、D_st=0.951、E_st=7.301，log law 系数 2.5、5.45（p. 412）；Z_b 所取 z⁺=300，Coles 的 κ=0.41、C=0.5、Π=0.55、Z_b/δ≈0.7，以及 Pfeil 的 κ=0.41、a₁=0.238、a₂=0.186、a₃=0.137、C₁=8.497（p. 413）；共用外层 F=1.52、G=1/6.5、H=0.68（p. 415）。Table 2 的过渡层 C_st、D_st 是按局地条件求解的系数，不是上述 Eq. (14) 的固定拟合值（p. 413）。\n\n模拟配置另列于索引：D=1600 m、Z₁=2100 m、V_in=70 m/s、ρ=1.225 kg/m³、μ=1.7894×10⁻⁵ kg/(m·s)、Re=7.7×10⁹（p. 408）；这些不是可跨算例沿用的风剖面常数。Eq. (21)–(23) 的分段方程、来源及版本差异均在索引文件中。\n\nDecision I made: 保留已有卡、另建方程常数索引——避免同一论文出现两张卡或改写既有状态；代价是委托方核对内核时需同时打开原卡与索引。\n\n\n\n（附件：Dang_2024_model_equations_constants.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 10:51",
+      "text": "Dang et al. 2024 的文献卡片其实早就在库里，之前是我没搜到。文献 bot 没有重复建卡，而是另做了一份方程和固定常数的页码索引：。\n\n我抽查了几个关键数，页码都列全了，可以直接用于修 Dang 内核：\n\n- **径向峰值**：1.095、−1.858、−1.949，p. 405。\n- **两个常数各有两套值**，代码里必须写明用哪套：\n - R_u,max/D：Dang 推荐 1.13，Li 原值 1.007（pp. 405/410）\n - R_zmin/D：Li 原值 1.473，Dang 的 CFD 对比值 1.451（pp. 407/410）。\n- **不能当固定常数保护的两类**：\n - 表 2 里的过渡层系数是按局地条件现解的（p. 413）\n - D=1600 m、V_in=70 m/s 是那篇文章的算例设置，不是剖面常数（p. 408）。\n\n转交没发出去：系统里同时进行的委托满了 16 个上限。我改成把上面这些要点直接写进内核子项目页的\"文献依据\"一栏，并注明以这份索引作为受保护常数清单。子项目 Lead 每次醒来都会先读这一页，所以不会漏。\n\nDecision I made：要点写进项目页，不等委托名额空出来再发。这样做的代价是子项目要到下次被叫醒时才看到。它的 Dang 修复任务已经在跑，最终改法我会在它交回时核对。\n\n\n\n（附件：Dang_2024_model_equations_constants.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 11:23",
+      "text": "【子项目回报 · 来源内核修复与基准（Dang guard / Moeini / 九模型）】Dang 保护已验收；Moeini 41.6 m 定位为原文 Eq.43 符号排版错误\nDang：非来源常数需显式开关否则报错，放行时 source_equation_modified=True；默认输出逐位不变；76 passed（venv 复跑）。Moeini：印刷 Eq.43 正号给 77.83 m，与 Eq.35（δ′=−80.04 m）、Eq.26（41.705 m）和正文 41.6 m 矛盾；我核对 PDF 后裁定按 Eq.12c/19b/35/26 实现并解除 blocked，实现+测试已派；卡片 DEPR4HXR Eq.19a 已由 litwiki 更正并加 Eq.43 符号注。决策记录 、moeini_eq43_sign_ruling_20261009.md。下一步：Moeini 实现验收 → 九模型基准（含 inventory.json 更新）。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 11:23",
+      "text": "卡了两个月的两项内核问题今天都解决了。我核对了证据，并在本机副本上重跑全套测试，90 项全过。\n\n**Dang 内核常数保护：已完成**\n- 现在要改原文的固定常数，必须显式打开开关，否则直接报错。\n- 开关打开后，输出包会自动标记\"已偏离原文方程\"。\n- 不动开关时，输出和改之前逐位相同。\n\n**Moeini 有限边界层峰高：41.6 m 已对上**\n- **原因**：原文 Eq.43 印刷的是正号，照它算出 77.83 m。原文还有三处都指向 41.6 m 左右：\n - Eq.35 的修正量是负的（−80.04 m）\n - Eq.26 算出 41.705 m\n - 正文写的是 41.6 m。\n \n 子项目 Lead 因此判定这个正号是排版错误，Eq.35 的负号是对照 PDF 原文逐字核过的。\n- **改法**：改走原文 Eq.12c/19b/35/26 这条式链，得 41.705 m，与原文 41.6 m 差 0.25%。没有为了凑数去调参数。\n- 我看了推导数值表并复算：77.83 m、41.705 m、把 Eq.43 改成负号后的 41.75 m 都能复现。\n- **错了的代价**：如果作者本意确实是正号，这一分支的峰高会低估约 36 m。它只用来核对内核和原文是否一致，不进任何对外结论，随时可以退回到\"挂起不用\"。\n- 文献卡片里另一处转写错误（Eq.19a）也已让文献 bot 更正。\n\nDecision I made：接受子项目的裁决，不另外送外部审稿。三条独立途径算出来一致，PDF 原文我们也亲自核过，而且这个结果只在本线内部使用。要不要对外指出\"原文印刷有误\"，属于对外科学结论，由你决定，我们不会主动对外说。\n\n**下一步**：子项目先验收 Moeini 的实现，然后做九个模型逐个对 MATLAB 和文献数值的基准。线况页已更新。\n\n\n\n\n（附件：moeini_eq43_sign_ruling_20261009.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 11:52",
+      "text": "【子项目回报 · 来源内核修复与基准（Dang guard / Moeini / 九模型）】Moeini 解锁与九模型静态基准已验收，剩 MATLAB 实跑\nMoeini finite-ABL 按 Eq.12c/19b/35/26 实现，JAWS 41.705 m（原文 41.6），isolated 53.7138 m。九模型：8 个 Python 与 GUI 源码逐字值一致，修了 chay 漏切向分量、li 内侧 NaN 两处转写错误；GUI 里 Moeini 旧移植保持 blocked。全套 94 passed（venv，我复跑）。公式清单写成 v2：，08-12 归档原件未动（它在 HASHES.sha256 里，下游请改读 v2）。下一步：MATLAB bot 实跑 GUI 取独立值，对上即收口。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 11:52",
+      "text": "内核子项目基本收尾，只剩用 MATLAB 实际运行一遍原版程序做独立核对。我在本机副本上重跑全套测试，94 项全过。\n\n**完成的内容**\n- **Moeini 有限边界层分支已解锁**：在 JAWS 这个参考个例上，峰高算出 41.705 m，原文是 41.6 m；不考虑背景边界层时为 53.71 m。\n- **九个下击暴流风剖面模型做了静态核对**：其中 8 个的 Python 版和原版 MATLAB 图形界面程序的源码逐值一致。核对中查出两处转写错误，已修好：\n - chay 模型漏了切向分量\n - li 模型在中心附近算出空值。\n- **原版程序里的 Moeini 旧移植**：仍标为暂不可用，因为它用的是印刷有误的那条式子。\n- **新版模型公式清单**：在。08-12 的旧版原样保留没动，下游以后读新版。\n\n**我发现并安排修的一个小问题**\n九模型的测试从输出目录里加载代码，只拷贝程序目录时整套测试会报错。已让子项目在收口前把这段代码移回程序目录。错误修正类的小改动，按 A2 做完报备。\n\n**下一步**\n- MATLAB bot 实际运行原版程序取独立数值，对上就收口。\n- 另一个子项目（真实风场包接入）还在等 D420 数据的审计表。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 11:59",
+      "text": "【子项目回报 · 真实风场包接入（CM1 D420 → R0/R1 packet）】D420 首个真实 packet v1 已出；Xhelaj 参数重做为 v2\n结论：\n1) v1 已交：，validator VALID，evidence_type=cm1_event_derived_parameters，not_approved，谱 evidence_blocked。另有实测 sidecar（20 个数组）、和合成包的差异表、EVA v1.1 sidecar（d420_feature_packet_v1.1_eva.json，不知是谁派的，请确认）。\n2) 采纳：剖面 Wood/Verhoff，Umax 31.8 m/s（下界），z_star 266 m（半速高度），29 层 RMS 约 6.8 m/s；gamma 采纳。\n3) 必须改：Xhelaj 水平场峰值 66.8 m/s，是实测 31.8 的 2.1 倍。代理参数取法有误：没扣背景，平移 30.9 m/s 是拼出来的，下沉核其实在 4 km 窗外。已派 v2，放新目录，只换这一块；EVA 升 v1.2；v1/v1.1 不动，因为 EVA v1.1 按哈希引用了 v1。\n4) 事故：11:55 平台阻塞时我自己动手，误覆盖了 bot 已交的 v1 文件，3 分钟后发现，已从平台上传存档原样恢复，哈希全部对上。记录在。\n下一步：v2 回来核完即收口本项目。Wister v2 复制请求仍有效。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 11:59",
+      "text": "Two questions back to the sub-Lead are sent; now updating the status page and closing out.本线第一个来自真实风场的特征包出来了：用 CM1 的 D420 模拟做的 v1，校验程序判通过，科学状态仍是\"未批准\"。\n\n**v1 里能用的**\n- **风速剖面**：最大风速 31.8 m/s。这是下限，因为峰值多半在 50 m 以下，那一段没有数据。风速降到峰值一半的高度约 266 m。\n- **风速随时间的起伏**：采纳，标为代用量。\n- **另外交了三样**：20 个实测数组、和原来合成数据包的差异表、一份给极值线的字段文件 v1.1。\n- **v1.1 是谁派的**：子项目 Lead 问过，我查清了。极值线 Lead 今天来核对它的输入字段，本线据此把数据包格式升到 v1.1，bot 照这个生成。它是正式产物，不是来路不明的文件。\n\n**要重做的**\n- **问题**：水平风场模型算出最大 66.8 m/s，是实测 31.8 m/s 的 2.1 倍。原因是模型参数取错了：\n - 没扣掉背景风\n - 风暴移动速度是把四个面各自的峰值拼出来的，不是同一个结构\n - 下沉气流核心其实在 4 km 数据窗外面。\n- **处理**：子项目已派 v2，放新目录，只换这一块；给极值线的字段文件跟着升 v1.2。v1 和 v1.1 一字不动，因为极值线已经按文件哈希引用了 v1。\n\n**一起事故，已恢复**\n11:55 平台卡住时，子项目 Lead 自己动手，没先看目录，覆盖并删除了 bot 已交的 v1 文件。3 分钟后发现，从平台上传存档原样恢复，6 个文件哈希全部对上，校验也通过。已定下规矩：写任何输出目录之前先查看里面已有什么。属于\"覆盖已有结果\"一类，所以向你报备，没有数据损失。\n\n**其他**\n- **重复派活**：同一条派活在 bot 的执行对话里被重复送了 14 次，是平台卡住期间的重试。我已提醒子项目，重做 v2 时别让 bot 照着旧消息再跑一遍覆盖 v1，一切以文件哈希为准。\n- **第二份数据 Wister v2**：早已复制到位，子项目回报里说\"仍在等\"是消息没同步，我已再告诉它一次。\n\n**下一步**：v2 核完，这个子项目就收口；接着开第三个子项目\"事件谱与下游接口\"。\n\n\n\n\n（附件：d420_packet_v1_review_20261009.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 12:04",
+      "text": "【子项目回报 · 来源内核修复与基准（Dang guard / Moeini / 九模型）】来源内核修复与基准已收口\n三项全部验收：Dang 来源常数保护；Moeini finite-ABL 41.705 m（原文 41.6，Eq.43 印刷符号错误已裁决）；九模型 Python 与 MATLAB bot 独立转写脚本在 Octave 执行 11/11 一致（本机 MATLAB R2026a 启动即崩溃 0xc0000005，未能用 MATLAB 实跑，属机器故障，建议告诉 Liang Hu）。94 passed。公式清单 v2：。决策记录。请在本子项目用\"总结并合并\"合回；我这边无后续活。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 12:04",
+      "text": "收尾：内核子项目已收口，测试解耦我自己修好了（94 passed，单独拷 tools 也过），正在更新线况。\"来源内核修复与基准\"子项目收口了，三项都已验收；全套测试我复核过，94 项通过。\n\n- **Dang 内核**：来源常数加了保护，不能被悄悄改掉。\n- **Moeini 有限边界层分支**：算出 41.705 m，原文是 41.6 m。差异来自原文 Eq.43 印错了正负号，这个结论只在本线内部用。\n- **九个模型**：我们自己的 Python 版，和 MATLAB bot 另行从原版程序转写的脚本，两份独立转写在 Octave（MATLAB 的开源替代）里跑，11 项结果全部一致。\n- **新版公式清单**：。\n\n**需要你处理一件机器上的事：本机 MATLAB R2026a 一启动就崩溃**\n- 连最简单的查版本命令都会崩，报错是访问冲突 0xc0000005（`mwhomesessionmanager_impl.dll`）。\n- 所以这次没能用 MATLAB 实际运行原版图形界面程序，只能用 Octave 替代核对。\n- 这不阻断本线，但所有线的 MATLAB bot 现在都用不了 MATLAB，要修本机安装或重装。\n- 修好后，我会用同一套脚本在 MATLAB 里再核一遍。\n\n**Decision I made**\n- **接受用 Octave 代替 MATLAB 收口**：两份转写出自不同 bot，脚本里只有普通算式，用 Octave 跑和用 MATLAB 跑结果一样。代价是：如果原版界面程序在算式之外还有隐藏处理（比如默认值、单位换算），这次可能漏掉。等 MATLAB 修好再复核。\n- **自己补了一个收尾漏洞**：之前要求子项目把九模型测试的代码移回程序目录，收口时还没做，只拷贝程序目录测试就会报错。我把这段代码复制进了，输出目录里的原件没动。现在原位置和单独拷贝两种方式都是 94 项通过。\n\n**请你在界面上操作一下**：在子项目 `` 里点\"总结并合并\"，把它合回本。我这边没法替你点。\n\n另一个子项目\"真实风场包接入\"在等 D420 特征包 v2，核完收口后开第三个子项目\"事件谱与下游接口\"。\n\n\n\n\n（附件：kernel_benchmark_close_20261009.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 12:07",
+      "text": "【子项目回报 · 真实风场包接入（CM1 D420 → R0/R1 packet）】D420 真实 packet v2 已交付，本项目可收口\n结论：\n1) 交付：（packet，validator VALID，evidence_type=cm1_event_derived_parameters，not_approved，谱 evidence_blocked）+ EVA 字段 v1.2 + 审计表 + 和合成包的差异 + v2 对 v1 对比。v1/v1.1 原件未动。\n2) 可用：剖面（Wood/Verhoff，峰速 31.8 m/s 为 50 m 以上下界，半速高度 266 m）、gamma 时间调制，可交给事件谱与下游接口做 dry run。\n3) 不可用作场：Xhelaj 水平均值在 D420 上不可辨识。v2 峰值 28.7 m/s 不再超标，但最佳相位下与实测首帧 50 m 场的 RMS 为 5–8 m/s（实测均值 11.4 m/s），只能当 R2 代理。下游需要 50 m 水平场时，用 sidecar 里的实测首帧场。\n4) 建议：可以分叉“事件谱与下游接口”了；移动场要么等 CM1 出逐时内部 50 m 切片，要么接 Wister v2。Wister v2 复制请求仍有效。\n决策：。请在本对话做“总结并合并”。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 12:07",
+      "text": "\"真实风场包接入\"子项目收口了，本线第一个真实风场特征包 v2 正式交付。第三个子项目\"事件谱与下游接口\"已经开工。\n\n**v2 结果（我复核过）**\n- 校验程序判通过，科学状态仍是\"未批准\"；v1 和给极值线的 v1.1 文件哈希都没变。\n- **能交给下游用**：\n - 风速剖面：峰速 31.8 m/s，是 50 m 以上的下限；风速降到一半的高度约 266 m。\n - 风速随时间的起伏。\n- **不能当真实风场用**：水平风场模型。v2 的峰值 28.7 m/s 已不再偏高，但和实测 50 m 风场比，误差 5–8 m/s（实测平均风速才 11.4 m/s）。原因是 D420 数据窗口只有 4 km，定不住这个模型的参数，所以它只能当代用量。下游需要 50 m 水平风场时，直接用实测的第一帧。\n\n**新子项目：事件谱与下游接口（``）**\n- **目标一**：从真实时程算出这个事件的风速谱、积分尺度、多点相干，让数据包的谱状态从\"缺证据\"变成\"候选\"。\n- **目标二**：请极值线、CFD 线各自试读这个包，各交一份\"能读 / 不能读\"回执。\n- **第一件事**：在 D420 侧面每秒一个的时程上算单点谱，并比较三种相干模型的敏感性。\n- **Wister v2 的用法**：只用来看慢变化和对照站点观测，它每 60 秒才一个值，算不了湍流谱。\n\n**Decision I made**\n- 收口 v2，并且不等移动风场就开谱子项目。剖面和时间起伏已经能用，谱和下游试读是 Step 2 剩下的唯一一道门。\n- 代价：D420 只有 261 秒，低频部分和积分尺度都不太准，结果只能标\"候选\"。CM1 以后如果给出更长的 50 m 内部切片，要重算。\n\n**请你在界面上操作**：对两个已收口的子项目各点一次\"总结并合并\"，一个是内核修复 ``，一个是真实风场包接入 ``。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 12:09",
+      "text": "【子项目回报 · 事件谱与下游接口（D420 谱 + EVA/CFD 读包 dry run）】事件谱子项目已启动：谱计算、文献索引、EVA/CFD dry run 四路已派\n结论：项目页改为进行中（lead_topic）。已派：windfield （D420 四侧 1 s 时程单点 PSD、50/100/200 m 积分尺度、100–1000 m 点对 coherence 对三档 Davenport C=7/10/16，输出新目录）；litwiki （谱/相干模型页码索引）；EVA Lead 29283339、CFD Lead 对 packet v2 只读 dry run。注意：可分辨频带高端受 CM1 约 100 m 网格滤波限制，不是 Nyquist 0.5 Hz，已要求从谱上量出。validator L1132 硬性要求 evidence_blocked，这一轮不改，谱核完后再派 schema v1.2 + packet v3。决策。下一步：等四份回来核对。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 12:09",
+      "text": "\"事件谱与下游接口\"子项目已开工，四件事同时在跑：\n\n- **风场 bot 算谱**：用 D420 四个侧面每秒一个的风速时程，算三样东西：\n - 单点风速谱\n - 50、100、200 m 三个高度的积分尺度\n - 100–1000 m 间距点对的相干性，并和三档 Davenport 相干模型比较。\n - 结果放新目录。\n- **文献 bot**：给要用到的谱模型和相干模型编页码索引。\n- **极值线 Lead、CFD 线 Lead**：各自只读试读 v2 风场包，回报能读还是不能读。\n\n子项目 Lead 提出一个对的判断：这份谱能看清的最高频率，受 CM1 约 100 m 网格的平滑限制，比每秒采样理论上能到的 0.5 Hz 低。已要求从算出来的谱上实测这个上限，不按理论值写。\n\n另外，现有校验程序硬性规定谱状态只能是\"缺证据\"。这一轮不动它；等谱核完，再升级数据包格式到 v1.2、出 v3 包时一起改。\n\n我这边只更新了线况页。顺带改了一个错误：上一轮我在两份决策记录和线况页里写的时间是估的，偏晚了半小时左右，已按文件实际时间改为 12:06、12:08。\n\n四份结果回来后，由子项目 Lead 核对，再报上来。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 12:17",
+      "text": "【子项目回报 · 事件谱与下游接口（D420 谱 + EVA/CFD 读包 dry run）】D420 给不出湍流谱；EVA/CFD 均能读 v2；v3 已派；事件谱换数据源需 Liang Hu 定\n结论：1) EVA、CFD 对 packet v2 均回'能读'（哈希全过、形状/单位/坐标对上），各 3 处非阻断修正——验收②达成。2) D420 谱（我复核 σu 与谱斜率）：CM1 100 m 网格 + 261 s，可分辨带仅 0.0077–0.013~0.022 Hz、每侧 1–2 频点，0.02–0.2 Hz 斜率 −8.6 为网格滤波、无惯性子区；结构频带 0.05–3 Hz（6EBHGKV3 p.10）完全在外。谱块保持 evidence_blocked、validator 不改；σu 1.4–5.1 m/s、I 0.13–0.39、L0 222–461 m 作 R2 描述特征入 v3。3) 已派 v3：六处修正 + 该特征 + CFD_Interface_Packet v1 映射文件（标明非入口）。决策。\n需 Liang Hu 定（改科学方向）：目标①'事件特定谱'在 D420 上不可达，换数据源 A 文献约化谱作 literature_candidate / B CM1 嵌套 10–20 m LES / C events 线 ≥1 Hz 实测；我推荐 A 先行、C 并查。\n下一步：v3 回来核 VALID，请 EVA/CFD 补读一次。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 12:17",
+      "text": "极值线和 CFD 线都能读我们的真实风场包 v2；但 D420 这份模拟数据算不出可用的事件风速谱。\n\n**下游试读：通过**\n两条线各自核对了哈希、数组形状、单位和坐标，全部对上，各提了 3 处不影响使用的小修正。这些修正已合并进 v3，正在做，做完再请他们读一遍。\n\n**事件风速谱：D420 给不出**\n- **数据精度不够**：CM1 网格 100 m、记录只有 261 秒，能分辨的频率只有 0.008–0.02 Hz，每个侧面只有 1–2 个频点。结构响应关心的是 0.05–3 Hz（依据 Roncallo & Solari 2020，卡片 6EBHGKV3 p.10），完全在这个范围之外。\n- **高频部分是假象**：比 0.02 Hz 更高的部分，谱掉得远比真实湍流陡，是网格把小尺度抹平了，不是真实湍流。\n- **处理**：谱这一块继续标\"缺证据\"。可分辨尺度上的几个描述量作为代用量放进 v3：风速标准差 1.4–5.1 m/s、湍流强度 0.13–0.39、尺度 222–461 m。\n\n**Decision I made：换数据源中两条我直接定了**\n\n子项目把三个备选都当成\"改科学方向\"报了上来。我判断其中两条不改科学问题，已批准执行：\n\n- **A 先用文献里的约化谱顶上**：明确标\"文献候选\"，不叫\"事件特定\"。这本来就是原计划第六层\"先接受外部提供的谱\"的做法。如果你认为下游不该看到非事件谱，撤回这个标记就行，原来\"缺证据\"的标法保留着。\n- **C 向事件线问有没有每秒至少 1 个点的实测风速记录**：只要一份清单，不要数据。\n\n**需要你定：要不要开 CM1 嵌套细网格 LES**\n\n这是第三个备选 B，算新的模拟方向，所以留给你。\n- **做什么**：在 D420 外流区套一层 10–20 m 网格的大涡模拟，拿到真正的事件湍流谱。\n- **代价**：要在超算上新跑一次模拟，CM1 线也要投入人力。\n- **我的建议**：先不开。等 A 和 C 的结果出来，看实测记录够不够，再决定值不值。\n\n\n\n\n（附件：d420_spectrum_not_resolvable_20261009.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 14:44",
+      "text": "【子项目回报 · 事件谱与下游接口（D420 谱 + EVA/CFD 读包 dry run）】事件谱与下游接口已收口：v4 定稿，谱为 literature_candidate，EVA/CFD 均能读\n结论：定稿 （runner，VALID，100 passed，not_approved）。① 谱：D420 网格给不出湍流谱，按 A 路 literature_candidate 达成——von Kármán 形（Liu 2023 Eq.30）、L_u 25.66 m、I_v 0.12、竖向相干 Chen&Letchford 2005 RFD、C_y=null；Canepa 2024 意大利 10 Hz 实测 89 条（I_v 0.179、L_v 18.6 m）区间支持取值，C_y 站距≥1.5 km 不可识别。② EVA、CFD对 v4 均'能读'、无阻断。遗留 3 处元数据小瑕疵下次出包修；事件特定谱只能靠 B 路（CM1 嵌套细网格，等 Liang Hu）。决策。请在本子项目用'总结并合并'合回。下一步：本子项目无后续活。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 14:44",
+      "text": "本线三个子项目今天全部收口。定稿包是，我复核过：校验通过，100 项测试全过，科学状态仍是\"未批准\"。\n\n**三个问题的答案**\n\n| 问题 | 结果 |\n| --- | --- |\n| 真实事件能否进线 | 能。风速剖面可用：最大风速 31.8 m/s，是 50 m 以上的下限，半速高度 266 m；风速随时间的变化曲线也可用。水平移动场用 D420 定不出来，只能当代用量。 |\n| 内核是否与原文一致 | 是。Dang 内核的常数已加保护；Moeini 算出 41.705 m，原文 41.6 m；九模型独立核对 11 项全部一致。 |\n| 下游能否读 | 能。极值线、CFD 线对 v2、v3、v4 三版都回执\"能读\"，没有阻断。 |\n\n**风速谱：先用文献谱顶上，不是这次事件自己的谱**\n- **谱形与参数**：谱形用 von Kármán（Liu 2023），湍流尺度 25.66 m，湍流强度 0.12。\n- **竖向相干**：用 Chen & Letchford 2005。\n- **水平相干**：留空。库里没有雷暴的标定，硬填就是编。\n- **实测佐证**：Canepa 2024 意大利港口 10 Hz 实测 89 条，测得湍流强度 0.179、尺度 18.6 m，量级上支持上面的取值。\n- **为什么没有事件自己的谱**：事件线查过，所有登记事件，包括和 D420 对应的 Wister 事件，都只有 1 分钟或 5 分钟的站点记录，没有每秒 1 个点以上的数据。\n\n**需要你定：要不要开 CM1 嵌套细网格 LES**\n\n想要 D420 这场事件自己的湍流谱，只剩这条路：在 D420 外流区套一层 10–20 m 网格的大涡模拟。这是新的模拟方向，要上超算，CM1 线也要投入人手。\n\n我的建议是暂不开：下游现在用文献谱已经能往下走。等结构线真的需要事件自己的谱时再开。\n\n**需要你处理的两件小事**\n1. 本机 MATLAB R2026a 一启动就崩溃，所有线的 MATLAB bot 都受影响。\n2. 三个子项目 ``、``、`` 请在界面上各点一次\"总结并合并\"。\n\n**Decision I made**：接受这个子项目以\"文献谱\"的标准收口，没达到原定的\"事件谱\"标准。理由是两项验收都有文件和哈希为证。代价是，如果下游坚持要事件自己的谱，就得等上面那个 LES 决定之后重开。\n\n还剩 3 处数据包里的说明字段小毛病，下次出包时顺手改。本线目前没有在跑的任务。\n\n\n\n\n\n（附件：event_spectrum_downstream_close_20261009.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 15:38",
+      "text": "【委托结果 · 风场 Lead】告知：runner 解释器固定为 工作目录\n委托失败：服务重启中断了子对话\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 15:38",
+      "text": "刚才系统报的是一条旧消息失败：给子项目的\"运行环境固定为 工作目录\"的提醒，因服务重启没送到。这不影响结果：\n\n- **不用补发**：三个子项目已经全部收口，它们实际都用这个环境跑过，最后复核是 100 项测试全过。\n- **已写进本线规则**：这条规定在本线的 里，以后的 Lead 和派活都会看到。\n\n我顺手更新了 里\"现有项目\"一节，原来写的还是\"未开始\"，现在改成三个子项目已收口、下游读 v4 包。\n\n还等你定的是：要不要开 CM1 嵌套细网格 LES 来取这场事件自己的湍流谱，我的建议是暂不开。另外两件请你处理：本机 MATLAB 一启动就崩溃；三个子项目请在界面上各点一次\"总结并合并\"。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 15:39",
+      "text": "【委托结果 · 风场 Lead】告知：runner 解释器固定为 工作目录\n委托失败：服务重启中断了子对话\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 15:39",
+      "text": "这是同一条运行环境提醒的另一份副本（发给另一个子项目的），也因服务重启没送到，同样不用补发：三个子项目都已收口，这条规定已写进本线。线况没有变化。\n\n还等你定的是：要不要开 CM1 嵌套细网格 LES，我的建议是暂不开。另外两件请你处理：本机 MATLAB 一启动就崩溃；三个子项目请在界面上各点一次\"总结并合并\"。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 15:41",
+      "text": "【子项目回报 · 真实风场包接入（CM1 D420 → R0/R1 packet）】Wister v2 时间调制任务未执行（网关排空）；本项目不重派"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 15:41",
+      "text": "15:37 那次 Wister v2 时程对照没跑成：平台网关当时排空，任务直接失败，没有任何产出。我已让\"真实风场包接入\"子项目（``）重新派一次。\n\n**这次要做的**\n- **时程变化**：用 Wister v2 整场事件（0–7200 s）的 10 m 风速，算风速随时间的变化曲线、峰值和持续时长。\n- **和 D420 对照**：比对两边风速随时间的变化。\n- **模式与观测比**：算模式峰值和实测峰值 25.9 m/s 的比值。\n- **边界**：不出新的风场特征包，也不编造剖面。\n- **输出位置**：新目录。\n\n**Decision I made：在原子项目里临时重开，做完再收口，不新开项目。**\n- **为什么做**：Wister 就是 D420 对应的那场真实事件，这一步是本线唯一能把模拟和实测风速挂上钩的地方，而且工作量小。\n- **为什么放回原子项目**：数据和任务书都在它那里，一个课题只留一个节点。\n- **代价**：这个子项目的状态会短暂从\"已收口\"变回\"进行中\"。\n- **重试规则**：网关再失败，隔 30 分钟重试一次，还不行就报上来，不连续重试。\n\n线况页的\"在跑\"一栏已更新。还等你定的事没变：要不要开 CM1 嵌套细网格 LES（我建议暂不开）。另外请你处理两件：本机 MATLAB 一启动就崩溃；三个子项目请在界面上各点一次\"总结并合并\"。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 15:42",
+      "text": "【子项目回报 · 来源内核修复与基准（Dang guard / Moeini / 九模型）】九模型测试已与 解耦\n基准逻辑移入，测试只依赖 tools/， 改为薄包装（表重跑逐字不变）；另加 Octave 独立值回归测试。本目录 101 passed。只拷 tools/ 复跑时九模型测试通过，但仍有 1 项失败：::test_literature_candidate_with_hash_bound_source_validates（13:17 别的项目新增，依赖 tools/ 外的哈希绑定源，windfield_run.py:1283），不是本子项目的，请转给它的项目。补记在。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 15:42",
+      "text": "九模型测试已经不再依赖输出目录了，我在原位重跑一遍，101 项全过。\n\n子项目报的那 1 项失败，我查了，不是缺陷，不用转派：\n\n- **为什么会失败**：文献谱的校验程序会检查引用的文献卡片在本地文献库里真实存在，找不到就判失败。这是有意设计的，防止包里挂着不存在的出处。\n- **只在复制出去时才出现**：子项目把程序目录单独复制到别处去跑，那里没有文献库，所以这一项失败。在原位置跑一直是通过的。\n\nDecision I made：不改代码，也不转给谱子项目；以后验收以\"原位全过\"为准，不再要求程序目录单独复制出去也全过。\n\n- **为什么**：校验文献出处真实存在是一道该有的保护，不能为了单独复制能跑就拆掉。\n- **错了的代价**：将来如果要把程序搬到别的机器上跑，得连同文献卡片一起带过去。\n\n已补记在，线况页也改了。还在跑的是 Wister v2 全程时间变化的对照。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 15:43",
+      "text": "【委托结果 · 风场 Lead】谱数据源：A、C 本线定了，直接做；B 交 Liang Hu\n委托失败：服务重启中断了子对话\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 15:43",
+      "text": "这又是一条旧消息的失败通知：给谱子项目的\"A、C 直接做，B 交你定\"，因服务重启没送到。不用补发：那个子项目当时已自行按同样的判断做完了 A 和 C，结果就在已收口的 v4 包里，事件线也已回复没有每秒 1 次以上的实测记录。\n\n线况没有变化。目前只有 Wister v2 全程时间变化对照在跑。\n\n还等你定的仍是：要不要开 CM1 嵌套细网格 LES，我建议暂不开。"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-09 15:48",
+      "text": "【Liang Hu】MATLAB 已经能用了：之前崩溃是因为我开着 MATLAB 时第二个实例会在启动/退出时崩；现在 bot 统一用 `matlab-batch` 命令跑（已写进 MATLAB bot 的规则，实测通过）。请把九模型 MATLAB 运行时验收（matlab 委托 那件）重新派一次。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 15:48",
+      "text": "九模型在真 MATLAB 里的运行验收已经重新派出。我交给了原来的内核子项目（``），由它新开 MATLAB 任务，验收完再收口。\n\n**任务内容**\n- **怎么跑**：用 `matlab-batch` 命令，不直接启动 MATLAB，免得你开着 MATLAB 时再撞上第二个实例崩溃。\n- **比对标准**：11 项取值逐项和 Octave、Python 的结果比，差小于 1e-10 才算通过；对不上要说明差异从哪来。\n- **顺带一项**：如果 `matlab-batch` 能直接调起原版图形界面程序，就用界面本身再取一次值，把之前\"界面本身没在 MATLAB 里跑过\"这个遗留补上；调不起来就写明原因，不影响验收。\n\n线况页已删掉\"MATLAB 崩溃\"这条待办，改为\"内核子项目临时重开，做 MATLAB 实跑验收\"。现在在跑的有两件：这次 MATLAB 验收，和 Wister v2 全程风速变化对照。\n\n还等你定的是：要不要开 CM1 嵌套细网格 LES，我的建议是暂不开。另外三个子项目请在界面上各点一次\"总结并合并\"，后两件做完后再点也行。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 19:57",
+      "text": "【委托结果 · 风场 Lead】Wister v2 已复制到 \n委托失败：服务重启中断了子对话\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 19:57",
+      "text": "这又是一条旧消息的失败通知（\"Wister v2 已复制到 \"），因服务重启没送到。不用补发：数据早已到位，子项目也知道。\n\n我顺带核了一下今晚重派的两件事，都没受这次重启影响：\n\n- **九模型 MATLAB 实跑**：19:58 已派给 MATLAB bot，用 `matlab-batch` 跑，结果还没回来。\n- **Wister v2 全程风速变化对照**：19:58 已送进\"真实风场包接入\"子项目，子项目正在处理。\n\n线况没有变化。两件回来后我核对数字再报你。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 19:58",
+      "text": "【委托结果 · 风场 Lead】收口前小修：九模型测试别依赖 \n委托失败：服务重启中断了子对话\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 19:58",
+      "text": "这也是一条旧消息的失败通知（\"收口前小修：九模型测试别依赖输出目录\"），因服务重启没送到，不用补发：子项目后来已经自己做完了这件事，我核过，原位 101 项测试全过。\n\n线况没有变化。仍在等两件：九模型 MATLAB 实跑，和 Wister v2 全程风速变化对照。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 19:59",
+      "text": "【委托结果 · 风场 Lead】回你两问：EVA v1.1 来源；Wister v2 已到位\nEVA v1.1 是正式产物，来源已补记；v1.2 照同一 schema 升级。14 次重复投递都没有覆盖 v1，19:58 核对 v1、v2 哈希都没变。Wister v2 的时间调制任务因网关失败没有产出，本项目已收口不重派，要做由根对话决定。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 19:59",
+      "text": "这是子项目对我早先两个问题的回复。它写这条时还没收到我 19:58 的重派，所以说\"不重派\"。重派已经排在它后面，接下来会照做。\n\n回复里的两点我认可：\n\n- **给极值线的 v1.1 字段文件**：是正式产物，来源已补记，v1.2 按同一格式升级。\n- **14 次重复派活**：都没有覆盖 v1，19:58 复核 v1、v2 的文件哈希都没变。\n\n线况没有变化。仍在等两件：九模型 MATLAB 实跑，和 Wister v2 全程风速变化对照。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 20:02",
+      "text": "【子项目回报 · 来源内核修复与基准（Dang guard / Moeini / 九模型）】九模型真 MATLAB 实跑通过，项目再次收口\nMATLAB R2026a 经 matlab-batch 跑 11/11：与 Python 最大差 7.1e-15，与 Octave 4.5e-13（Octave 只存 12 位小数），均 <1e-10。App Designer 类实例化在 batch 下崩溃 0xc0000005，GUI 回调路径仍未实跑，记为非阻断残留。文件拷入 *.csv；补记在；项目页已改回已收口。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 20:02",
+      "text": "九个下击暴流模型在真 MATLAB 里跑通了，内核子项目再次收口。\n\n- **跑法**：MATLAB R2026a，用 `matlab-batch` 跑，11 项取值全部对上。\n- **对 Python**：最大差 7.1e-15。\n- **对 Octave**：最大差 4.5e-13。这点差来自 Octave 那边结果只存了 12 位小数，不是算式有出入。\n- **验收线**：两边都远小于 1e-10。\n\n**还剩一处没跑到，不影响结论**\n原版图形界面程序本身在批处理模式下一启动就崩，所以界面按钮背后的那条运行路径仍然没在 MATLAB 里实际跑过。这次核对的是界面里写的算式，结果是一致的。只有在界面另外偷偷加了默认值或单位换算的情况下，才会漏掉差异。真需要时可以由人在 MATLAB 窗口里手动点一次。\n\nMATLAB 的原始取值放在，线况页已更新。现在只剩 Wister v2 全程风速变化对照在跑。还等你定的是：要不要开 CM1 嵌套细网格 LES，我的建议仍是暂不开。\n\n\n\n（附件：matlab_runtime_values.csv）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-09 20:11",
+      "text": "【子项目回报 · 真实风场包接入（CM1 D420 → R0/R1 packet）】Wister v2 全程时间调制已交付采纳，本项目再收口\n结论（not_approved）：\n- 站点 10 m 峰 14.45 m/s @ 模式 2880 s；原值/观测 25.9 = 0.558，×1.4 后 0.781。邻域代表点峰 20.19 m/s，原值 0.780，×1.4 后 1.092。站点峰值、基线比、半峰宽我已独立复算，一致。\n- 时间尺度：半峰持续时间站点约 850 s、邻域约 690 s；衰减/上升 1.2 和 4.0。对称 rational 型拟合的 T 不稳（51–889 s，RMSE 约 3 m/s），下游用半峰时长，不用 T。\n- 不和 D420（floor 0.325、T 131 s，50 m/1 s/261 s 截断）合并成一个范围，只并列。等级：Wister 10 m/60 s 为 R1，迁到 3 s 阵风或其他高度为 R2 proxy-only。"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-09 20:11",
+      "text": "Wister v2 全程风速变化对照做完了。它是 D420 对应的那场真实事件，这一步把模拟和观测挂上了钩。子项目 Lead 已独立复算过站点峰值、峰值比和持续时间，结果一致。\n\n**模拟和观测比（观测峰值 25.9 m/s）**\n\n| 位置 | 模拟 10 m 峰值 | 直接比 | 乘 1.4 换算成阵风后比 |\n| --- | --- | --- | --- |\n| 站点 | 14.45 m/s | 0.56 | 0.78 |\n| 站点附近代表点 | 20.19 m/s | 0.78 | 1.09 |\n\n- 1.4 是假设的阵风系数，把模式每分钟一个的平均风换算成阵风。\n- 站点本身偏低，附近代表点乘 1.4 后和观测基本相当。\n- 站点原值在 CM1 线事先定下的合格范围（12.95–24.05 m/s）之内。\n\n**时间尺度**\n- **大风持续多久**：风速高于峰值一半的时间，站点约 850 秒，附近代表点约 690 秒。\n- **形状不对称**：衰减比上升慢，站点慢 1.2 倍，代表点慢 4 倍。\n- **下游用法**：曲线拟合出的时间常数在 51 到 889 秒之间乱跳，不可靠，下游只用持续时间和不对称比。\n\n**使用等级**\n- **原样可用**：10 m 高度、每分钟一个值的时程。\n- **只能当代用量**：换算到 3 秒阵风或别的高度。\n- **不和 D420 合并**：D420 是 50 m 高度、每秒一个值、只有 261 秒，和这里口径不同，两者只并列给出，不合成一个范围。\n- **文件没被动过**：D420 的 v1、v2、v4 包哈希都没变。\n\n线况页\"真实事件包\"一行已补上这组观测锚点。今天派出的活都已完成，本线现在没有在跑的任务。\n\n还等你定的是：要不要开 CM1 嵌套细网格 LES 来取这场事件自己的湍流谱，我建议暂不开。另外三个子项目请在界面上各点一次\"总结并合并\"。\n\n\n\n\n（附件：wister_vs_d420.md）"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-10 08:43",
+      "text": "【委托结果 · 风场 Lead】Wister v2 全程时间调制：在本节点重派\n委托失败：服务重启中断了子对话\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-10 08:43",
+      "text": "这又是一条服务重启后补发的失败通知（\"Wister v2 全程风速变化对照：重派\"），不用处理。这件事其实已经做完：结果在，子项目报上来后我核过，昨晚已向你汇报。\n\n线况没有变化，本线没有在跑的任务。\n\n还等你定的是：要不要开 CM1 嵌套细网格 LES 来取这场事件自己的湍流谱，我的建议是暂不开。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-10 08:43",
+      "text": "【委托结果 · 风场 Lead】重开一件：九模型 MATLAB 实跑验收\n委托失败：服务重启中断了子对话\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-10 08:43",
+      "text": "这同样是服务重启后补发的旧失败通知（\"九模型 MATLAB 实跑验收\"），不用处理。这件事已经做完：MATLAB 11 项全部对上，和 Python 最大差 7.1e-15，结果在，昨晚已向你汇报。\n\n线况没有变化，本线没有在跑的任务。还等你定的仍是要不要开 CM1 嵌套细网格 LES，我的建议是暂不开。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-12 17:52",
+      "text": "【委托 · 来自 数字孪生风洞 Lead】口径对齐请求：城区 LBM-LES 低空风场的入流剖面、粗糙度、参考高度与观测\n我是数字孪生风洞（独立项目）子项目「Urban Field 城市低空风场」的 Lead。我们用 GPU LBM-LES（FluidX3D，dx 5 m，域约 4 km×4.5 km×0.8 km）算真实城区 50–150 m 低空速度场（平均、阵风、尾流、切变），首选城区暂定 Oklahoma City 下城（JU2003 外场数据，待核实），备选纽约曼哈顿。第一阶段是中性良态风（不是雷暴），雷暴非平稳入流以后再接。\n想与风场线口径一致，请回答（引用你们线的文件路径或卡片页码即可，没有现成口径的直说\"无\"）：\n1. 中性 ABL 入流剖面你们用的形式（对数律/幂律/有限 ABL 模型如 Moeini）、上风向粗糙度 z0 分级取值、参考高度（10 m？）、平均时距（10 min/1 h）与阵风时距（3 s）的换算口径。\n2. 湍流谱与强度口径（von Kármán、L_u、Iu/Iv/Iw 随高度）——D420 v4 包里的 von Kármán L_u 25.66 m、I_v 0.12 是事件专用，中性时你们有无推荐值。\n3. 你们接入过的俄克拉何马观测源（Wister 事件用的 Oklahoma Mesonet / ASOS / 雷达径向风等）：哪些能覆盖 OKC 城区、获取方式、你们的读取脚本在哪。\n4. 将来我们输出 50–150 m 风场若要进你们的 packet 格式（real_packet_d420_v4 那类），需要哪些字段。\n不急：48 小时内回即可；不需要你们的 bot 动手算，只要口径与路径。\n（原因：Urban Field 入流与边界口径须与 PETW 风场线衔接（项目设立时 Liang Hu 指定））"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-12 17:52",
+      "text": "Urban Field 子项目的 Lead 来问口径对齐。我查完了本线的文件和知识库，下面直接答复；不需要 bot 动手，也不在本线立项。\n\n（下文路径相对于，本线目录为，简称 WFC。）\n\n**1. 中性大气边界层入流剖面：本线没有现成口径。**\n- **本线只做下击暴流剖面**：Wood/Verhoff、Dang、Xhelaj、Moeini 等，见 、。\n- **Moeini 的\"有限 ABL\"不是中性入流剖面**：它把背景边界层风当作云底高度的一个速度 u_H，用来和下击暴流叠加，见。中性入流不能借用。\n- **粗糙度 z0**：本线只做过敏感性取值 0.01、0.03、0.10、0.30 m（基准 0.03），没有分级口径，见。CFD 线有一条地表粗糙度单因素试验决策可参考：。\n- **参考高度与平均时距**：本线没有统一规定。现有数据用的是 Wister 10 m、60 s，D420 是 50 m、1 s。\n- **10 min / 1 h / 3 s 的阵风换算**：由 EVA 线管，本线没有。\n - \n - 同目录 （ASCE 7 阵风平均时间）、（阵风系数）\n- **本线 Wister 对照里用过的 ×1.4**：只是一个假设阵风系数，不是口径。\n\n**2. 湍流谱和强度：中性条件下本线没有推荐值。**\n- **D420 v4 包里的数都是下击暴流文献候选值，不能当中性值用**：\n - 谱形 von Kármán：，Eq.30，PDF p.14–15。\n - L_u = 25.66 m： p.14。\n - I_v = 0.12： p.17。\n - 竖向相干 Chen & Letchford 2005： pp.23–24。\n - 依据见。\n- **D420 自己给不出湍流谱**：100 m 网格加 261 s 记录，只能分辨到约 0.02 Hz。\n- **建议**：中性条件下的 Iu、Iv、Iw 随高度变化和 L_u，按规范（如 ESDU、EN 1991-1-4）或贵方 JU2003 实测另定。本线库里没有这类卡片，可委托 litwiki 补。\n\n**3. 俄克拉何马观测：本线没有直接接入过，也没有读取脚本。**\n- **本线手里只有 CM1 线 Wister v2 的模式输出**，带一份 WIST Mesonet 站点对照。\n- **两个源都在城区之外**：\n - WIST 站在 OKC 以东很远。\n - 雷达用的是 KSRX（Fort Smith）公开 Level-II，来源清单在。\n- **建议**：OKC 城区观测（Mesonet OKCN/OKCE 等站、ASOS KOKC/KPWA、KTLX 雷达）问事件线 ``。它们有获取和分析脚本的先例，例如。上面这几个站号只是线索，请核实。\n\n**4. 进本线数据包需要的字段**\n- **格式文件**： 下的，以及 （逐特征字段）和 （谱状态）。\n- **运行程序的输入输出契约**：。\n- **最低要求**：\n - 事件编号、来源文件及哈希\n - 坐标系与风向约定、单位\n - 空间和时间分辨率、高度层、分析时窗\n - 每个特征标 R0–R3 分辨率等级并注明是否代用量，附不确定性说明\n - 允许和禁止的下游用途\n - `scientific_status=not_approved`。\n- **实例**：。\n- **一处适配**：校验程序目前只认下击暴流的剖面模型，中性城区风场进来要加一种直接读实测场的表示方式。到时请把样例交给本线 Lead，我们来接。\n\n我在线况页记了一行，不立项。\n\n## 结论\n1. **入流剖面与粗糙度**：风场线没有中性 ABL 入流口径，只做下击暴流剖面；Moeini 有限 ABL 不能当中性入流用。z0 只做过 0.01/0.03/0.10/0.30 m 的敏感性。参考高度和平均时距没有统一规定；阵风时距换算以 EVA 线卡片为准（`EVA-STEP3-C07`、`EVL2LFZK`、`2KXRIJJB`、`ZR7S3SEJ`），CFD 线的 z0 决策可参考。\n2. **湍流谱与强度**：中性条件下无推荐值。D420 v4 的 von Kármán、L_u 25.66 m、I_v 0.12 都是下击暴流文献候选值（卡片 P75A95JC、3E2M4J4I、6EBHGKV3），不适用于中性良态风。建议按规范或 JU2003 实测另定。\n3. **俄克拉何马观测**：风场线没有直接接入，只有 CM1 的 Wister 对照（WIST 站和 KSRX 雷达，都不覆盖 OKC 城区）。城区观测请问 ``。\n4. **数据包字段**：按 、v1.1、v1.2 增补和 准备，样例。中性城区场进来时需要加一种实测场表示方式，到时请把样例交给风场线 Lead。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-14 22:48",
+      "text": "【委托 · 来自 PETW 总 Lead】工作站 C 盘告急：暂停本机 >1 GB 写入\n总 Lead 紧急通知（10-14 23:00）：工作站 C 盘只剩约 21 GB，可能今晚或明天写满，写满全平台停。即刻起至另行通知：本线（含 bot、子项目）暂停在 工作站 本机上任何单次 >1 GB 的写入或下载（含 WSL 里的 工作目录 目录——WSL 盘就在 C 盘上；也含 工作区）。CRC/TACC 上的作业不受影响。大输出一律留在集群。已在进行的 >1 GB 本机写入请停在安全点并回我一句；没有则不需回复。不删任何文件——删除仍须 Liang Hu 批。\n（原因：工作站 C 盘将满，全平台风险）"
+    },
+    {
+      "role": "bot",
+      "who": "风场",
+      "ts": "2026-10-14 22:48",
+      "text": "收到总 Lead 的紧急通知：工作站 C 盘只剩约 21 GB。本线没有需要停的写入：\n\n- **当前状态**：本线三个子项目都已收口，没有在跑的委托或作业，也没有正在进行的大文件写入或下载。\n- **磁盘占用**：本线在 工作站 上最大的一项是运行环境，329 MB，是已经存在的，不会再增长。\n- **今后执行**：已在线况页记下这条禁令。之后如果派活，任务书里会写明：单次超过 1 GB 的输出留在集群，不往本机写，也不删任何文件。\n\n## 结论\n风场线没有进行中的超过 1 GB 的本机写入或下载，无需停。本线三个子项目均已收口，没有在跑的委托或作业；本机最大占用为 329 MB，已存在、不再增长。禁令已记入线况页，之后派活时任务书会写明大输出留集群、不在 工作站 本机写入超过 1 GB，也不删任何文件。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-15 12:59",
+      "text": "【告知 · 来自 PETW 统筹】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nCRC 共享 SSH 主连接（[用户]@超算）10-15 12:56 断开，socket 已不在（总 Lead 12:59 复核）。在平台通知恢复之前：本线及 bot 暂停一切 CRC 命令（ssh/scp/rsync/qsub/qstat），**绝不重连、不重试**。已在 CRC 上跑的作业不受影响，只是暂时没人盯；TACC 照常。有 CRC 依赖的活先做本机小文件部分或 TACC 部分。恢复后平台会通知。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-15 15:32",
+      "text": "【告知 · 来自 PETW 统筹】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nCRC 主连接已由 Liang Hu 重建，平台 15:30 确认正常，可恢复 CRC 操作。注意：分析提交到计算节点跑，登录节点只提交作业和做很短的查询；scp 大文件分批、每批限时；经 socket 的 ssh/scp 一律加 -n 或 stdin 用普通文件/ [local path omitted]，不用 FIFO 或不结束的管道；d24cepyc154 仍默认排除；连接再断不重连。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-16 08:09",
+      "text": "【告知 · 来自 知识库智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n | 香港行人高度风速与湍流现场观测 | 建议入口 E2 | 需全文核观测划分、数据可用性 | 来源笔记 \nE2=精读待定：请你（或派 litwiki/文献 bot）精读，写精读卡；精读结论和建议出口 X1–X5 + 理由交回平台 Lead「开新项目与子项目」，出口由 Liang Hu 审批，X3/X4/X5 等批后再落地。觉得入口不对可以改，在来源笔记 Disposition 行尾注明。"
+    },
+    {
+      "role": "relay",
+      "who": "风场特征 Lead · 转达",
+      "ts": "2026-10-16 23:16",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）"
+    }
+  ],
+  "files": {
+    "self": "841575f7.json",
+    "claims": null,
+    "pdf": null
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "id": "ae4ca290",
+  "slug": "ae4ca290",
+  "number": "R25.2",
+  "title": {
+    "zh": "R25.2 高保真 CFD（LES/LBM）",
+    "en": "R25.2 High-fidelity CFD (LES/LBM)"
+  },
+  "group": "uwp",
+  "parent": "548d771a",
+  "depth": 1,
+  "status": {
+    "zh": "待开工",
+    "en": "Not started"
+  },
+  "status_class": "todo",
+  "done": false,
+  "start": "2026-10-16 20:44",
+  "end": null,
+  "updated": "2026-10-16 20:47",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "发展能高精度算建筑群中目标建筑表面风压的 LES 或 LBM 模型，以 TPU 数据验证，再批量产出训练数据。",
+    "goal_en": "Develop LES or LBM models capable of accurately computing surface wind pressure on target buildings within building clusters, validate against TPU data, and generate training datasets in batch."
+  },
+  "report": {
+    "zh": "# 高保真 CFD（LES/LBM）（UBWP，公开项目（Liang Hu 10-17 撤销保密））\n\n## 目标\n发展能高精度算建筑群中目标建筑表面风压的 LES 或 LBM 模型，以 TPU 数据验证，再批量产出训练数据。\n\n## 当前状态\n待开工：10-16 按 Liang Hu 要求先建好，等开工指令；不做研究、不派 bot、不提交作业。Liang Hu 补文献前不开工。\n\n## 已定决定\n- 2026-10-16 先建不开工 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n\n## 未决与下一步\n- 开工后：先定 LES 还是 LBM；LBM 须先有表面 Cp 对 TPU 的实测对照，LUW 源码因许可不能直接用。\n\n## 文献依据\n- （只读参考）\n- \n\n## Liang Hu 注",
+    "en": "# 高保真 CFD（LES/LBM）（UBWP，公开项目（Liang Hu 10-17 撤销保密））\n\n## 目标\n发展能高精度算建筑群中目标建筑表面风压的 LES 或 LBM 模型，以 TPU 数据验证，再批量产出训练数据。\n\n## 当前状态\n待开工：10-16 按 Liang Hu 要求先建好，等开工指令；不做研究、不派 bot、不提交作业。Liang Hu 补文献前不开工。\n\n## 已定决定\n- 2026-10-16 先建不开工 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n\n## 未决与下一步\n- 开工后：先定 LES 还是 LBM；LBM 须先有表面 Cp 对 TPU 的实测对照，LUW 源码因许可不能直接用。\n\n## 文献依据\n- （只读参考）\n- \n\n## Liang Hu 注"
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "城市风压 Lead · 开子项目",
+      "ts": "2026-10-16 20:44",
+      "text": "【Liang Hu 让 线况与派活 分出的子对话】UBWP 项目，不对外公开。目标：发展能高精度算建筑群中目标建筑表面风压（均压、脉动、峰值）的 LES 或 LBM 模型，以 TPU 数据为基准验证，再批量产出训练数据。项目页；父页：；参考：（只读）。状态：待开工——等开工指令，不做研究、不派 bot、不提交作业。"
+    },
+    {
+      "role": "bot",
+      "who": "城市风压",
+      "ts": "2026-10-16 20:44",
+      "text": "「高保真 CFD（LES/LBM）」子项目已经建好，现在处于待开工状态。按你的要求，我这次只核对了文件：没有做研究，没有派 bot，也没有提交作业。\n\n- **项目页**： 已写好目标、状态（待开工）、已定决定和文献依据（广州 GPU-LBM 精读卡，以及 LBM 表面风压精度那张 wiki 卡）。父页「子项目」一节里有它的链接。\n- **决策记录**：。\n- **开工后第一件事**：先定用 LES 还是 LBM。如果选 LBM，要先拿到表面风压和 TPU 的实测对照证据，均压、脉动风压、峰值三项分开比。LUW 源码受许可证限制，不能直接用。\n- **开工条件**：你把文献补上后，先让 litwiki 建 UBWP 文献子库，再按你定的先后顺序开工。\n\n等你说开工我再动。"
+    }
+  ],
+  "files": {
+    "self": "ae4ca290.json",
+    "claims": null,
+    "pdf": null
+  }
+}

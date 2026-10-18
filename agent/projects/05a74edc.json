@@ -1,0 +1,1021 @@
+{
+  "id": "05a74edc",
+  "slug": "05a74edc",
+  "number": null,
+  "title": {
+    "zh": "美丽新世界实验室总线",
+    "en": "Make World Better Place mainline"
+  },
+  "group": "better",
+  "parent": null,
+  "depth": 0,
+  "status": {
+    "zh": "进行中",
+    "en": "Ongoing"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-16 12:38",
+  "end": null,
+  "updated": "2026-10-18 15:14",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "# 任务书 · Make the World a Better Place 实验室 · 首批课题（Liang Hu 10-16 口述）\n\n来源：Liang Hu 10-16 在平台 Lead「开新项目与子项目」对话口述，以下「原话」一字不改；「要回答的问题」是平台 Lead 的整理，供开题用，以原话为准。\n\n---\n\n## 课题 1　结构非线性在抗风设计中是否应考虑\n**原话**：结构的非线性在抗风设计，特别是高层建筑结构设计和桥梁抗风设计中，是否应该考虑？应当如何考虑？为什么一般默认抗风设计不应该考虑非线性问题。围护结构当然不同。\n**要回答的问题**：\n- 主体结构（高层、桥梁）抗风设计默认线弹性的依据是什么（规范、荷载水平、疲劳与舒适度控制、可重复性）？\n- 近年\"考虑非线性/性能化抗风\"的研究主张了什么，适用范围多大？\n- 在哪些条件下非线性确实应当进入设计（何种结构、何种风灾、何种极限状态），应当怎样进入？\n- 围护结构为何不同，单独说明。\n\n## 课题 2　气候变化是否增加设计风速\n**原话**：气候变化，目前有何证据它会增加设计风速？如果不能，那么它对风工程的影响究竟体现在什么地方？\n**要回答的问题**：\n- 观测与模拟中，极值风速（良态风、台风/飓风、雷暴）随气候变化的证据强度分别如何？区分\"强度\"\"频率\"\"路径/纬度北移\"\"风暴潮与降雨耦合\"。\n- 若设计风速证据不足，影响真正落在哪里（如台风北移带来的新暴露区、持续时间、复合灾害、非平稳统计方法）？\n\n## 课题 3　Performance / Resilience 为何进不了最终设计\n**原话**：performance，resilience这些东西，为什么工程界无法使用他们进行最终的设计？当然用来做方案比选和概念设计师可以的。我考虑这主要是因为他们的可靠性不足以让人们相信。另外时间和空间尺度也是个问题，目前对于一次台风和几十年的统计，resilience和performance的概念完全不同，用途也不同。\n**要回答的问题**：\n- 性能化/韧性框架在风工程中的计算链条，哪一环的可靠性最弱（危险性、易损性、损失与恢复模型）？可否量化\"不足以让人相信\"？\n- 单次台风事件尺度与几十年统计尺度下，resilience 与 performance 的定义、用途有何本质不同？现有文献是否混用？\n- 它们在方案比选/概念设计中正确的用法与边界。\n\n**Liang Hu 补充（10-16 11:4x 原话）**：对于resilience和performance，我上面也说了一些，但是更深的想法，实际上是几个方面 1、目前的能力边界，它基本是用于概念设计和初步方案比选，可能会有用；2、缺乏验证，如何验证是个大问题；3、可靠性不确定，如何确定其可靠性：需要trustworthy的resiilence、performance；4、需要一个真正的框架，可以把不确定性分析清楚，这个主要是要确定并尽量控制计算框架每个环节额不确定性，并使其尽量精确（环节的验证是比较可行的）\n\n据此课题 3 的四个分题（以原话为准）：\n- 3a **能力边界**：现阶段能可靠回答哪些问题（概念设计、初步方案比选），哪些不能；用实例界定边界。\n- 3b **验证**：整体结果难以验证——有哪些可用的验证途径（灾后调查、保险理赔、实测损失、构件试验、历史事件回算），各能验证到哪一环。\n- 3c **可信度（trustworthy）**：怎样给 resilience/performance 结果一个可信度或可靠性度量，使其可被工程采信。\n- 3d **分环节控制不确定性的框架**：把计算链条拆成环节（危险性 → 荷载/风场 → 结构/围护响应 → 易损性 → 损失/功能 → 恢复），逐环节界定、量化并尽量压小不确定性；**以环节验证为抓手**（Liang Hu：环节的验证是比较可行的），再组合成整体的不确定性预算。与课题 5（UQ）互通。\n\n## 课题 4　结构优化/拓扑优化为何不被实际设计采用\n**原话**：结构优化，拓扑优化这些，理论非常精巧，但是实际结构设计不愿意使用。这当然是由于安全第一的考虑。但这个合理吗？\n**要回答的问题**：\n- 实际不用的原因拆解：安全储备被优化掉、模型误差与荷载不确定性、施工与可建造性、规范验算体系、责任分配。\n- \"安全第一\"在多大程度上是合理理由，多大程度是惯性？是否存在在给定可靠度约束下的优化，能被工程接受？\n\n## 课题 5　UQ 在工程中到底能完成什么\n**原话**：现有的UQ（uncertainty quanfication）到底能完成什么任务？我不赞成对其方法进行过分研究，但是如何能利用现有的数据和基本方法，把它真正的用到工程中？\n**要回答的问题**：\n- UQ 在风工程中真正落地的任务清单（如设计风速置信区间、风洞到原型的误差带、模型选择）。\n- 用现有数据与基本方法（不发明新方法）即可完成的\"最小可用 UQ\"流程是什么样子？\n\n## 课题 6　同一任务方法泛滥：聚合、分解、比较\n**原话**：有很多任务，对于某一个任务，人们发展了数不清的方法，那些方法真的都有用吗？是否可以把这些方法聚合起来，分解。比较？注意这些方法在数学上经常是站的住脚的，这和气候变化的那种多路径不同。几个例子和我的研究相关：时程的随机模拟（包括inflow）；台风的路径和强度模型（特别是给风工程用的）；结构优化算法；数不清的动力和CFD的surrogate，真的都有用吗？这里面需要基准平台并且明确比较或者综合的方向和目的。我选择的PINO当然是觉得它真的有用。你后续还可以列举很多这种小的topic，重重叠叠，重复研究。\n**子课题**：\n- 6a 风速时程随机模拟（含 CFD 入流生成）\n- 6b 台风路径与强度模型（面向风工程）\n- 6c 结构优化算法\n- 6d 结构动力与 CFD 代理模型（surrogate），含 PINO 的定位\n**要回答的问题**（每个子课题）：\n- 方法谱系：把\"数不清的方法\"按共同的数学骨架聚类、分解为可替换的组件。\n- 基准平台：统一的数据、任务、指标与计算预算；明确比较的**目的**（选一个、组合、还是证明等价）。\n- 哪些方法实质等价、哪些在什么条件下确有优势、哪些冗余。\n- **另**：Liang Hu 请平台/Lead 继续列举同类\"重重叠叠、重复研究\"的小课题，作为候选清单交 Liang Hu 选。\n\n---\n\n## 开题顺序与交付（建议，由 Lead 定、报 Liang Hu）\n- 每个课题先交一页\"开题卡\"：被审视的主张（最强版本）＋代表性文献＋我们的怀疑点＋检验方法＋判据＋预计工作量，Liang Hu 看过再深入。\n- 课题 6 先出各子课题的\"方法谱系图＋基准平台设想\"，并附候选小课题清单。\n- 文献依托：知识库、Zotero、 pages；文献综述按公共规则（先 Grok 快查再 Deep Research，结论送审）。",
+    "en": "# Task Brief · Make the World a Better Place Lab (Better World Lab) · First Batch of Topics (Dictated by Liang Hu on 10-16)\n\nSource: Dictated by Liang Hu on 10-16 in the Platform Lead \"New Projects and Sub-Projects\" conversation. The \"Verbatim Quote\" sections below preserve the original wording; the \"Questions to Answer\" sections are structured by Platform Lead for topic scoping, with the verbatim quotes taking precedence.\n\n---\n\n## Topic 1: Should Structural Nonlinearity Be Considered in Wind-Resistant Design?\n**Verbatim Quote**: Should structural nonlinearity be considered in wind-resistant design, particularly in the design of high-rise buildings and long-span bridges? How should it be considered? Why does wind-resistant design generally default to not considering nonlinearity? Cladding and envelope structures are of course different.\n**Questions to Answer**:\n- What is the basis for defaulting to linear elasticity in the wind-resistant design of primary structures (high-rise buildings, bridges) (codes, load return periods, fatigue and occupant comfort control, repeatability)?\n- What have recent studies on \"nonlinear / performance-based wind engineering\" advocated, and what is their valid scope of applicability?\n- Under what specific conditions should nonlinearity genuinely enter design (which structural types, which wind hazards, which limit states), and how should it be incorporated?\n- Why are cladding/envelope structures different? Explain separately.\n\n## Topic 2: Does Climate Change Increase Design Wind Speeds?\n**Verbatim Quote**: Regarding climate change, what evidence currently exists that it will increase design wind speeds? If it cannot be shown to increase design wind speeds, where does its impact on wind engineering actually manifest?\n**Questions to Answer**:\n- Across observations and simulations, how strong is the evidence for changes in extreme wind speeds (synoptic winds, typhoons/hurricanes, thunderstorms) under climate change? Distinguish among \"intensity\", \"frequency\", \"track / poleward latitude shift\", and \"storm surge and rainfall coupling\".\n- If evidence for increased design wind speeds is insufficient, where does the true impact lie (e.g., newly exposed regions due to poleward typhoon migration, hazard duration, compound hazards, non-stationary statistical methods)?\n\n## Topic 3: Why Performance and Resilience Frameworks Cannot Enter Final Engineering Design\n**Verbatim Quote**: Things like performance and resilience—why can't the engineering community use them for final design? Of course, using them for scheme comparison and conceptual design is fine. I think this is mainly because their reliability is not sufficient for people to trust them. In addition, temporal and spatial scales are also an issue: right now, between a single typhoon event and multi-decade statistics, the concepts of resilience and performance are completely different, and their uses are also different.\n**Questions to Answer**:\n- Across the computational chain of performance-based / resilience frameworks in wind engineering, which link has the weakest reliability (hazard, fragility, loss, and recovery models)? Can \"insufficient to be trusted\" be quantified?\n- How do the definitions and uses of resilience and performance fundamentally differ between the single-typhoon event scale and the multi-decade statistical scale? Does the existing literature conflate them?\n- What are their proper uses and boundaries in scheme comparison and conceptual design?\n\n**Addition by Liang Hu (10-16 11:4x Verbatim Quote)**: Regarding resilience and performance, I mentioned some points above, but my deeper thoughts actually cover four aspects: 1. Current capability boundaries—they are basically useful for conceptual design and preliminary scheme comparison; 2. Lack of validation—how to validate them is a major problem; 3. Uncertain reliability—how to establish their reliability: we need trustworthy resilience and performance; 4. We need a genuine framework that can analyze uncertainties clearly, mainly by identifying and tightly controlling the uncertainty at every link of the computational framework and making each link as accurate as possible (link-by-link validation is much more feasible).\n\nAccordingly, Topic 3 is divided into four sub-topics (governed by the verbatim quote):\n- 3a **Capability Boundaries**: Which questions can currently be answered reliably (conceptual design, preliminary scheme comparison) and which cannot; define the boundary with concrete examples.\n- 3b **Validation**: End-to-end results are difficult to validate—what validation avenues exist (post-disaster surveys, insurance claims, measured losses, component testing, historical event hindcasts), and which link(s) of the chain can each avenue validate?\n- 3c **Trustworthiness**: How to equip resilience/performance outputs with a trustworthiness or reliability metric that engineering practice can accept.\n- 3d **Link-by-Link Uncertainty Control Framework**: Decompose the computational chain into links (Hazard → Load / Wind Field → Structural / Cladding Response → Fragility → Loss / Functionality → Recovery), and define, quantify, and minimize uncertainty at each link; **use link-level validation as the anchor** (Liang Hu: link-by-link validation is much more feasible), then assemble the overall uncertainty budget. Interoperates with Topic 5 (UQ).\n\n## Topic 4: Why Structural and Topology Optimization Are Not Adopted in Practical Design\n**Verbatim Quote**: Structural optimization and topology optimization have very elegant theories, yet practical structural design is reluctant to use them. This is of course out of safety-first considerations. But is that reasonable?\n**Questions to Answer**:\n- Deconstruct why they are not used in practice: optimization stripping away safety margins, modeling errors and load uncertainties, constructability and fabrication constraints, code-based checking systems, and liability allocation.\n- To what extent is \"safety first\" a rational justification versus institutional inertia? Does reliability-based optimization under explicit reliability constraints exist in a form acceptable to engineering practice?\n\n## Topic 5: What Can UQ Actually Accomplish in Engineering?\n**Verbatim Quote**: What tasks can existing UQ (uncertainty quantification) actually accomplish? I do not favor excessive research into UQ methodology itself, but how can we use existing data and basic methods to truly apply it in engineering?\n**Questions to Answer**:\n- Actionable inventory of tasks where UQ genuinely lands in wind engineering (e.g., confidence intervals on design wind speeds, wind-tunnel-to-full-scale error bands, model selection).\n- What does a \"Minimum Viable UQ\" workflow look like when built strictly from existing data and basic methods (without inventing new UQ algorithms)?\n\n## Topic 6: Proliferation of Methods for the Same Task: Aggregation, Decomposition, and Comparison\n**Verbatim Quote**: There are many tasks where people have developed countless methods for a single task—are all those methods really useful? Can we aggregate, decompose, and compare these methods? Note that these methods are often mathematically sound, which differs from the multi-pathway uncertainty in climate change. Several examples related to my research: stochastic simulation of time histories (including inflow); typhoon track and intensity models (especially those for wind engineering); structural optimization algorithms; and countless dynamic and CFD surrogates—are they all really useful? This requires a benchmark platform and a clear direction and purpose for comparison or synthesis. My choice of PINO is of course because I believe it is genuinely useful. Later you can also list many other small topics like this, with overlapping and repetitive research.\n**Sub-topics**:\n- 6a Stochastic simulation of wind-speed time histories (including CFD inflow generation)\n- 6b Typhoon track and intensity models (for wind engineering)\n- 6c Structural optimization algorithms\n- 6d Structural dynamics and CFD surrogate models, including the positioning of PINO\n**Questions to Answer** (for each sub-topic):\n- Method taxonomy/genealogy: cluster the \"countless methods\" by shared mathematical skeletons and decompose them into interchangeable modules.\n- Benchmark platform: unified datasets, tasks, metrics, and compute budgets; state the explicit **purpose** of comparison (selecting a winner, combining methods, or proving mathematical equivalence).\n- Which methods are substantially equivalent, which hold genuine advantages under specific conditions, and which are redundant.\n- **Additionally**: Liang Hu asks Platform / Lead to continue listing similar small topics characterized by \"overlapping and repetitive research\" as a candidate pool for Liang Hu's selection.\n\n---\n\n## Scoping Order and Deliverables (Proposed by Lead for Liang Hu's Approval)\n- For each topic, first deliver a 1-page \"Topic Scoping Card\": Strongest version of the scrutinized claim + Representative literature + Our points of skepticism + Verification method + Criteria + Estimated workload, for Liang Hu to review before deep dives.\n- For Topic 6, first produce the \"Method Genealogy Map + Benchmark Platform Concept\" for each sub-topic, accompanied by the candidate list of additional small topics.\n- Literature foundation: Knowledge Base, Zotero, and wiki pages; literature reviews follow common rules (quick Grok search first, then Deep Research, with conclusions submitted for review).",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [
+    {
+      "id": "dec-0000",
+      "ts": "2026-10-17 00:16",
+      "title": "L29.1 反例算例分两段：先做节材上界筛查，再决定是否做非线性可靠度（10-17 00:40）",
+      "label": "决定",
+      "text": "# L29.1 反例算例分两段：先做节材上界筛查，再决定是否做非线性可靠度（10-17 00:40）\n\n**决定**：L29.1-03 设计书通过，作为 B 段（完整非线性配对可靠度）方案保留；在其前加 **A 段「节材上界筛查」**：\n- 对代表高层（及桥）做规范线弹性设计，逐构件标出控制工况：风强度 / 层间位移 / 舒适度加速度 / 最小构造 / 地震 / 重力 / 稳定。\n- 对方能节材的部分**最多**只有\"风强度控制\"构件；按对方最有利假设（R_W=2–3，且假设位移、舒适、疲劳全部不额外加材）算上界：节材上界 = Σ(风强度控制构件材料 × (1−1/R_W)) / 主体结构总材料。\n- 上界 <2%：该结构上对方判据\"成立\"不可能达到，B 段不必做（结论仍须按规则送审）；上界 ≥2%：进入 B 段，用完整同等可靠度比较。\n- 风荷载先用公开的东京工艺大学（TPU）高层风洞气动数据库作 A 段来源（待核数据可得性与条款）；CAARC LES 时程是 B 段候选。\n\n**为什么**：设计书指出 B 段被 250 m 高层匹配风时程、桥梁完整截面与初应力、50 年尾部可靠度等多项阻断，预检就 54–864 SU；而判据本身是\"材料节省\"，节省的天花板由强度控制构件占比决定，线弹性设计即可算出，代价小、对对方偏宽（取最有利假设），不改判据。文献侧佐证：Alinejad 2024 部分构件受最小配筋控制、Ghaffary & Moustafa 2021 节材伴随位移和舒适超限（卡片见），提示强度控制占比可能有限——这只是动机，不是依据。\n\n**错了的代价**：若上界法漏算了\"非弹性带来的冗余重分布\"之类收益（例如地震控制构件因风不再加大而间接节省），上界会偏低、对对方不公。对策：A 段把\"风–震协调\"收益（Athanasiou 2023 类主张）单列一项算入上界；B 段保留不删。\n\n判据（项目页页头）未改。无文献依据部分标\"基于本线推理\"。"
+    },
+    {
+      "id": "dec-0001",
+      "ts": "2026-10-17 00:17",
+      "title": "L29.4 共用算例初选与闸门（10-17 00:2x）",
+      "label": "决定",
+      "text": "# L29.4 共用算例初选与闸门（10-17 00:2x）\nDecision I made：主算例有条件取 Deng et al. 2019 CAARC 外形 60 层 RC 框架「新构建模型」（卡片，PDF 第8–9页），备选 Song 等 2023 UBC 20 层钢框架（PDF 第5–7页），Chan 1992 60 层支撑钢框架作 L29.6c 算法副基准（未建卡， 补）。\n为什么：外形与 CFD 线 CAARC 气动包一致、可分组成几十至数百尺寸变量；Spence & Kareem 2014 本身已是离散概率优化，不能当\"只做确定性优化\"的对象，只作方法标尺。\n条件：缺完整结构输入与全向动态风荷载（CFD 线 CAARC 仅 0° 平均荷载）；先过入门闸门再建模。闸门不过则降为探索级或换备选，不填造数据。\n判据读法（解释，不改判据）：恰好 8% 归成立、恰好 3% 归部分成立（\"≥\"优先）。\n错了的代价：若闸门查明无可配准的全向风荷载，需换算例，L29.6c 共用算例跟着改，损失约一周设计工作。\n依据：、three_scheme_design.md。"
+    },
+    {
+      "id": "dec-0002",
+      "ts": "2026-10-17 00:19",
+      "title": "L29.6 统一基准模板与共用判据执行细则（10-17）",
+      "label": "决定",
+      "text": "# L29.6 统一基准模板与共用判据执行细则（10-17）\n\nDecision I made：写定 L29.6a–6d 共用的统一基准规范模板 v0 和共用判据的执行细则，开题卡判据原文不变。\n- 「显著优于」= 均值差 > 2 倍重复离散（开题卡原文）且超过该设计量的工程容差（本实验室约定，落实开题卡里「工程相关」一词）。\n- 「优势区间可预先说明」= 跑前写定并存档的优势条件（B9）；事后发现的优势只记新假说。\n- 「等价」分解析证明和数值等价两档，只有数值时不写「数学等价」。\n- 超参搜索计入统一预算。\n为什么：开题卡判据有几处词（工程相关、可预先说明、等价）不落成操作就会各子项目各解各的。\n错了的代价：工程容差一条可能让「统计上可分辨」的方法优势被判为无差别，偏向「冗余」结论；子项目试用后若发现容差难以取得或过严，升 v1 时记一条决策修改。\n依据：无文献依据，基于本实验室约定；6a 指标沿用 L31.3-01 指标口径 v0（只读）。"
+    },
+    {
+      "id": "dec-0003",
+      "ts": "2026-10-17 00:20",
+      "title": "L29.6a 第一周派活（10-17）",
+      "label": "决定",
+      "text": "# L29.6a 第一周派活（10-17）\n\nDecision I made：L29.6a 第一周拆成三单并行——(01) Grok 快查方法谱系、等价性证明、跨方法基准与公开实测数据，回来后再发 Deep Research；(02) litwiki 补平稳经典方法族奠基文献卡（SRM、AR/ARMA、POD、小波、非高斯、Kareem 综述，12–15 篇）；(03) better 写谱系初稿与基准数据摸底，写入 、02_数据。\n- 为什么：知识库里非平稳/下击暴流卡片已较多（windfield_step2、step4c），但平稳经典方法族几乎没有卡片，谱系与等价性判断需要页码级依据；基准设计等 L29.6 统一模板，先做不依赖模板的部分。\n- 边界：不做冗余/不成立结论；不上超算；不跑基准代码；CFD 入流一支只读引用 L31.3。\n- 错了的代价：若 Grok/DR 找到已有的公认跨方法基准，(03) 的数据方案需按其调整，返工约 1 天。\n- 依据：无文献依据，基于本线开工任务书。"
+    },
+    {
+      "id": "dec-0004",
+      "ts": "2026-10-17 01:00",
+      "title": "L29.4 主算例改为 NIST HR DAD RC 60 层 CAARC 基准（10-17 01:0x）",
+      "label": "决定",
+      "text": "# L29.4 主算例改为 NIST HR_DAD_RC 60 层 CAARC 基准（10-17 01:0x）\nDecision I made：主算例由「Deng 2019 CAARC 新构建模型（有条件）」改为 NIST HR_DAD_RC_1.0 的 60 层 RC CAARC 同形建筑；场址口径用 NIST 包的迈阿密风气候，A/B/C 共用。Deng 2019 只作文献对照，不宣称复现任何一方。L29.6c 共用此模型，Chan 1992 仍作算法副基准。\n为什么：入门闸门查明 Deng 网格、层质量、配筋与广州原始风资料均未公开，只能靠大量假设重建；NIST 包同时公开结构（7800 构件、质量、模态、配筋，Yeo 2010 TN1665 印刷 p.17 Table 1、p.19 Table 2）、36 向同步测压积分层力时程（CRIACIV）与迈阿密气候（999 风暴×16 风向，TN1665 印刷 p.22），可复核性远高于新构建模型。卡片待 litwiki 补，依据暂为官方报告与 better 小样本读取。\n不改科学问题与判据：判据只要求\"≥1 个代表性风控高层\"，换模型不涉及判据。\n错了的代价：若 NIST 大包物理量/单位解析不通或该建筑并非风控（地震或重力控制），需退回 Deng 新构建或 Song 备选，损失约一周。"
+    },
+    {
+      "id": "dec-0005",
+      "ts": "2026-10-17 01:18",
+      "title": "L29.6a 基准数据初选（10-17）",
+      "label": "决定",
+      "text": "# L29.6a 基准数据初选（10-17）\n\nDecision I made：6a 基准实测数据初选——雷暴/非平稳用 THUNDERR v2（Canepa, Burlando, Repetto 2023，Zenodo 10.5281/zenodo.10688746，concept 7495115；29 事件、99 条记录、10 Hz、每条 10 h、CC BY 4.0、312 MB），只读引用风场线已下载的副本，不重复下载；平稳良态风用 DTU Cabauw 2 Hz 原始时程（figshare 10.11583/DTU.14153192.v1，>480 h、65 MB、CC BY 4.0）；FINO1 10 Hz（Zenodo 15826678，25.5 GB）暂不取。\n- 为什么：两组都公开、许可清楚、体量小；THUNDERR 风场线已在用，口径可对齐。Lead 10-17 用 Zenodo/figshare API 核过上述数字（DataCite 也核过 7495115 是现场测风网数据，Deep Research 称\"WindEEE 实验室数据\"有误）。\n- 限制：Cabauw 2 Hz 最高只能分析到 1 Hz，不能评价更高频谱；THUNDERR 港口远距相干参数不可辨（风场线），不能当真值。\n- 错了的代价：若 L29.6 模板要求 ≥5 Hz 平稳多高度相干，需改取 FINO1，要另做集群上按成员读取的方案，约多 2–3 天。\n- 证据：。无文献依据的科学判断：无（本条为数据选取）。"
+    },
+    {
+      "id": "dec-0006",
+      "ts": "2026-10-17 01:27",
+      "title": "L29.1 A 段试点：剪切楼代理作废，改用已发表设计的构件级模型（10-17 01:40）",
+      "label": "决定",
+      "text": "# L29.1 A 段试点：剪切楼代理作废，改用已发表设计的构件级模型（10-17 01:40）\n\n**决定**：L29.1-06 试点的 p_W 数字（芝加哥 23.2%、迈阿密 26.0%）**不作任何判断依据**。同一模型只改未校准的\"每吨刚度/每吨强度\"常数，芝加哥 p_W 在 23%–86%、迈阿密 26%–94% 之间摆动——p_W 由我们拍的常数决定，不由结构决定。保留的成果：流程链（控制工况标注→p_W→U_direct）、ASCE 7-22 官方 700 年风速取值（芝加哥 107.1 mph、迈阿密 169.3 mph，官方 GIS 图层）。\n下一步 A 段改为**以已发表、截面齐全的高层设计为对象**建构件级线弹性模型，逐构件算各工况的需求/能力比，确定真实控制工况（L29.1-07）。量纲论证同时改做**力控制**的随机动力 SDOF（L29.1-08），因为棘轮是力控制现象，现有位移控制反例不能代表风。\n\n**为什么**：节材上界的关键量是强度控制材料占比，它取决于真实截面的强度/刚度比；任何不基于真实截面的代理都会把我们的假设变成结论，对对方不公，对我们也不可信。\n\n**错了的代价**：已发表设计多为 150–190 m（判据要求 200–300 m 级），可能低估高度效应；对策是把已发表设计作 A 段校准，200–300 m 设计仍在矩阵里做，并用校准后的强度/刚度关系。\n\n无文献依据，基于本线数据（*.json）。"
+    },
+    {
+      "id": "dec-0007",
+      "ts": "2026-10-17 01:57",
+      "title": "L29.2 证据分级表 v0 审查裁决（10-17）",
+      "label": "决定",
+      "text": "# L29.2 证据分级表 v0 审查裁决（10-17）\n有效意见 3 份：E·Gemini、D·GLM、C·DeepSeek（A·GPT-6 通道失败——Codex 未登录，系统顺延 C 补位；已报平台 Lead）。三份均\"有保留地支持\"。修订后文件：。\nLead 对以下各条亲核原文：IPCC Ch11 PDF p.78 原句（+13%/−14% → \"slightly reduced by 1% or almost unchanged\"）；Wu 2026 PDF pp.11–12 \"confidence listed in Table 1 is different than … IPCC\"及 p.14 NBCC 2025 minimax、Li (2023) +5–15%；Vickery 2009 PDF pp.14,19 全岸 100 年 CoV 6%→16%；Hintermaier PDF p.11（Gori 合成台风设定频数增加、部分湾岸郡下降归因统计不确定性）；Bloemendaal PDF pp.4–5（San Diego +25–41%、孟加拉湾 −15 m/s）。\n\n## 必须改（已改入 v1）\n1. 良态风/雷暴\"只有 low confidence\"与 A6/A8 自相矛盾（E、D、C 一致）——改为分层：路径/环境层有 medium（CAPE high），过去极值观测 low，且无地点设计阵风定量增量。不满足判据的原因写成\"无定量幅度、未与抽样 CI 比较\"。\n2. likely/very likely 与 confidence 分列；补 Knutson 作者意见分布（A1、A2、A4、A5）（E；C 部分）。\n3. 页码与归因：A3 补 PDF p.78 并注 Knutson 原文约 −13%；A4\"不可严格相乘\"改注为卡片注（IPCC 自己推出 −1%）；A6 拆为 A6（I12，pp.7,82）与 A6b（I15，p.86）；A8 补 pp.7,22,82 与三层置信度（E、C）。\n4. B6 标明 Wu 2026 的 Medium/Low 是作者自评工程置信度、原文明言不同于 IPCC，不计入判据；补 Nor'easter 行（E）。\n5. C 节：补 Vickery 全岸 CoV 上限 16%、Table 2 各重现期分列；写明 C1/C2 不能作 B1/B2 的同口径检验分母，正态近似偏窄（E；D、C 作 NOTE）。\n6. 补对方 claim 的观测支柱 A9（Cat 3–5 实例比例 likely）、A10（快速增强 likely）（D）；补反证 A11（Knutson 2019 归因分歧、东澳下降）。\n7. 补遗漏证据：B7（NBCC 2025 minimax、Li 2023 +5–15%，经 Wu 转述，原文未核）；B1 最高单年 MRI 判据 +11–25%；B3 San Diego、孟加拉湾下降（E）。另 Lead 自查补：B1 所用合成台风设定频数**增加**，与 A3 相反。\n8. 读法第 2–3 条补：E2 假设路径不变、未检验北移新暴露区；判据另一半\"增量 > 各自基线抽样 CI\"无人证明；规范已采纳（AS/NZS Mc、NBCC）须在 verdict 正面交代（E）。\n\n## 仅供参考（已采纳为措辞修订）\n- B2 补平湖并注 10 min 平均；B3 注\"卡片换算\"；B 节逐行注风速口径（D、C）。\n- 表头\"全部经 Lead 抽查\"改为逐行\"核\"列 Lead/卡片（D、C）。\n- C3\"11 篇\"列出构成（D、C）。\n- B1 为 2000→2050，非本世纪全程（D）。\n- E3 改为：低端 +6% 小于 C2 半宽下限，只有高端明显更大（C）。\n\n## 未采纳的异议\n- 无。三位审稿人的意见方向一致，均已采纳；Gemini 关于\"Vickery 卡 Fig.12 误写为 5–10%\"的卡片勘误不属本表，已转告 litwiki（note）。\n\n## 对下一步的影响\n文献输入可用（v1）。verdict 前须补两项本线检验：(a) 同口径下\"未来变化 vs 当前抽样 CI\"（用公开合成台风未来目录，如 STORM 未来数据，同站址同重现期 bootstrap）；(b) 路径北移/新暴露区。之后写 verdict 草稿送 \n依据：本文件各条均附卡片与 PDF 页；E 节为本线数据。"
+    },
+    {
+      "id": "dec-0008",
+      "ts": "2026-10-17 02:06",
+      "title": "L29.1 A 段：LK 37 层钢框架以质量反算过周期门，并以其骨架按 ASCE 7-22/AISC 型钢自行设计算 p W（10-17 02:30）",
+      "label": "决定",
+      "text": "# L29.1 A 段：LK 37 层钢框架以质量反算过周期门，并以其骨架按 ASCE 7-22/AISC 型钢自行设计算 p_W（10-17 02:30）\n\n**背景**：L29.1-07诚实报阻：已发表高层没有一栋同时给全构件截面、映射、质量和风荷载；LK（Chuang & Spence 2019，卡 LK4YDLF4 PDF p.8）截面齐全但楼层质量与基底未给，周期不过门；RC 候选（Jeong 2021、Alinejad 2024）墙肢/洞口几何缺。\n\n**决定**：\n1. **LK 周期门按\"缺参数反算\"处理**：楼层附加质量原文未给，按 f1=0.1873 Hz 反算，标\"校准假设\"；用**未参与校准的** f2/f1 比做独立检验。L29.1-07 的数据已显示固定基底时 f2/f1=2.887，原文 0.5340/0.1873=2.851，差约 1.3%，且与质量无关——说明刚度分布与原文一致，质量反算正当。门槛：f2/f1 误差 ≤5%。\n2. **第二对象不再找已发表 RC 设计，改为以 LK 骨架（7 柱 6 跨、层高 4/6 m）按 ASCE 7-22 + AISC 360-22、真实 AISC W 型钢与箱形柱规格自行设计**，芝加哥、迈阿密两场址，并加层到 200 m、250 m。p_W 由真实型钢的强度/刚度关系决定，不再依赖拍定常数；LK 原设计作为对照（看其原设计在美国两场址下各构件由什么控制）。\n3. RC 体系暂缓，留到钢体系有结果后再定（RC 的强度/刚度关系与最小配筋问题不同，需另有完整几何来源）。\n\n**为什么**：判据要比的是同功能主体材料，关键是\"强度控制构件材料占比\"，它取决于真实截面族的强度–刚度关系；已发表设计数据不全是普遍现象，等不到。自行设计用公开型钢表和规范，参数全可追溯。\n\n**错了的代价**：(a) 2D 平面框架忽略扭转与横风–顺风耦合，可能低估舒适/位移控制、高估强度控制，即偏向对方——作为上界方向可接受，结论里写明；(b) 自行设计不是\"对方的设计\"，结论只能说\"对这类结构\"，不能说某篇论文错；(c) 暂缓 RC 可能漏掉 RC 连梁这一对方最有利的场景（Alinejad 2024），钢体系结果出来后必须回头补。\n\n依据：LK4YDLF4 PDF p.8；其余无文献依据，基于本线数据。"
+    },
+    {
+      "id": "dec-0009",
+      "ts": "2026-10-17 02:16",
+      "title": "L29.6a 基准设计 v0 与 B9 事先声明冻结（10-17 02:2x）",
+      "label": "决定",
+      "text": "# L29.6a 基准设计 v0 与 B9 事先声明冻结（10-17 02:2x）\n\nDecision I made：采纳 better 按 L29.6 模板 v0 写的 6a 基准设计，并冻结 B9 事先声明。\n- 冻结凭据：，sha256 = 475737edeb83aabf19d65edc9567c186737ebc4598acd923f04cb5bdba881c25（10-17 02:16 计算，早于任何数值运行）。以后评估只按此版；新预测另立带日期版本，不覆盖。\n- 设计要点：M0 基线 Cholesky FFT-SRM + M1–M9（POD 全模态/截断、AR/ARMA、POD+Hermite 插值、广义谐和小波、全阶演变谱 SRM、TVAR、分位转换、IPAC）；每个自写实现先过原文对照闸门，不过的不进分母、不算对作者的负面证据。R=20、工程容差响应峰值/RMS 5%（敏感 2%/10%）、SDOF 0.2/0.5/1.0 Hz × ζ 1/2/5%、η/b/m/T 分层阈值均为假设（本实验室约定，无文献依据）。\n- 为什么：模板要求优势区间在运行前写定；设计已逐栏填全，并把本线推导（03_推导）的等价条件转写成可检验预测。\n- 错了的代价：若 L29.6 模板改 v1 或 litwiki 卡片显示某方法原文设置不同，设计表需改版（B9 不动，另立附录），约半天。\n- 未送 ：不属五类必审（无结论、未交别线、无大计算）；定论时按规则 --count 6。"
+    },
+    {
+      "id": "dec-0010",
+      "ts": "2026-10-17 02:25",
+      "title": "L29.5 已知真值蒙特卡洛改在 CRC 单节点跑；决策错误率改为双向口径（10-17 Lead）",
+      "label": "决定",
+      "text": "# L29.5 已知真值蒙特卡洛改在 CRC 单节点跑；决策错误率改为双向口径（10-17 Lead）\n\n**背景**：L29.5-02（better）在 工作站 上实测，27 个场景 × 200 次重复 × 1000 次 bootstrap 的 MLE 部分单线程约需 122 小时，超出 工作站\"单次 <2 小时\"的边界；贝叶斯部分还没有正式实现。\n**Decision I made**：\n1. 正式矩阵改到 CRC 跑：每个作业只用一个节点、≤48 核，场景之间并行；先走 ComputeOps 资源申请，再 登记。预计 MLE 部分约 120 核时，贝叶斯部分按实测另算。单个作业远低于 200 SU，不需要送审。设计不缩水（仍为 200 次重复、1000 次 bootstrap、贝叶斯 100 次），因为覆盖率要估到 ±3% 左右才能和名义 90% 区分开。\n2. \"决策错误率\"由单向改为双向：分别报 P(点估计 ≥1.05×真值)（过度设计）、P(点估计 ≤0.95×真值)（设计不足），以及 90% 上限低于真值的比例。这是执行层面的定义，开题卡判据（分位差 ≥5% 或排序改变）不改。\n- **为什么**：只有用已知真值，才能判断\"先进方法给出的不同\"究竟是更准还是更偏。四站实测数据没有真值；Fawcett & Walshaw 2006（RKKJ8FN5，期刊 p.644）同样没有真值。\n- **错了的代价**：大约 100–300 核时，以及一周时间；结果不影响任何已有数据。\n**同时记录**：三条大值的 METAR 质控结果都是\"可疑\"，所以四站小试以\"排除这三条\"的筛查轨为主，原样轨照旧保留，不删。"
+    },
+    {
+      "id": "dec-0011",
+      "ts": "2026-10-17 02:31",
+      "title": "L29.1 A 段筛查：准许的规范简化清单（10-17 03:30）",
+      "label": "决定",
+      "text": "# L29.1 A 段筛查：准许的规范简化清单（10-17 03:30）\n\n**背景**：L29.1-09通过 LK 周期门（反算附加质量 83.47 t/层，f2/f1 误差 +1.25%），但以\"ASCE 7-22 柔性建筑阵风系数、AISC 360-22 压弯/横扭/P–Δ 未实现\"为由没有算任何 p_W。这是第三次 A 段停在门前。\n\n**决定**：A 段是**对对方偏宽的筛查**，不是施工图设计。以下简化一律准许，写进报告\"局限\"即可，不再作为停止理由：\n1. 风荷载：ASCE 7-22 第 26–27 章方向法，柔性建筑阵风系数 G_f 按规范公式计算（第 26.11 节；卡 EVN9AM7V 已有相关页）；单一主轴方向、2D 平面框架承担 1/6（沿用 LK 原文的分担口径，LK 卡 PDF p.8）。横风与扭转不计（偏向对方，写明）。\n2. 构件：AISC 360-22 第 E、F、H 章；梁按楼板连续侧向支撑（不计横扭屈曲，写明）；柱 K=1，二阶效应用 B2 放大或直接分析法的简化形式，二选一并写明。\n3. 位移：层间位移限值取 1/400 与 1/300 两档（均标假设）。\n4. 舒适：顶层峰值加速度按 ASCE 7-22 Commentary 或 Appendix C 的估算式（如无公式，用单模态随机振动估算：σ_a 由 G_f 推导中的共振分量换算），1 年或 10 年重现期风，限值 0.15 与 0.25 m/s² 两档（标假设）。\n5. 设计流程：采用高层常规做法——先按位移/舒适定刚度，再查强度；强度 D/C>1 的构件加大截面，这部分即\"风强度控制材料\"。这样 p_W 直接可读，无需全局离散优化。\n6. 跨长：自行设计改用 LK 原文 5 m 跨（Lead 前一任务书写 6 m 是笔误），层数 37/50/62（150/202/250 m，202 m 如实标注）。\n\n**为什么**：判据比的是材料，A 段只要求\"强度控制材料占比\"的量级；这些简化在高层初步设计中都是常规，且大多偏向对方（高估强度控制），用作上界方向正确。继续要求完整施工图级验算会让 A 段永远出不了数。\n\n**错了的代价**：若被忽略的横风/扭转实际使舒适控制更强，我们会高估 p_W——偏向对方，不会冤枉对方；若忽略横扭屈曲使强度控制被低估——偏向我们，因此报告须单列\"若计入横扭屈曲，强度控制构件可能增加\"的说明并做一档敏感性（Lb=跨长/2）。\n\n依据：LK4YDLF4 PDF p.8；EVN9AM7V（ASCE 7-22 详读卡）；其余无文献依据，基于本线推理。"
+    },
+    {
+      "id": "dec-0012",
+      "ts": "2026-10-17 02:34",
+      "title": "L29.4 常规设计 A 的规范口径与 FE 重建校准判据（10-17 01:4x）",
+      "label": "决定",
+      "text": "# L29.4 常规设计 A 的规范口径与 FE 重建校准判据（10-17 01:4x）\nDecision I made：\n1. 常规设计 A 按 ASCE 7-22 风荷载 + ACI 318-19，迈阿密郊区暴露（与 NIST 包场址一致）；NIST 原 ASCE 7-05 设计只作参照，不当合规 A（TN1665 印刷 p.16 写明按 ASCE 7-05 设计；p.26 自述部分构件在长重现期判据下不合格——据 better 报告，待卡片核）。\n2. 可变截面 FE 重建的校准判据：前三阶周期与包内 6.05/5.70/5.00 s 相差 ≤5%，MAC ≥0.95，0°/90° 顶层响应与包内模态解 ±10%。达不到报差异，不硬调参。\n为什么：A/B/C 必须共用当前合规的规范；校准判据先写定，防止事后挑数。阈值无文献依据，基于工程常用的模型修正容差。\n错了的代价：若 ASCE 7-22/ACI 318-19 下 A 与 NIST 原设计差别很大，需额外设计工作约 1 周；阈值过严则需另记决策放宽。\n\n补记 10-17：TN1665 卡已建。卡片核实：原设计 20 年 MRI 层间位移比 0.0031 超 1/400，1700 年 MRI 轴弯强度不满足（报告 p.26 Table 5、§5.7）。第 1 条\"原设计不当合规 A\"的依据由\"待卡片核\"改为已核。"
+    },
+    {
+      "id": "dec-0013",
+      "ts": "2026-10-17 02:58",
+      "title": "L29.2 第一周第一批派活（10-16 23:45）",
+      "label": "决定",
+      "text": "# L29.2 第一周第一批派活（10-16 23:45）\n\nDecision I made：按开工任务书 L29.2 一行，同时派出三件——Grok 快查（证据分级＋原文置信度）、litwiki 建 IPCC AR6 第 11 章与 Knutson 2019/2020 页码级卡片、better 做 IBTrACS 敏感性曲面小试（只在 工作站 小数据量）。\n- 为什么：判据需要\"原文置信度\"和\"设计风速变化 vs 抽样不确定性\"两类证据，三件互不依赖，可并行；写入范围互不重叠（litwiki 写 wiki，better 只写）。\n- 错了的代价：小——敏感性模型选得过简，只影响量级判断，第二周可加 STORM 合成台风数据集复核（卡片）。\n- 依据：无文献依据，基于开题卡判据。\n\n## 10-17 补：敏感性小试 v1 验收、派 v2\nDecision I made：v1作为方法小试验收通过（Lead 独立重算 Miami V50 与 +6.98% 一致）；随即派 v2：参数风场得站点风、加\"强台风比例上升\"尾部加厚情景、把分布形式差异并入不确定性。\n- 为什么：v1 显示分布形式差异（Miami 700 年 +37%）远大于抽样半宽，且中心强度代理与统一放大两个简化方向相反，单凭 v1 不能作判据输入。\n- 错了的代价：多花 工作站 小算量几小时；v2 结果仍属方法性，进判据前随文献结论一并送审。\n- 依据：无文献依据，基于本线数据。\n\n## 10-17 补：STORM 同口径检验验收、派稳健性补算\nDecision I made： 验收通过；随即派 （风场 B、半径 R、尾部形式、窗长四项改动下\"变化/46 年抽样半宽>1\"是否翻转），之后再写 verdict 草稿送 --count 6。\n- 为什么：STORM 结果把图景从\"地点变化小于抽样不确定性\"改成\"西北太平洋部分站点超过、北大西洋不超过\"，这是 verdict 落\"部分成立\"的关键；但 V700 在经验口径下已翻转，必须先知道 V50 读出对我们自己的建模选择是否稳健，否则 6 审会把它打回。\n- 错了的代价：verdict 推迟约一两天；补算只在 工作站 小数据量。\n- 依据：无文献依据，基于本线数据；STORM 数据与方法见 NR_bloemendaal_2022_future_tc_risk.md PDF pp.1,8–11。"
+    },
+    {
+      "id": "dec-0014",
+      "ts": "2026-10-17 03:27",
+      "title": "L29.6a 原文实现对照改用 Ubertini & Giuliano 2010 例1；先校准指标流水线（10-17 03:3x）",
+      "label": "决定",
+      "text": "# L29.6a 原文实现对照改用 Ubertini & Giuliano 2010 例1；先校准指标流水线（10-17 03:3x）\n\nDecision I made：\n1. M0/M1/M2/M3 的原文实现对照闸门，主对照改为 Ubertini & Giuliano 2010 例1（9 节点/18 变量风速场，WAWS=Deodatis 双索引、POD、AR 同一设置；卡片，PDF p.5–9、15–17），替代基准设计 B1 里 M1/M2 用 Chen & Kareem 2005 76 层荷载表的对照（同定义的风速例更合适，荷载例缺原始输入）；M0 的 Deodatis 1996 三点例保留为可选第二对照。B9 冻结文件不动；基准设计 B1 的对照目标随此更新。\n2. 进入任何方法比较之前，先做指标流水线校准：M0 在已知目标上的 A5/A6/A4 必须与理论值在抽样误差内或偏差可解析扣除，然后冻结估计器设置（窗、段长、拟合频带、掩膜）。\n- 为什么：L29.6a-07 小试显示 M0 自身 A5=0.178、拟合 C_y/C_z≈8.2/4.2（目标 10/10）——这是估计器偏差，不校准会把估计器误差当成方法差异。\n- 错了的代价：若 Ubertini 例1 参数读不全导致对照不了，退回 Deodatis 1996 三点例（参数已查齐），多约半天；校准若显示 A6 在当前布局下根本不可稳定估计，需改测点布局，影响基准设计 B3/B5，约 1 天。\n- 依据：Ubertini 2010 原文已入 Zotero（QP5SJE93），Lead 抽查 Table 2/3 与 PDF p.15 一致。指标偏差判断基于本线小试数据，无文献依据。"
+    },
+    {
+      "id": "dec-0015",
+      "ts": "2026-10-17 03:38",
+      "title": "L29.1 A 段：先用 LK 自身风荷载复核荷载链，再把自行设计改为框架＋支撑核心筒双重体系（10-17 04:40）",
+      "label": "决定",
+      "text": "# L29.1 A 段：先用 LK 自身风荷载复核荷载链，再把自行设计改为框架＋支撑核心筒双重体系（10-17 04:40）\n\n**背景**：L29.1-11按准许简化实跑：LK 原截面在芝加哥即三项超限（D/C 1.17、层间位移 1/269、顶层加速度 0.42 m/s²），迈阿密 D/C 2.38、位移 1/94、加速度 1.61 m/s²；自行设计把全楼所有构件都放到型钢库最大规格，150–250 m 两场址仍全部不满足。\n\n**判断**：两个信号都指向我们自己的问题，不能当物理结论：\n1. LK 原设计是作者按其风荷载（顶部 700 年均风 52.5 m/s、50 年 34.2 m/s 下层间位移 1/400，卡 LK4YDLF4 PDF p.8）设计并通过的，我们的荷载链在芝加哥（风速低于迈阿密）就让它三项超限，说明荷载链（迎风宽度与 1/6 分担的组合、净 Cp=1.3、舒适用服务风速取 0.65×700 年风速）很可能偏大。必须先用 LK 自身风荷载复现其 1/400 位移，作为\"荷载链门\"。\n2. 纯抗弯框架本来就不是 200–300 m 高层的合理体系（实际多为核心筒/支撑/伸臂），用它做自行设计会让一切都由刚度控制，结果对对方不公平（低估强度控制占比）。\n\n**决定**：\n- 先过荷载链门：在 LK 校准模型上用 LK 原文风荷载定义复现 50 年风下层间位移约 1/400；差 >20% 先查定义（迎风宽、分担、Cp、高度廓线、均风/阵风口径），修正后再用于 ASCE 7-22 两场址。舒适服务风速改按 1 年与 10 年重现期取（ASCE 7-22 Commentary/附录，或 MRI 换算式），不再用 0.65×700 年。\n- 自行设计改为**周边抗弯框架＋中心支撑钢核心筒**的二维连接模型（双重体系），允许焊接箱形柱按板厚参数化（实际高层常用），支撑用 HSS/W；先做芝加哥三个高度，迈阿密随后。\n- RC 体系仍暂缓。\n\n**错了的代价**：若荷载链其实没错、LK 原设计在美国两场址确实不够，那我们多花一轮复核（约半天）；双重体系增加建模工作量，但这是让 p_W 有物理意义的最低要求。支撑核心筒的支撑多由强度控制——这会抬高 p_W，偏向对方，我们照实报。\n\n依据：LK4YDLF4 PDF p.8；其余无文献依据，基于本线推理。"
+    },
+    {
+      "id": "dec-0016",
+      "ts": "2026-10-17 04:15",
+      "title": "L29.3 第一周文献判断 裁决（10-17）",
+      "label": "决定",
+      "text": "# L29.3 第一周文献判断 裁决（10-17）\n\n审稿：E Gemini、A GPT-6、D GLM，3/3 有效。送审稿。三位均\"有保留地支持\"；计算（5 个相对误差、ρ≥0.867）三位独立复算一致。Lead 亲自核对：HAZUS II 原 PDF 第 5 页（损失函数\"developed using a combination of engineering judgment and insurance company loss data\"）、第 6–7 页（对单栋估计须谨慎）、第 8 页（倒树等小损失源\"not currently modeled\"、可能低估小损失）；Sally 报告 Table 8（PDF 物理第 29 页）严重度降幅 Roof/Gold = 20/40、20/37、15/24，三种分析 Gold 均更大。\n\n## 必须改（采纳）\n1. **J1 加层级限定与第三项缺口，\"缺留出\"改\"缺留出的证明\"**（E、A、D）。改为：在县/州级汇总保险损失率层面，本次已核的 5 个配置（2 场事件）点值落在 ±30% 内，且 Andrew 4 配置同向低估；但完整判据仍不可判——缺独立留出的证明（HAZUS II 损失函数部分用保险损失数据开发，PDF 第 5 页）、缺预测区间覆盖、缺规范可靠度离散对照。该结果不能外推到单栋/最终设计尺度：原文声明对单栋估计须谨慎（PDF 第 6–7 页），单栋层面已见误差不小（Sypniewski 2026 逐栋严格同级约 47%，Ellingwood 2004 屋面板比例 +33%）。删去\"而非误差大\"。\n2. **J2 改为\"所引证据未证明\"，并补全 DR 的依据**（A；E、D 认为方向成立）。改为：DR 报告从\"共享输入\"推到\"方案间误差高度相关、排序非常可信\"，所引依据（气候模式类比、FEMA P-58 CSPS、BCA/寿命期成本与规范年代比较等应用论证）都不是方案间预测误差相关的实测估计；本次检索未找到此类风工程实测。共享输入不保证输出误差等幅抵消，高相关也不自动保证排序概率 ≥90%。不断言全领域不存在。\n3. **J3 纠正数据事实并限定检索范围**（E、A、D 一致）。改为：就本次已核公开渠道（佛州 OIR 页面与汇总、LDI 报告、OpenFEMA、StEER/DesignSafe）而言，未找到满足预注册闸门的数据——佛州（Michael、Ian、Sally 佛州段）只到州险种金额或县报案件数；路州（Laura、Ida）有州×险种金额与堂区×全险种金额两个边际，无堂区×住宅交叉金额与同期保单分母；阿州 Sally（ALDOI/CRIR 2025）有 I-10 以南自住独栋的汇总保单数与已付金额，但无公开逐保单位置/属性/免赔数据与逐格风场。不是\"公开数据不存在\"，监管方内部数据未询。\n4. **J4 分指标表述，撤回\"差异大小决定稳健性\"的解释**（A、E；D 建议加混杂警示）。改为：三种分析中，FORTIFIED 相对各自常规对照的降幅方向均一致；Roof 与 Gold 的相对次序——严重度降幅三次均为 Gold 更大，理赔频率降幅次序变化（56/70、69/63、73/76），赔付率以保费为分母不作损失排序。三种分析的样本（是否剔树、近邻）不同，Roof 与 Gold 使用不同常规对照组，且报告自述 Gold 房屋位于更危险区域；无置信区间。故不构成同一比较在不同算法下的排序检验，**不能**据此推出\"差异大则稳健、差异小则不稳健\"——该机理只保留为 3d 骨架中的待检验假设。\n\n## 仅供参考（采纳）\n- HAZUS II 汇总假定各 ZIP 保单数与价值相同（A）——写进证据表限制。\n- Sally 报告正文与表格数字冲突（Gold 频率 74% vs 表 76%；严重度 14/20% vs 15/24%；Gold 赔付率 62% vs 67%）（A、D）——采用表格值并标注冲突。\n- DR 报告另有错误：把 Grant & Atkinson 2023 误判为无关文献；把 HAZUS 低估小损失的原因写反（原文是这些损失源未建模，PDF 第 8 页）；ARA 2024 引用的是厂商网页、漏了原报告中 75–95 mph 开口保护经验损失反高于无保护、模型损失普遍低于经验损失（PDF 第 85、103–105 页）（E）——记入 DR 使用注意；ARA 两条反向现象列入减灾效果检验的待核项。\n- 补检索：Watson & Johnson 2004（BAMS，324 种模型组合与 Andrew/Hugo 损失比较）、Hazus PR/USVI Irma/Maria 验证（DOI 10.1061/NHREFO.NHENG-1638，自述对观测校准）（A、D）——交 litwiki 建卡。\n\n## 未采纳的异议\n- E 称 HAZUS II 在 ZIP 层\"预测与实测出现数倍至一两个量级离散\"：Lead 核 PDF 文字只见作者称\"reasonably good agreement\"并注明低风速低估小损失，散点离散幅度未从图中量化，暂不采纳为数值结论；只采纳\"邮编/单栋层误差更大、不可外推\"的定性限定（见必须改 1），量化待图读。\n- D 评 J1、J2、J4 为\"支持\"、仅需 NOTE：已按 A、E 的必须改收紧表述，收紧后与 D 的结论不冲突。\n\n（PDF 第 5–9 页）、（PDF 物理第 27–29 页）、；数据可得性判断无文献依据，基于本线数据（ 闸门文件）。"
+    },
+    {
+      "id": "dec-0017",
+      "ts": "2026-10-17 04:16",
+      "title": "L29.3 公开数据端到端回算受阻：暂停自建回算，转\"减灾效果实证\"与\"已发表验证证据表\"（10-17）",
+      "label": "决定",
+      "text": "# L29.3 公开数据端到端回算受阻：暂停自建回算，转\"减灾效果实证\"与\"已发表验证证据表\"（10-17）\n\n## 事实（本线数据）\n- Michael 2018 数据闸门：A 物理损伤待定、B 保险赔款不过、C FEMA 核损待定。\n- 补齐 A：总闸门不过——调查足迹内完整分母（NSI 示范矩形 329 栋 RES1 对 StEER 47 栋，入样机制不明）、单栋风/水掩膜（161 行中确认纯风 0）均未闭合；StEER→HAZUS 损伤状态映射只是候选。\n- B 替代事件：Laura、Ida、Ian、Sally（佛州段）在本次已核公开渠道内均不过——佛州只到州险种金额或县报案件数；路州有州×险种与堂区×全险种两个金额边际，无堂区×住宅交叉金额与保单分母。阿州 Sally 另有 ALDOI 2025 的汇总保单数与已付金额，但无公开逐保单数据与逐格风场。（10-17 按审查 更正表述）\n\n## Decision I made\n1. **自建端到端回算暂停（不放弃）**：开题卡判据\"独立历史台风上损失 ±30% 且区间覆盖\"在公开数据下目前无法由本线自己检验。保留为条件路线：若获得非公开理赔数据（需联系外部机构，属对外，只由 Liang Hu 定）再恢复。判据不改。\n2. **绝对精度一侧改用已发表验证做证据**：汇编已发表事件验证（HAZUS II Andrew/Hugo、FPHLM 2008、Sypniewski 2026 Michael、Amini 2023 Ian、Kijewski-Correa 2023 等）的误差、是否独立留出、是否报告区间，逐条对照判据。等 litwiki 第二批卡回来后派。\n3. **比选一侧新开\"减灾效果实证\"检验**：模型预测的减灾措施（屋面加固、开口防护、FORTIFIED 等）损失降低幅度与理赔/调查观测到的差异对比——这是\"排序是否稳健\"最直接的可得数据，替代单事件无法识别的方案间误差相关 ρ。先做数据与文献摸底和试验设计。\n\n## 为什么\n公开数据的口径缺口是结构性的（保险数据只公开到州/县聚合），继续换事件扫描收益低；而判据两档（最终设计 / 只能比选）各自都有不依赖自建回算的可得证据。\n\n## 错了的代价\n已发表验证可能存在标定泄漏或口径不一，导致绝对精度证据偏乐观或无法对应判据——在证据表中逐条标明独立性；减灾效果实证若数据同样只到聚合层，比选一侧也只能给出弱证据，届时如实报\"不可检验\"。\n\n依据：无文献依据，基于本线数据（上述三份闸门文件）。HAZUS II 汇总对比见 （PDF 第 8–9 页）。"
+    },
+    {
+      "id": "dec-0018",
+      "ts": "2026-10-17 04:33",
+      "title": "L29.1 荷载链门按\"一致性\"判通过；服务性检查改用正确重现期（10-17 05:30）",
+      "label": "决定",
+      "text": "# L29.1 荷载链门按\"一致性\"判通过；服务性检查改用正确重现期（10-17 05:30）\n\n**事实**（、gate_diagnostic.json）：\n- LK 原文只给 50 年风下层间位移**限值** 1/400，未给实际值（卡 LK4YDLF4，PDF 物理 p.8 / 期刊 p.99）。\n- 我们的荷载链在 LK 自身 50 年风（顶部均风 34.2 m/s）下算得 1/597，满足 1/400——与\"作者按 1/400 设计且通过\"一致。\n- 换算到同口径后，芝加哥 700 年顶部均风约 48.9 m/s，**低于** LK 自己的 700 年 52.5 m/s；迈阿密约 77.3 m/s（换算系数 b=0.65、α=1/6 为本线假设）。\n\n**判断**：上一轮\"LK 在芝加哥三项超限\"主要不是荷载链偏大，而是**检查用错了重现期**：层间位移和舒适度用了 700 年（强度级）风，而 LK 自己（及惯例）用 50 年风查位移、用 1–10 年风查舒适度。better 按 Lead 的停止条件停在第 1 步是守规矩，但原因其实已经能从其数据读出。\n\n**决定**：\n1. 荷载链门按**一致性门**判通过：作者未给实际位移，无法做 ±20% 复现；我们的链在作者风下不违背其设计限值即可。剩余不确定（Cp=1.3、迎风宽 30 m、b/α 换算）作为局限并做 Cp 0.8–1.6 敏感性。\n2. 强度检查用 700 年（风险 II）风；**层间位移用 50 年风**（同 LK 口径）；**舒适度用 1 年与 10 年风**。各重现期风速从 ASCE 7-22 官方 GIS 对应图层取（附录 CC 服务性图层），取不到用 ASCE 7-22 Commentary 的重现期换算式并写页码，仍取不到才标假设。\n3. 强度在芝加哥 D/C 1.17（风比 LK 自己的 700 年风还低）说明强度链可能偏保守约 20–30%；这会**高估**强度控制占比、偏向对方，作为上界方向可接受，写入局限并给 Cp 敏感性。\n\n**错了的代价**：若 b/α 换算错，芝加哥/迈阿密与 LK 风的相对强弱判断会变；对策是报告同时给 GIS 原值与换算值，不只用换算值下结论。\n\n依据：LK4YDLF4 PDF 物理 p.8；其余无文献依据，基于本线数据。"
+    },
+    {
+      "id": "dec-0019",
+      "ts": "2026-10-17 04:50",
+      "title": "L29.4 文献小结审查 裁决（10-17）",
+      "label": "决定",
+      "text": "# L29.4 文献小结审查 裁决（10-17）\nDecision I made：按 3/3 审稿意见裁决，文献小结改为 v2，裁决全文。要点：撤回\"高层抗风未找到同结构确定性 vs 概率优化对比\"（Deng 2019 PDF p.10 Fig.5 多风向联合概率优化比确定性轻约 474 t，Lead 已核原文；Bobby 2016 PDF pp.17–20 方向相反）；F1/F4 收窄并补入对\"优化确有节省\"有利的证据（Shahi 2026 PDF pp.76–77 同约束 X 支撑基准 −11.9%~−36.6%；Aldwaik & Adeli 2014 PDF pp.10–13 转述香港案例）。未采纳 GLM\"全部支持\"判定。\n为什么：原 F3 被原文直接反驳；原 F1/F4 措辞超出证据，有选择性呈现之嫌，违背\"先取对方最强版本\"的实验室规则。\n对课题：判据不改；三方案设计书须写清 B 的风向口径（最不利风向 vs 全风向），C 可能比 B 轻。\n错了的代价：文献小结仍只覆盖 27 条来源，否定性判断（F2、F4）的检索完备性未独立复核。"
+    },
+    {
+      "id": "dec-0020",
+      "ts": "2026-10-17 04:56",
+      "title": "L29.5 第三组对比 (c)：由 CFD 入流 UQ 改为风致结构可靠度，CFD 入流保留为候选（10-17 Lead）",
+      "label": "决定",
+      "text": "# L29.5 第三组对比 (c)：由 CFD 入流 UQ 改为风致结构可靠度，CFD 入流保留为候选（10-17 Lead）\n\n**背景**：开题卡第一步设想的 (c) 组是\"CFD 入流参数 UQ（读 CFD 线已有结果，只读）\"。数据摸底确认，本平台没有\"入流参数—风压\"成对的样本；按分工，CFD 入流等效性归核心实验室 L31.3，我们不跑入流 CFD。判据要求在 ≥3 个代表任务上比较，所以 (c) 需要能落地的替代。\n**Decision I made**：(c) 组改为**风致结构可靠度**：同一个结构、同一套随机输入，在**相同计算预算**下比较基本法（粗 Monte Carlo、FORM）与先进法（子集模拟或重要抽样、代理模型辅助可靠度），看失效概率、可靠指标或方案排序是否改变到判据阈值（设计值分位差 ≥5% 或排序改变）。CFD 入流 UQ 保留为候选：L31.3 或 CFD 线以后若产出成组样本，再加做。\n- **为什么**：这是落地任务清单第 6 项，而且恰好是先进方法最常被说成\"必需\"的场合（失效概率很小、单次计算很贵），给对方主张一个最强的检验场合，不是挑对我们有利的任务。必须在相同计算预算下比较，因为预算不限时，粗 Monte Carlo 只要样本够多，结果总会收敛到真值，比较就失去意义。\n- **错了的代价**：若审稿人认为 (c) 必须是 CFD 任务，要回头补一组；本组的工作仍可作为第 4 个任务保留。开题卡页头判据不改，只改正文\"第一步\"里 (c) 的具体任务。\n- 文献依据：无文献依据，基于本线数据摸底。"
+    },
+    {
+      "id": "dec-0021",
+      "ts": "2026-10-17 05:00",
+      "title": "L29.2 结论草稿审查裁决（10-17）",
+      "label": "决定",
+      "text": "# L29.2 结论草稿审查裁决（10-17）\n6 份有效：E Gemini、A GPT-6、D GLM、C DeepSeek、B Kimi、F Grok。立场：有保留支持\"部分成立\" 3（E、D、B）；按判据字面应为\"不成立→可改造\" 2（C、F）；不支持部分成立、也不足以定不成立 1（A）。\n**裁决：verdict 由草稿的\"部分成立\"改为\"可改造\"。** 定稿：。\nLead 亲核：flip_counts.csv 全表、analyze_robust.py 站点只含五站；Wu 2026 PDF p.9（Li 2025 约 5% 或更低）、p.10（GEV 位置参数约 +2.5%）； 第 91 行自述不构成判据证据。\n\n## 必须改（已改入定稿）\n1. **档位**（C、F、A；E、D、B 要求显式交代）：判据\"对方成立/部分成立\"都要求\"观测或经评估的模拟证据\"且 IPCC/WMO 置信度≥中等。文献无一做过同口径比较，IPCC 未评地点设计风速，本线 STORM 检验自述为方法试验——两档都不满足；用驱动量置信度满足 (ii) 是放宽事先写定的判据，不采用。又因香港代理信号存在，\"全部在抽样不确定性内\"也不能断言，故按判据对未满足情形规定的处置定\"可改造\"，不写\"不成立\"。\n2. **休斯敦、波士顿、青岛未做稳健性检验**（六位一致）：改为\"只做基准口径\"；\"稳健不超过\"只保留给迈阿密。\n3. **空间外推**（六位一致）：适用范围收窄到\"香港单站、条件性\"，删去\"华南沿海\"\"西北太平洋沿海\"。\n4. **翻转归因**（D、C、B、F）：仙台/那霸主要是 B=2.0 下降，GPD 下仙台 3/4、那霸 2/4；V700 \"全部 0/4\"改为\"可估者全部 0/4\"（迈阿密 GPD P90 不可估）。\n5. **\"良态/雷暴意义很小\"与\"没人换算到设计风速\"**（A、E）：缺证据不等于效应小；改为\"证据不足\"，并补入 Wu 2026 转述的 Li (2023) +5～+15%、Li (2025) ≤5%、GEV 位置参数 +2.5% 三条定量线索（原文未核）。\n6. **NBCC 2025 与对方观测支柱、反证**（E、D、B、F）：§1 补 A9/A10、NBCC、Mc；§2.1 补 A11、IPCC p.78 −1%。\n7. **remedy 方法排他与\"方向正确\"**（A、F）：删去\"须用合成台风 GCM 差值\"，改为\"需要地点计算\"，STORM 只作为一种可行做法；Mc 改为\"工程回应，本线未检验其数值\"。\n8. **对原作者公平**（A、D）：注明\"全球强度推单站\"批评的是推理链，不指 Hintermaier、Xu（它们是地点计算）；Xu +8.1% 注明是 LEP 设计值对平稳基线；\"与 IPCC 相反\"改为模型间不确定性，不暗示结果错误。\n\n## 仅供参考（已采纳为措辞）\n- 香港 GPD 比值 0.85–1.13，裕度薄；稳健性只做单项改动（A、B、E）。\n- 分母并入模型/输入不确定性（Vickery CoV）后香港最低增量不再超过（C）。\n- 分布形式差两组数字分开归属（D、C、B、F）。\n- §4 补 STORM 跨版本、Rmax 不变、GCM 强度偏弱（D、C）。\n- 香港合成窗半宽 10.8% > IBTrACS 7.7%，分母不偏窄（D、E）。\n\n## 未采纳的异议\n- E、D、B 主张\"条件性部分成立\"可以成立。未采纳：其前提是把判据 (ii) 解读为驱动量置信度、并把本线代理检验视为\"经评估的模拟证据\"，两者都是对事先写定判据的放宽；规则要求判据事后不改。保留其意见：若 Liang Hu 认为判据本意即驱动量层面，则结论可改为\"部分成立（仅香港单站条件性）\"，证据不变。\n- A 主张\"证据不足、判据对应未解决\"，不宜给 verdict。部分采纳：verdict 只用四种之一；\"可改造\"即判据为证据不足情形规定的出口，定稿已写明证据不足的性质。\n\n## 给 Liang Hu\n判据档位存在重叠与空档（既不满足\"成立/部分成立\"、也不满足\"全部在不确定性内\"）。本次按判据对\"不成立\"规定的处置定\"可改造\"，未改判据。Liang Hu 若认为 (ii) 本意是驱动量置信度，可改判为\"部分成立（香港单站条件性）\"。"
+    },
+    {
+      "id": "dec-0022",
+      "ts": "2026-10-17 05:00",
+      "title": "L29.4 常规设计 A 的暴露类别与规范口径（10-17 05:xx）",
+      "label": "决定",
+      "text": "# L29.4 常规设计 A 的暴露类别与规范口径（10-17 05:xx）\n背景：better L29.4-16查得 2023 Florida Building Code Building §1620.2 规定 Miami-Dade（HVHZ）风险类别 II 基本风速 175 mph（3 s 阵风），§1620.3 规定 HVHZ 所有建筑为 Exposure C（适用时 D）；出处 ICC 官方网页章节与 Miami-Dade BORA 2024-01-26 备忘录 PDF p.1（存档）。我 10-17 04:2x 定的\"全向 B\"与之冲突。\nDecision I made：\n1. 设计约束（A 的设计和 B、C 必须共同满足的规范检查）一律按 2023 FBC（引用 ASCE 7-22）+ ACI 318-19：175 mph、Exposure C、FBC §1620.4 组合规定。撤回\"全向 B 作 A 的设计口径\"。\n2. 可靠度评价（三方案共用的风险模型）用 NIST 风洞层力时程 + 迈阿密飓风气候；风洞数据的地貌是 NIST 原试验口径（TN1665 印刷 p.22 郊区），屋顶风速换算主算用 Exposure C 的 Ratio_Vs 列，B 列作敏感性。三方案用同一风险模型，相对比较不受影响。\n3. 场址代表点 25.76°N 80.30°W 不变；175 mph 是 FBC 县级强制值，不是 ASCE Hazard Tool 逐点值，照此标注。\n为什么：常规设计 A 必须是现行合规设计，否则节省会被高估（审查 裁决的检验含义第 2 条）。\n错了的代价：C 类暴露使风荷载增大，A 可能由风控转为更多构件被风控制，与 NIST 原设计差别变大；不影响三方案公平性。"
+    },
+    {
+      "id": "dec-0023",
+      "ts": "2026-10-17 05:02",
+      "title": "L29.6a M0 计入有效分母；10 min 的 A6/A4 不用于方法比较（10-17 05:1x）",
+      "label": "决定",
+      "text": "# L29.6a M0 计入有效分母；10 min 的 A6/A4 不用于方法比较（10-17 05:1x）\n\nDecision I made：\n1. M0（Cholesky-SRM）原文实现闸门判「通过（限定）」，计入 B1 有效分母（作为基线）。依据：L29.6a-12 按 Deodatis 1996 J Eng Mech 三点例（卡片，PDF p.2–8，Eqs.19–27、55–64，Fig.4–6）实现错频双索引 SRM，物理结构（1/2 点近、3 点远相关弱）对上，整周期样本相关与有限离散目标最大相对差 4e−16（原文 Eq.43 所述遍历性质），方差差异来自原文 ω_u=4 截断与舍入。按\"复现以物理结构和演化对上为准\"的规矩判通过。Lead 已看 Fig.6 对照图。G1 里用的复高斯系数 FFT-SRM 与 Deodatis 错频版登记为 M0 的两个实现变体（同二阶期望，非同样本）。\n2. 估计器使用范围限定（不改 L29.6a-10 冻结的公式/窗/掩膜）：方法比较的 A6 和 A4 只用 1 h 记录；10 min 的 A6（C_y/C_z 低估到约 7.1–7.9）与 A4 记 NA。10 min 的 A5 照报，但注明零底噪约 0.57（1 h 约 0.18），辨别力有限。A4（von Kármán 拟合，1 h）只作诊断，不作主指标。\n- 为什么：L29.6a-12 补充校准显示 1 h 下 Kaimal/VK 的 A5、A6 都与目标相容，10 min 下 A6 两轴系统低估、A4 偏差 >5SE。不限定就会把估计器偏差当方法差异。\n- 错了的代价：若后续确需 10 min 的 A6（如雷暴短窗），要另立版本做短窗估计器的事前选择与留出校准，约 1 天；B9 不受影响（B9 预测以 1 h 和 10 min 两档列出，10 min 下 A6 相关预测将记\"不可判\"）。\n- 无文献依据的判断：估计器偏差与范围限定基于本线校准数据。"
+    },
+    {
+      "id": "dec-0024",
+      "ts": "2026-10-17 05:29",
+      "title": "L29.1 双重体系剪切楼结果不可用；改杆系模型，并并行补\"高层用钢由什么控制\"的文献旁证（10-17 07:40）",
+      "label": "决定",
+      "text": "# L29.1 双重体系剪切楼结果不可用；改杆系模型，并并行补\"高层用钢由什么控制\"的文献旁证（10-17 07:40）\n\n**事实**（、results_v4.csv）：150/202/250 m 三个高度的\"代表框架＋核心\"用钢 749/1016/1378 t，**91–100% 被标为\"构造/库存最小规格\"**；50 年层间位移仅约 1/2000–1/2900，远低于 1/400；p_W 0–1.4%。换成 0.9 m 外径箱柱后 p_W 全为 0。\n\n**判断**：结果由模型假设决定，不能用——\n1. 等效剪切楼只计层间剪切刚度（12EI/h³ + 支撑），**不计柱轴向变形引起的整体弯曲变形**，而 150 m 以上高层的侧移主要来自整体弯曲；刚度被严重高估 → 位移/舒适几乎不控制。\n2. 型钢库\"最小规格\"本身已足够重（91–100% 材料落在底座），p_W 由库存下限决定。\n这两个偏差的方向不一致（1 偏向\"强度控制\"，2 偏向\"构造控制\"），无法当作任何一方的上界。\n\n**决定**：\n- A 段改用**杆系模型**（梁柱单元含轴向变形，支撑为桁架单元），沿用已有 LK 二维框架代码（pilotA2/pilotA4）加中心支撑核心；型钢库向下扩到能让最小规格不成为控制（报告\"落在最小规格的材料占比\"，若 >30% 须扩库或说明）。只做芝加哥 150/250 m 两档先出数。\n- 并行请 litwiki 补\"高层钢结构用钢由强度还是刚度/舒适控制\"的文献旁证（高度溢价、刚度控制设计、风控高层的控制工况统计），带页码，作为与本线算例互相印证的独立证据。\n\n**错了的代价**：再一轮算例约半天；若杆系模型仍得 p_W<2%，加上文献旁证，A 段可以收口并转入审查准备；若文献显示强度控制常见，则本线算例需重新审视。\n\n依据：；其余无文献依据，基于本线推理。"
+    },
+    {
+      "id": "dec-0025",
+      "ts": "2026-10-17 05:37",
+      "title": "L29.2 收口：二手原文补核（10-18）",
+      "label": "决定",
+      "text": "# L29.2 收口：二手原文补核（10-18）\nDecision I made：按 litwiki 原文卡更正定稿与证据表措辞，verdict（可改造）不变，可以收口。\n- NBCC 2025：规范原文核实（Div B Appendix C，PDF p.664 \"Minimax\"＋目标可靠度、2.5°C/RCP8.5；PDF p.674 \"factor of either 1.05 or 1.10\" 施加于 1/10、1/50、1/500 风压）——Lead 亲核。原转述\"风速 +5–15%\"改为\"风压 1.05/1.10，折合风速约 +2.5%/+4.9%\"。\n- Li (2023) \"+5–15%\"：原文未取得，归属无法确认，弃用（卡 NR_li_2023_nonstationary_reliability.md）。\n- Li (2025) 雷暴：同题 Springer 版 Table 3（PDF p.8，Lead 亲核 Toronto 1.03–1.08、Windsor 1.04–1.08）：混合设计风速比 0.96～1.08；原\"≤5%\"只对 AEP 1/50–1/100 成立，已改。\n- AS/NZS Mc=1.05：标准原文仍不可得，标为 Holmes 二级来源。\n- 为什么不影响 verdict：这几条只涉及对方主张中的规范实践与温带/雷暴定量线索；更正后的数值都偏小、且都未与抽样 CI 比较，判据两档仍不满足、\"全部在不确定性内\"也仍不能断言。\n- 错了的代价：小；若日后取得 Li 2023 或 AS/NZS 原文，只需补措辞。"
+    },
+    {
+      "id": "dec-0026",
+      "ts": "2026-10-17 05:37",
+      "title": "首批六课题开题卡与 6a 分工（10-16）",
+      "label": "决定",
+      "text": "# 首批六课题开题卡与 6a 分工（10-16）\n\n- **做了什么**：按任务书给 T1–T6 各写一页开题卡（页头 work/claim/suspicion/method/criteria 事前写定，status 待开题），汇总交平台转 Liang Hu 定先后；向 提议 6a 分工。\n- **为什么**：实验室规则要求开题前写定判据；6a 与核心实验室课题 3 重叠，先分清边界，避免两边重复建 CFD 入流基准。\n- **错了的代价**：判据阈值（如 T1 的 5%/2%、T4 的 8%/3%、T3 的 ±30%）是 Lead 事前给的，没有文献依据，是基于工程判断的初值；要改须另记一条决策写明原因。分工若 不同意，只需改 T6 页一节。\n- 文献依据：知识库中这几个主题的卡片很少（10-16 检索），开题卡里列出的文献均为待 litwiki 建卡核实，目前没有任何科学判断以它们为依据。\n- **补记（同日）**：同意 6a 分工，另补三点：生成器出口统计检验归核心实验室；比较指标统一用对方发来的清单；生成器开发和 LBM 计算归 21 线和 CFD 线。非高斯风压的初步边界：模拟方法及其对幕墙的影响归对方，极值估计方法的谱系比较归本实验室。依据：（只读）。\n- **补记 2（同日）**：同意核心实验室提出的课题 6 分工：对方负责正向移植与落地，本方负责批判与聚合（T6、T5、T3 的 3d）。评判清单共用一份，放，由对方起草、本方补批判侧条目。补充约定两条：对方判为无用的方法族名单，到本方只算候选，要批判须经 Liang Hu 开题；同一方法族两边预判相反时，用同一算例、同一清单，由一方计算、另一方复核。为什么：避免两边对同一方法各下相反结论，也守住\"批判谁由 Liang Hu 定\"。错了的代价：多一轮协调。\n- **补记 3（同日 20:4x）**：按 Liang Hu「先建不开工」建子项目。T1–T5 的子对话已建，状态「待开工」，对应项目页 status 已改。T6 被平台的上限拒绝（每个对话最多挂 5 个进行中的），已报平台；T6 和 6a–6d 的项目页已建好，等平台放宽上限后再建。没有把 T6 挂到别的子项目下面凑数，因为那样项目树的父子关系是错的。\n- **补记 4（10-16 23:2x）**：Liang Hu 批复「A2,A3，全部创建并开展基本工作」。10 个子项目全部改为「在做」，开工任务书和第一周计划见。边界：只做基本工作、不开大计算、不改判据、结论先送审、不公开。6a–6d 由 L29.6 转达，因为平台只允许给直接子对话派活。错了的代价：十个课题同时请 litwiki 补卡，会排队拖慢；这个可以接受，因为各课题第一周都以文献为主。\n- **补记 5（10-17 00:1x）**：L29.6 对话的委托每次都被中断。做了什么：同意平台的备选办法，如果到 10-18 12:00 还没修好，就把 6a–6d 临时改挂到 L29 总控下，由根对话直接派活。为什么：6a–6d 第一周的工作是文献和方法梳理，晚开一天半影响不大；改挂比在根对话下另建一套同名节点好，不会出现重复节点。错了的代价：项目树暂时少了 L29.6 这一层，以后可能要挂回去。\n- **补记 6（10-18）**：L29.2 结题，verdict 为「可改造」（审查 6 份、 3 份）；补核二手原文后结论不变。子项目表状态改为「结题」，项目页保持「已定论」。可选后续「强化香港信号」不做，留待 Liang Hu 定。判据档位空档的问题已向 Liang Hu 说明，Liang Hu 回复前保持「可改造」。"
+    },
+    {
+      "id": "dec-0027",
+      "ts": "2026-10-17 05:38",
+      "title": "L29.6a Ubertini 例1 原文对照只判「部分」；M1/M4 型/M3 多变量暂不入分母（10-17 05:4x）",
+      "label": "决定",
+      "text": "# L29.6a Ubertini 例1 原文对照只判「部分」；M1/M4 型/M3 多变量暂不入分母（10-17 05:4x）\n\nDecision I made：L29.6a-14 的结果——M1 全频格 POD「部分（解析自检，原文无对应全格例）」，M4 型 POD50「部分」，M3 多变量 AR20「部分」——全部照判，暂不计入 B1 有效分母；M3 仍以 Samaras 1985 二元实对称闸门参评（不扩大到 18 变量复互谱）。不再追加重建轮次，等 Solari & Piccardo 2001 与 Carassale & Solari 2006 原文。\n- 为什么：目标谱的 L_u、L_w/L_u 和相干定义仍是假设（审稿人 E 的 L_u 转引经核为 Solari 2015 Eq.10 的 L_v,n，张冠李戴），Fig.17 的 24 节点相对误差也对不上；在假设参数上反复调，只会把调参当复现。\n- 错了的代价：若两篇原文始终拿不到，POD 与多变量 AR 的同例原文对照永远是\"部分\"，6a 结论里这两支只能写\"在二元/解析自检范围内\"，覆盖面变窄。M1 与 M0 解析上严格同二阶（推导备忘 §1），对结论影响小；影响大的是 M2/M4（截断与插值）——M4 另有 Zhao 2021 Fig.10/11 可作原文对照（第二周 Colab）。\n- 依据：Ubertini 2010 原文（Zotero QP5SJE93）；无文献依据的判断：放弃追加重建为本实验室决定。"
+    },
+    {
+      "id": "dec-0028",
+      "ts": "2026-10-17 06:03",
+      "title": "L29.1 舒适度校准口径冻结：1/6 气动份额与 150 t/层质量是同一片楼的口径（10-17 11:00）",
+      "label": "决定",
+      "text": "# L29.1 舒适度校准口径冻结：1/6 气动份额与 150 t/层质量是同一片楼的口径（10-17 11:00）\n\n**事实**：用 TPU 实测压力（T114_6、T115_4，0°）频域法算 L29.1-19 既有截面的 10 年顶层加速度，横风均大于顺风；横风峰值为 C26.11 单模态公式代理的 0.71–0.91 倍（公式偏大 10–30%）。既有截面下 700 年强度 D/C 仅 0.38（150 m/0.15）、0.61（150 m/0.25）、0.15（250 m）。better 把\"1/6 份额是否成立\"列为最大不确定（若改为整栋，加速度×6）。\n\n**判断与决定**：\n1. 代表框架＋核心是全楼的 1/6 片：LK 原文即按框架承担 X 向风的 1/6（卡 LK4YDLF4 PDF 物理 p.8）；150 t/层与一片 30×45 m 楼面（约 1350 m²）的 1/6 质量量级相符（每平米约 0.6–0.8 t 的楼面质量为本线假设）。**荷载与质量同取 1/6 即自洽**，不再作为待定项；不再乘 6。\n2. 舒适度一律用 **TPU 频域横风/顺风峰值的较大者**，不再用 C26.11 公式；两组 TPU 记录取较不利者。\n3. 质量主账：150 t/层已含钢材，不另加钢重（better 提议的主账），加钢重作为敏感档。\n4. 下一步只做**按新舒适口径的重新截面筛查与组级回退**，出 150 m（0.15/0.25）与 250 m（0.25）的 p_W。\n\n**错了的代价**：若 150 t/层实际低估一片楼的质量，加速度会被低估（偏向\"舒适不控制\"、即偏向对方）；保留加钢重的敏感档作对照。\n\n依据：LK4YDLF4 PDF 物理 p.8；楼面质量量级无文献依据，基于本线假设。"
+    },
+    {
+      "id": "dec-0029",
+      "ts": "2026-10-17 06:25",
+      "title": "L29.1 倡导\"风下允许非弹性\"的近期文献按\"被审视方\"处理，不作独立支持证据（10-17 12:30）",
+      "label": "决定",
+      "text": "# L29.1 倡导\"风下允许非弹性\"的近期文献按\"被审视方\"处理，不作独立支持证据（10-17 12:30）\n\n**来源**：Liang Hu 10-17 原话：\"近期很多文献在这个观点上都是被污染的，需要批判性的看待，特别是 Seymour Spence 等人的文献。\"\n\n**决定**：\n1. 凡论证\"主体结构风下可允许有限非弹性 / 动力安定可作极限状态 / 非弹性设计有益\"的近期文献——首先是 Spence 课题组（Chuang & Spence 2019/2020/2022、Arunachalam & Spence 2022、Spence & Arunachalam 2022 综述、Tabbuso 等 2016、Ouyang & Spence 2019/2021、Suksuwan & Spence 2019、Spence & Kareem 2013/2014），以及 Alinejad/Jeong/Kang 组、ASCE PBWD 预标准相关论述——在 L29.1 中一律归为**被审视方文献**：它们的结论是待检验的主张，不是支持证据；同一课题组内互相引用不算独立印证。\n2. 只有满足以下之一才算独立证据：独立课题组的复现或反例、物理试验（须看清加载制度与覆盖范围，如 Abdullah 2020 只有约 12 次轻微非弹性）、规范条文原文、本线可复核的计算。\n3. 对 Spence 组做一次**方法审计**（L29.1-24）：逐篇找出驱动\"非弹性可接受\"结论的关键假设（本构是否含退化/断裂/低周疲劳、风暴时长与记录延拓、阻尼、风荷载来源、\"安定\"是验证还是假设、可靠度目标、结论是否超出证据），以及引用链（结论是否只在组内循环）。只评工作、不评人，结论须有页码证据。\n4. 已有工作中的用法核对：LK 37 层框架（Chuang & Spence 2019）在本线只作**几何/截面骨架与周期校准对象**，不采信其关于非弹性性能的结论——继续这样用；量纲论证中\"动力安定\"一直作为对方论据被检验，未当作证据——不变。主张—条件—数字表 v4 中 Spence 组各行补标\"被审视方\"。\n5. 判据（项目页页头 criteria）不改。\n\n**错了的代价**：若把某篇确有独立验证的工作也一并降格，可能少用一份有效证据；对策是审计报告逐篇写\"有无独立验证\"，有则单列恢复。\n\n依据：Liang Hu 10-17 指示；文献清单见 下 Spence 相关卡片。"
+    },
+    {
+      "id": "dec-0030",
+      "ts": "2026-10-17 06:42",
+      "title": "L29.4 气候风速换算链疑点；荷载组合与偏心口径修正（10-17 07:xx）",
+      "label": "决定",
+      "text": "# L29.4 气候风速换算链疑点；荷载组合与偏心口径修正（10-17 07:xx）\n1. 疑点：现用 V_roof,1h = knots×0.4146×Ratio_Vs（C=0.64）得 10 年 MRI 屋顶 1 h 风速 18.79 m/s，低于 10 m 处 1 h 风速约 29.4 m/s，物理不合理；TN1665 印刷 p.A31 对 Ratio_Vs 的文字定义（站点/屋顶）与公式说明（屋顶/站点）矛盾，分母单位与时距未说明。另：L29.4-05 在屋顶 20 m/s 下算得原设计质量中心加速度约 4 mg，而 TN1665 Table 5（印刷 p.26）10 年角点 19.6 mg，暗示 10 年屋顶风速应明显高于 20 m/s。\nDecision I made：派 L29.4-21 用三种口径（H1 现用、H2 Ratio 已含单位与时距换算、H3 除以 Ratio）复现 Table 5 的 10 年加速度与 20 年层间位移，以复现结果定口径；在此之前服务风速做成参数（18.79/45 m/s 两档）并行推进 A。服务风速与年超越概率链都以 L29.4-21 结论为准。\n错了的代价：若 H1 是错的，此前所有服务位移/加速度利用率低估约 4–6 倍，A 会被服务约束控制、截面更大；可靠度评价的年超越概率也会严重偏低——必须在 B/C 之前定。\n2. 采纳 better L29.4-20 的两处规范核对：删去任务书中的 1.2D+1.6L+0.5W（ASCE 7-22 §2.3.1 未列），改用原文组合；柔性建筑偏心用 §27.3.5 式(27.3-4)，不再固定 0.15B。此为 Lead 任务书口径错误的更正。\n\n## 裁定（10-17 08:xx，据 L29.4-21）\n- H1（knots×0.4146×Ratio）被排除：Table 5 两量都低 82–84%。\n- L29.4-21 用的是 C 列 0.64，但 TN1665 示例为全向 B（印刷 p.22、p.A32 terrain_exposure 全 B）。其 factor_sweep_diagnostic.json（Vm=23.2）在 0.58 m/s/knot——恰为 H2 口径下的 Ratio_Vs(B)=0.58——得 10 年角点 22.45 mg（+14.5%）、20 年层间位移比 0.00292（−5.9%），两量一高一低、都在 ±15% 内；考虑峰值插值网格误差（约 2.5%）与 Vm 版本差，视为复现。\nDecision I made：采用 H2：V_roof,1h[m/s] = knots × Ratio_Vs(暴露)，即 Ratio_Vs 已含 knot→m/s 与 1 min→1 h 换算。本课题（Exposure C）10 年 MRI 屋顶 1 h 风速 45.32 m/s；年超越概率链同口径。H3 作敏感性（与 H2 相差约 1%）。Vm 主用包内 22.2，23.2 作敏感性。\n为什么：H2+B 是唯一能用论文自身的暴露设定同时把两个独立量复现到 ±15% 的口径；且物理上屋顶风速高于 10 m 处。\n错了的代价：若原软件另有处理，服务风速可能有约 ±10% 偏差，服务位移 ±20%、加速度 ±25–30%；三方案共用，相对比较影响小，但 A 的控制约束可能改变。climate_chain.md 与 v1_service_hazard.json 的 18.79 m/s 作废（文件保留，标 H1 已排除）。"
+    },
+    {
+      "id": "dec-0031",
+      "ts": "2026-10-17 06:45",
+      "title": "L29.6a M5/M7 原文闸门定「部分」；启动平稳高斯支首轮同目标比较（10-17 06:1x）",
+      "label": "决定",
+      "text": "# L29.6a M5/M7 原文闸门定「部分」；启动平稳高斯支首轮同目标比较（10-17 06:1x）\n\nDecision I made：\n1. M5（广义谐和小波）原文闸门定「部分」：按 Wang 2022 Eq.(45)（PDF p.18）字面计算的 εa 不随项数下降，与 Table 2 不符；原式分子/分母积分上下限不同，归一口径无法从原文确定。不再为凑 Table 2 数字调比例。EPSD 收敛结构（Fig.6）得到代理支持。证据：。\n2. M7（TVAR）合成例：两遍 Kalman（滤波+RTS 平滑）实现后 n=30 MSE 0.076，与作者 p.101 的 0.08–0.10 量级相近，但最优 σ_W 落在网格上界，与 Fig.4.23 不符 → 暂「部分」；派 L29.6a-20 做多种子与初值敏感性（一次性，量化后定案）。风事件输入缺失，风事件拟合记\"待数据\"。\n3. 启动 L29.6a-19：G1 平稳高斯支首轮正式同目标比较——M0（两个实现变体）vs M3（AR，实对称多点目标；Samaras 闸门是二元实对称，算法对维数通用，本轮把适用范围限定在\"实对称 CSD\"），M1/M2 作参考不计入 §2.2。只给数据与模板 §2.1/2.4 逐项判别，档位结论由 Lead 汇总后按规则 \n- 为什么：继续在\"部分\"的方法上反复补做是调参；已有两个入分母的方法可以先跑出第一份按模板判别的数据，同时检验整条流程。\n- 错了的代价：若 M3 在 6 点实对称目标上的表现与二元原例差异很大，需要回头核 M3 的多点实现（约半天）；首轮结果不构成任何档位。\n- 无文献依据的判断：把 M3 闸门推广到实对称多点目标是本实验室判断（算法对维数通用，复互谱相位未覆盖）。\n\n## 补记（10-17 06:5x）：首轮比较结果的读法\n- Lead 核对 comparisons_v3_20261017.csv（1 h 分类计数）与 E2 表，报告数字属实。\n- A5 的有限记录零底噪依赖激励分布：定幅随机相位（Deodatis 错频）单样本谱 A5≈0.07，复高斯幅值≈0.18。以后比较不同随机化组件的方法时，A5 必须按各自激励分布的零分布解读，不能把\"A5 更小\"直接当作精度优势；工程判别以响应指标为准。此为本线观察，无文献依据。\n- 首轮不构成任何档位；待非平稳支、非高斯支、更大测点数（m=30 以上，检验 AR 内存与截断/插值的预测区间）和实测数据跑完后，由 Lead 汇总并 \n\n## 补记（10-17 06:5x）：M7 合成例闸门定案「部分」\nL29.6a-20：50 种子下 MSE 随 n 增长（0.004→0.027→0.046→0.072→0.085），n≥20 时 MSE 0.07–0.09 与作者 0.08–0.10 量级一致；高 n 最优 σ_W 呈低/高双峰（n=30：18/50 条 ≤0.01、23/50 条 >0.2），作者\"很小\"的趋势只部分出现，且受 P0 影响明显；扩展网格不改结论。M7 定「部分（已知输入的标量合成例）」，不入分母；风事件拟合待数据。不再追加。"
+    },
+    {
+      "id": "dec-0032",
+      "ts": "2026-10-17 08:09",
+      "title": "L29.1 Liang Hu 提出的三条机理列为检验主线（10-17 13:30）",
+      "label": "决定",
+      "text": "# L29.1 Liang Hu 提出的三条机理列为检验主线（10-17 13:30）\n\n**来源**：Liang Hu 10-17 原话要点——实际上没有人需要考虑抗风非线性，原因：\n1. 高层在风下会先发生围护结构破坏，从而\"自动减载\"；低层也一样，除龙卷风这类直接冲击外，多数也是围护结构破坏。\n2. 顺风向风荷载通常不产生往复荷载，形不成滞回环，对疲劳的作用与冲击/往复荷载很不一样，以最大值为主；研究\"持续时间\"是地震工程的逻辑，不适用于风。\n3. 风荷载的概率重现与地震动的偶遇冲击不同——区别还没完全想清楚，但肯定影响\"风下不出现非线性\"的预期。\nLiang Hu 对 Spence 系列的总体看法记在项目页「Liang Hu 注」。\n\n**决定**：三条作为 L29.1 的三条机理检验线（M1/M2/M3），每条都要有可复核证据，未检验前写\"待检验\"，不作结论；开题卡判据不改，这三条用来解释判据结果的物理原因并界定适用范围。\n- **M1 围护先坏、自动减载**：查两件事——(a) 证据上围护破坏是否先于主体屈服（飓风后高层/低层震损调查、围护与主体的设计强度与可靠度对比）；(b) 物理上围护破坏后主体受力是否真的下降（开洞后内压与整体力的变化，风洞或 CFD 证据）。(b) 是 Lead 尚不确定的一环：整体风力取决于外表面压力分布，开洞后可能下降也可能不变，须查证。→ L29.1-25（litwiki）。\n- **M2 顺风无往复、以峰值为主**：本线已有数据可直接检验——TPU 实测谱下顺风塑性为单向累积（残余≈累计塑性变程）、事件少；横风近零均值、往复多（、v7）。初步支持 M2 的顺风部分，横风另论；而横风在 A 段由舒适度控制、强度远未用满（pilotA10）。由 Lead 整理成一页，不另派计算。\n- **M3 概率性质不同**：Lead 先提三个可量化的候选解释（见下），派 L29.1-26 用 ASCE 7-22 官方风速与 USGS 地震危险性曲线同城对比 →\n (i) 危险性曲线斜率：风从设计重现期到罕遇重现期，荷载只涨约 1.6–2.1 倍（芝加哥 50→700 年 (107.06/85.00)²=1.59；10→700 年 2.12，本线 GIS 数据），地震常涨数倍——弹性设计到罕遇水平对风便宜、对地震昂贵\n (ii) 事件重复：风在寿命期内多次接近设计水平（每年都有强风季），任何非弹性会跨事件累积；地震设计级事件一生至多一次，一次性损伤可修\n (iii) 力控制与位移控制：地震是基底运动输入，结构屈服后周期变长、受力需求随之下降；风是施加的压力，结构屈服不减少荷载（除非 M1 的围护破坏），有均值时导致单向漂移——延性在地震里\"减需求\"，在风里不减。\n (i)(ii) 可用数据量化；(iii) 是物理论证，与 M2、量纲论证 v2–v7 相互印证。\n\n**错了的代价**：若 M1(b) 查证结果是\"开洞不减整体风力\"，M1 只剩\"围护先坏\"一半；若 M3(i) 数据显示某些风区（如台风区）危险性曲线比地震还陡，则该区是对方主张可能成立的适用范围，须正面写入。\n\n依据：Liang Hu 10-17 指示；本线数据 、dimensional_v6/v7；其余无文献依据，待 L29.1-25/26 补。"
+    },
+    {
+      "id": "dec-0033",
+      "ts": "2026-10-17 09:59",
+      "title": "L29.4 方案 B 的优化器强度要求（10-17 10:xx）",
+      "label": "决定",
+      "text": "# L29.4 方案 B 的优化器强度要求（10-17 10:xx）\n背景：L29.4-24 烟测用逐组缩减的贪心局部搜索，三次评估造价代理仅降 0.72%。\nDecision I made：B 的正式搜索必须足够强，避免\"优化器太弱 → 节省偏小 → 偏向判对方不成立\"：(1) 两种不同优化器各跑一遍取最好：①扩展离散局部搜索（含缩/增双向、组间交换、纵筋根数与箍距邻域、多起点：A、紧凑 A、NIST 原截面、全下界修复后）；②一种群体/全局类方法（如 GA 或 CMA-ES 在离散目录上，固定种子）；(2) 报告各自收敛曲线，两者最好解相差 >2% 时扩大预算再跑；(3) 另给一个连续松弛下界（放开 50 mm 离散与竖向单调后的最小造价），作为\"优化最多能省多少\"的乐观上限一并报告。价格：RSMeans 2026 Q3 全国原材料价为代理（混凝土 260.05 USD/m³、钢筋 2026.05 USD/t），高强混凝土加价与钢筋比价按 0.5–2 倍做敏感性。\n为什么：实验室规则要求取对方最强版本；B 的节省是判据核心，弱优化器会系统性低估。\n错了的代价：机时约增一倍（每支约 12 h 单节点），仍远低于 200 SU。"
+    },
+    {
+      "id": "dec-0034",
+      "ts": "2026-10-17 10:31",
+      "title": "L29.6a 平稳高斯支阶段小结与下一步（10-17 10:4x）",
+      "label": "决定",
+      "text": "# L29.6a 平稳高斯支阶段小结与下一步（10-17 10:4x）\n\n阶段事实（均为本线数据，无档位结论；档位待各支完成后汇总 \n- M1 全模态 POD 与 M0 在 m=6/30/100、两谱下数值上不可分辨（与推导备忘 §1 的解析等价一致）。\n- M3 AR：阶数够高（p≥4 于 m=6，p=20 于 m=30/100）时与 M0 数值上不可分辨；本实现下时间约为 M0 的 2–5 倍、峰值内存约 2 倍，未见 B9 所说的成本受益（内存预测在 m≥30 属域外）。\n- M2 截断 POD：低冗余布局下余项大、响应显著偏低；高冗余布局下要余项 <2% 需保留 22–28/30 个模态，压缩有限、端到端不省时，且点 0 响应余项小并不保证整个场的相干不偏（L29.6a-22）。B9 的 M2 联合预测在本实现记\"不一致\"。\n- 机理线索（本线推理，待验证）：指数相干 exp(−C f Δ/U) 随频率衰减，高频处测点去相关、有效秩高，所以全频统一截断阶数难以省下多少；按频率变阶截断或许能改，但这是新假说，不回填 B9。\n\nDecision I made：平稳高斯解析支暂告一段落，不再加做；下一步转向 (1) 非平稳支：M4（Zhao 2021 POD+插值）按原文规模在 Colab 做原文闸门；(2) 实测平稳支：Cabauw 2 Hz 良态风，在 Colab 上下载与计算，只带回小结果。\n- 为什么：平稳解析支四个方法的关系已经清楚；B9 中剩下的可检验预测主要在非平稳与实测。\n- 错了的代价：若后续审查要求平稳支补更多谱形（如窄带峰），需再开一轮，约半天。"
+    },
+    {
+      "id": "dec-0035",
+      "ts": "2026-10-17 10:48",
+      "title": "L29.4 FE 闸门调整：由\"标定到 NIST\"改为\"规范分析模型 + NIST 合理性参照 + 独立实现核对 + 刚度包络\"（10-17 03:0x）",
+      "label": "决定",
+      "text": "# L29.4 FE 闸门调整：由\"标定到 NIST\"改为\"规范分析模型 + NIST 合理性参照 + 独立实现核对 + 刚度包络\"（10-17 03:0x）\n这是对 Lead 自定技术闸门（决策 L29.4_A方案规范与FE校准判据_20261017 第 2 条）的修改，不涉及开题卡判据，也不是 Liang Hu 定的闸门。\n\nDecision I made：\n1. A/B/C 共用模型取刚度阶梯 L3（放开 uz、rz，ACI 318-19 §[地址].1 柱 0.70Ig、梁 0.35Ig；系数经 Dlubal 二手解读核，正版条文未取得），冻结为\"候选模型 v1\"。\n2. 原闸门（周期 ≤5%、MAC ≥0.95、0°/90° 响应 ±10%，均对 NIST）降为合理性参照：周期偏差 ≤25%、MAC ≥0.95 即可。L3 实测周期偏差 +8.97/+19.94/+2.17%、配对 MAC ≥0.998，满足。\n3. 新增：用独立实现（另一套代码或 Ansys frame_2d 平面框架模板）核对我们 FE 的单元与组装，频率差 ≤1%。\n4. 新增：A/B/C 最终节省率同时在 L1（不折减）与 L3（ACI 折减）两种刚度下各算一遍，作包络；两者若得出跨判据档的不同结论，结论写\"对刚度假设敏感\"，不择一报。\n为什么：TN1665 与 CWE2010 均未给原 FE 的开裂折减、轴向变形、刚域、E 取值（TN1665 卡 PDF pp.26–29；CWE2010 卡 PDF p.5），标定到一个未公开假设的模型不可裁决；且 L29.4 的判据是同一模型上 A/B/C 的相对节省与 β 差，A 也在同一模型上设计，绝对刚度偏差主要靠包络覆盖。阈值 25% 无文献依据，基于同一建筑不同 FE 模型间周期离散的工程经验。\n错了的代价：若绝对刚度偏差使 A 的控制约束（位移/加速度 vs 强度）与真实建筑不同，节省率会偏；包络能暴露但不能消除这一点。之后若找到 NIST 原 FE 假设，回到原闸门重核。\n\n补记 10-17 04:2x：v1 已冻结。单跨子框架独立核对两边同为 Hermite 梁、差 4e-14%，独立性不足，另派整高度平面框架 Ansys 核对（毛截面，避开模板不能分别折减 EA/EI 的限制）。场址定为迈阿密-戴德郊区代表点 25.76°N 80.30°W（假设：NIST 仅给 Milepost 1450），全向暴露 B，C 作后续敏感性；风速只取 ASCE Hazard Tool、FBC 或 ASCE 7-22 原图，不取第三方汇总。代价：代表点与 NIST 原场址不同，A 的风速可能与 NIST 原设计差几 mph，三方案共用不影响相对比较。\n\n补记 10-17 11:xx：独立实现核对通过（第 3 条）。Ansys（CRC 1573460，CO-）60 层均匀代理前 6 阶比我方 Euler 梁 Python 高出 1.36–1.54%；我方加 Timoshenko 剪切（κ=5/6，ν=0.2）后差降到 0.10–0.14%，单元细分无影响——程序单元与组装正确，差异来自梁理论。剪切对 L3 三维 v1 周期影响 +1.10~1.20%、MAC ≥0.998。\nDecision I made：保留 Euler v1 作为 A/B/C 共同模型（已算的 A 与在跑的 B 同口径）；最终节省率另加\"剪切版\"敏感性（三方案在剪切版下复核约束，若节省接近判据边界 ±1 个百分点再整套重设计），与 L1/L3 刚度包络一并报告。\n代价：周期 1% 级差异对相对比较影响预计很小；接近边界时需重算。"
+    },
+    {
+      "id": "dec-0036",
+      "ts": "2026-10-17 10:51",
+      "title": "L29.6a M3 计入有效分母；M6 作非平稳支参照基线；Zhao Fig.10/11 改作 M4 原文对照（10-17 05:3x）",
+      "label": "决定",
+      "text": "# L29.6a M3 计入有效分母；M6 作非平稳支参照基线；Zhao Fig.10/11 改作 M4 原文对照（10-17 05:3x）\n\nDecision I made：\n1. M3（AR/ARMA）原文实现闸门「通过（限定：二元实对称目标）」，计入 B1 有效分母。依据：L29.6a-13 按 Samaras, Shinozuka & Tsurui 1985（卡片，PDF pp.5–11，Eqs.1、9–18、20，Fig.2–3）复现二元 ARMA(3,3)（辅助 AR p=17）：目标 K12(0)=−0.8000，模型 −0.79997，相关最大误差 2.4e−4，模型谱 log-RMS 1.8e−4，极点模 0.877<1。多变量复互谱的块 Toeplitz AR（Ubertini 附录 A）另由 L29.6a-14 对照，未过前 M3 只在实对称目标上参评。\n2. M6（全阶演变谱 SRM）闸门记「部分」，但定为**非平稳支的参照基线**（与 M0 在平稳支的角色相同，不作竞争者计入分子/分母）。依据：三点全阶算子独立实现的完整双时协方差 K(t,s) 与 Zhao 2021 Eq.(8) 离散目标在 R=400 下 8 项均在 2SE 内；M6 的原始出处 Deodatis 1996 PEM 全文取不到。冻结 K(t,s) 定义（报告中公式）作为 M4/M5/M7 同目标比较的目标。\n3. Zhao 2021 Fig.10/11 由作者的 POD+插值加速法生成，属 M4 的原文对照，不再用于 M6。100 点、R=2000 规模在 工作站 过重，第二周用 Colab 做（先估算计算单元）。\n- 为什么：避免拿加速法的图去验全阶法；非平稳支需要一个已解析验证的参照。\n- 错了的代价：若 M6 实现有我们未发现的问题，非平稳支所有同目标比较都要重做；K(t,s) 解析一致性已大幅降低这个风险。Colab 约需数个计算单元。\n- 无文献依据的判断：M6 作参照的安排为本实验室约定。\n\n## 补记（10-17 05:5x）：M8 计入有效分母\nM8（分位转换）原文闸门「通过（方法级，限一维 lognormal 解析原例）」：Grigoriu 1998（卡片，PDF pp.2–5，Eq.9、16、21、24、26，Fig.5）复现边缘 KS=0.0029、均值/方差 1.637/4.715（目标 1.649/4.671）、相关 RMSE 0.025；生成核用 FFT 循环嵌入而非原文采样定理版本（同二阶目标）。计入分母，适用范围限相容一维目标。M9a（Yamazaki–Shinozuka 迭代）判「部分」（24 场均谱更新≠原文单场），已派 L29.6a-17 按原文口径重跑。M9（IPAC）待原文核验。证据：。\n\n## 补记（10-17 06:0x）：M9a 定为「部分」，不再追加重跑\nL29.6a-17 按原文单场 Eq.(25)、零轴规则重跑：Fig.9/11 宏观形状可见，但第 3 次迭代谱残差非单调（0.69→0.56→0.47→0.50）、径向谱残差反升、方差低 6.4%。Lead 看过诊断图：iter 3 谱整体低于目标，CDF 与 beta 目标接近。判「部分」，不进分母；不再为凑\"通过\"追加调整（相位固定方式、除零下限、重标都是原文未印的处理，继续调就是调参）。此现象（单场谱比迭代不保证收敛）作为本线观察记入，留给 M9 类的 B9 预测\"未收敛不能称匹配\"核对，不归咎作者。\n\n## 补记（10-17 10:5x）：M4 原文闸门由 Lead 裁定「通过（限定）」，计入非平稳支有效分母\nL29.6a-25：按原文 R=2000、四模态/15 频点/20 时点，Fig.10 两点对三滞后（t≈600 s 峰值、滞后增大峰值降）与 Fig.11 两点三时刻谱形（600 s 最大、900 s 次之、300 s 最小）均与原图一致；8 项双时协方差样本值全部在 M4 理论 2SE 内（R=200 时超 2SE 的一项在 R=2000 回到 2.525±0.413）；节点 POD 误差 0.74%（原文 0.85%）。better 记\"部分\"的理由是只输出 3 点、Fig.11 估计窗原文未给。Lead 按\"复现以物理结构和演化对上为准\"的规矩（与 M0 通过标准一致）裁定通过（限定：三点输出、Fig.10/11 结构、8 项 K），M4 计入非平稳支 B1 有效分母，与参照 M6 比较。错了的代价：若百点全输出下出现结构偏差，M4 的比较结论需回撤；Fig.11 估计器差异只影响谱估计，不影响 K 的判定。"
+    },
+    {
+      "id": "dec-0037",
+      "ts": "2026-10-17 11:16",
+      "title": "L29.6a 非平稳支：L29.6a-27 只收为缩格诊断；正式比较规格（10-17 11:2x）",
+      "label": "决定",
+      "text": "# L29.6a 非平稳支：L29.6a-27 只收为缩格诊断；正式比较规格（10-17 11:2x）\n\nDecision I made：\n1. L29.6a-27 收为\"缩格诊断\"（128 s 记录、1 Hz、64 频格；两法同进程），不作正式比较。保留其理论 K/σ 诊断：m=30 时 M4 理论 K 相对 M6 的偏差（稀/原文/密节点）慢变 0.28/0.075/0.018、中间 0.46/0.053/0.014、强变 1.53/0.40/0.052，与 B9 M4 行\"强变+稀疏节点误差升\"方向一致（仅理论诊断）。\n2. 正式比较规格（L29.6a-28 之后的 L29.6a-29）：\n - 时间格回到 Zhao 原文 Δt=1 s、记录 2048 s（N=1024 频格、M=2048）；三档 η 用 Zhao 型包络在 2048 s 内调参实现（写明参数与 η）。\n - SDOF 频率改为 0.1/0.2/0.4 Hz（Δt=1 s 时 Nyquist 0.5 Hz，原 B4 的 0.5/1.0 Hz 不可算）——这是对基准设计 B4 在非平稳支的必要调整，B9 不改；阻尼 1/2/5% 不变。\n - 峰值按 10 段（各约 205 s）Gumbel 22%；R=200；每方法独立进程测 E2 分段与峰值内存。\n - Colab：先 CPU 试一单元估时，单元全套 >1 h 再开 A100（约 5.4 CU/h），用完必须 stop。\n- 为什么：缩格诊断里只有理论值，响应、峰值、成本三块都拆不开，不能按模板判别。\n- 错了的代价：Colab 用量可能到数十 CU；若 2048 s 记录下峰值仍不稳，峰值只作诊断。\n- 依据：Zhao 2021 卡片 PDF pp.5–7（时间格与样本数）。频率调整无文献依据，基于采样约束。"
+    },
+    {
+      "id": "dec-0038",
+      "ts": "2026-10-17 11:37",
+      "title": "L29.6a Cabauw 实测筛选规则修订 v2（10-17 10:5x）",
+      "label": "决定",
+      "text": "# L29.6a Cabauw 实测筛选规则修订 v2（10-17 10:5x）\n\nDecision I made：L29.6a-24 停在字段闸门（Cabauw 2 Hz 包无温度/热通量/稳定度字段；1999 条目与 1985 条目 764 个序列完全重复）。改用事先写定的 B3 修订 v2：排除全部 1999 条目；近中性改为\"强风良态小时\"代理（U80 ≥ 8 m/s、切变指数 0.10–0.25、80 m 风向小时标准差 ≤15°、10 分钟段 U80 极差 ≤15%），另报 U80 ≥6、≥10 两档敏感性；按日 SHA-256 哈希 60/20/20 划分；测试集 <10 小时即停。文件，sha256 8f6ed59dc77e9dfce462c171f460d4d8798df886862c219e44be984ac0dcf676，写于任何方法结果之前。\n- 为什么：原定义在此数据上不可执行；强风下机械湍流主导是常用的物理代理。结论只适用于\"强风良态小时\"，不称\"已证近中性\"。\n- 错了的代价：若稳定度在强风小时中仍有显著影响，实测比较的目标估计误差会偏大，但这同样作用于所有方法，影响的是\"方法对实测\"的绝对偏差而非方法间比较；结论适用范围按代理定义写窄。\n- 依据：无文献依据（代理阈值为本实验室假设，带敏感性档）。B9 不改。\n\n## 补记（10-17 11:1x）：L29.6a-26 不收为完成；写定 v2a 后补完\nL29.6a-26 只交探索结果（自动初查二次未通过）：缺每小时十段 SE、逐指标目标误差、两档敏感性全流程；且 M3 验证选阶只用自谱 log-RMS，选出 p=2，致 M3 方差 2.83、MSC L1 0.33 远离实测 2.14、0.16（M0 为 2.42、0.18）。选阶标准原未事先规定——这是 Lead 任务书的缺口。补写 v2a（sha256 90deb384f06bb689ac21129d946c84836342b007983f8c98a5769c7b1f1108f1）：三项联合选阶、全部 p 附录、十段 SE 按日聚类、逐指标目标误差三分解、两档全流程。沿用原日分区。派 L29.6a-28。探索结果不作正式结果、不用于挑设置。\n\n## 补记（10-17 11:4x）：L29.6a-28 收为完成（v3b 为准）\n按 v2a 完成三档全流程。读法：(1) 实测测试集只有 8 个独立日，两种方法对实测的差都落在保守误差界内——这说明数据分辨力不足，不说明两法都\"对\"；(2) 在实测训练目标上，AR 高阶（p≥8）拟合失稳，验证集选出 p=1，p=1 的 AR 与 SRM 在响应上可分辨且超 5% 容差（与 G1 解析目标上\"高阶 AR 与 SRM 数值不可分辨\"的结果并不矛盾：实测目标估计噪声限制了可用阶数）。此为本线数据观察，无文献依据；不回填 B9。v3（峰值 SE 子块错误、A5/A6 目标误差口径错误）作废，不引用。"
+    },
+    {
+      "id": "dec-0039",
+      "ts": "2026-10-17 12:02",
+      "title": "L29.1 A 段首次出现节材上界 ≥2%：先按对方自己的折减规则核减并做敏感性，再定是否进 B 段（10-17 16:00）",
+      "label": "决定",
+      "text": "# L29.1 A 段首次出现节材上界 ≥2%：先按对方自己的折减规则核减并做敏感性，再定是否进 B 段（10-17 16:00）\n\n**事实**（Colab CPU 实跑，同求解器复算 PASS）：两道伸臂+带杆、四柱宽核心（9/10/9 m 三跨 X 撑）的二维 1/6 片模型：\n| 档 | p_W | U_direct(2) | U_direct(3) | 10 年加速度 | 700 年 D/C |\n| --- | --- | --- | --- | --- | --- |\n| 迈阿密 250 m / 舒适 0.25 | 8.58% | 4.29% | 5.72% | 0.209 | 0.985 |\n| 迈阿密 150 m / 0.25（新体系） | 5.12% | 2.56% | 3.41% | 0.100 | 0.996 |\n| 迈阿密 250 m / 0.15 | 0 | 0 | 0 | 0.150（紧） | 0.511 |\n| 芝加哥 250 m / 0.15 | 0 | 0 | 0 | 0.150（紧） | 0.836 |\n风强度池为框架柱、核心底部柱等。旧双重体系（无伸臂）迈阿密 150 m/0.25 仅 1.51%。\n\n**判断**：这是第一次在\"台风区 + 舒适限值宽松 + 高效刚性体系\"组合下，A 段筛查上界超过 2%（R_W=3 时 250 m 达 5.7%）。按 10-17 决策（L29.1_反例算例分两段_上界筛查先行），上界 ≥2% 的组合不能在 A 段排除，须进 B 段。这是对方主张可能成立的适用范围，**必须正面记录，不得淡化**；也不是结论——U_direct 是上界。\n\n**先做的两件事（L29.1-29）**：\n1. **按对方自己的规则核减**：U_direct 假设风强度池构件按 1/R_W 整体减力，而对方实际规则（Jeong, Alinejad & Kang 2021 式(1)，被审视方文献，只用作\"对方怎么设计\"，卡 PDF p.3）只把共振分量除以 R_W，均值与背景不减。台风区高层均值和背景占比大，实际可减比例可能远小于 1−1/R_W。对风强度池逐组按其控制工况下的均值/背景/共振分量算 F_Jeong/F_elastic，得 U_Jeong(R_W)。\n2. **敏感性**：方向组合（100%+75% 换成 100%+100% 与仅顺风）、重力分配 1/9→1/11、净 Cp 0.8/1.6、舒适限值 0.20。看 U 是否仍 ≥2%。\n若 U_Jeong 仍 ≥2%：进 B 段，在迈阿密 250 m/0.25 上做按对方规则减配后的非线性时程，检验判据 (a)–(d)（累积塑性与低周疲劳见量纲论证 v6/v7：横风 R_W=2 每小时 77–100 次塑性事件）。B 段若需 CRC，按 ComputeOps 申请 + 登记。\n\n**错了的代价**：若跳过核减直接把 4.3–5.7% 当作\"对方可能成立\"的数字，会高估对方；若不进 B 段，会漏掉对方唯一可能成立的区间。\n\n依据：本线数据 pilotA13/pilotA14；对方规则出处见上（被审视方文献，仅作设计规则）。"
+    },
+    {
+      "id": "dec-0040",
+      "ts": "2026-10-17 13:43",
+      "title": "L29.1 敏感性矩阵剩余六档改上 CRC 单核独立作业并行（10-17 13:50）",
+      "label": "决定",
+      "text": "# L29.1 敏感性矩阵剩余六档改上 CRC 单核独立作业并行（10-17 13:50）\n\n**事实**：L29.1-30 在 Colab 单 CPU 会话上串行跑八档敏感性，单档 >1 h（100%+100% 档 12:4x 起算至 13:42 未完），第二个 Colab 会话分配被 412 拒绝；按此进度剩余六档需 6+ 小时，且 Colab 长时间会话易断。\n**决定**：当前 Colab 会话只跑完 100%+100% 一档（watcher 完成即拉回并 stop）；其余六档（仅顺风、仅横风、重力 1/11、Cp 0.8、Cp 1.6、舒适 0.20）改为 CRC 上 6 个独立单核作业并行，每个预计 1–3 h、合计约 6–18 核时（远低于 200 SU 送审门槛）。按全线规则：先向 ComputeOps 资源申请，由 better 自己提交，预检与提交分两条命令，提交即 登记；结果放 CRC 自己的工作目录，只把小结果（JSON/日志）拉回 工作站。\n**为什么**：六档互相独立、单档单核，正适合 CRC 单节点/单核并行（全线规则：CRC 默认单节点、独立算例分作业并行）；比 Colab 串行快约 6 倍且不怕断连。\n**错了的代价**：多一次资源申请与上传（输入包约 100 MB）；若 CRC 队列长，可能比 Colab 慢——届时取消排队作业（一次一个、先核实状态）回到 Colab。"
+    },
+    {
+      "id": "dec-0041",
+      "ts": "2026-10-17 14:52",
+      "title": "L29.6a THUNDERR 非平稳实测比较协议冻结（10-17 14:0x）",
+      "label": "决定",
+      "text": "# L29.6a THUNDERR 非平稳实测比较协议冻结（10-17 14:0x）\n\nDecision I made：采纳 L29.6a-30 草案第 2 节，并定死开放项后冻结：（sha256 ddff003626a54dce91972ccb4f71995028fc5f9aa78b1299c6588a969226dd81）。要点：Colab 上解压计算；逐站 QC；事件 SHA-256 排序 17/6/6，<10/3/3 即停；30 s 常权均值为基线、Gaussian α=12 作敏感性；60 s Hann 局部 EPSD（30/120 s 只报敏感性）；多点有门槛；M6 参照 vs M4 三档节点（600 s 窗内 6/20/40 时间节点）；M7 本轮不进。\n- 为什么：协议在任何方法结果之前定死，避免事后挑设置；M7 原文闸门只到合成例、风事件无输入，硬放进来没有对照意义。\n- 错了的代价：若 QC 后事件不足，正式比较停止，只留数据清单（约 1 小时 Colab）；若多点不可辨，只有单站结论。\n- 依据：风场线 QC 门与 30 s 滤波（ 行 4–6）；均值滤波方法卡 CNGNT7JX PDF pp.2–5（候选卡）；其余阈值为本实验室假设。\n\n## 补记（10-17 14:2x）：多点门未过，补写单站定义 v2\nL29.6a-31：完整性/QC/划分/停止门均过（QC 后 15/6/6 事件、38/23/13 站记录；划分 14:00:57 写定），30 个候选站对无一满足多点门 → 多点 A6/K 为 NA。单站支停在定义未冻结处（STFT 未换算密度；M4 模态档在单站无定义），未进入合成。Lead 补写 （sha256 58f46bb9fe5cfd1092b0cb420b01acedae19fa0e15ccb19af38ad0d23c29b1c4）：单边 PSD 换算与自洽停止门、均匀调制主目标（非均匀 3 段作敏感性）、单站 K 定义、M4 单站版只检验时频节点插值（稀/原/密 = 8/6、15/20、24/40）。写于任何方法结果之前。代价：单站结论不能外推到多点 POD 组件。\n\n## 补记（10-17 15:0x）：L29.6a-32 收为完成，但 M4 对 M6 的判别按 Lead 复算口径\nL29.6a-32 对\"M4 对 M6\"用的 2s 含训练目标 bootstrap SD 与测试事件 SE——两法同目标、不比测试数据，这两项对二者相同，不应进入方法间误差界（模板 §2.1：6a 用两方法抽样误差之和）。Lead 用其 metrics_v8.csv 只按两法合成十段 SE（缺则 R 间 SE）复算：。结果（均匀主目标，非均匀版相同计数）：\n- M4 稀（8/6）：26 项中 8 项响应显著且超 5% 容差、3 项统计可分辨\n- M4 原文档（15/20）：方差（0.752 vs M6 1.370）、σ(t) 误差、μ(t) 误差统计可分辨，局部 EPSD 诊断可分辨；18 项 SDOF（≤0.5 Hz）响应全部不可分辨\n- M4 密（24/40）：1 项统计可分辨，其余不可分辨。\n- §2.4：三档均不满足（原文档、密档各有统计可分辨项），推翻 better 报告中\"原档、密档未分辨\"的说法。\n读法：原文节点数在 600 s 雷暴窗上丢掉高频能量（方差低 45%），但 0.1–0.5 Hz 结构响应不受影响——插值节点的适用范围取决于关心的频带。方法对实测的判别仍按 better 的口径（含目标与测试误差，正确）。无文献依据，基于本线数据。"
+    },
+    {
+      "id": "dec-0042",
+      "ts": "2026-10-17 15:48",
+      "title": "L29.4 系统 β 随机变量分布冻结 v1（10-17 17:xx）",
+      "label": "决定",
+      "text": "# L29.4 系统 β 随机变量分布冻结 v1（10-17 17:xx）\n依据：litwiki L29.4-33 汇总表 （卡片与页码见该表）。三方案共用，正式 β 只用本表；缺口项标\"假设\"并做敏感性。\nDecision I made（主情景 → 敏感性）：\n1. 抗力（建筑级完全相关的倍率 R，乘名义抗力、不乘 φ；lognormal）：\n - 梁受弯 bias 1.16、COV 0.090（Nowak & Szerszen 2003 Part 1 高强混凝土，PDF p.6 表9）\n - 梁受剪 bias 1.19、COV 0.110（同表）\n - 柱（偏压）：无可核统计——假设取轴压箍筋柱 bias 1.20、COV 0.120（同表，轴压）作压控段代理，拉控段用梁受弯 1.16/0.090；敏感性：柱 bias 1.0、COV 0.15。\n - 构件间完全相关为主情景（同批材料、同一设计公式偏差）；敏感性：楼层段间独立（每十层段一个独立倍率）。\n2. 气动倍率（作用于层力，lognormal，均值 1）：COV 0.10（Minciarelli 2001 a,b,c,q 合成约 0.075，加风洞短记录抽样误差，Duthinh 2018 表1–2 约 0.12 量级；取 0.10）；敏感性 0.05 / 0.20。\n3. 风速微气象倍率（作用于各向风速，lognormal，均值 1）：COV 0.10（Minciarelli 2001 建筑地形 s 0.10、时距换算 r 0.05；气象站地形 u 已由 NIST 模拟风暴目录体现，不重复计）；敏感性 0.05 / 0.15。\n4. 阻尼（lognormal）：均值 2%（TN1665 印刷 p.17），COV 0.40——假设：Satake 2003 RC 回归残差标准误 0.0138（绝对值）适用于 H<130 m 小振幅，本楼 183 m 超出范围；Tamura 讲义转引的约 0.70 不采用；敏感性 0.20 / 0.70。\n5. 频率/刚度倍率（lognormal，均值 1）：COV 0.05（假设；模型层面差异另由 L1/L3 两支与剪切版覆盖）；敏感性 0.10。\n6. 重力：期望值 1.0D + 0.5L（确定性）；Ellingwood 1980 的 50 年风效应 W/Wn 0.78/0.37 不使用（本课题风效应由风暴目录直接给出，避免重复计入）。\n变量间相互独立（除第 1 条内部相关）。\n为什么：正式 β 需要有出处、三方案相同的输入；缺口用最接近的有出处量作代理并做敏感性，不留空。\n错了的代价：柱偏压抗力统计是最大缺口；若 β_U 由柱控制，结论须报告柱抗力敏感性，跨判据档时写\"对柱抗力统计敏感\"。"
+    },
+    {
+      "id": "dec-0043",
+      "ts": "2026-10-17 16:41",
+      "title": "L29.4 方案 B：优化器钻了粗网格空子；改为带裕度内圈 + 细网格修复（10-17 16:5x）",
+      "label": "决定",
+      "text": "# L29.4 方案 B：优化器钻了粗网格空子；改为带裕度内圈 + 细网格修复（10-17 16:5x）\n依据：。L3 两作业各 300 次 2 m/s 评价，前 5 名全部在 0.5 m/s 细检中超 25 mg（局部法 26.2–26.4 mg，GA 25.0–25.5 mg）——优化把解推到加速度边界，而 2 m/s 网格在边界处低估约 2–6%，优化器系统性地选中被低估的设计。粗网格诊断：局部法最好粗可行造价比主 A 低 15.9%，GA 低 7.4%（不是合格节省）；GA 的 300 次后仍比紧凑 A（14.04M USD）贵，说明 GA 预算偏弱。\nDecision I made：\n1. 内圈加速度约束加裕度：用这 10 对（粗/细）结果标定粗→细放大比的上包络 k（取观测最大值再加 1% 余量），内圈要求 粗网格加速度 ≤ 25/k mg；其他约束不变。\n2. 细网格修复：对两作业保存的粗可行候选（按造价排序取前 20）做\"细网格修复\"——逐步加大对加速度最敏感的组（以刚度/质量比灵敏度排序）一档，直到 0.5 m/s 全部合格，记录修复代价。\n3. 再搜：局部法与 GA 各再跑一次，起点加入主 A、紧凑 A（3608561 第 20 轮）与修复后的最好候选；局部法 600 次、GA 1000 次评价（GA 原预算偏弱）；只报 0.5 m/s 合格解。\n4. L1 两作业（3608739/3608740，运行中）同样结束后按同法修复与再搜，不中断。\n为什么：只有细网格合格的解才能计算节省；修复给出\"最近的合格解\"，再搜在可信约束下找最优。\n错了的代价：再多约 2×12 h 单节点（约 48 SU/刚度支）；若裕度过大会略低估节省，修复+再搜两路可互相对照。"
+    },
+    {
+      "id": "dec-0044",
+      "ts": "2026-10-17 18:24",
+      "title": "L29.4 常规设计 A 第一版（L3）验收；增设\"紧凑 A\"敏感性（10-17 09:4x）",
+      "label": "决定",
+      "text": "# L29.4 常规设计 A 第一版（L3）验收；增设\"紧凑 A\"敏感性（10-17 09:4x）\n依据：、v4_acceptance_addendum.md、v4_sections_L3_grid1_final.csv。\nDecision I made：\n1. 接受 L3 刚度下的常规设计 A 第一版为三方案基准之一：6 轮工程师式迭代，混凝土 25,613 m³、纵筋+估算箍筋 4,463 t（抗侧框架，楼板另列）；事件法 10 年角点加速度 21.1 mg（利用率 0.85，0.5 m/s 网格；Vm 23.2 为 18.0 mg）、层间位移比 0.00116（0.46）、顶点 0.54；强度最大为梁弯 0.86，柱 P–M 0.70；\"按共同验算集 v1 研究口径合格\"，非报建级。\n2. 事件法量级核对通过：NIST 固定模态原截面 C 暴露 10 年 30.8 mg，重建 L3 原截面 29.2 mg，两者一致（差 5%）。\n3. L1 刚度的 A 在登录节点单轮 >7 分钟未完成，转 TACC/CRC 单节点（ComputeOps 资源申请已发）。\n4. 新增\"紧凑 A\"变体作敏感性：同一工程师规则，但利用率 <0.85 的组试退一级（主 A 为 <0.6）。理由：主 A 最大强度利用率仅 0.86，设计余量会直接计入 B 的\"节省\"；工程实践中这种余量部分来自 10 层一组的分组，也部分来自保守取值。最终节省率同时报相对主 A 与相对紧凑 A，两者跨判据档时写\"对 A 的余量敏感\"。\n为什么：判据比的是\"常规设计\"；常规设计的余量是现实的一部分，但不能让我们自定的退级阈值单独决定结论。\n错了的代价：若紧凑 A 与主 A 差别大，结论只能给区间；多一个 A 变体约增加 1–2 小时单节点机时。\n\n补记 10-17 17:xx：紧凑 A（L3）选定为 3608561 第 20 轮（细网格全部合格）：混凝土 19,169 m³、钢筋 4,469 t，造价代理比主 A 低 10.6%。两个 A 之差已超过判据 8% 线，所以最终必须并报\"相对主 A\"与\"相对紧凑 A\"的节省；在 B 结束后用 --resume --extra-start 把紧凑 A 第 20 轮作为 B 的第四起点续算。另需在结论中讨论：哪一个更代表\"常规设计\"（按十层分组、退级阈值 0.6 vs 0.85），这本身是\"安全第一\"问题的一部分。\n\n补记 10-17 18:3x：紧凑 A（L1）选定为 TACC 3609078 第 9 轮（程序只产生 9 轮、7 轮粗可行，最便宜的第 9 轮一次细检全部合格）：混凝土 16,249 m³、钢筋 3,916 t、J 12,158,529 USD，比 L1 主 A −8.22%（钢价 0.5/1/2：−10.91/−8.22/−5.91%），控制项配筋率 0.997、梁剪 0.990，角点 23.69 mg。\nLead 计算的 L1 B 相对两个 A 的价格代理（钢价 0.5/1/2；本线数据，无文献依据）：B 局部最优 vs 主 A −13.23/−13.96/−14.59%，vs 紧凑 A −2.61/−6.25/−9.22%；B GA 最优 vs 主 A −4.41/−4.50/−4.57%，vs 紧凑 A +7.29/+4.06/+1.43%。\nDecision I made：(1) 接受第 9 轮为紧凑 A（L1）；(2) 相对紧凑 A 的节省横跨判据三档、且随钢价单调变化（紧凑 A 省混凝土、B 省钢），所以最终判断必须按价格区间报，不能只报主价；(3) GA 最优比紧凑 A 还贵，说明 L1 B 搜索预算不足、依赖起点，派 L29.4-44 以主 A、紧凑 A、B 局部最优为多起点重搜（局部 600、GA 1000），以免把\"优化器没搜好\"当成\"优化省得少\"。\n为什么：判据检验的是优化能省多少，B 必须至少不劣于工程师能做到的紧凑设计。\n错了的代价：多约 40 SU、约半天；若重搜后 B 仍只比紧凑 A 低 3–8%，结论落在\"部分成立\"区间，且仍须经同等 β 核对。"
+    },
+    {
+      "id": "dec-0045",
+      "ts": "2026-10-17 19:00",
+      "title": "L29.4 U 内核柱轴力符号错误；旧 β 作废、修正后重算（10-17 19:xx）",
+      "label": "决定",
+      "text": "# L29.4 U 内核柱轴力符号错误；旧 β 作废、修正后重算（10-17 19:xx）\n依据：、betaA_diag_addendum_20261017.md（L29.4-45）；Lead 读了 beta_base_v1.py 第 277–284 行。\n事实：\n- betaU_kernel.py 第 145 行 P=max(0,−X[:,[0,6]]) 把柱两端都按 −F 当压力，底端压力（+F0）被截成 0，压弯柱被误判成低轴力类。\n- 792 号风暴、L1 柱 990 底端：P=+12.70 MN 是压力，原内核按 P=0 处理，利用率 1.22；修正后，该方向柱最大利用率 0.58。\n- 前 10 场风暴：L1 原有 7 场名义利用率 >1，修正后 0 场，最大利用率 1.29→0.67；L3 最大利用率 0.82→0.62。\n- 风洞峰值基底剪力和倾覆力矩没有一致地超过 ASCE Ch.27 设计包络。重力总量核对无误，单位和 1:500 换算没有重复。\n- 设计验算程序（A、B 共用）：P 对两端取 max(0,−P_end)，实际取到的是顶端压力，底端拉力会被读成压力；不验算拉力；弯矩是两端分别取包络（不同端混用）。\nDecision I made：\n1. 旧正式 β（3609025/26：L3 3.45、L1 2.26）作废，原文件保留不动。B L1 β 作业 3609079 用的是同一内核，已取消（运行了 49 分钟，约 2 SU 白费）。\n2. 派 L29.4-46：修内核 v4（每端单独判别、同端同步、拉力不截零），手核误差 ≤0.5%，另加单元测试；写同端同步、带拉力的验算 v2，对 6 个设计重验，不改设计；用 v4 重算 6 个设计的 β（3 个作业，约 18 SU）。\n3. 在跑的 B 搜索（3608925/30、3609152、3609159）不停：A 和 B 用同一个验算程序，比较是同口径的；它们的候选最后要用验算 v2 复核。\n为什么：U 定义下的 β 被一个代码错误主导，旧数字不能用于 β_B 与 β_A 的比较。设计验算的写法基本偏保守（压力取顶端、弯矩取包络），但拉力没有验算，必须审计。\n错了的代价：重算约 18 SU、半天；若验算 v2 发现有设计不合格，A、B 都要修设计后再比较节省。\n依据：无文献依据，基于本线代码与数据。"
+    },
+    {
+      "id": "dec-0046",
+      "ts": "2026-10-17 19:44",
+      "title": "L29.4 A/B/C 共同验算集 v1（10-17 06:xx）",
+      "label": "决定",
+      "text": "# L29.4 A/B/C 共同验算集 v1（10-17 06:xx）\n背景：L29.4-18 烟测显示 NIST 原截面在 FBC 175 mph、Exposure C、L3 刚度下极限风屋顶位移约 1.40 m、层间位移比约 0.0094——原截面离合规很远，A 需要实质加大截面；程序框架可运行，但 ACI 构件验算、二阶、服务态未实现。\nDecision I made：A、B、C 三方案统一用以下\"共同验算集 v1\"，三者完全相同，A 由工程师式迭代满足它，B/C 由优化满足它：\n1. 强度（FBC 2023 / ASCE 7-22 Ch.27 方向程序，175 mph、Exposure C，§1620.4 组合；1.2D+1.0W+L 等 ASCE 7-22 §2.3 组合，全 36 风向按 Ch.27 风向工况）：柱 ACI 318-19 双向偏压（P–Mx–My，用荷载等值线法或 Bresler 倒数法，写明），梁受弯与受剪，φ 按 ACI 21.2；配筋从 NIST Table 2 起步，纵筋率 1%–4%（柱）。\n2. 二阶：ACI 318-19 §6.6.4 弯矩放大法或 §6.7 几何刚度二阶分析，择一写明。\n3. 服务位移：层间位移比 ≤ h/400、顶点 ≤ H/500，服务风速取 10 年 MRI；服务风速由 NIST 迈阿密飓风气候文件按 TN1665 式(11) 估得（与可靠度评价同一风险模型，避免另找 ASCE 服务图）。\n4. 顶部峰值加速度 ≤ 25 mg（住宅/办公业界常用值，10 年 MRI；出处须写进参数来源表，TN1665 印刷 p.26 也用 25 mg）。\n5. 不含抗震构造（迈阿密低烈度，抗震不控制；须在报告中用 ASCE 7-22 SDC 判定核实一句）、不含节点详图与锚固（三方案同等忽略，作为共同简化写明）。\n6. 可供应目录：b、h 以 50 mm 模数，柱 0.5–1.8 m、梁宽 0.3–0.8 m、梁高 0.5–1.2 m（假设，写进参数来源表）；纵筋按 #8–#14 标准直径取整。\n为什么：判据要求\"同一规范约束下\"比较；完整设计院级验算（节点、锚固、构造详图）不可能逐项实现，三方案共用同一简化集即公平，简化之处如实写明。\n错了的代价：省略的构造条款若在实际中控制某些构件，三方案的绝对材料量都偏低；相对节省可能略偏高（优化会把构件压到验算集边界，而实际构造要求会再加一些），在结论中作为局限说明。\n\n补记 10-17 06:4x：L29.4-19 未实现验算集，只交回缺口清单。Lead 把各缺口的实现口径定死（委托 L29.4-20 任务书）：ASCE 7-22 Ch.27 Part 1 迎风 0.8/背风按图 27.3-1、图 27.3-8 Case 1–4（含 0.15B 偏心）、Kd=0.85、§2.3 三组组合、活载 2.4 kPa；杆端力由 3D 位移恢复；二阶 ACI §[地址] δs；柱应变协调 P–M + Bresler 倒数法、φ 按 §21.2；梁第 9 章弯剪；服务风速 10 年 MRI 屋顶 1 h 18.789 m/s（NIST 气候，式(11)），1 h→3 s 系数约 1.52（出处待 bot 核）；角点峰值加速度由 NIST 风洞层力时程按 Vm=22.2 缩放、三模态叠加；mass_asc 视为已含自重；SDC A（假设）。规范数值由 bot 核原文页码，核不到标\"二手\"。用 Case 1–4 替代 36 角插值是规范本身的风向工况，三方案共用。\n\n补记 10-17 09:xx：服务约束改用\"事件法\"MRI（Lead 定）\nL29.4-22把 10 年 MRI 屋顶风速 45.32 m/s（每风暴 16 向取最大后的分位）施加到全部 36 个风向再取最大响应，得 A 角点加速度 66 mg（L3，截面已触目录上界、混凝土 46,163 m³）；而 L29.4-21 用 TN1665 事件法（每风暴 16 向各用本向风速→插值风洞角→每风暴取响应最大→按式(11) 排序取 MRI）对更柔的 NIST 原设计在 C 暴露下只得约 30 mg。前者把最大风速与最不利气动方向人为叠加，过于保守，且与可靠度评价的风险模型不一致。\nDecision I made：验算集 v1 的服务约束（层间位移 h/400、顶点 H/500、角点 25 mg）一律按事件法求 10 年 MRI 响应，复用 的流程（H2 口径、Exposure C、Vm 22.2 主/23.2 敏感性）；36 向同风速取最大的做法作废。三方案共用。\n为什么：与 TN1665 原方法及本课题可靠度评价的风险模型一致；ASCE 7-22 附录 CC 的服务性检查本意也是对应 MRI 的响应，不是最大风速×最不利方向。\n错了的代价：若事件法下 A 仍不满足 25 mg，需另定（扩目录上界或承认加速度由阻尼/体系控制、在三方案中同样处理）；事件法对风速插值网格敏感约 2.5%。\n\n补记 10-17 20:xx：v1.1——补受拉验算（L29.4-46 审计）\n事实：6 个设计（主 A、紧凑 A 各 L1/L3，B L1 局部最优/GA 最优）在 0.9D+W 下第 1 层柱 i 端受拉 6.3–9.7 MN。旧实现 P=max(0,−P_end)：拉力要么被截成 0，要么被当成压力，从没验算过受拉。按同端同步、带受拉的研究版验算，柱利用率在 1.08–3.98 之间，6 个设计全部不合格。\nDecision I made：\n1. 定\"共同验算集 v1.1\"= v1 + 同端同步 P–M + 受拉分支。受拉分支按 ACI 318-19 应变协调曲线延伸到 Pnt=As·fy（§22.4），双向用荷载等高线法，主判据 α=1，α=1.5 作敏感性；φ 按 §21.2。可靠度内核用同一模型，去掉 φ。\n2. 4 个 A 按 v1.1 重新设计（L29.4-48，约 24 SU）；B 的搜索程序换成 v1.1，等新 A 出来后重搜。\n3. 用旧验算的 B 搜索：L1 GA 3609152 已取消（运行 1 小时 11 分）；L29.4-47 撤销；L3 的 3608925/30 已接近完成，让它们跑完，结果只作为 B 重搜的起点线索。L29.4-46 的三个 β 作业暂不提交。\n为什么：旧验算没管受拉，\"合格设计\"并不合格；不补齐，节省率和 β 都没有意义。补的是验算实现上的漏项，开题判据不变。\n错了的代价：A、B 重新设计和重搜要多花约 1 天、约 60–80 SU；若受拉分支偏保守，所有设计的柱都偏大，但 A 和 B 是同一口径，节省率的比较仍然公平。\n依据：ACI 318-19 条号由 better 在 v1.1 说明里写明，没把握的标\"待核\"；未用文献卡片，基于本线代码与数据。"
+    },
+    {
+      "id": "dec-0047",
+      "ts": "2026-10-17 20:26",
+      "title": "L29.1 桥梁部分：按公开骨架自行设计后做逐截面控制工况分解（10-17 21:15）",
+      "label": "决定",
+      "text": "# L29.1 桥梁部分：按公开骨架自行设计后做逐截面控制工况分解（10-17 21:15）\n\n**依据**：L29.1-38 文献表——9 篇无一给出风强度首控比例（NR）；L29.1-40——Hardanger 公开模型无截面/索初力/原设计利用率，原桥分解不可识别；泰州桥无公开完整模型，静力设计全文（10.1680/bren.12.00017）付费未得。\n\n**决定**：与高层部分（LK 骨架按 AISC 自行设计）同口径，以公开参数最全的骨架（优先 Akashi Kaikyo 都灵理工硕士论文，备选 Çanakkale / Hardanger）按一套完整规范自行设计主梁/缆/吊杆/塔，先过原截面频率 ±5% 闸门，再逐截面找首控约束，给风强度首控份额（构件数/长度/钢重）与颤振比；所有数字标“本线按某规范自行设计”，不称原桥设计。先弹性分解，非线性算例待份额出来再定。\n\n**错了的代价**：自行设计可能与真实桥的冗余分布不同，份额带系统偏差；以设计风速、交通模型两项敏感性约束；若份额处于 2–5% 判据边界，再找原设计资料或第二座桥对照。"
+    },
+    {
+      "id": "dec-0048",
+      "ts": "2026-10-17 20:34",
+      "title": "L29.1 桥梁频率闸门放宽：等效脊梁标定 ±10%，过不了也交带“代理”标签的数字（10-17 21:40）",
+      "label": "决定",
+      "text": "# L29.1 桥梁频率闸门放宽：等效脊梁标定 ±10%，过不了也交带“代理”标签的数字（10-17 21:40）\n\n**依据**：L29.1-40、-41 两单均在 Lead 自设的“独立原截面模型前几阶 ±5%”闸门前停下，未交任何分解数字（、B2）；Ansys 线明石等效脊梁 r4 也只有 2/5 阶过 ±5%，原因是原文表间质量/惯性不相容。该闸门是 Lead 设的，不是 Liang Hu 的。\n\n**决定**：改为 VS1/LS1/TS1 ±10%，允许标定等效刚度/质量并标“标定”；未过也继续，数字标“代理”。目的只是得到风在各构件需求中的份额量级，不是复现原桥。派 L29.1-43（bridge/B3/）。已核事实：明石桥面设计风速 60 m/s、最低要求颤振风速 78 m/s（Katsuchi 1998 PDF p.9）；EN 1991-1-4 不适用 >200 m 及缆索桥（AC:2009 PDF p.2–3）。\n\n**错了的代价**：份额带模型偏差；用于判据时只当量级证据，若落在 2–5% 边界须另找第二座桥或原设计资料。"
+    },
+    {
+      "id": "dec-0049",
+      "ts": "2026-10-17 21:36",
+      "title": "L29.1 RC 核心筒+连梁 A 段：固定几何只改配筋，不做多起点（10-17 22:40）",
+      "label": "决定",
+      "text": "# L29.1 RC 核心筒+连梁 A 段：固定几何只改配筋，不做多起点（10-17 22:40）\n\n**依据**：Alinejad, Ahn, Kang 2024 本身固定构件尺寸、只改配筋（Table 14，卡 NR_alinejad_ahn_kang_2024_corner_inelastic，PDF p.17）；L29.1-39 三维原型经标定过三向周期 ±10% 子闸门（角部连接刚度×2 为标定假设；作者无整楼质量与可比配筋，故总重/配筋回归不可判定）。\n\n**决定**：A 段按对方做法——混凝土几何固定，开裂有效 EI 用作者 Table 1 系数，不随配筋变；于是三种荷载模式（R=1 / Jeong 只共振÷2 / 整体÷2）下弹性内力相同，配筋可逐构件直接确定，无路径依赖，不需钢体系那样的多起点。比较钢筋吨数和全楼主体材料造价 S_C。派 L29.1-45（designRC/A3/）。完整“周期+总重+配筋”回归闸门不再要求（作者数据不可得），以周期子闸门+标定假设为准，结果标“本线自行配筋”。\n\n**错了的代价**：实际配筋减少会略降开裂刚度、增大层漂与共振，固定 EI 略偏向对方；墙厚不变忽略了可能的混凝土节省（作者也未改），亦偏向对方之外的方向需在报告中说明。"
+    },
+    {
+      "id": "dec-0050",
+      "ts": "2026-10-17 22:21",
+      "title": "L29.1 RC 体系：先用作者自案做全楼折算，240 m RC 暂缓（10-17 23:30）",
+      "label": "决定",
+      "text": "# L29.1 RC 体系：先用作者自案做全楼折算，240 m RC 暂缓（10-17 23:30）\n\n**依据**：L29.1-45——160 m 几何直接扩高到 240 m 时 50 年层漂代理 0.0085 ≫ H/400，墙厚 2.7 m 仍 0.0044，该体系在 240 m 由刚度控制，不是对方体系的公平代表；逐构件 P–M–V 配筋两次未交吨数。L29.1-48 Lead 手算：作者 Table 14（卡 NR_alinejad_ahn_kang_2024_corner_inelastic，PDF p.17）× 本线构件体积，全楼主体材料造价节省 0.2–1.5%。\n\n**决定**：RC 体系的证据先用“作者自案全楼折算”（160 m，完全采纳作者 R2 设计），240 m RC 暂缓（不放弃）：若审查认为判据必须在 200–300 m RC 上直接检验，再按带外伸臂的 RC 体系重新设计。\n\n**错了的代价**：160 m 低于判据高度；若更高 RC 楼的风控连梁/墙配筋占比显著更大，折算会低估对方。审查时把这一点列为局限。"
+    },
+    {
+      "id": "dec-0051",
+      "ts": "2026-10-17 23:03",
+      "title": "L29.6c 代表算法与基准草案（10-17）",
+      "label": "决定",
+      "text": "# L29.6c 代表算法与基准草案（10-17）\n\nDecision I made：选定 10 个代表算法 + 1 个随机搜索对照（满应力/OC、MMA、SQP、GA、PSO、DE、CMA-ES、HS、TLBO、GWO/Jaya），基准取 10/25/72 杆桁架 + Chan 1992 1080 杆框架（按 L29.4 建议），预算按函数评估次数统一，30 次运行，零容差复算可行性，默认参数与同等调参两种设置都跑。\n— 为什么：每个谱系分支取最强代表，\"新算法\"只有在同等调参下也赢才算；零容差复算专防违约的\"更优解\"。\n— 错了的代价：名单或预算档不合适时需要补算或改档，都是 Colab 小规模算力，可撤回；不涉及判据（判据仍照父页 T6 共用判据）。\n依据：无文献依据，基于本线方法选择；基准参数待 litwiki 核原文。草案：。\n\n## 补记 10-17：6c 增量定位与 litwiki 交付验收\nDecision I made：接受 litwiki （自动初查因格式未过，内容已核：15 张卡、优先级 1 四篇中三篇全文）；6c 主比较放在\"同一离散空间、同 FE、同等重启、零容差复算\"。\n— 为什么：卡片 NR_wansasueb_2025_gradient_vs_meta.md（PDF p.6–7、9–11）显示先例的梯度法单次连续取整、随机法 30 次离散，协议不对称；Charalampakis 2019 未测比喻类与梯度法（卡 PDF p.3–4）。\n— 错了的代价：若后续发现已有对称比较先例，6c 降级为复核，算力为 Colab 小规模，可撤回。\n\n## 补记 10-17：B4 定为 Chan 型 60 层支撑框架重建版\nDecision I made：B4 用 Chan & Grierson 1993 的 60 层 7 跨 1080 构件框架按规则重建，截面性质取 AISC Shapes Database，原文未给项标\"假设\"；原文 4968.214 kip 只作合理性对表。\n— 为什么：卡 NR_chan_grierson_1993_drift_L29_6c_supplement.md（PDF 物理页 9–13）给出几何、材料、风压规则与最终截面，可重建；同时自带伪离散 OC 这一成熟离散基线；与 L29.4 建议一致。\n— 错了的代价：重建差异过大时改用公开 15 层框架仓库，损失一次 Colab 小规模建模。\n\n## 补记 10-17：接受 B4 重建为\"Chan 型\"基准\nDecision I made：接受 L29.6c-08 的重建模型为 B4 基准定义（约束 h/400 按本模型计算），Chan & Grierson 1993 的最终设计只作重量参照（本模型 4964.97 kip vs 原文 4968.214 kip，差 0.07%），不称复现。\n— 为什么：层间位移比中位 1.016（53/60 层略超），说明原文设计各层位移都压在限值上，本模型只比原文模型软 1–2%；最可能来源是原文用截面性质拟合式（卡 NR_chan_grierson_1993_drift_L29_6c_supplement.md，PDF 物理页 3–4，表 I–II）而本模型用 AISC v16 实际 Ix。对算法比较而言，只要所有算法用同一模型，这个差异不影响公平性。\n— 错了的代价：若拟合式核查后差异仍不能解释，B4 只能称\"受 Chan 启发的 60 层框架\"，比较照做；无需重算已有桁架结果。\n\n## 补记 10-17 23:xx：B4 改称\"受 Chan 启发的 60 层框架\"，停止追查位移差\nDecision I made：按上一条预案，B4 改称\"受 Chan 启发的 60 层支撑框架\"；不再追查与原文 1–2% 的刚度差，比较照做。\n— 为什么：L29.6c-10 用原文表 I–II 拟合式替换 AISC Ix 后中位位移比只降 0.000832，剩余可能来源（K 撑拓扑、支座、荷载离散、控制点）原文信息不足以区分（卡 NR_chan_grierson_1993_drift_L29_6c_supplement.md，PDF 物理页 9）；所有算法用同一模型，差异不影响比较的公平性。\n— 错了的代价：只是基准命名与对原文的可比性弱一些；若日后取得原始输入文件可再对齐。无文献依据部分：基于本线数据。"
+    },
+    {
+      "id": "dec-0052",
+      "ts": "2026-10-18 10:05",
+      "title": "L29.1 A 段多起点结果处置与送审（10-18 10:30）",
+      "label": "决定",
+      "text": "# L29.1 A 段多起点结果处置与送审（10-18 10:30）\n\n**依据**：、summary.json（CRC 1578195；62 路径全部联合可行，邻域 9/50 AssertionError，退出码 1）。\n\n**决定**\n1. 接受 62 条路径结果作为“对方最优”的有限样本分布；作业按“路径结果有效、邻域阶段失败”记，不重跑 9 个断言错误邻域（最大值路径已完成邻域仅提高 0.06 pp，边际价值小；修复成本高于信息增益）。\n2. 判据比较口径：以最大值作“对方最有利”的上限、同时报中位与 ≥2% 路径比例；不把单路径最大值当代表值，也不隐去它（2.59% 落在判据 2–5% 区间，故按判据文字不能直接判“不成立”）。\n3. 综合钢/RC/桥证据，先）再给任何结论；B 段全矩阵是否放行（约 212 单核小时）一并交审，裁决后再定。\n\n**错了的代价**：若审稿认为 9 个缺失邻域会显著抬高最大值，则补一个单节点作业（约几小时）；送审延后一晚的代价很小。"
+    },
+    {
+      "id": "dec-0053",
+      "ts": "2026-10-18 10:23",
+      "title": "L29.1 A 段改多起点、取对方最优；单一贪心路径不用于阈值定类（10-17 19:40）",
+      "label": "决定",
+      "text": "# L29.1 A 段改多起点、取对方最优；单一贪心路径不用于阈值定类（10-17 19:40）\n\n**依据**：L29.1-33 v2。同一物理参数下仅换选型路径，基准 p_W 0.78–8.58%、U_Jeong,joint(2) 0.03–2.36%；重力 1/11 p_W 1.40–9.50%、U_Jeong,joint(2) −0.07–1.27%。原口径 U_Jeong(2)=5.24%（逐组独立可行相加）作废。无文献依据，基于本线数据。\n\n**决定**\n1. A 段数字一律用统一联合口径（U_Jeong,joint、U_whole,joint，同一候选池、合并后整体复检）；原代数 U_direct=p_W/2 只作参考，不进判据。\n2. 单一贪心路径不做阈值定类。改为多起点（每档 ≥30 个随机种子，加一条确定性升序路径），报分布与**最大值**；判据比较取对方最有利（最大）值——保证\"给对方最强版本\"。负值视为贪心回退伪迹，报告中单列，不取 0 掩盖。\n3. 在多起点结果出来前，迈阿密 250 m 伸臂体系的 A 段结论暂写\"<5% 已稳健（所有路径），≥2% 不稳健\"；B 段全矩阵（约 212 单核小时）等多起点选出对方最优路径后再定是否跑、跑哪条。\n4. 并行开对方最有利体系（RC 核心筒+连梁）与桥梁的反例设计书，只设计不算大作业。\n\n**错了的代价**：多起点约几十单核小时（<200 SU，CRC 单核并行）；若最大值仍落在 2–5% 之间，判据归\"部分成立/适用范围窄\"一侧的可能上升，需 B 段补同等可靠度证据。\n\n\n**更正（10-18）**：本文“若最大值仍落在 2–5% 之间，判据归‘部分成立/适用范围窄’一侧的可能上升”不被冻结判据授权，撤回；2–5% 区间的处理见 L29.1_判据解释_度量口径与灰区_20261018.md。"
+    },
+    {
+      "id": "dec-0054",
+      "ts": "2026-10-18 10:23",
+      "title": "L29.1 对冻结判据的解释：材料节省度量口径、2–5% 灰区、集合与“部分成立”（10-18）",
+      "label": "决定",
+      "text": "# L29.1 对冻结判据的解释：材料节省度量口径、2–5% 灰区、集合与“部分成立”（10-18）\n\n**依据**：；审稿人 C、D 指出开题卡判据在以下四处含糊。以下是**解释而非修改**——阈值 5%/2% 与三档定义文字不动；若 Liang Hu 不同意，推翻后记入作先例。\n\n1. **度量口径**：钢结构用主体钢重（t）；RC 同时报钢筋吨数节省与全楼主体材料造价节省（混凝土不变），与阈值比较**取对方最有利口径**；桥梁用上部结构钢重分母。筛查增量（A 段）不等于“节省”，只有通过同等可靠度（累积塑性/LCF/50 年超越）检验的设计才算判据意义的节省。\n2. **2–5% 灰区**：既不满足“成立”（≥5%）也不满足“不成立”（全部 <2%）。落入灰区时，只有在 (i) 该节省在可量化子集内已通过同等可靠度检验时才记“部分成立/适用范围窄”；(ii) 否则记“证据不足”，不向任一端倾斜。\n3. **“全部代表性结构”集合**：冻结为——钢伸臂高层（迈阿密 250 m，基准与重力两档）、低高宽比对角网格高层（待测）、RC 核心筒+连梁（作者自案 160 m + 240 m 重设体系，待测）、大跨悬索桥（明石桥降阶代理）。集合内任一未测，不得声称“全部 <2%”。\n4. **“部分成立”**：理解为“≥5% 在可量化的窄子集成立”或“信息增益改变设计决策”的子集存在，而不是任何正的节省。\n\n**错了的代价**：若 Liang Hu 认为灰区应倾向某端，只改解释，已测数据不动。**需 Liang Hu 知悉**：这是对其判据文字的解释性补充（非改阈值）。"
+    },
+    {
+      "id": "dec-0055",
+      "ts": "2026-10-18 12:00",
+      "title": "L29.1 B 段配对取舒适 0.25 m/s² 档（10-18 20:30）",
+      "label": "决定",
+      "text": "# L29.1 B 段配对取舒适 0.25 m/s² 档（10-18 20:30）\n\n**依据**：（L29.1-61）：舒适门 0.20 时 E 比 B2 原 E 重 147.45 t，E→I 净差仅 7.83 t（0.125%），Jeong 规则几乎无释放；此前 L29.1-30 舒适 0.20 档 U≈0.26% 同向。舒适限值 0.15–0.25 m/s² 均为敏感档（NBC 2015 注释历史经验 0.147–0.245，卡 NR_NBC2015_commentaryI_acceleration_L29_1）。\n\n**决定**：B 段需求侧筛查取对方最有利的 0.25 档配对（A18 baseline_seedascending 的 E_clean 与 Jeong I），0.20 档“几乎无释放”作为独立发现记入证据，不进主矩阵。设计仍按 A 段口径（0° TPU、100%+75%）；30° 真实风只作为时程输入方向，不重新设计。\n\n**错了的代价**：0.25 超过 NBC 历史范围上端 0.245 约 2%，对方更有利；结果要带“舒适限值取对方最有利档”的限定。"
+    },
+    {
+      "id": "dec-0056",
+      "ts": "2026-10-18 12:03",
+      "title": "L29.4 判据中\"系统 β\"的口径与风暴目录尾部处理（10-17 16:xx）",
+      "label": "决定",
+      "text": "# L29.4 判据中\"系统 β\"的口径与风暴目录尾部处理（10-17 16:xx）\n背景：L29.4-31 设计书请 Lead 在计算前锁定判据用的单一系统 β，并指出极限事件 U 可能落在 999 场风暴目录（最远约 1786 年 MRI）之外。\n这是对开题卡判据中\"系统可靠度指标 β\"的口径解释，不改阈值。\nDecision I made：\n1. 判据用的\"系统 β\" = β_U：一年内任一构件强度（共同验算集 v1 的抗力形式，用名义抗力 × 随机抗力偏差，不再乘 φ，以免重复折减）或整体二阶稳定超限的年概率所对应的 β。理由：开题卡问的是\"安全第一是否合理\"，安全指极限状态。β_S（服务事件并集）一并报告，作为第二指标；C 的约束同时要求 β_C,U ≥ β_A,U 与 β_C,S ≥ β_A,S。\"β_B 比 β_A 低 ≥0.5 判不成立\"一条按 β_U 读，β_S 同步报告。\n2. 尾部处理：不靠计数，而是对目录中每场风暴求条件失效概率 r_i（给定风暴、对建筑级随机变量做 FORM 或重要抽样），p_U = 1−exp(−ν·Σr_i/999)。目录外更强风暴不计入，所以 p_U 是\"目录内下界\"，β_U 是上界；三方案同一截断，成对 Δβ 仍可比较。另做一次尾部外推敏感性（按目录前 50 场拟合 GPD/Weibull 尾部、外推到 10^5 年），报告截断对 Δβ 的影响。若 Δβ 的结论在截断与外推两种处理下跨判据档，结论写\"对风暴目录尾部敏感\"。\n3. 随机变量分布：设计书参数表中的\"假设网格\"先用于程序实现与试点；正式 β 前由 litwiki 补 RC 抗力统计（Nowak & Szerszen 2003 ACI 318 校准等）、风荷载/气动不确定与高层阻尼统计的卡片，Lead 据卡片冻结分布后再算正式值。\n错了的代价：若审查认为系统 β 应取 S 与 U 的并集或另行合成，需重算组合，但 r_i 与指示量会全部保存，可重新组合而不必重跑 FE。\n\n补记 10-17 18:4x：主 A 正式 β 结果：L3 β_U 3.45（含尾部 3.35）、β_S 1.55；L1 β_U 2.26（2.25）、β_S 1.57；截断检查两支均 <5%，不扩 300。\nDecision I made：(1) 接受计算本身（退出码、哈希、截断、内存均核过）；(2) 暂不把绝对 β_U 当可信值——L1 主 A 年 p_U≈1.2% 对规范设计不合常理，派 L29.4-45 诊断（荷载口径对照 ASCE Ch.27、内核与设计验算一致性、控制杆件分解）；(3) B 与 A 的 β 比较只在同一刚度层内做（同一规则下 L1/L3 相差 1.2，远超 0.5 门槛）。\n为什么：判据\"β_B 比 β_A 低 ≥0.5\"是相对量，但若内核有口径错误，相对差也不可信。\n错了的代价：若诊断证明是真实荷载差异，只是多花半天；若是错误而不查，整套 β 结论作废。\n\n补记 10-18 12:xx：8 个设计正式 β 完成（TACC 3610684、3610691–96、3610708；βv4c，v1.1 同一抗力模型；种子 2936，150 场×200 样本；截断相对误差 ≤1e-10，无需扩 300 场）。结果与成对自助区间见。GPD 尾部外推因 4 h 墙钟超时只完成 2/6（紧凑 A L3 1/6），summary_with_tail 未生成，列为待补限制。\nDecision I made：(1) 接受 8 个设计 summary.json 作为正式 β（base 部分 150 场全齐，仅尾部敏感性未完）；(2) 拟定课题结论“部分成立（对常规设计余量敏感）”，先 Liang Hu；(3) 尾部外推、α=1.5、Vm 23.2 等敏感性按审稿人意见决定补做哪些。\n为什么：|Δβ|≤0.29 远小于 0.5 否决线；节省率相对主 A ≥13.9%，相对紧凑 A 0–8.9%，两种 A 把判据分成两头。\n错了的代价：若审稿人认为 β_U 口径不足，需要补更强可靠度口径，约 1 天；若尾部敏感性使 β 差变化 >0.3（旧口径仅 0.01–0.10），需重评。\n依据：无文献依据，基于本线数据；文献背景见 lit_synthesis_v2。"
+    },
+    {
+      "id": "dec-0057",
+      "ts": "2026-10-18 12:23",
+      "title": "L29.4 审查 裁决：撤回\"部分成立\"草案，按同 β 读判据（10-18）",
+      "label": "决定",
+      "text": "# L29.4 审查 裁决：撤回\"部分成立\"草案，按同 β 读判据（10-18）\n依据：（6/6 份有效意见）；证据；三方案设计书 three_scheme_design.md 第 27 行、C_beta_design.md 第 43–47 行（判据读同 β 的 C 相对同支 A）。无文献依据，基于本线数据；文献背景见 lit_synthesis_v2。\nDecision I made：\n1. 草案\"部分成立（对常规设计余量敏感）\"撤回；status 保持\"检验中\"，对 Liang Hu 暂不报结论。\n2. 判据按事先写定的读法：同 β 的 C 相对同支 A。因 C 未做，用 β 配平代替——B 搜索加强度利用率上限 ρ∈{1.0, 0.90}，在造价—β 曲线上读 β=β_A 处的节省。\n3. 修正 B 搜索对紧凑 A 起点的不对称（起点按细检判可行、可作父代；1.085 裕度只管新候选），8 路重搜（L29.4-56，约 146 SU）。\n4. 结果表并列混凝土 m³、钢筋 t、质量、造价代理；碳排放等 litwiki 给出有出处的系数后才报。\n5. 补做：构件组独立抗力版、柱抗力统计敏感性（bias 1.0/COV 0.15）、0.9D 变体、GPD 尾部补完；委托 litwiki 核 ACI 318-19 受拉/φ 条文页码。\n6. 在 C 配平结果出来前，不写\"安全第一不能解释不用优化\"。\n为什么：三位审稿人（Gemini、GPT-6、Grok）指出草案偏离自己写定的读法；GLM、DeepSeek、Kimi 有保留支持但列出同样的核心问题；我逐条核对：B−A 的 Δβ 区间不含 0、B 对紧凑 A 是以钢换混凝土、搜索对紧凑 A 起点不对称、内核屏蔽串联效应，均属实。\n错了的代价：多约 1–2 天、约 200+ SU（每个作业 <200 SU，不触发大计算）；若配平后节省仍 ≥8%/分档不变，结论更稳。"
+    },
+    {
+      "id": "dec-0058",
+      "ts": "2026-10-18 15:26",
+      "title": "L29.1 B 段需求侧度量：塑性变程由“端部积分点塑性应变”改为“构件塑性转角”（10-18 23:00，主矩阵运行前）",
+      "label": "决定",
+      "text": "# L29.1 B 段需求侧度量：塑性变程由“端部积分点塑性应变”改为“构件塑性转角”（10-18 23:00，主矩阵运行前）\n\n**依据**：（L29.1-63）。20 s 对照中梁柱积分点 4→6，E 的最大塑性应变变程 0.00118→0.00154（+23.5%），超 10% 门。force-based 纤维梁柱的端部积分点权重随积分点数变化（Lobatto 端点权重 1/6→1/15），端部积分点塑性应变是积分点数依赖的“热点”量，不具客观性；而半步长对照通过（E Vp 差 0.44%，残余漂 5.2%）。此时尚未跑任何主矩阵数据。\n\n**决定**：方案 v2 的塑性变程度量除保留“端部积分点塑性应变变程”（作热点敏感性）外，**以构件塑性转角变程**（沿杆长对塑性曲率积分，或对桁架杆取塑性伸长）作为判据主度量；预设判据的比较方式（2 倍、3–6 h 增量、残余层漂差、D 差）与阈值数值不变，绝对容差在新单位下按等效量级取值并写明；两种度量归类不一致时记“中间情形”，不判“未放大”。积分点 4→6→8 在新度量下重做收敛检验，≤10% 方进入主矩阵。主矩阵使用 stageB3/run2/design025 的 E_clean 与 I、wind/ 的 0°/30° 力、Δt=0.08 s。\n\n**错了的代价**：改度量属运行前对预注册方案的修正，若被认为偏向任一方，保留热点度量结果作敏感性并存；两度量不一致则不判“未放大”。\n\n## 补记（10-18 23:50）：塑性铰长度正则化\nL29.1-68 在构件塑性转角度量下积分点 4→6→8 仍不过（E 差 32.6%/34.1%，热点迁移；I 差 4.9%/1.3%）。最大构件塑性转角在 force-based 纤维梁柱里仍受端点积分权重影响（Lobatto 端点权重随点数变化）。决定改用 forceBeamColumn + HingeRadau（Scott & Fenves 2006）固定塑性铰长度 Lp=0.5h 正则化（敏感性 0.25h/1.0h），使塑性转角沿铰长积分、不依赖积分点数；比较方式、阈值（1e-4 rad 在 run3 写定、不再改）不变。仍无任何主矩阵数据。\n\n## 再补记（10-19 00:30）：HingeRadau 不可行，判据度量改为系统级稳健量为主\nL29.1-69 预检（、geometry_audit.json）：OpenSees HingeRadau 每端占 4Lp、要求 L−8Lp>0；Lp=0.5h 时旧 E 有 128 根（核心柱）、E_clean 268 根、I 194 根不合法，Lp=1.0h 超过 600 根；且铰内积分点数不可调。该路线不能按指定条件执行，放弃。最大构件局部量（热点）在 force-based 纤维梁柱里随积分点迁移，是已知的非客观量。\n\n**决定**：判据度量以**系统级稳健量**为主——全结构累积构件塑性转角（对所有构件的 Vθ 求和）、残余层间位移、屈服构件数；最大构件热点量保留为未收敛的诊断量，不进入归类。比较方式（2 倍、3–6 h 增量、残余漂差、D 差）与阈值不变，D 仍按 Tang 塑性项宽范围且以构件塑性转角为输入。先用已有的 run3 短测历史（E/I × 积分点 4/6/8）核对系统级量的积分点收敛，≤10% 方进入主矩阵（Lobatto 6 点）。这是继 10-18 23:00 之后第二次运行前度量修正，主矩阵仍无任何数据；两次修正的原因（局部量积分点依赖）与证据均写入记录，终审时请审稿人评估是否合理。\n\n**错了的代价**：被认为以收敛为名挑选对结果有利的度量；对策＝同时报告最大构件量，归类不一致记“中间情形”，不判“未放大”。"
+    },
+    {
+      "id": "dec-0059",
+      "ts": "2026-10-18 15:32",
+      "title": "L29.1 B 段：24 条 6 h 主矩阵暂缓，改用已有 1 h 历史做低周疲劳界限估计（10-19 01:10）",
+      "label": "决定",
+      "text": "# L29.1 B 段：24 条 6 h 主矩阵暂缓，改用已有 1 h 历史做低周疲劳界限估计（10-19 01:10）\n\n**依据**：（L29.1-70）：系统级量在积分点 4→6→8 仍不收敛——E 的 ΣVθ 1.02e-3 / 0.81e-3 / 1.06e-3 rad（差 20.7%、24.2%），能量代理差 30.9%、16.9%；I 的 ΣVθ 1.60e-3 / 1.71e-3 / 1.59e-3 rad（差 6.1%、6.5%）；屈服构件数 E 8、I 9（20 s，700 年，旧 B2 截面）；残余最大层漂 E 2.61e-4、I 4.12e-4（差 1.5e-4 <1/1000）。根因：在该荷载水平下全楼只有个别（8–9）构件进入塑性、总量约 1e-3 rad，局部量被个别构件的积分权重主导，相对差判据不适用。HingeRadau 不可行（run4）。\n\n**决定**：判据 (d) 项的实质问题是“棘轮/低周疲劳是否使允许非弹性的方案不满足同等可靠度”，放大倍数只是代理。改为：以已有的 1 h 逐步塑性历史（E、I 各 45000 步，stageB3/run2/model/hour/，CRC 副本）直接做低周疲劳**界限估计**——对每个构件的塑性应变历史做雨流计数，Tang 等 2021 Q345 塑性项（ε_f′=0.740、c=−0.620）+ 宽范围（ε_f′ 0.37/0.74/1.48、c −0.75/−0.62/−0.50）、焊缝寿命折半、Kε=1/2/3，给出每小时损伤 D_1h 与“损伤达 1 所需的 700 年强度风暴数”；并给“全部塑性变程集中为单循环”的保守上界（Coffin–Manson 指数 >1 的凸性使拆成小循环的损伤更小，故为上界）。24 条 6 h 主矩阵暂缓（不取消）：若界限估计显示 D 接近 1 或所需风暴数不远大于 700 年事件在服役期的期望次数，再启动主矩阵以细化。\n\n**错了的代价**：这是对预注册方案（放大倍数判据）的运行前替换，被审时可能被视为改判据。对策：同时报 I/E 放大倍数（ΣVθ 约 1.6–2×、构件转角 2.4–3.7×，不收敛，作诊断）；预设放大判据保留但标“数值不收敛，不可用于归类”；界限估计直接回答判据 (d) 的实质问题且对积分点数不敏感。参数仍为 Q345 光滑试样，A992/SM490 与焊缝节点参数缺，结论带此限定。"
+    }
+  ],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 12:39",
+      "text": "【委托 · 来自 平台】首批课题开题（Liang Hu 口述 6 个）\n（原因：0099 建项后按 Liang Hu 交代开题）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 12:39",
+      "text": "6 个课题各有一页开题卡，放在，状态都是\"待开题\"，还没有开始研究。每页开头先写定五项：被审视的工作、对方主张（按最强版本复述）、我们的怀疑点、检验方法、判据（什么算对方成立、什么算不成立）。正文写第一步要做什么、需要什么数据、大约多少工作量，并留了参数来源表。\n\n| # | 课题 | 怀疑类型 | 判据要点 | 工作量 |\n| --- | --- | --- | --- | --- |\n| T1 | 抗风设计中的结构非线性 | 适用范围极窄＋意义很小 | 可靠度相同（把累积塑性和低周疲劳算进去）时，主体结构省材料 ≥5% 算对方成立，<2% 算不成立 | 3–5 周 |\n| T2 | 气候变化与设计风速 | 部分概念错误＋意义很小 | 设计风速的变化要超出现有估计的抽样不确定性，而且 IPCC/WMO 的置信度要在\"中等\"以上，才算对方成立 | 1–2 周 |\n| T3 | Performance/Resilience（按 Liang Hu 补充分为 3a 能力边界、3b 验证、3c 可信度、3d 框架） | 适用范围极窄＋单次事件与几十年统计两种尺度混用 | 预测误差在 ±30% 内、且不确定性区间能覆盖实测，才算能用于最终设计；只有两个方案的排序稳健，则判为\"只能做比选\" | 4–7 周 |\n| T4 | 结构/拓扑优化为何不被采用 | 意义很小＋适用范围窄 | 系统可靠度相同、截面换成标准规格后仍省 ≥8% 算对方成立，<3% 算\"安全第一\"合理 | 4–6 周 |\n| T5 | UQ 在工程中能完成什么 | 意义很小 | 3 个代表任务里，至少 2 个任务中先进方法与基本方法的差别会改变设计决策，才算对方成立；否则我们交一份\"最小可用 UQ 流程\" | 2–3 周 |\n| T6 | 方法泛滥：6a 风速时程随机模拟、6b 台风路径与强度模型、6c 结构优化算法、6d 代理模型（含 PINO） | 意义很小＋适用范围窄 | 在统一基准上，至少 1/3 的方法优势超出重复间离散的 2 倍，并且优势在什么条件下出现能事先说明，才算方法多样性有用 | 每个子课题的谱系图和基准设想 1–2 周 |\n\n- **PINO**：作为 6d 的检验对象之一，和其他方法用同一个判据，不预设结论。\n- **候选小课题**：T6 页附了 11 个同类\"重复研究\"的候选（峰值因子、极值分布与阈值选择、非平稳分解、POD/DMD 变体等），等 Liang Hu 选。\n- **文献**：知识库里这几个主题几乎没有卡片。开题卡里列的代表文献都只是待 litwiki 建卡核实的检索目标，目前没有任何判断以它们为依据。\n\n## 我建议的先后顺序（交 Liang Hu 定）\n1. **T2**：基本只靠文献，最快能出结果。\n2. **T5 和 T3 的 3d 一起做**：两者用的是同一套\"分环节控制不确定性\"的方法。\n3. **T6**：先做 6d（与 PINO 主线最相关）和 6a，再做 6b、6c。\n4. **T1**：需要算非线性反例。\n5. **T4**：和 6c 共用算例，排在 6c 之后。\n\n## 我做的决定\n判据里的阈值（5%/2%、8%/3%、±30% 等）是我事先定的初值，没有文献依据。原因是规则要求判据在检验前写定。如果定得不合适，代价是以后要改，必须另写一条决策说明原因。记录在。\n\n## 6a 与核心实验室的分工：已提议，对方还没回复\n提议已发给，内容是：\n- **归核心实验室课题 3**：CFD 入流生成的等效性、适用性研究和基准算例。我们不另建 CFD 入流基准，也不跑入流 CFD。\n- **归 6a**：面向结构分析的风速时程随机模拟，包括方法谱系和低成本基准。\n- **交界**：6a 谱系图里 CFD 入流那一支，结论直接引用核心实验室的结果。\n- 另外，核心实验室课题 4（非高斯风压）和我们的候选\"峰值因子\"相邻，以后要选这个候选时先和他们对齐。\n\n对方回复后，我会更新 T6 页和汇总，再用 note 告知平台。\n\n## 其他已办\n- **线况表**： 已建课题总表，并写了\"首批课题见任务书\"。\n- **对外**：一切对外只由 Liang Hu 定，汇总里也写了。\n\n\n\n## 结论\n- **开题卡**：首批 6 个课题的开题卡已写好，汇总在。每页都事先写定了对方主张（最强版本）、怀疑点、方法、判据、第一步、所需数据和工作量。全部\"待开题\"，没有动手研究。\n- **建议先后（请 Liang Hu 定）**：T2 → T5 与 T3（3d）一起做 → T6（先 6d、6a）→ T1 → T4。T6 页另附 11 个候选小课题，供 Liang Hu 选。\n- **6a 分工**：已向 提议，对方还没回复。提议内容是 CFD 入流生成的等效性研究和基准归核心实验室课题 3，结构分析用的随机时程模拟谱系和基准归 6a，交界处直接引用核心实验室的结果。对方回复后我更新开题卡，并用 note 告知平台。\n- **对外**：只由 Liang Hu 定，本实验室不公开任何内容。\n\n（附件：开题卡汇总_首批六课题_20261016.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 12:48",
+      "text": "【委托结果 · 核心构想】入流生成课题分工对齐（更好世界 6a × 核心实验室 课题3）\n核心实验室**同意**你们提的 (1)–(4) 分工，补三点：\n- a. 合成入流生成器的出口统计检验（不跑 CFD，只检查生成场的谱、相干、积分尺度、雷诺应力、散度）归核心实验室，你方需要时只读引用。\n- b. 两边比较指标用同一套口径：核心实验室在课题 3 开题卡定稿时把指标清单发给你方对表。\n- c. 入流生成器开发和 LBM 计算仍由 和 PETW CFD 线负责，核心实验室需要时走跨线交接。\n\n关于 (4) 的初步边界：非高斯风压的模拟方法以及它对幕墙的影响归核心实验室，极值估计方法的谱系比较归更好世界。Liang Hu 点选那个课题时双方再对齐。\n\n课题 3 项目页，开题卡还没写。\n分工决定：\n\n本实验室不公开，你方只能只读引用这些路径，不要转到任何对外页面。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 12:48",
+      "text": "6a 的分工已经定下来：核心实验室同意我们原先提的方案，另外补了三点，我都已写进文件。\n\n**分工结果**\n- **归核心实验室课题 3**：CFD 入流生成的等效性和适用性研究、基准，以及检验生成器出口的入流统计量（谱、相干、积分尺度、雷诺应力、散度；只检查生成场，不跑 CFD）。\n- **归我们 6a**：结构分析用的风速时程随机模拟，包括方法谱系和基准。谱系图里 CFD 入流那一支，结论直接引用核心实验室的结果。\n- **比较指标**：两边用同一套口径。核心实验室写定课题 3 开题卡时会把指标清单发给我们，6a 的基准照这份清单对表。\n- **入流生成器开发和 LBM 计算**：仍归数字风洞线和 PETW CFD 线。\n- **非高斯风压（初步边界）**：模拟方法及其对幕墙的影响归核心实验室，极值估计方法的谱系比较归我们。等 Liang Hu 选到这个候选课题时，两边再对齐一次。\n\n核心实验室要求它的项目页和决策记录只在我们内部只读引用，不转到任何对外页面。\n\n**已更新的文件**\n- T6 开题卡和首批课题汇总：写入上面的分工。\n- 线况表：委托 已关闭。\n- 决策记录：补了一条，写明这次分工和依据。\n- 已用 note 告知平台 Lead。\n\n其余五个开题卡没有改动。现在只等 Liang Hu 定首批课题的先后顺序，定了就开工。\n\n\n\n（附件：开题卡汇总_首批六课题_20261016.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 12:49",
+      "text": "【自动初查 · 未通过】你交回的结果还缺下面几项（按派活方的验收清单）：\n- 6 张开题卡的路径（结果仅写了通配缩写 …T6_*.md，未给出 6 张开题卡各自的具体路径）\n- 与 关于 6a 的分工（结果仅说已发提议、待对方回复后再更新开题卡和汇总，只报进度不算完成）\n\n验收清单：\n交回 6 张开题卡的路径和一页汇总（每课题一句话 + 建议先后），并写明与 关于 6a 的分工；只报进度不算完成\n\n请补齐后重新给出完整的结论（包括已经做好的部分）；确实做不到的，写明原因和已经尝试过什么。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 12:49",
+      "text": "初查退回的两项都已补齐：6 张开题卡各给了完整路径，6a 与核心实验室的分工对方已同意、已定稿。下面是完整的交付结论。\n\n## 结论\n\n**1. 六张开题卡（都已写好，状态都是\"待开题\"，开题前不做研究）**\n\n每张卡的页头都在检验前写定了：被审视的工作、对方主张的最强版本、我们的怀疑点、检验方法、判据。正文写了第一步、需要的数据、工作量和参数来源表。\n\n- **T1 抗风设计中的结构非线性**\n - 一句话：怀疑\"适用范围极窄＋意义很小\"。可靠度相同（计入棘轮效应和低周疲劳）时，主体结构省材料 ≥5% 算对方成立，<2% 算不成立。\n - \n- **T2 气候变化与设计风速**\n - 一句话：怀疑\"部分概念错误＋良态风区意义很小\"。要求设计风速的变化超出现有估计的抽样不确定性，且 IPCC/WMO 的置信度在\"中等\"以上，才算对方成立；否则把气候变化的影响重新定位到新暴露区、复合灾害和方法层面。\n - \n- **T3 Performance/Resilience 为何进不了最终设计**（分 3a 能力边界、3b 验证、3c 可信度、3d 分环节控制不确定性）\n - 一句话：怀疑\"适用范围极窄＋单次事件与几十年统计两种尺度混用\"。预测误差在 ±30% 内、且不确定性区间能覆盖实测，才算能用于最终设计；只有方案排序稳健，就判为\"只能做比选\"。\n - \n- **T4 结构/拓扑优化为何不被采用**\n - 一句话：怀疑\"意义很小＋适用范围窄\"。系统可靠度相同、截面换成标准规格后仍省 ≥8% 算对方成立（\"不用优化是惯性\"），<3% 算\"安全第一\"合理。\n - \n- **T5 UQ 在工程中能完成什么**\n - 一句话：怀疑\"意义很小\"。3 个代表任务里，至少 2 个任务中先进方法与基本方法的差别会改变设计决策，才算对方成立；否则交一份\"最小可用 UQ 流程\"作为改造方案。\n - \n- **T6 同一任务方法泛滥**（6a 风速时程随机模拟含入流、6b 台风路径与强度模型、6c 结构优化算法、6d 动力/CFD 代理模型含 PINO）\n - 一句话：怀疑\"意义很小＋适用范围窄\"。在统一基准上，至少 1/3 的方法优势超出重复间离散的 2 倍，且优势在什么条件下出现能事先说明，才算方法多样性有用。PINO 作为 6d 的检验对象之一，用同一判据。卡里另附 11 个候选小课题，等 Liang Hu 选。\n - \n\n**2. 汇总页和建议先后（请 Liang Hu 定）**\n\n汇总页：\n\n建议先后：\n1. T2：基本只靠文献，最快出结果\n2. T5 和 T3 的 3d 合并推进：两者用的是同一套方法\n3. T6：先做 6d 和 6a，再做 6b、6c\n4. T1：需要算非线性反例\n5. T4：和 6c 共用算例，排在 6c 之后。\n\n**3. 6a 与核心实验室的分工（已定，10-16 同意）**\n- **归核心实验室课题 3**：CFD 入流生成的等效性和适用性研究、基准，以及检验生成器出口的入流统计量（谱、相干、积分尺度、雷诺应力、散度，不跑 CFD）。我们不另建 CFD 入流基准，也不跑入流 CFD。\n- **归我们 6a**：结构分析用的风速时程随机模拟，包括方法谱系和低成本基准。谱系图里 CFD 入流那一支，结论只读引用核心实验室的结果。\n- **比较指标**：两边用同一口径。核心实验室写定课题 3 开题卡时发来指标清单，6a 照这份清单对表。\n- **入流生成器开发和 LBM 计算**：仍归数字风洞线和 PETW CFD 线。\n- **非高斯风压（初步边界）**：模拟方法及其对幕墙的影响归核心实验室，极值估计方法的谱系比较归我们。等 Liang Hu 选到这个候选课题时，两边再对齐。\n- **依据**：（只读）。本方记录在。\n\n**4. 其他三件事**\n- **对外**：一切对外只由 Liang Hu 定，本实验室不公开任何内容。\n- **还需说明的两点**：\n - 开题卡里列的代表文献，知识库里大多还没有卡片，目前只是待 litwiki 建卡核实的检索目标，没有任何判断以它们为依据。\n - 判据里的阈值是我事先定的初值，没有文献依据；以后要改，必须另写一条决策说明原因。\n\n\n\n（附件：开题卡汇总_首批六课题_20261016.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 14:21",
+      "text": "【委托 · 来自 核心构想】课题分工对齐：核心实验室课题6（概率方法用进风工程）× 更好世界课题5/6/3d\n核心实验室首批新增课题 6\"把现代概率论方法真正用到风工程\"（任务书 课题6节：6a《概率工程力学》按方法族梳理并判\"有用/有条件/无用\"；6b 海岸 JPM/多灾种联合极值、地震 PSHA/PBEE/条件谱/IDA/去聚合 移植到抗风；6c \"判断有没有用\"的评判清单）。平台建议分工，我方提议具体化如下，请同意或修改后回复一句：\n(1) 核心实验室：正向移植与落地——从 PEM 和海岸/地震工程里挑出\"可能有用\"的方法，每族用我们已有数据做 1–2 个风工程试金石算例，证明它对一个具体设计/评估问题有可见增益；不发展新方法。\n(2) 更好世界：批判与聚合——识别、清理无用/重复方法（你方课题 6 方法泛滥），UQ 能完成什么的\"最小可用 UQ\"（课题 5），分环节不确定性框架（课题 3d）。核心实验室判为\"无用/冗余\"的方法族只列名单交你方，不另写批判；你方判\"有用\"的交我方做移植落地。\n(3) 6c 评判清单共用：建议由核心实验室起草初版（问题是否真实 / 比现行做法强在哪 / 风工程数据上能否复现 / 对设计结论是否有可见影响 / 数据与计算是否可得），你方补\"批判侧\"条目（与已有方法是否实质等价、证据可复核性），定稿一份放双方都能只读引用的位置（建议 下，你方只读引用；如你方更想放 29 也可以，请说）。\n(4) 交界：可靠度/UQ 方法作为\"工具\"出现在你方 3d 环节框架中时，方法本身的风工程适用性结论引用核心实验室课题 6；框架和环节不确定性预算归你方。\n请回复：同意/修改意见；你方课题 5、6、3d 的项目页路径（若已建）。本实验室不公开，路径只读引用。\n（原因：平台委托要求两实验室对齐课题6分工后写进开题卡）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 14:21",
+      "text": "核心实验室课题 6 与我们 T5、T6、T3 的 3d 怎么分工，我同意对方的提议，另加了两条约定，已写进三张开题卡、线况表和决策记录。\n\n**同意的部分**\n- **(1)(2) 主线分工**：核心实验室做正向移植与落地，我们做批判与聚合。\n- **(3) 评判清单**：两边共用一份，由核心实验室起草，放 下，我们只读引用，不必放到 29。\n- **(4) 交界**：某个方法作为工具出现在 3d 框架里时，它在风工程中能不能用，引用对方课题 6 的结论；框架本身和各环节的不确定性预算归我们。\n\n**我加的两条**\n1. **\"无用名单\"只当候选。** 对方判为无用或冗余的方法族，到我们这边只算候选。要写批判，按实验室规则须先经 Liang Hu 点头开题，再按我们的判据补齐证据，不能把名单直接当结论。原因是批评谁的工作由 Liang Hu 定。\n2. **预判相反时同算同审。** 两边碰到同一个方法族、可能得出相反结论时，用同一个试金石算例、同一份评判清单，一方算、另一方复核，不各算各的。比如我们 T5 怀疑先进 UQ 方法不改变设计决策，而对方要证明它有增益，就属于这种情况。这样避免两边对同一个方法给出相反结论。\n\n**我们要补进评判清单的批判侧条目**\n- 与已有方法是否实质等价\n- 证据能否复核\n- 增益是否超过输入假设本身的不确定性，且不是因为输入假设不同造成的\n- 是否在统一基准（同样的数据、指标和计算预算）上比较\n- 优势出现在什么条件下，能否事先说明。\n\n\n\n## 结论\n更好世界实验室**同意** (1)–(4) 分工：核心实验室课题 6 负责正向移植与落地，更好世界负责批判与聚合（T6 方法泛滥、T5 最小可用 UQ、T3 的 3d 分环节不确定性框架与预算）。方法作为工具出现在 3d 框架里时，它在风工程中适用与否引用贵方课题 6 的结论。\n\n评判清单由贵方起草，放 下，我方只读引用。我方要补的批判侧条目：\n- 与已有方法是否实质等价\n- 证据能否复核\n- 增益是否超过输入假设本身的不确定性，且不是因为输入假设不同造成的\n- 是否在统一基准（同数据、同指标、同计算预算）上比较\n- 优势出现在什么条件下，能否事先说明。\n\n**补充两条约定：**\n- (a) 贵方判为\"无用/冗余\"的方法族名单，到我方只算候选。要批判须先经 Liang Hu 点头开题，并按我方判据补齐证据。\n- (b) 两边碰到同一方法族、预判可能相反时（如我方 T5 与贵方课题 6 对先进 UQ 方法），用同一个试金石算例、同一份清单，一方计算、另一方复核。\n\n**我方项目页**（只读引用，均为\"待开题\"，等 Liang Hu 定先后）：\n- T5：\n- T6：\n- 3d（在 T3 页内）：\n\n本分工已写进上述三页、29 实验室线况表和决策记录。两个实验室都不公开。\n\n（附件：首批课题开题卡与分工_20261016.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 20:43",
+      "text": "【委托 · 来自 平台】按任务划分建好全部子项目（先建不开工）\nLiang Hu 10-16 决定（原话：『因为近期需要展示，我们最好要先开出来。按照任务划分先开好，但是工作不需要立刻全部开展』）：**现在把下列子项目全部建好，但不开展工作**。\n开工另行通知：Liang Hu 定先后后由我转告，或 Liang Hu 在你这里直接说。已在做的照常做，不受影响。\n交回：子项目清单（名称 + 对话前缀 + 状态）。建完一次交回。\n本实验室要建的子项目：T1 抗风设计中的结构非线性；T2 气候变化与设计风速；T3 Performance/Resilience（3a–3d 写在 T3 页内，不另分）；T4 结构优化/拓扑优化；T5 UQ 到底能完成什么；T6 方法泛滥的聚合与比较——T6 下再 四个子项目：6a 风速时程随机模拟（结构分析用，CFD 入流部分只读引用核心实验室）、6b 台风路径与强度模型、6c 结构优化算法、6d 动力与 CFD 代理模型（含 PINO 定位）（共 10 个）。\n（原因：Liang Hu 10-16 要求近期展示前先开出来）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 20:43",
+      "text": "已建 T1–T5，T6 因\"每个对话最多 5 个进行中子对话\"被拦，先写项目页，稍后重试。10 个子项目建了 5 个：T1–T5 的子对话和项目页都已建好，状态都是「待开工」。T6 和它下面的 6a–6d 只建了项目页，对话没建成。原因是平台规定每个对话最多挂 5 个进行中的，根对话挂满 T1–T5 后，T6 被拒绝了。\n\n我已把这个限制报给平台 Lead，请它给根对话放宽上限，或代为在根对话下建 T6。T6 建好后，我从 T6 再分出 6a–6d，T6 那一层只有 4 个，不会超限。我没有把 T6 挂到别的子项目下面凑数，那样项目树的父子关系就错了。\n\n线况表已加子项目总表，决策记录也补了一条。五个子对话的开题任务都只要求回一句「已收到，待开工」，不做研究、不派 bot、不提交作业。\n\n## 结论\n**已建（5 个，子对话 + 项目页，状态均为「待开工」）：**\n\n| 子项目 | 对话前缀 | 状态 |\n| --- | --- | --- |\n| T1 抗风设计中的结构非线性 | | 待开工 |\n| T2 气候变化与设计风速 | | 待开工 |\n| T3 Performance 与 Resilience 为何进不了最终设计（3a–3d 在页内） | | 待开工 |\n| T4 结构优化与拓扑优化的工程采用 | | 待开工 |\n| T5 UQ 到底能完成什么 | | 待开工 |\n\n**未建成（5 个，项目页已建，子对话被平台上限挡住）：**\n\n| 子项目 | 对话前缀 | 状态 |\n| --- | --- | --- |\n| T6 方法泛滥的聚合与比较 | 未建 | 待开工（页已建） |\n| 6a 风速时程随机模拟（结构分析用，CFD 入流部分只读引用核心实验室） | 未建，等 T6 | 待开工（页已建） |\n| 6b 台风路径与强度模型 | 未建，等 T6 | 待开工（页已建） |\n| 6c 结构优化算法 | 未建，等 T6 | 待开工（页已建） |\n| 6d 动力与 CFD 代理模型（含 PINO 定位） | 未建，等 T6 | 待开工（页已建） |\n\n- **原因**： 规定每个对话最多挂 5 个进行中的子对话（ 里的 `MAX_OPEN_FORKS=5`），根对话 已挂满 T1–T5。\n- **已尝试**：先建 T1–T5，再建 T6 时被拒；我已另发一条普通委托报平台 Lead。\n- **需要平台做的**：给 放宽上限，或代为在 下建 T6。T6 建好后，我立刻从 T6 分出 6a–6d。\n- **提醒**：核心实验室如果也要在一个对话下建 6 个以上子项目，会碰到同样的限制。\n- **页面与表**：项目页都在 （T1–T6、T6a–T6d），子项目总表在。\n- **开工**：所有子项目都不开展工作，等 Liang Hu 定先后后的开工指令。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 20:45",
+      "text": "【自动初查 · 未通过】你交回的结果还缺下面几项（按派活方的验收清单）：\n- 子项目清单（名称、对话前缀、状态）：T6 及 6a–6d 共 5 个子项目对话尚未建成，缺少对话前缀\n\n验收清单：\n子项目清单（名称、对话前缀、状态）\n\n请补齐后重新给出完整的结论（包括已经做好的部分）；确实做不到的，写明原因和已经尝试过什么。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 20:45",
+      "text": "T6 和 6a–6d 的子对话还是建不成，前缀补不出来，自动初查缺的那一项我这边做不到。刚才又试了一次，平台仍然拒绝：每个对话最多只能挂 5 个进行中的，根对话 已被 T1–T5 占满。这个上限写死在平台脚本里，我改不了。\n\n能做的已经做完：T1–T5 的子对话和项目页都已建好，T6 和 6a–6d 的项目页也已建好；线况表的子项目总表已更新，T6 这 5 行注明了未建的原因。我已另发一条委托请平台 Lead 放宽上限或代建 T6。我没有把 T6 挂到别的子项目下面凑数，那样项目树的父子关系是错的。\n\n## 结论\n**子项目清单（共 10 个，全部「待开工」，不做研究）：**\n\n| 子项目 | 对话前缀 | 状态 |\n| --- | --- | --- |\n| T1 抗风设计中的结构非线性 | | 待开工 |\n| T2 气候变化与设计风速 | | 待开工 |\n| T3 Performance 与 Resilience 为何进不了最终设计（3a–3d 在页内） | | 待开工 |\n| T4 结构优化与拓扑优化的工程采用 | | 待开工 |\n| T5 UQ 到底能完成什么 | | 待开工 |\n| T6 方法泛滥的聚合与比较 | **未建成**（被平台上限挡住） | 待开工，项目页已建 |\n| 6a 风速时程随机模拟（结构分析用，CFD 入流部分只读引用核心实验室） | **未建成**（要先有 T6） | 待开工，项目页已建 |\n| 6b 台风路径与强度模型 | **未建成**（要先有 T6） | 待开工，项目页已建 |\n| 6c 结构优化算法 | **未建成**（要先有 T6） | 待开工，项目页已建 |\n| 6d 动力与 CFD 代理模型（含 PINO 定位） | **未建成**（要先有 T6） | 待开工，项目页已建 |\n\n\n**做不到的部分**\n- **原因**：平台规定每个对话最多挂 5 个进行中的子对话（ 第 26 行 `MAX_OPEN_FORKS = 5`），根对话 已被 T1–T5 占满。\n- **已尝试**： 建 T6 两次，两次都被拒。没有改挂到别的子项目下，因为那样父子关系是错的。\n- **已请平台做的**：另发委托请平台 Lead 给 放宽上限（至少 6 个），或代为在 下建 T6。T6 建成后，我马上从 T6 分出 6a–6d（这一层 4 个，不超限），补齐 5 个前缀，并用 note 交回平台。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 20:48",
+      "text": "【委托结果 · 平台】 每对话 5 个子对话上限挡住 T6 子项目\n挡住 T6 的是平台代码里写死的上限：每个对话最多 5 个进行中的子对话（RC 的 agent-fork.ts 和 .py 各一处）。已开，把两处一起改为 8 个，层数上限不变，部署走空闲队列。部署生效后我会通知你，届时请在 下自己用 建 T6，再从 T6 分 6a–6d。T6 现在只是先建不开工，等部署不耽误研究。核心实验室以后也适用这个新上限。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 20:48",
+      "text": "T6 和 6a–6d 的子对话还没建，要等 部署，部署后由我自己建。工单把每个对话的子对话上限从 5 个提到 8 个。我刚查过，平台代码里的上限还是 5，没有生效。\n\n平台部署后会通知我。通知一到，我在根对话下建 T6，再从 T6 分出 6a–6d，把 5 个对话前缀补进线况表，并用 note 告知平台。这五个子项目本来就是先建不开工，晚几天建不耽误研究。\n\n现在的状态：\n- **已建**：T1–T5 共 5 个子项目，对话和项目页都有，状态都是「待开工」。\n- **只有项目页**：T6 和 6a–6d 的项目页已写好，对话等部署后再建。\n- **线况表**：已写明在等 部署，以及部署后要做的步骤。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 22:40",
+      "text": "【委托 · 来自 平台】子对话上限已放宽到 12，请建 T6 及 6a–6d\n0109 已上线：每个对话可以有 12 个进行中的。请在 下用 建 T6（标题按新编号 L29.6 …），再从 T6 分出 6a–6d（L29.6a–L29.6d），都只建不开工。建成后回这 5 个子对话的前缀。\n（原因：0109 核对，并补齐 Liang Hu 交代的子项目）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 22:40",
+      "text": "这条委托我还没做完，现在只交一个进度，不是最终结果。\n\nL29.6「方法泛滥的聚合与比较」已经建在根对话下面，前缀，状态是待开工。\n\n6a–6d 四个还没建。它们要挂在 L29.6 下面，而 只能从发起命令的那个对话往下分，所以我从根对话建不了。我已发，请 L29.6 自己建这四个，标题分别是 L29.6a 风速时程随机模拟、L29.6b 台风路径与强度模型、L29.6c 结构优化算法、L29.6d 动力与CFD代理模型。四个都只建不开工，建完后交回前缀，并把前缀填进各自的项目页。这条委托在排队，要等 L29.6 处理完它的开工确认才会送进去。\n\n四个前缀回来后，我核对一遍，填进线况表，再把 5 个前缀一次交给平台。线况表和 T6 项目页已写上。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 22:41",
+      "text": "【自动初查 · 保持进行中】委托 「子对话上限已放宽到 12，请建 T6 及 6a–6d」带验收清单，你这次交回的是进度（转派出去的结果还没回来），没有当结果交给 平台。\n本委托保持进行中：等你转派的结果回来、核过之后，再一次交回完整结论（按验收清单逐条）。\n需要先让对方知道进度，用 \n\n验收清单：\n给出 L29.6 及 L29.6a–6d 五个子对话前缀，层级正确（6a–6d 挂在 L29.6 下）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 22:41",
+      "text": "【委托结果 · 正本清源】建 L29.6a–L29.6d 四个子项目（只建不开工）\n| 子项目 | 对话前缀 | 状态 |\n| --- | --- | --- |\n| L29.6a 风速时程随机模拟 | | 待开工 |\n| L29.6b 台风路径与强度模型 | | 待开工 |\n| L29.6c 结构优化算法 | | 待开工 |\n| L29.6d 动力与CFD代理模型 | | 待开工 |\n\n- 四个项目页页头的 `lead_topic:` 都已填前缀，填完后逐页查过，四个都对。\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 22:41",
+      "text": "平台要的 5 个子项目对话都已建好，状态都是待开工，不做研究、不派 bot、不提交作业。\n\n我用 看了项目树：L29.6 挂在根对话 下面，6a–6d 挂在 L29.6 下面，父子关系是对的。四个项目页开头登记的对话前缀也都核过，没有错。\n\n线况表的子项目总表已补齐全部 10 行，按新规定加了编号列。表头也加了一行「编号：L29 · 状态：待开工」。\n\n## 结论\n请求的 5 个子对话都已建成，状态都是待开工：\n\n| 编号 | 子项目 | 对话前缀 | 父对话 |\n| --- | --- | --- | --- |\n| L29.6 | 方法泛滥的聚合与比较 | | （L29 总控） |\n| L29.6a | 风速时程随机模拟（CFD 入流部分只读引用核心实验室 L31.3） | | |\n| L29.6b | 台风路径与强度模型 | | |\n| L29.6c | 结构优化算法 | | |\n| L29.6d | 动力与CFD代理模型（含 PINO 定位） | | |\n\n加上之前建好的 L29.1 、L29.2 、L29.3 、L29.4 、L29.5，Liang Hu 交代的 10 个子项目已全部建齐。\n\n- **项目页**：每个子项目一页，在，页头登记了对话前缀，status 为待开工。\n- **线况表**：子项目总表（编号、名称、前缀、状态、一句话）在。\n- **开工**：等 Liang Hu 定先后后另行通知。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:15",
+      "text": "【委托 · 来自 平台】A3 批复：L29 全部课题（T1–T6、6a–6d）创建并开展基本工作\nLiang Hu 10-16 23:3x 批复（原话）：'A2,A3，全部创建并开展基本工作。'\n即：L29 更好世界实验室课题 1–6 及 6a–6d 全部建好子项目对话（尚未建的 L29.6 与 6a–6d 现在用 补建，6a–6d 挂在 L29.6 下； 上限已修）；**标题改为 L29.x**（现在的『T1–T5』与 T 工具群字母冲突，按公共规则『编号』节：完整编号＋本层名称，如『L29.1 抗风设计中的结构非线性』『L29.6a 风速时程随机模拟』；若平台 0115 已改则核对即可），并**全部开展基本工作**：每个课题按开题卡做文献梳理、最强主张复述、检验方法设计；课题 6 先出各子课题方法谱系图＋基准平台设想＋候选小课题清单。不开大计算；结论性判断照实验室规则送审；默认不公开。与 L31 核心实验室按任务书分工对齐。\n（原因：Liang Hu 批复 A3，平台 Lead 督办）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:16",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:19",
+      "text": "【委托 · 来自 平台】重发：Liang Hu 批复——全部课题开展基本工作\n（23:15 那条委托在启动瞬间被系统中断 terminated，现重发，内容不变。）Liang Hu 10-16 23:3x 批复原话：'A2,A3，全部创建并开展基本工作。'\n范围：L29 更好世界实验室全部课题（L29.1–L29.6 与 6a–6d，已建好）；若子对话标题仍是 T1–T5 请改为 L29.1–L29.5。不再等先后排序，**全部开展基本工作**：每个课题按开题卡的首步做文献与数据准备、方法梳理、最小可行试验设计；不开大计算（超出开题卡预计先自己判断、写理由）；结论照实验室规则送审，默认不公开。与 （L31）按任务书分工对齐。\n用 给各子项目交代，或派本线 bot。\n（原因：Liang Hu 批复，平台 Lead 督办（重发））"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 23:19",
+      "text": "- **标题**：子对话标题已经是 L29.1–L29.6、L29.6a–6d，不用再改。\n- **怎么交代的**：我写了一份开工任务书，每个课题一行第一周计划（10-17 至 10-23），另附各课题共同遵守的边界。\n- **L29.1–L29.6**：我直接各发了一条开工。\n- **L29.6a–6d**：平台只允许给直接挂在自己下面的子对话派活，所以由 L29.6 转达，转达委托是。\n- **记录**：线况表、10 个项目页的状态都已改为「在做」，决策记录也补了一条。\n\n我做了一个决定：十个课题同时请 litwiki 补文献卡片，会排队、拖慢进度。我仍然让它们一起开工，因为各课题第一周都以文献为主，排队的代价可以接受。\n\n\n\n## 结论\n按 Liang Hu 批复，L29 全部 10 个课题已开展基本工作， 和各项目页的状态都已改为「在做」。子对话标题已是 L29.x，无需改。\n\n**第一周计划**（10-17 至 10-23，每课题一行）：\n- **L29.1 抗风设计中的结构非线性**：请 litwiki 补 8–12 篇卡片，建「主张—条件—数字」表；写一页累积塑性的量纲论证；写反例算例设计书，只设计，不提交计算。\n- **L29.2 气候变化与设计风速**：先 Grok 快查，再 Deep Research，把极值风速变化证据按风气候和区域分级；补 IPCC AR6 第 11 章和 WMO 评估的卡片；用 IBTrACS 算设计风速的敏感性曲面。\n- **L29.3 Performance/Resilience（3a–3d）**：补 10–15 篇卡片；写分环节不确定性预算的骨架；列验证途径清单；摸清事件回算能用的损失数据。\n- **L29.4 结构/拓扑优化的工程采用**：补 8–12 篇卡片，建「报告的节省—所用假设」表；写三方案对比的试验设计，与 L29.6c 共用算例。\n- **L29.5 UQ 到底能完成什么**：列落地任务清单；为三组对比摸清数据；先小试一组（50 年极值风速置信区间，bootstrap 对比贝叶斯）；与 L31.6 对评判清单。\n- **L29.6 方法泛滥的聚合与比较**：写统一基准规范模板，供 6a–6d 共用；写共用判据的执行细则；补候选小课题；协调 L31.3 和 L31.6 的两份清单。\n- **L29.6a 风速时程随机模拟**：画谱系图初稿；写基准设计（解析谱加公开实测数据，含下击暴流）；按 L31.3 的指标清单对表。\n- **L29.6b 台风路径与强度模型**：按五个组件整理谱系；摸清 IBTrACS 和 STORM 能否拿到；写方差分解的试验设计。\n- **L29.6c 结构优化算法**：选 6–10 个代表算法和标准桁架基准；定函数评估预算；在 Colab 上小试。\n- **L29.6d 动力与 CFD 代理模型**：整理谱系表；写 TPU 风压场插值和外推两种测试集的基准设计；PINO 用同一判据。\n\n**共同边界**：只做文献与数据准备、方法梳理和最小可行试验设计，不开大计算，不改开题卡判据。结论定论前按规则送审，默认不公开。与 L31 的分工照已定的办。\n\n**委托编号**：L29.1，L29.2，L29.3，L29.4，L29.5，L29.6；6a–6d 由 L29.6 转达。\n\n开工任务书：。\n\n（附件：L29_全部课题开工_第一周计划_20261016.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:24",
+      "text": "【委托 · 来自 核心构想】对表：入流/随机风速时程共用指标口径 v0\n按 10-16 分工补充 b（两边比较指标统一口径），核心实验室 L31.3 起草了指标口径 v0：（只读，不公开）。请看第 0 节（参考风速、统计时长、10 段抽样不确定度）、A1–A6（U、Iu/Iv/Iw、雷诺应力、xLu 双算法、对数谱误差与截止频率、Davenport 相干拟合）和 D 节 6 条共用约定，回复：同意 / 逐条修改意见；你方 6a 随机模拟一侧还需要哪些指标（例如非平稳/演变谱、相位或高阶统计）我方应同时采用。请别改我方文件，意见写在回复里。\n（原因：分工约定两边比较指标用同一套口径，避免两套定义）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:30",
+      "text": "【委托结果 · 正本清源】L29.1 开工：第一周基本工作\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 23:30",
+      "text": "L29.1 的开工委托还没产出任何东西就被系统中断了，重发一次。L29.1 的第一条开工委托在启动时被系统中断了（terminated），子对话里没有任何回复，也没有产出。23:3x 我原样重发了一条，线况表已改成新。\n\n重发的这条比原来多交代了一句：这一轮先把第一批文献和数据的活派出去，回复里写明派了什么。这样即使后面再被中断，也能看出做到了哪一步。\n\n另外 5 条直发的开工委托（L29.2–L29.6）都已送进各，目前没有收到失败通知。6a–6d 的开工由 L29.6 转达，按派发记录排在 L29.6 自己那条开工委托之后。哪条再被中断，我会再重发一次；如果同一条连续两次被中断，我就当作平台问题报给平台 Lead。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:35",
+      "text": "【委托结果 · 正本清源】L29.2 开工：第一周基本工作\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 23:35",
+      "text": "L29.1 重发后已正常开工。再给 L29.2 重发一次：L29.2 的开工委托也被系统中断了（首发），子对话里同样没有任何回复。我已原样重发，线况表也改成了新。\n\nL29.1 在 23:35 重发后已正常开工，第一批 4 件事都派出去了：\n- litwiki 补 8–12 张带页码的文献卡片，并建「主张—条件—数字」表\n- 用 Grok 快查文献线索\n- better 写累积塑性的量纲论证\n- better 写反例算例设计书，只设计，不提交计算。\n\n产物写在 下。\n\nL29.1 和 L29.2 两条都是 23:20 发出的，子对话里都没有回复就被判失败。平台 23:15 那条委托也是这样被中断的。看起来是同一时段的一次统一中断，不像是我们任务书本身的问题。我已用 note 告诉平台 Lead 供排查，不占它的委托名额。\n\nL29.3–L29.6 同一批发出的四条也可能受影响，目前还没有回音。收到失败通知的，我逐条重发；同一条第二次失败，我改用普通委托正式报平台 Lead。现在不预先重发，免得原委托其实还在跑、两边重复干活。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:38",
+      "text": "【委托结果 · 正本清源】L29.3 开工：第一周基本工作\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 23:38",
+      "text": "L29.3 的开工委托也被系统中断了。我已原样重发，线况表已改成新。重发时补了一句：3d 用到的可靠度和不确定性量化方法，在风工程中适不适用，只读引用核心实验室课题 6（L31.6）的结论，这是之前和核心实验室定的分工。\n\n23:20 同一批发出的开工，已经有三条被系统中断：L29.1、L29.2、L29.3。重发后的 L29.1 已正常开工，L29.2 和 L29.3 的重发正在子对话里处理。\n\nL29.4、L29.5、L29.6 三条还没有回音，6a–6d 要等 L29.6 转达。收到失败通知的，我逐条重发；同一条第二次失败，我就正式报平台 Lead。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:41",
+      "text": "【委托结果 · 正本清源】L29.4 开工：第一周基本工作\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 23:41",
+      "text": "L29.4 的开工委托（首发）也被系统中断了。我已原样重发，线况表已改成新。重发时补了一点：L29.4 和 L29.6c 共用风控高层算例，L29.4 选定算例后报给我，我转给 L29.6c。\n\n23:20 那批开工，到现在 L29.1–L29.4 四条都被系统中断了，四条都已重发：\n- **L29.1**：重发后已正常开工。\n- **L29.2、L29.3、L29.4**：重发的委托正在各自的子对话里跑。\n\n**L29.5、L29.6**：还没有回音。6a–6d 的开工要等 L29.6 转达。这两条要是也失败，我照样重发。哪条重发后第二次失败，我就用普通委托正式报平台 Lead。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:44",
+      "text": "【委托 · 来自 核心构想】对表（重发）：入流/随机风速时程共用指标口径 v0\n上一单中途终止，重发。按 10-16 分工补充 b（比较指标统一口径），请只读看 的第 0 节和 D 节 6 条（Iu 用当地均速归一；xLu 双算法并注明；相干用 Davenport 型系数加曲线、间距按 H 归一；谱误差用对数谱 RMS 并写频带与截止频率；差小于两者 10 段抽样误差之和记\"不可分辨\"；峰值统一 10 段 Gumbel 22% 超越概率、同一无量纲时长）。简短回复：逐条同意/修改；6a 一侧需要我方同时采用的额外指标（或无）。不必改任何文件。\n（原因：两边比较指标用同一套口径）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 23:44",
+      "text": "D 节 6 条我全部同意，其中 3、4、5 三条补了细化，不改对方口径的原意。另外请核心实验室一起报两项指标，下面结论里写清楚了。对方文件我只读没动；我把对表结果写进了我方 6a 项目页，6a 开工后照这个口径做。\n\n## 结论\n**D 节 6 条，逐条：**\n1. **Iu 用当地平均风速归一**：同意。\n2. **xLu 两种算法都报，注明算法和窗长**：同意。6a 另报目标谱里设定的积分尺度与模拟结果实际达到的值之比，因为随机模拟的积分尺度是输入参数。\n3. **相干用 Davenport 型系数加曲线**：同意，细化两处。\n - 拟合式里的 U 取两点平均高度处的平均风速。\n - 间距按结构特征尺寸归一：建筑取 H；6a 的桥梁算例取跨度或节段长。\n4. **谱误差用对数谱 RMS，写明频带和截止频率**：同意，细化两处。\n - 频带要覆盖所分析结构的前几阶频率。\n - 随机模拟一侧的截止频率是模拟时设定的上限频率，与 CFD 的分辨截止含义不同，两者分开写。\n5. **差小于两者 10 段抽样误差之和记\"不可分辨\"**：同意，细化两处。\n - \"不可分辨\"只在同一无量纲总时长下成立，报告必须写明时长，不能当作一般意义的\"等价\"。\n - 随机模拟的抽样误差也按单条记录等分 10 段计算，与 CFD 同一口径；样本之间的离散另报。\n6. **峰值用 10 段 Gumbel、22% 超越概率，同一无量纲时长**：同意。\n\n**请贵方一起报的两项额外指标：**\n- **E1 偏度和峰度**：u 分量，可选 v、w。用来区分高斯和非高斯方法，计算成本几乎为零。\n- **E2 计算成本**：每生成 10⁶ 个\"点×时间步\"所用的墙钟秒数，注明硬件。\n\n**只在 6a 内部用、不需要贵方采用的：**\n- 非平稳算例（下击暴流）的时变均值和时变标准差误差\n- 参考结构（单自由度或高层）响应的均方根值和峰值。\n\n我方已把以上内容写进 的「与 L31.3 共用的比较指标口径」一节。贵方文件只读引用，未改动。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:48",
+      "text": "【委托结果 · 正本清源】L29.5 开工：第一周基本工作\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 23:48",
+      "text": "L29.5 的开工委托（首发）也被系统中断了，我已原样重发（新），线况表已改成新。重发时补了一句：需要和核心实验室课题 6（L31.6）对表时，由 L29.5 先报给我，我出面去对。\n\n23:20 那批开工委托里，L29.1–L29.5 五条都被系统中断过，都已重发：\n- **L29.1**：已正常开工。\n- **L29.4**：已派出第一批，项目页已写上「当前状态」。\n- **L29.2、L29.3、L29.5**：重发的委托还在跑。\n\nL29.6还没有回音，6a–6d 要等它转达开工。它如果也失败，我照样重发；哪条重发后第二次失败，我就正式报平台 Lead。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:53",
+      "text": "【委托结果 · 正本清源】L29.6 开工：第一周基本工作\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 23:53",
+      "text": "L29.6 的开工委托（首发）也被系统中断了，我已重发，新，线况表已改。\n\n6a–6d 的开工还在等 L29.6 转达。我 23:26 发过一条转达，它已经送进 L29.6 的，但 L29.6 那一轮被中断了，这条转达到底处理了没有，目前看不出来。所以我在重发的委托里写明：转达已经做过的就不要重复派；没做或被中断的，这一轮一起把四条开工委托派出去，回复里写明。\n\n另外，6a 的比较指标我已和核心实验室对过表。重发的委托里也交代了：L29.6 写统一基准模板时，6a 那一支按对好的口径来。\n\n23:20 发出的 L29.1–L29.6 六条开工，全部被系统中断过，都已重发一次：\n- **L29.1、L29.4**：已正常开工，第一批文献和数据的委托已派出。\n- **L29.2、L29.3、L29.5、L29.6**：重发的委托还在跑。\n\n哪条重发后第二次失败，我就用普通委托正式报平台 Lead。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:57",
+      "text": "【委托结果 · 正本清源】转达 L29.6a–6d 开工：第一周基本工作\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-16 23:59",
+      "text": "【委托结果 · 正本清源】L29.6 开工：第一周基本工作（重发）\n委托失败：terminated\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-16 23:59",
+      "text": "L29.6 和它下面的 6a–6d 四个子项目还没能开工，我已经正式报给平台 Lead。\n\n**怎么回事**：发进 L29.6 的委托连续三次都是\"terminated\"，对话里一个字都没回。三次分别是开工首发、请它转达 6a–6d 开工的那条，以及刚才的重发（约 2 分钟就失败）。和它同一批被中断的 L29.1–L29.5，重发后都已正常开工。所以问题像是出在 L29.6 这个对话本身，再重发也没用。\n\n**影响**：平台只允许父对话给直接挂在下面的子对话派活，6a–6d 只能由 L29.6 派。L29.6 修好之前，这四个子项目都开不了工。\n\n**我请平台做的**：查明原因并修复。修不了的话，请平台代 L29.6 给 6a–6d 各转一条开工，内容就用开工任务书里那四行和「共同边界」一节。\n\n**我的决定**：没有在根对话下另建 6a–6d 来绕过去。那样项目树里会出现两套同名节点，以后对不上账。代价是这四个子项目可能要晚一两天开工；它们第一周主要是文献和方法梳理，晚一两天影响不大。平台修好后，我马上重发 L29.6 的开工。\n\n**其他五个子项目**：L29.1–L29.5 都已开工，各自的工作目录都建起来了，正在等第一批文献和数据的委托回来。线况表已写明 L29.6 的情况。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 00:03",
+      "text": "【委托结果 · 平台】L29.6 对话每次开一轮都被 terminated\nL29.6的三次委托在后台都启动了，但每次续做都没跑起来，对话里一个字也没写进去。这和 10-16 23:15–23:32 那 14 条 terminated 委托是同一类问题，已并进平台高优：要求离线查清原因，必要时给 L29.6 换新会话、把对话内容带过去。修好后我会通知你，届时请重发 L29.6 的开工，再由 L29.6 给 6a–6d 派活。平台没法代转 6a–6d：委托只能送进发送方下一层的，6a–6d 在第三层。如果修复拖得久，备选办法是临时把 6a–6d 改挂到 L29 总控下，这会改动项目结构，我先问过你再做。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 00:03",
+      "text": "L29.6 这个对话还开不了一轮。平台已把它并进高优：先查原因，必要时给 L29.6 换一个新会话，并把原对话内容带过去。6a–6d 这四个子项目挂在 L29.6 下面，L29.6 修好之前只能等，平台也没法代为派活。\n\n我替平台做了一个选择：同意它提的备选办法，并定了时限。到 10-18 12:00 还没修好，就请平台把 6a–6d 临时改挂到 L29 总控下面，编号和标题不变，由我直接派开工。修好了，就重发 L29.6 的开工，再由 L29.6 给四个子项目派活。\n\n- **为什么这样定**：6a–6d 第一周的工作是文献整理和方法梳理，晚开一天半影响不大。改挂原有节点，比在总控下另建一套同名节点好，项目树里不会出现重复。\n- **代价**：项目树会暂时少掉 L29.6 这一层，以后可能要挂回去。\n- **兜底**：我已预约 10-18 12:04 回来查，平台没来通知也不会漏掉。\n\n其余五个课题（L29.1–L29.5）都已正常开工。L29.5 的 Grok 快查已经回来，第二步的深度文献检索也已发出。\n\n线况表和决策记录都已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 00:17",
+      "text": "【子项目回报 · L29.4 结构优化与拓扑优化的工程采用】L29.4 共用算例初选（请转 L29.6c）\n共用算例初选（有条件）：主算例 Deng et al. 2019 CAARC 外形 60 层 RC 框架「新构建模型」（DOI 10.1061/(ASCE)ST.1943-541X.0002383，卡片，PDF 第8–9页）；备选 Song 等 2023 UBC 20 层钢框架（卡片）；纯算法副基准 Chan 1992 60 层 1080 杆支撑钢框架（DOI 10.1007/BF01744692，可接标准截面离散，几十至数百设计变量）——建议 L29.6c 除桁架外把 Chan 框架作为共用的中等规模基准。限制：主算例尚缺完整结构输入和全向动态风荷载（CFD 线 CAARC 仅 0° 平均荷载，不能用于加速度或可靠度），正在核查入门闸门（查 TPU/NALD 全向数据与 Deng 全文），闸门结论出来后再报一次定稿。详情：、three_scheme_design.md（只读）。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 00:17",
+      "text": "L29.4 报上来的共用算例初选，现在转不到 L29.6c。L29.6c 只能经 L29.6 转达，而 L29.6 还卡在 上，委托一发进去就被中断。我先把初选写进了 L29.6c 的项目页，新加了一节「与 L29.4 共用算例」，6c 开工后照这一节选基准。\n\n**L29.4 的初选（有条件）**：\n- **主算例**：Deng 等 2019 年的 CAARC 外形 60 层钢筋混凝土框架。目前还缺完整的结构参数和全向动态风荷载。CFD 线已有的 CAARC 结果只有 0° 风向的平均荷载，不能用来算加速度或可靠度。L29.4 正在核查能否补齐，核完后再报一次定稿。\n- **备选**：Song 等 2023 年的 20 层钢框架。\n- **6c 专用的中等规模基准**：L29.4 建议 6c 在 10/25/72 杆桁架之外，再加 Chan 1992 年的 60 层、1080 杆支撑钢框架。它可以换成标准截面，设计变量几十到几百个，适合拿来比算法。我同意，已一并写进 6c 页。\n\nL29.4 那边不需要回复。它的闸门定稿报上来后，我再更新 6c 页。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 00:18",
+      "text": "【平台通知·】你 00:00 报的「L29.6每次开一轮都被 terminated」已查明：是平台 Claude 适配器的问题（排队时无数据被 Research Chat 掐断；另外 claude 程序在被反复重装，那几秒内启动就失败），和 L29.6 对话本身无关；00:13 已修复并重启，之后没有再出现终止。\n请把 **L29.6 第一周任务（ /）和转达 L29.6a–6d 开工** 重发一次；L29.1–L29.5 的重发都在正常跑，不用动。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 00:18",
+      "text": "平台说 L29.6 那几次中断是平台程序的问题，和对话本身无关，已在 00:13 修好。我已把 L29.6 的开工委托和\"转达 6a–6d 开工\"合成一条重发。\n\n这条委托交代了两件事：\n- **L29.6 自己开工**：按开工任务书推进第一周工作。统一基准模板里 6a 那一支的比较指标，按已和核心实验室对好的口径。\n- **给 6a–6d 各发一条开工委托**：其中 6a 按对好的指标口径做；6c 按项目页里与 L29.4 共用的算例选基准，即三种标准桁架加 Chan 1992 年的 60 层框架，主算例等 L29.4 定稿。\n\n委托附了验收清单：L29.6 回复时要列出自己第一批派出的，以及给 6a–6d 的四条委托，少一项会被自动退回去补。\n\n之前和平台约定的备选办法已经告诉平台取消，即\"到 10-18 12:00 还没修好，就把 6a–6d 改挂到总控下\"。线况表已更新。10-18 12:04 的回访我留着，到时顺便核对全部 10 个课题的第一周进展。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 00:27",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n0121 已修好：原因在 Claude 适配器（程序自更新那几秒里文件不在，加上并发只有 4 个，排队的请求约 5 分钟后被断开），和 L29.6 的会话本身无关，会话是好的。平台会话已提示重发，（L29.6 和 6a–6d 开工）正在正常跑，L29.6 首轮 00:20 已经完成。不用再重发；请等这一轮交回，确认 6a–6d 都收到了开工。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 00:27",
+      "text": "【委托 · 来自 核心构想】6c 评判清单 v1 对表（核心实验室 L31.6）\n6c 评判清单已从 v0 改到 v1，文件仍在原处：（只读引用）。\n改动：\n- 你方给的 6–10 条一字未改。\n- 新增 3 条：\n - 第 0 条：方法定义能否复现\n - 第 11 条：移植时风灾特有的物理差异，即持续时间、非平稳、方向性、混合风气候\n - 第 12 条：尾部有多少样本支撑。设计重现期附近少于约 30 个事件，只能判“条件过”。\n- 第 4 条要求不确定带写出数值。\n- 打分改为四档：过 / 条件过 / 不过 / 未评。判定规则相应修订，并新增“未评”档。\n- 修改理由来自第一个试金石：用 B2 STORM 目录做 V700 去聚合，每站超过 V700 的只有 14 场风暴。详见。\n请对表并回复：\n(1) 同意 v1，或指出要改哪几条、怎么改\n(2) 新增的 0、11、12 条，你方用于 T6/T5/3d 的批判时是否也采用。若不采用，说明理由，我方在清单里注明“仅落地侧”。\n两实验室都不公开。\n（原因：L31.6 第一周目标 (1)：清单 v1 与更好世界对表（分工约定见））"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 00:27",
+      "text": "我已把评判清单 v1 读完（核心实验室的文件只读，没改），同意 v1。第 4、12 条和判定规则建议小改；新增的 0、11、12 三条我们也采用，第 11 条改标「共用」。对表结果已记进我方 T5、T6 两页，T5 自己的判据不改。\n\n## 结论\n**(1) 同意 v1，建议改三处：**\n- **第 12 条**：「约 30 个事件」这个门槛请标为「本线约定，无文献依据」。另请注明，没有事件可数的方法，比如峰值估计，写等效样本量，例如独立分段数。\n- **第 4 条和判定规则**：请区分两种「没有超过不确定带」。\n - 一种是影响确实小于不确定带，记「不过」。\n - 另一种是不确定带本身宽到任何方法都超不过，比如每站只有 14 场风暴时，这一条应记「未评（样本不足）」，不记「不过」，免得把方法误判为「无用」。\n- **判定里「6–10 没有否决项」**：请写明哪些算否决。建议第 6 条不过（与已有方法完全等价）或第 8 条不过（增益来自输入假设不同），就不能判「有用」，最多「有条件有用」；第 7、9、10 条不过时，降为「条件过」并写明条件。\n\n**(2) 新增三条我方都采用，不必标「仅落地侧」：**\n- **第 0 条**：采用。我方判「实质等价」时，先要能复现方法的定义。\n- **第 11 条**：采用，请把「侧」改为「共用」。\n - 6b（台风模型）和 3d（危险性、荷载环节）必查。\n - 6a 的非平稳算例也要查。\n - 优化算法、代理模型等与风灾物理无关的方法族，按本条原文写「无关」并附一句理由。\n- **第 12 条**：采用，T5、T6、3d 都用。\n\n**另需说明：** 我方 T5 的判据在检验前已写定，即「分位差 ≥5% 或排序改变」，不改。T5 报告时，这个判据和清单第 4 条（是否超过不确定带的数值）并列给出，两种口径都报。\n\n我方记录在 和。两个实验室都不公开。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 00:29",
+      "text": "【告知 · 来自 核心构想】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：你方三处建议已全部采纳，6c 评判清单定为 v1.1，路径不变。改动：第 12 条\"约 30\"标为本线约定、无文献依据，并补等效样本量；第 4 条区分\"不过\"与\"未评（样本不足）\"；判定写明第 6、8 条不过即最多\"有条件有用\"，第 7、9、10 条不过降为\"条件过\"；第 11 条改为共用，并写明无关方法族的处理。你方 T5 判据与第 4 条并列报告，已写进文末改动记录。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 00:47",
+      "text": "【委托结果 · 正本清源】L29.2 开工：第一周基本工作（重发）\n- **v2 已验收**：把 2°C 的全球文献数字（套到单站是假设）套到五站的站点风代理上，50 年和 700 年风速只升 4.6–4.8%，都小于当前估计本身的抽样不确定性，比值 0.22–0.62；再算上分布形式的差异，比值只有 0.06–0.18。v1 里那霸过线是用风暴中心强度代替站点风造成的，v2 不再成立。最大的不确定性来自分布形式（700 年风速差 33–57%）。以上都是方法性读出，没送审。\n- **在途**：litwiki （工程预估 5 篇，含澳新规范气候变化乘子 Mc 的出处）、（Vickery 2009 不确定性与风速均一化 6 篇）。\n- **下一步**：卡回来后写《证据分级表 v0》，与 v1、v2 小试一起送 ` 前用 `--report` 报回第一周。\n\n（附件：report.md）\n\n（附件：uniform_surface_annotated.png）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 00:47",
+      "text": "L29.2（气候变化与设计风速）重发后第一周在正常推进，我看过它的回报，没有需要我插手的地方。\n\n- **第二版小试的结果**：把全球文献里升温 2°C 的数字套到 5 个测站，50 年和 700 年重现期风速都只升 4.6–4.8%，低于这些风速估计本身的抽样不确定性。套到单个测站是我们自己的假设，它在回报里已经标明。\n- **第一版的问题已纠正**：第一版里那霸站超过阈值，是因为用了台风中心的强度，而不是测站处的风速。第二版改用站点风速后，那霸也不过线了。\n- **最大的不确定性**：来自拟合用哪种分布。不同分布之间，700 年风速相差 33–57%，远大于气候变化带来的那 5% 左右。\n\n这些还只是方法上的初步结果，没有送审，不能当结论。下一步等 litwiki 两批卡片回来，其中一批包括澳新规范里气候变化系数的出处。L29.2 会据此写证据分级表，连同两版小试送 3 位审稿人审，10-23 前报回第一周的结果。\n\n线况表里 L29.2 那一行已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 00:54",
+      "text": "【委托结果 · 正本清源】L29.5 开工：第一周基本工作（重发）\n- litwiki 交回 8 张新卡（索引在），Lead 核过后接受；自动初查未通过只是交回正文太简略。\n- 原文证据有两面：Kareem 1988 显示两种传播方法差别有时很小；Kikumoto 2021 显示概率方法在阈值边上会改变判级；多保真代理模型降了误差，但作者不认为可用于围护结构最终设计。\n- \"设计值怎么定义\"一项就能造成约 9% 的差别，所以结果改为分四栏报告；判据不改。\n- 同一数据上 bootstrap 和层次贝叶斯比较设计决策，文献里还是空白，由 (a) 组小试来补。\n- 在排队：better 、litwiki 、。第一周结束时用 --report 报回。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 00:54",
+      "text": "L29.5（UQ 在工程中到底能完成什么）第一周进展正常，没有需要我插手的地方。\n\n**抽查**：我核了它引用的一个数字。设计值取后验均值还是后验预测值，会造成 1.4%–9% 的差别。卡片里 Fawcett & Green 2018 的表 1（期刊第 2239 页）给出：Yeovilton 站 50 年风速，后验均值 56.8、后验预测 57.6，差 1.4%；Bradfield 站分别是 103.5 和 113.1，差 9.3%。两组数对得上。\n\n卡片还特别注明，这篇比的是同一个贝叶斯模型下取哪种值作设计值，不是\"基本方法对先进方法\"。L29.5 没有把它当成后一种用，用法没问题。\n\n**目前读到的情况**：\n- **两面都有证据**：Kareem 1988 显示，两种不确定性传播方法的结果有时差别很小。Kikumoto 2021 则显示，概率方法在行人风评级的阈值附近会改变判级结果。\n- **文献里还是空白**：在同一站点数据上，比较 bootstrap 和层次贝叶斯会不会改变设计决策，目前没找到研究。这一项要靠它自己的小试来补。\n- **报告口径改了，判据没改**：由于\"设计值怎么定义\"一项就能带来约 9% 的差别，结果改为分四栏报告：只换估计方法、换模型形式、换输入、换设计值定义。事先定下的判据不变。\n\n线况表已更新 L29.5 这一行。还有 better 一单、litwiki 两单在排队，第一周结束时它会再报回。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 01:00",
+      "text": "【子项目回报 · L29.4 结构优化与拓扑优化的工程采用】L29.4 共用算例改定为 NIST HR_DAD_RC 60 层 CAARC 基准（请转 L29.6c）\n更新 10-17 00:2x 的初选：入门闸门核查发现 NIST HR_DAD_RC_1.0 公开了与 CAARC 同形（45.72×30.48×182.88 m）的 60 层 RC 建筑完整基准：7800 根梁柱、层质量、模态、配筋（Yeo 2010 NIST TN1665，印刷 p.17、p.19），CRIACIV 同步测压积分的 36 个风向（每 10°）层力时程，以及迈阿密风气候（999 风暴×16 风向，TN1665 印刷 p.22）。主算例改为此基准，Deng 2019 只作文献对照；Chan 1992 60 层支撑钢框架仍建议作 L29.6c 中等规模算法副基准。下一步 ：数据解包、数据字典、前三阶频率复核（0.165/0.175/0.200 Hz）与作为共同模型的可行性，完成后再报。详情（只读）：。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 01:00",
+      "text": "L29.4 把和 6c 共用的主算例改成了 NIST 公开的 HR_DAD_RC 60 层钢筋混凝土基准，我已转给 6c。\n\n**为什么改**：原来选的 Deng 2019 模型，网格、质量、配筋和风荷载原始资料都没有公开，严格复现做不到。NIST 这套是与 CAARC 同外形的 60 层钢筋混凝土建筑，资料齐全：\n- **结构资料**：7800 根梁柱、层质量、模态和配筋。\n- **风荷载**：36 个风向的层力时程。\n- **风气候**：迈阿密的风气候数据。\n\n所以 Deng 2019 改作文献对照，不再作主算例。最后能否定稿，还要等 L29.4 把数据解开、复核前三阶频率之后。\n\n**怎么转给 6c 的**：6c 只能经 L29.6 转达，L29.6 正在处理它的开工。我做了两件事：\n- 改了 6c 项目页里「与 L29.4 共用算例」那一节。\n- 给 L29.6 留了言，让它给 6c 派活时以这一节为准。\n\n6c 自己的纯算法基准不变，还是标准桁架，加 Chan 1992 的 60 层支撑钢框架。\n\n**L29.4 的初步观察（还没检验、没送审，不算结论）**：它整理的 12 篇文献里，没有一篇是在系统可靠度相同的条件下，对照符合规范的常规设计报告节省量。能核到的节省数字，比的都是初始设计或上取整方案，例如 Deng 2019 的 −42.8%、Chan 1992 的约 2.75%。这正是开题时怀疑的方向，还要等算例做出来才能判断。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 04:31",
+      "text": "【告知 · 来自 核心构想】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n共用指标口径经审查 （3 份）裁决修订为 v1.1，唯一权威文本：（只读；裁决）。你方 T6a 页「与 L31.3 共用的比较指标口径」节目前锚定 v0，请改锚定 v1.1。主要变化：谱估计器统一（Welch Hann T/16 50% + 1/10 十倍频程分箱）、A5 用自然对数+公共评分频带、A6 用模相干线性空间拟合（目标相干≥0.3）、A4(a) 有偏 ACF 首零插值梯形积分 U∫ρdτ、B3 epochal+Lieblein BLUE+段长 T/10 的 78% 分位、可分辨判据改 2√(SE₁²+SE₂²)。审稿人核到你方 pilot_v3.py 与 v1.1 不符的两处：第 94–97 行 a4_zero=U·τ₀ 漏掉对 ρ(τ) 的积分（且用无偏 ACF）；第 87–90 行相干在对数空间过原点回归，受 Welch 底噪拉低 C；第 59 行 Gumbel 用 MLE 而非 BLUE。是否改由你方定。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 05:00",
+      "text": "【子项目回报 · L29.2 气候变化与设计风速】L29.2 气候变化与设计风速：已定论（可改造），第一周工作报告\n【结论】L29.2 已定论：verdict = 可改造（6 份有效意见裁决；文献结论另经 --count 3）。\n- 判据要求'经评估的地点设计风速证据显示变化>当前抽样不确定性，且 IPCC/WMO 置信度≥中等'。已核 11 篇文献无一做过这个比较；IPCC/WMO 只评驱动量（台风强度、强台风比例 high/very likely，频数减少或不变 medium，西太北移 medium），不评地点设计风速。→ 不满足'成立/部分成立'；但本线检验中香港单站有条件性超过信号，也不能断言'全部在不确定性内'→ 按判据处置定'可改造'。\n- 关键数字（本线数据）：全球中位驱动量套到单站只升 4.6–4.8%，为抽样半宽 0.22–0.62 倍；STORM 同口径（SSP5-8.5，2015–2050，四 GCM）香港 V50 +12.7～+17.6%，各单项改动下 2–4/4 GCM 超过 46 年抽样半宽（GPD 口径裕度很薄）；仙台、上海、那霸不稳健；迈阿密稳健不超过；700 年全部不稳健。温带风暴/雷暴：证据不足，现有定量线索偏小（雷暴 ≤5%，北美部分海岸非飓风 +5–15%，均为二手转述）。\n- 改造方案：保留驱动量方向与按区域设乘子的思路（AS/NZS Mc=1.05、NBCC minimax，本线未检验其数值）；全球强度不能直接推地点设计风速，主张上调须报告'变化/当前抽样不确定性'并检验对风场与尾部的稳健性；700 年结论须先处理尾部不确定性。\n- 给 Liang Hu 的一点：开题卡判据档位有重叠与空档；本次按字面未放宽。若 Liang Hu 认为判据 (ii) 本意是驱动量置信度，可改判'部分成立（仅香港单站条件性）'，证据不变。见 末节。\n【产物】项目页 （status 已定论）；定稿；证据分级表；本线计算 {sensitivity,sensitivity_v2,storm_check,storm_robust}/；决策 *（3 条）；文献卡 （14 张）。全部只在 工作站 小数据量计算，未上超算。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 05:00",
+      "text": "L29.2「气候变化与设计风速」已经定论，结论是「可改造」，我核过后接受。这是实验室内部结论，按规矩不对外。\n\n**结论**：要主张气候变化应当上调某地的设计风速，现在的证据还不够。\n- **文献**：已核的 11 篇里，没有一篇在具体地点比较过「设计风速的变化」和「现有估计本身的抽样不确定性」孰大孰小。IPCC 和 WMO 只评估台风强度、强台风比例这类驱动因素，不评估地点设计风速。\n- **本线计算**：五个台风站中只有香港出现超过抽样不确定性的信号，而且是有条件的：50 年风速升 12.7%–17.6%，四个气候模型中多数情况有 2–4 个超过，但换一种分布拟合后裕度就很薄。迈阿密稳健地不超过；仙台、上海、那霸结果不稳定；700 年重现期的结果全部不稳定。\n- **温带风暴和雷暴**：证据不足，现有定量线索都偏小，而且都是二手转述。\n\n**改造方向**：保留「按区域设气候变化乘子」的思路，比如澳新规范的 1.05。但不能拿全球强度的变化直接推出某地设计风速；要主张上调，须先报告「变化与抽样不确定性之比」，并检验尾部是否稳健。\n\n**审查**：结论经 6 位审稿人审过（审查），文献部分另经 3 位审过。我亲自看了裁决记录。原草稿写的是「部分成立」，审后改成「可改造」，理由写得清楚，我同意。\n\n**我做的决定**：L29.2 第二周只补核四处二手引用的原文，然后收口，即 Li 2023、Li 2025、加拿大 NBCC 2025、澳新规范 Mc 条款。它提的另一项「用第二套合成台风资料加强香港信号」这次不做，作为可选后续写进项目页。原因是这项工作成本高，而且不会把结论推到「成立」。如果核原文后发现会改变结论，它会停下来报我，不会自己改判。\n\n**要 Liang Hu 知道的一处判据问题**：判据是我开题时定的，档位有一个空档。这次的结果既够不上「成立」或「部分成立」，也不能说「全部在抽样不确定性内」。L29.2 按判据字面处理，没有放宽，归入「可改造」，这一点做得对。如果 Liang Hu 认为判据的本意是看驱动因素的置信度，结论可以改为「部分成立（仅香港单站、有条件）」，证据不变。这个由 Liang Hu 定，在他回复之前保持「可改造」。\n\n线况表已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 05:35",
+      "text": "【委托结果 · 正本清源】L29.3 开工：第一周基本工作（重发）\n- **钉固对应关系**：Gemini 和 Grok 都认为 FORTIFIED 更接近 HAZUS 的 8s 档，但 8s 只是下界：FORTIFIED 用环纹钉，高风速地区钉距 4 英寸，都比 8s 更强。\n- **含义**：即使用下界表示，模型预测的 FORTIFIED 降幅也已高于 Sally 的观测值，用更真实的表示差距只会更大。原因还分不清，是下一步环节检验的对象。这是描述性结果，待检验、未送审。\n- **第一周（10-23）**：用 --report 报回本周做了什么、产物路径、下周计划。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 05:35",
+      "text": "L29.3（Performance/Resilience 为何进不了最终设计）这条重发的开工委托已经交回，第一周在正常推进，不用我插手。\n\n它现在拿 FORTIFIED 加固住宅作例子，对照模型预测的减损效果和实际观测到的效果。\n- **钉固怎么对应**：Gemini 和 Grok 都认为，FORTIFIED 最接近 HAZUS 里的「8s」钉固档，但这只是下界，因为 FORTIFIED 用环纹钉、钉距更密，实际比 8s 更强。\n- **初步现象**：就算按偏弱的下界来建模，模型预测的损失降幅也已经高于飓风 Sally 中实际观测到的降幅；按更真实的强度建模，差距只会更大。\n- **意义**：这正好对上 3a/3b 要问的问题：性能化模型的绝对值靠不靠得住。\n- **还没定的**：差距出在哪一环，是易损性曲线、风场，还是观测数据本身，还没分清，这是下一步环节检验的对象。目前只是描述性观察，没检验，也没送审。\n\n另外，它原计划用公开损失数据做事件回算，但数据拿不到，已改为「减灾效果实证 + 已发表的验证研究」，这个决定有记录。\n\n线况表里 L29.3 这一行已更新。它会在 10-23 第一周结束时报回本周工作和下周计划。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 05:37",
+      "text": "【子项目回报 · L29.2 气候变化与设计风速】L29.2 收口：二手原文补核完成，verdict 不变，可以收口\n【改了什么】litwiki 交回四条原文卡，我抽核了 NBCC 2025 原文 PDF pp.664,674 与 Li 2025 Table 3 原文。按原文更正定稿与证据表措辞，verdict（可改造）不变：\n1) NBCC 2025：规范原文核实——按 2.5°C/RCP8.5、Minimax＋目标可靠度，对 1/10、1/50、1/500 **参考风压**乘 1.05 或 1.10（安大略、大西洋省份、BC 西经 120° 以西 1.10）。原转述'风速 +5–15%'改为'风压 1.05/1.10，折合风速约 +2.5%/+4.9%'。\n2) Li 2023 '北美部分海岸 +5–15%'：原文未取得，Wu 2026 的归属无法确认（同年另有 Li 风能论文、'15 RCM'属 Li 2022），已弃用。\n3) Li 2025 雷暴（同题 Springer 版，Wu 所引 Winnipeg 版未取得）：安大略五城混合设计风速比 0.96～1.08（AEP 1/50–1/100 最大约 +5%，1/500–1/1000 最大约 +8%），单次 RCP6.0 模拟，无抽样 CI；原'≤5%'改为限定 AEP。\n4) AS/NZS 1170.2 Mc：标准原文 Table 3.3 仍不可得（ANSI 预览 403），Mc 存在性由 Standards Australia 官方新闻确认，1.05 标为 Holmes 2023 二级来源。\n不影响 verdict 的理由：这些只涉及规范实践与温带/雷暴定量线索，更正后数值偏小且都未与抽样 CI 比较，判据两档仍不满足。\n【产物】定稿 （10-18 更正）；证据表补注；决策；新卡 下 NR_nbcc_2025_climate_wind_pressures.md、NR_li_2025_nbcc_cost_v2.md、NR_li_2025_thunderstorm_winds.md、NR_li_2023_nonstationary_reliability.md、NR_asnzs1170_2_2021_mc_source_boundary.md。\n【状态】项目页 status 保持'已定论'，verdict 可改造；'强化香港信号'已作为可选后续写进项目页'未决与下一步'。**可以收口。** 本实验室不公开。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 05:37",
+      "text": "L29.2「气候变化与设计风速」已收口，结论仍是「可改造」，补核原文后没有变化。\n\n**补核改了什么**：之前转述的几条二手引用，L29.2 已对照原文改正，都只改措辞，不动结论：\n- **加拿大规范 NBCC 2025**：原文是对参考风压乘 1.05 或 1.10，不是之前转述的「风速 +5–15%」。折合风速约 +2.5% 和 +4.9%，我验算过，没问题。\n- **Li 2023**：原文没拿到，转述的出处也对不上，这条已弃用。\n- **Li 2025 雷暴**：设计风速比为 0.96–1.08，原来的「≤5%」改为按年超越概率分档写。这个结果只来自一次模拟，没有抽样置信区间。\n- **澳新规范的气候变化乘子 1.05**：标准原文仍拿不到，只能确认这个乘子存在，1.05 这个数标为二级来源。\n\n**为什么结论不变**：这些改动只涉及规范实践和温带风暴、雷暴的定量线索。改正后数值都偏小，而且都没有和抽样不确定性比较过，所以够不上「成立」或「部分成立」。\n\n**已更新**：线况表里 L29.2 标为「结题」，项目页保持「已定论」，决策记录补了一条。\n\n**可选后续**：用第二套合成台风资料检验香港的信号，这次不做，已写进项目页的「未决与下一步」，要不要做由 Liang Hu 定。\n\n**之前提过的判据问题仍在**：判据档位有一个空档。Liang Hu 如果认为判据本意是看驱动因素的置信度，结论可改为「部分成立（仅香港单站、有条件）」，证据不用补。Liang Hu 回复前保持「可改造」。\n\n\n\n（附件：L29.2_结论定稿_20261017.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 05:37",
+      "text": "【委托结果 · 正本清源】L29.2 第二周：补核二手原文后收口\n- **改了什么**：按原文更正了定稿和证据表的措辞。\n - NBCC 2025 改为\"参考风压乘 1.05/1.10，折合风速约 +2.5%/+4.9%\"（规范原文已核）。\n - Li 2023 的\"+5–15%\"因出处无法确认，已删去。\n - Li 2025 雷暴改为\"混合设计风速比 0.96～1.08，按重现期分别标明\"。\n - AS/NZS 1170.2 的 Mc = 1.05 标为二级来源，标准原文仍拿不到。\n- **结论不变**：仍为\"可改造\"，项目页状态保持\"已定论\"；\"强化香港信号\"已作为可选后续写进项目页的「未决与下一步」。\n- **产物**：\n - 定稿：（10-18 更正）\n - 证据表补注：\n - 决策记录：\n - 新文献卡 5 张，在 \n- **可以收口**：已用 `--report` 报回根。10-19 那次兜底回访到时只需确认收口，没有别的待办。\n\n（附件：L29.2_结论定稿_20261017.md）\n\n（附件：L29.2_收口原文补核_20261018.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 05:37",
+      "text": "这条是我 10-18 派给 L29.2 的收口委托交回的结果，内容和它之前的收口报告一样，我已经处理过了，这次不用再改什么。\n\nL29.2 已结题，结论是「可改造」，项目页状态是「已定论」。线况表和决策记录在上一轮都已更新。\n\n它自己约了 10-19 的兜底回访，那次只是确认收口，没有别的待办。\n\n判据档位的空档问题仍然留给 Liang Hu 定。Liang Hu 回复前，结论保持「可改造」。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 05:53",
+      "text": "【子项目回报 · L29.1 抗风设计中的结构非线性】L29.1 第一周计划已完成：三条证据线有中间结果，舒适度校准为下周关键\n第一周计划（10-17 至 10-23）三项已于 10-17 完成，小结：；项目页 已更新。全部为中间证据，未下课题结论，判据未改，不公开，未上超算。\n做了什么：(1) 文献：litwiki 三批共约 23 篇带页码，表 与；Grok+Deep Research 两步已对照核对。(2) 量纲论证扩展为七轮，最终在 TPU 实测谱、按对方实际规则（Jeong 2021 只折减共振分量）下：R_W=1.5 顺风每小时约 7–9 次塑性事件、μ≈1.7–1.9；R_W=2 横风 77–100 次/h；累计塑性随风暴时长 1→6 h 不饱和；初步提示连梁风载试验（约 12 次轻微非弹性）只覆盖 R_W≈1.5 级需求。(3) 反例算例设计书完成（design/），并加了 A 段节材上界筛查：LK 37 层钢框架校准通过；芝加哥双重体系杆系模型 150 m 舒适度为紧约束、强度 D/C 0.62、风强度可释放材料 0（条件性），250 m 强度 D/C 0.27。\n下一周：① 用 TPU 实测谱校准舒适度加速度（L29.1-21 已派，A 段最关键未知）；② 对方最有利体系（RC 核心筒+连梁、低高宽比对角网格）各做 A 段算例；③ 桥梁部分开工；④ 若全部代表体系节材上界 <2% 且校准后不变，准备 B 段。\nLead 自查的三处弯路（均已改正、旧数作废）见小结第三节。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 05:53",
+      "text": "L29.1「抗风设计中的结构非线性」第一周计划已全部完成。现在只有中间证据，还没有下课题结论，判据没改，也没用超算。\n\n**目前的中间证据**：\n- **算例**：选的是对方观点比较有利的芝加哥高层钢结构双重体系。150 m 时，起控制作用的是舒适度（风振加速度），强度只用到能力的 62%；即使允许结构在风下进入非弹性，能省下的材料上界是 0。这个结论还有条件，要等加速度校准。250 m 时强度只用到 27%，更省不下。\n- **量纲论证**：风暴持续 1 到 6 小时，累计塑性变形一直在增加，不会饱和。连梁风载试验只模拟了约 12 次轻微非弹性，大约只够覆盖最温和的一档放开幅度。这正对着开题时的怀疑：风荷载持续时间长，非弹性变形会一直累积。\n- **文献**：约 23 篇已建卡，带页码；Grok 快查和 Deep Research 两步已互相对照核过。\n\n它自己查出三处弯路，已经改正，相关旧数字作废。\n\n**下周**：\n1. 用 TPU 风洞实测谱校准舒适度加速度。这是最关键的未知，「省不下材料」这个结论要等这一步才能落地。\n2. 对对方最有利的体系各做一个算例：钢筋混凝土核心筒加连梁，以及高宽比较低的对角网格结构。\n3. 桥梁部分开工。\n\n如果所有代表体系能省的材料上界都低于 2%，而且校准后结论不变，就按规定送 6 位审稿人，审完才能定论；否则进入下一阶段。\n\n我看过计划，方向对，也照顾到了公平，没有需要插手的地方。线况表里 L29.1 这一行已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 09:00",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n10-17 05:13–06:27 那几单 bot 1–14 秒就回「Something went wrong」，是 Hermes 网关跑久了内部链条过长、爆栈造成的，和你们的任务内容无关。07:09 网关重启已经清零，之后没再出现。根治的修复等下一次网关空闲重启生效。涉及的单号：、。已经重发并完成的不用管；还没重发的可以现在重发。如果网关重启前又碰到秒回失败，直接重发一次，再告诉我。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 10:09",
+      "text": "【委托结果 · 正本清源】L29.6 开工并转达 6a–6d 开工（平台修复后重发）\n**1. L29.6 第一批派出的委托（10-17）**\n\n| 发往 | 内容 |\n| --- | --- |\n| L29.6a | 6a 开工：按第一周计划推进，边界照「共同边界」；比较指标用 L31.3 指标口径 v0；CFD 入流部分只读引用，不跑入流 CFD |\n| L29.6b | 6b 开工：按第一周计划推进，边界照「共同边界」 |\n| L29.6c | 6c 开工：基准用 10/25/72 杆桁架加 Chan 1992 的 1080 杆框架；风控高层主算例等 L29.4 闸门定稿，不自己选 |\n| L29.6d | 6d 开工：PINO 与其他方法用同一判据，不预设结论 |\n\n四单都写明了：\n- Liang Hu 10-16 的批复原话，状态\"在做\"\n- 按第一周计划里本编号那一行推进\n- 写入范围只限自己的项目页和 \n- 可以自己派 bot、用 \n- 10-23 用 --report 报回 L29.6。\n\n另外发了几条 note（note 不生成委托）：\n- 模板 v0 已发给四个子项目。6b、6c、6d 回报说没看到，已各补发一次。\n- 已告知 我方怎样与 L31.3 指标口径、L31.6 评判清单对表。\n\n**2. 四个子项目的开工委托编号与第一轮回报**\n\n| 子项目 | 开工委托 | 第一轮回报 |\n| --- | --- | --- |\n| L29.6a 风速时程随机模拟 | | 派出 Grok 快查、litwiki 补卡，以及 better 做谱系图和数据摸底 |\n| L29.6b 台风路径与强度模型 | | TCRM 轨迹接入 CLIMADA，往返误差为零；四种风场能在同一批轨迹上跑。1 万年试算第一次在第 128 年静默失败，补丁后正在 Colab 重跑 |\n| L29.6c 结构优化算法 | | 10/25/72 杆桁架四个基准的最轻解与文献逐截面对上；Chan 型 60 层框架正在重建 |\n| L29.6d 动力与CFD代理模型 | | 两批补卡收齐，第二批；谱系表初稿、基准设计初稿已写好；还缺 CNN/U-Net、GNN、多任务多保真三类卡片 |\n\n**3. L29.6 自己的第一周产物**\n- **统一基准规范模板 v0**：。内容有三块：\n - 12 栏基准设计表（B0–B11）\n - 共用判据的执行细则\n - 与 L31.6 评判清单第 6–10 条的逐条对照。6a 一支的指标以 L31.3 指标口径 v0 为准。\n- **候选小课题**：补了 4 个，都没开题。\n- **决策记录**：。\n- **项目页**：T6 页已更新。\n\n**4. 下一步**\n- 四个子项目 10-23 报回第一周情况，收齐后我把模板升到 v1。v1 要加一条：每次试算都核对实际跑完的年数或步数，因为 6b 那次失败程序没有报错。\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 10:09",
+      "text": "L29.6 和下面的四个子项目（6a–6d）都已开工，平台修好后重发的那条委托顺利完成了。\n\n**四个子项目的开工委托和第一轮进展**：\n- **6a 风速时程随机模拟**：已派出 Grok 文献快查、litwiki 补文献卡片，并让 better 做方法谱系图和数据摸底。比较指标按之前和核心实验室对好的口径。\n- **6b 台风路径与强度模型**：TCRM 生成的台风轨迹已接进 CLIMADA，四种风场模型能在同一批轨迹上跑。1 万年试算第一次跑到第 128 年就停了，程序没有报错。打了补丁后，现在在 Colab 上重跑。\n- **6c 结构优化算法**：10/25/72 杆桁架四个基准的最轻解，逐截面都和文献对上了；Chan 1992 那种 60 层框架正在重建。\n- **6d 动力与 CFD 代理模型**：方法谱系表和基准设计的初稿已写好，还缺三类文献卡片（CNN/U-Net、GNN、多任务多保真）。\n\n**L29.6 自己交了三样东西**：\n- **统一基准规范模板 v0**：给 6a–6d 共用，和核心实验室评判清单的批判侧条目逐条对照过。\n- **候选小课题**：补了 4 个，都还没开题。\n- **决策记录**：一条。\n\n6b 那次程序没报错就停了，L29.6 据此准备在模板 v1 里加一条：每次试算都要核对实际跑完了多少年或多少步。我同意。\n\n我核过委托的交付清单，自动初查也通过了，结果接受。线况表里 L29.6 的委托记录和 T6 那一行已更新。四个子项目 10-23 先报给 L29.6，L29.6 汇总、把模板升到 v1 之后再报给我。\n\n10-18 12:04 我约了一次回访，逐个核对 10 个课题第一周的进展。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 10:45",
+      "text": "【委托结果 · 正本清源】L29.4 开工：第一周基本工作（重发）\n- **better L29.4-27 已接受**：B 的两个搜索作业（TACC 3608240、3608241，每个 12 小时，共约 48 SU）已提交并登记监控，排队中。\n- **在跑**：\n - TACC：两版常规设计 A 和两个 B 搜索，共 4 个作业排队中\n - better L29.4-28：检验 Ansys 交叉核对偏差是不是剪切变形造成的。\n- **待办**：紧凑 A 出结果后补进 B 搜索；B 的连续松弛下界另立小单。\n- **兜底回访**：10-20 02:46。第一周结束时（10-23）用 --report 报根。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 10:45",
+      "text": "L29.4「结构优化与拓扑优化的工程采用」第一周在正常推进，暂时不需要我插手。\n\n**现在到哪一步**：常规设计 A（开裂刚度版）第一版已按三个方案共用的验算标准合格。TACC 上有 4 个作业在排队：\n- 常规设计 A 的两个版本，一个是 L1 刚度版，一个是紧凑版\n- 确定性优化 B 的两种搜索：局部搜索和遗传算法，各 12 小时。\n\n4 个作业合计约 72 SU，每个都走了资源申请，也登记了作业监控，跑完会自动叫醒 L29.4。单个作业远低于 200 SU，不用送审。\n\n**还在查的一处偏差**：用 Ansys 独立核对时，我们自己的程序算出的前 6 阶频率比 Ansys 系统性高 1.3%–1.5%，没过 1% 的门槛。怀疑是我们的梁单元没计剪切变形，正在验证。\n\n**后续步骤**：紧凑 A 算完后，把它加进 B 的搜索起点；B 的理论下界另开一个小单来算；然后进入可靠度约束优化 C 和可靠度评价。第一周结束时（10-23），L29.4 会把进展报给我。\n\n线况表里 L29.4 这一行已更新。\n\n另外 L29.5 在 CRC 上的 27 个作业，10-17 10:09 启动时全部失败了，原因是脚本找不到 `module` 命令。L29.5 已经修好脚本，先提交了一个单场景短测作业，短测通过后再提交 27 个正式作业。这件事它自己在处理，我会在 10-18 的回访里核对。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 11:02",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n平台 Lead 转来近两天采集中与你线相关的材料（仅告知，按需取用；若要精读，按处置规则报 E2，出口由 Liang Hu 批）：① PRO-DYN（ICML 2026，动力学视角解释线性模型胜 Transformer）——正好是 L29.6d『代理模型泛滥』的典型案例；② arXiv 2610.14355 AI Meets Turbulence Modeling（采集时因超窗筛掉）——L29.6d 参考；③ CFD 与风洞谁更可信、气动结果如何验证——L29.3b 验证；④ WE-UQ v4.4.0——L29.5 UQ 工具现状。路径："
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 11:13",
+      "text": "【告知 · 来自 CFD】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nL29.5：WE-UQ 随机荷载与 UQ 例：E1/E2 Wittig–Sinha 随机风抽样、E3 敏感性、E4 风洞数据驱动随机风力（高斯）、E8 随机风压（非高斯，Duarte 2023）、weuq-0018 GP 代理。见 与 R16.5-W04。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 14:10",
+      "text": "【告知 · 来自 核心构想】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nL31.3-01 v1.1 B0 的 Cp 主分母勘误：由\"0.5ρŪ_e²（平均速度平方）\"改为\"空场建筑处瞬时动压的时间平均 mean(½ρ|u|²)，跟随风洞定义\"。只影响 B 段风压，不影响 6a 的风速指标。文件同路径已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 14:43",
+      "text": "【委托结果 · 正本清源】L29.1 开工：第一周基本工作（重发）\n- **L29.1-32 接受**：\n - 减配设计实际节材 2.90%（含原设计余量；扣除后新增 2.54%）。\n - 700 年风、单种子、1 小时：减配设计峰值位移大约 20%，出现塑性的梁柱 177 根，弹性设计 112 根，两者都未失稳。\n - 推覆核对只补了 E，I 的推覆在 B 段全矩阵时补上。\n- **在途**：CRC 六档敏感性（预计 10-18 01:50），回来后定 B 段全矩阵范围。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 14:43",
+      "text": "L29.1 的第一个非线性算例出来了。结果只算一个初步信号，不能当结论。\n\n**算例结果**：允许结构进入非弹性后，减配设计比原设计省材料 2.90%。原设计本来就有余量，扣掉这部分，真正因放开强度而省下的是 2.54%。\n\n**和判据对照**：开题时定的判据是，省 ≥5% 算对方成立，<2% 算不成立。2.54% 正好落在两者之间，要看在哪些结构上成立、边界在哪里。\n\n**代价**：在 700 年重现期的风下，减配设计的峰值位移大约多 20%；出现塑性的梁柱有 177 根，弹性设计是 112 根。两种设计都没有失稳。\n\n**为什么还不能下结论**：\n- 这次只算了一个随机种子、一小时风程。\n- 开题时担心的「风暴越长、塑性越累积」，要等更长风程、更多种子才能看清。\n- 推覆核对只做了一部分，另一部分要等全矩阵计算时补上。\n\n**下一步**：CRC 上六档敏感性计算在跑，预计 10-18 01:50 出结果。L29.1 据此定全矩阵算哪些组合，结果超出边界的部分，届时按规矩送审。\n\n线况表里 L29.1 这一行已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 20:07",
+      "text": "【平台·】Liang Hu 10-17 批复：结题一律由他主动下令、逐项批准，Lead 不能自己标「结题」（规则已写进 Lead 公共规则「编号」一节）。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 20:07",
+      "text": "线况表子项目表里 L29.2「气候变化与设计风速」那一行已改好，只动了状态这一格，其他文件都没动。\n\n**改成**：暂停 · 建议结题（待 Liang Hu）：T2 已定论「可改造」，二手原文已补核，无待办\n\n我选「暂停」而不是「在做」，是因为 L29.2 已定论、原文也补核完了，手上没有在跑的工作。可选的后续「强化香港信号」要不要做，仍留给 Liang Hu 定。\n\n以后哪个子项目我认为可以结题，也照这个格式写，不自己标「结题」。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-17 21:45",
+      "text": "【委托结果 · 正本清源】回访回报：L29.1 抗风设计中的结构非线性\n钢伸臂体系的多起点计算预计明天下午完成，不需要拆开并行。已出的几条路径按对方规则节材都不到 1%，但这只是早期个别路径，要等全部结果出来再判断对方的最优值。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-17 21:45",
+      "text": "L29.1 这次回访只报进度，我这边不需要做什么。\n\n- **在算什么**：钢伸臂体系的多起点计算，预计明天下午算完。L29.1 判断不用拆开并行。\n- **早期结果**：已经出来的几条路径，按对方的规则算，省下的材料都不到 1%。\n- **为什么还不能下结论**：这只是少数路径。对方的最优值是多少，要等全部路径算完再看，现在不下结论。\n\n结果出来后，L29.1 会报给我。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-18 08:04",
+      "text": "【告知 · 来自 知识库智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n | SciΠvot: Benchmarking Principal-Investigator Judgment at Pivotal Moments of Scientific AutoResearch Agents | 建议入口 E2 | L29 ：需要原始论文/数据或源码核实，暂不把来源说法当结论 | 来源笔记 \nE2=精读待定：请精读并提出结论与建议出口 X1–X5 + 理由，交回平台 Lead「开新项目与子项目」，可用 Liang Hu 审批，X3/X4/X5 等批后再落地；若不同意入口可注明。正式论文先查重并走 Zotero Literature Agent，知识代理未写 Zotero。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-18 09:41",
+      "text": "【子项目回报 · L29.5 UQ 到底能完成什么】L29.5 第一周报告：UQ 三任务对比与真值试验已出，判词未下\n第一周（10-17 至 10-18，提前完成）。完整小结：；项目页。\n做了什么：①落地任务清单 6 项＋三组数据摸底（、02）；②(a) 风速极值：Iowa 四站实测小试＋27 场景已知真值蒙特卡洛（CRC 单核 27 作业，修复版贝叶斯 8088/8100 重复过诊断闸门；正式核心表在 05_a组真值MC/正式结果_v1/）；③(b) 风洞峰值：NIST m11 两个风向，Gumbel/BLUE/高斯峰值因子/Hermite，含留出验证；④(c) 风致结构可靠度：合成模型，FORM、重要抽样、子集模拟、SORM，含对 FORM 不利的串联情形；⑤文献：15 张新卡（索引），并更正了 Grok/Deep Research 报告里的数字（如实验室间离散、15 个峰值、Nottingham 表值）。\n读数（仅证据，未下判词）：真值 MC 里五站场景层次贝叶斯与朴素区域合并点估计精度相当（中位 RMSE 6.5%/12.3%/14.9% 对 7.2%/11.4%/13.1%，50/700/1700 年），但两法点估计在多数同一抽样里差 >5%；层次贝叶斯的价值在区间校准（覆盖 0.86–0.89 对朴素合并 0.57–0.71，后者 bootstrap 未传播标准化不确定性，属我们简化）。风洞峰值：高斯峰值因子低估 18%–47%，Gumbel/BLUE 记录 ≥2 段时稳健，Hermite 随上穿率取法变化 23%–46%。可靠度：多失效模式下 FORM 偏高 16%–20%，先进法无通用赢家。Lead 预判结论接近“部分成立”（先进方法在区间校准、尾部外推、多模式可靠度上有用，多数日常任务基本法＋更好输入够用），remedy 为“最小可用 UQ 流程”；预判尚需送审。\nDecision I made：①真值 MC 改在 CRC 单核并行跑（工作站 预算 122 h 超界）；②(c) 组由 CFD 入流改为风致结构可靠度（CFD 入流无成对样本，且归 L31.3）；③决策错误率改双向口径；④旧贝叶斯发散判定为我方实现缺陷，不计入先进方法可用性代价；以上见 *。\n踩过的坑：CRC 首批 27 作业因 module 命令不可用全部启动即失败（零结果、仅排队损失），已修并加短测闸门；better 有 3 次网关中断（、 等），已报平台 Lead。\n第二周计划：①证据表（任务×基本×先进×差异×是否改变决策，四栏分列）＋最小可用 UQ 流程一页；②补两项小规模真值试验——朴素合并改为传播标准化不确定性的 bootstrap、真值形状加大到 |ξ|=0.2–0.3 检验先验有利的担心（CRC 单核，先资源申请）；③证据包完成后 status/verdict。\n请根对话出面与 L31.6 对一件事：评判清单第 4 条口径，其“超过既有不确定带”与 L29.5 开题卡判据“设计值分位差 ≥5% 或排序改变”不同，我方判据不改，但真值 MC 现已提供“既有不确定带”（重复间 RMSE）的实测量级，可供对表。"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-18 09:41",
+      "text": "L29.5（UQ）第一周报告我读完了，工作进度没问题，不用我插手。它要求根对话出面的评判清单第 4 条对表，我已经发给 L31.6。\n\n**第 4 条口径差**：核心实验室的清单要求「变化超过既有不确定带」，而 L29.5 的判据（检验前已写定，不改）是「设计值分位差 ≥5% 或排序改变」。L29.5 的真值试验正好给出了不确定带的实测量级，可以拿来对：\n- 重现期 50 年、700 年、1700 年的重复间误差，层次贝叶斯是 6.5%、12.3%、14.9%，朴素区域合并是 7.2%、11.4%、13.1%。\n- 所以 5% 的差在 50 年值上落在不确定带之内，在 700 年以上则远小于带宽。同一个差值可能一边算过、一边不算。\n\n我提议 L29.5 报告时两个口径并列，各自给「过 / 不过 / 未评」。清单不用改，只建议第 4 条加一句：不确定带随重现期变宽，要按重现期分别写带宽。\n\n**第一周读数**（只是证据，没下判词）：\n- 层次贝叶斯和朴素区域合并，点估计精度差不多，但两种方法在同一批抽样里常常相差 5% 以上。层次贝叶斯的价值在区间：覆盖率 0.86–0.89，朴素合并只有 0.57–0.71。\n- 风洞峰值：高斯峰值因子低估 18%–47%；Gumbel 或 BLUE 在记录 ≥2 段时稳健。\n- 可靠度：多失效模式下，一阶可靠度法（FORM）偏高 16%–20%。\n\n**L29.5 对朴素合并的对比有个要注意的地方**：区间覆盖率 0.57–0.71 来自一个简化，即朴素合并的 bootstrap 没有传播标准化带来的不确定性。这是我们自己的简化，L29.5 第二周的补充试验就是要修这一点，并检验加大真值形状参数后先验是否有利。覆盖率差距在这两项做完之前，不能当结论用。\n\n**对它预判的看法**：L29.5 预判结论接近「部分成立」，remedy 是最小可用 UQ 流程。这条要送 6 位审稿人审，审完才能定。第二周它整理好证据包就送审，我同意这个安排。\n\n线况表里 L29.5 这一行已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-18 09:41",
+      "text": "【委托结果 · 核心构想】评判清单第 4 条口径对表（L29.5 真值试验给出了不确定带实测量级）\n- 同意 L29.5 报告时两种口径并列：5% 判据不动，评判清单第 4 条照旧，各自给出\"过 / 不过 / 未评\"。\n- 第 4 条已加一句：重现期越长不确定带越宽，需按重现期分别写带宽。清单升到 v1.2，路径。\n- 带宽大到任何方法都超不过时，第 4 条记\"未评\"，不记\"不过\"，也不算\"无用\"。你们要引用清单时，请引 v1.2。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-18 09:41",
+      "text": "第 4 条口径对表在 L31.6 那边定了，评判清单现在是 v1.2，我已把结论告知 L29.5。\n\n- **并列报告**：L29.5 的 5% 判据不动，清单第 4 条照旧，两个口径各自给「过 / 不过 / 未评」。\n- **清单新增一句**：重现期越长，不确定带越宽，要按重现期分别写带宽。\n- **带宽太宽的处理**：带宽宽到任何方法都超不过时，第 4 条记「未评」，不记「不过」，也不算「无用」。\n\nL29.5 第二周写证据表和送审的证据包时，直接用真值试验里各重现期的重复间误差作为带宽。以后引用清单，要引 v1.2。\n\nL29.5 的项目页里这一条已经更新成 v1.2。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-18 12:04",
+      "text": "【定时回访】核对：L29.6修好了没有。修好了就重发 L29.6 开工委托（让它转达 6a–6d）；没修好，就确认 6a–6d 已按约定改挂到 L29 总控，再直接给它们派开工。同时逐条看 L29.1–L29.5 第一周进展。\n（这是你在 2026-10-17 00:04 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-18 12:04",
+      "text": "**回访结果（10-18 12:05）**\n\n- ** 已修好**（10-17 00:13）。L29.6 已正常开工，并把任务转给了 6a–6d。我不用重发开工，也不用把 6a–6d 改挂回总控。\n- **L29.1 到 L29.5 第一周都在正常推进，没有卡住的：**\n - **L29.1：** 等 CRC 敏感性算完，再做 B 阶段矩阵。\n - **L29.2：** 已定论「可改造」，线况标的是「暂停 · 建议结题（待 Liang Hu）」。判据分档那一处缺口还等你回复，你回复前结论不变。\n - **L29.3：** 在做 FORTIFIED 阶段测试。\n - **L29.4：** 临时结论是「部分成立（对常规设计余量敏感）」，审查 的结果还没回来。裁决前我不会把这个结论当定论告诉你。\n - **L29.5：** 第一周小结已交。第二周做证据表、最小 UQ 流程和两个补充的真值测试，之后送 6 份。\n- **L29.6a–6d：** 6a、6b、6c 在 10-17 到 10-18 都有进展记录。6d 最后一条记录在 10-17 02:59，之后没有新进展，我会在 10-23 第一周汇报时一并看它。\n\n**待办：** 10-23 收齐第一周汇报，更新线况，并推进 6a–6d 的统一基准模板 v1。\n- 本轮没有新增需要你定的事。\n- 我没有再约兜底回访，等 10-23 汇报或审查结果来叫醒我。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-18 12:15",
+      "text": "【告知 · 来自 CFD】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知（R16.5c CFD 学习库，供 L29.5 参考）：WE-UQ 的 UQ 用法已写成卡 （Dakota LHS 正向、敏感性、GP 可靠度；E10 用 wsF² 缩放荷载只算一次 CFD）；E10 围护结构峰值方法见同目录 W05。只读引用，不需回复。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-18 15:14",
+      "text": "【委托结果 · 正本清源】回访回报：L29.1 抗风设计中的结构非线性\nL29.1-63 的回访已办完，不再预约。B 段现在等 L29.1-69 的结果。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "正本清源",
+      "ts": "2026-10-18 15:14",
+      "text": "L29.1 的回访已办完，不用再约。B 段现在等 L29.1-69 的结果，我这边暂时没有要推的动作。\n\n我不改线况里 L29.1 的状态，仍是「在做」。L29.1-69 回来后，我按计划看 B 段矩阵：如果所有上界都小于 2%，且校准后不变，就准备送 `\n\n下一次叫醒我的是 L29.1-69 的结果、审查 的结果，或 10-23 的第一周汇报。"
+    }
+  ],
+  "files": {
+    "self": "05a74edc.json",
+    "claims": null,
+    "pdf": null
+  }
+}

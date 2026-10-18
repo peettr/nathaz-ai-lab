@@ -1,0 +1,16 @@
+# NatHaz AI Lab — 第一实验室 / First Lab
+
+Experimental research projects and short trials. Content is AI-generated and not peer reviewed; a done state is an archive/transition marker, not formal research closure. Read claims with scope and evidence; do not present exploratory results as validated science.
+
+## Data organization
+
+- [Agent schema](agent/README.md): field definitions and relative-link rules.
+- [Project index](agent/index.json): all projects, hierarchy, bilingual title/status/conclusion, and entries.
+- [Project records](agent/projects/): bilingual tasks and reports; decisions, review rulings, results, figures, code, and role/who/ts/text timeline.
+- [Trial claims](agent/projects/latticeurbanwind-guangzhou.claims.json): L22.1 only; AI extraction; evidence excerpts checked by Lead 10-17.
+- [Human PDF reports](pdf/): zh/en reports for done projects only.
+- [Chinese source snapshot](data.json) and [English source snapshot](data_en.json): already-redacted source records.
+
+## Status classes
+
+run = in progress; todo = awaiting work; pause = suspended; pend = awaiting transition/undetermined; done = a source project marked done (including promoted, abandoned, or judged useful). The original bilingual status and done flag remain in each record. PDF publication does not mean peer review or formal completion.

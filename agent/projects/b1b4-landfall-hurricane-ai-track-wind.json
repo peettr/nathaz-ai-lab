@@ -1,0 +1,603 @@
+{
+  "id": "aedd5f57",
+  "slug": "b1b4-landfall-hurricane-ai-track-wind",
+  "number": "R23.3a",
+  "title": {
+    "zh": "R23.3a 登陆飓风：AI 路径与集合到站点峰值风",
+    "en": "R23.3a Landfalling hurricanes: AI tracks and ensembles to site peak winds"
+  },
+  "group": "wx",
+  "parent": "03475f82",
+  "depth": 2,
+  "status": {
+    "zh": "搁置",
+    "en": "Shelved"
+  },
+  "status_class": "pause",
+  "done": true,
+  "start": "2026-10-14 14:37",
+  "end": "2026-10-16 00:57",
+  "updated": "2026-10-16 00:57",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "# 任务书：H2 登陆飓风站点留一重建（2026-10-14）；按既定授权做，中途不必求批。\n\n## 目标\n良态风阶段（r1/r2）结论：密站网插值够用，站稀处 ERA5+残差克里金好约 13%。H2 问：登陆飓风时（背景场最差、站点断报多），\"参数化台风风场 + 残差克里金\"能不能比纯插值和 ERA5 背景明显更准地重建站点风，尤其是每站的事件峰值？这是实验室 I 节点（损失–风速库）要用的场景。\n\n## 事件与数据（只读复用 B 节点资源，不改 B 的文件；需要的脚本复制到本目录再改）\n- 事件（10-14 按上级指示修订）：B 节点 中 v1 同一批 10 个（Delta、Zeta、Ida、Nicholas、Ian、Nicole、Idalia、Debby、Helene、Milton）+ BERYL 2024 附加单列；有效站 <8 的事件只列不判。\n- 参数化风场：复用 B 节点 （CLIMADA 6.1.0 Holland 2008 + 方向海陆粗糙度 + 时距换算；预注册 、勘误），不在本试验里调它的系数。\n- 观测：登陆前后各 12 h、路径 300 km 内全部 ASOS/AWOS 的 METAR 小时持续风与阵风（IEM，写法同 r1 的）；ERA5 10 m 风（ARCO-ERA5，同 r1）。\n- 断报：峰值窗口内缺测的站单独列出、不进主评分（B 节点发现约一半站在飓风中断报），报告数量。\n\n## 方法\nIDW、普通克里金、ERA5 直插、ERA5+残差克里金、Holland 直插、Holland+残差克里金；可加\"Holland 与 ERA5 加权\"一种，但权重事先固定，不按结果调。学习方法不做（r2 中不如残差克里金）。逐站留一。\n\n## 指标与判据（事先写定）\n- 主指标：每站事件峰值（窗口内最大小时持续风）的 RMSE 与偏差；副指标：逐小时 RMSE、阵风峰值误差（阵风只与阵风比）。\n- 判据：最好的\"背景+残差\"方法比最好纯插值的峰值 RMSE 低 ≥20% 且 ≥2/3 站更好 → 飓风场景值得做融合；10–20% 或只满足其一 → 有条件；<10% → 插值够用。每个事件单独报，再报合计。\n- 加报：按到风暴中心距离分组（<1×、1–3×、>3× RMW）的峰值误差。\n\n## 边界\n工作站 本地 CPU，0 CU；只在 写；时间一律 UTC；平均风与阵风不混；假设参数写进参数来源表，不得写成文献值；新外部数据写 PUBLIC_CITATIONS.md。\n\n## 交付\n（逐事件与合计方法对比表、判据结论一句、断报站清单、按距离分组、参数来源表）、一张峰值预测 vs 实测散点图（标数据来源）、脚本。回报只写结论和数字。",
+    "en": "# Task Brief: H2 Leave-One-Station-Out Reconstruction for Landfalling Hurricanes (2026-10-14); Execute under Established Authorization without Seeking Mid-Course Approval.\n\n## Objective\nConclusion from the benign-wind phase (r1/r2): pure interpolation suffices for dense station networks, while ERA5 + residual kriging is ~13% better where stations are sparse. H2 asks: during landfalling hurricanes (when background fields are poorest and station dropouts are frequent), can \"parametric typhoon wind field + residual kriging\" reconstruct station winds—especially each station's event peak—substantially more accurately than pure interpolation and ERA5 backgrounds? This is the scenario needed by Node I (loss–wind speed library) of the Lab.\n\n## Events and Data (Read-only reuse of Node B resources without modifying Node B files; copy needed scripts to this directory before editing)\n- Events (revised on 10-14 per parent instructions): the same v1 batch of 10 events from Node B  (Delta, Zeta, Ida, Nicholas, Ian, Nicole, Idalia, Debby, Helene, Milton) + BERYL 2024 listed separately as an addition; events with <8 valid stations are listed only and excluded from criteria evaluation.\n- Parametric wind field: reuse Node B  (CLIMADA 6.1.0 Holland 2008 + directional sea/land roughness + averaging-time conversion; pre-registration , errata), without tuning its coefficients in this experiment.\n- Observations: METAR hourly sustained winds and gusts from all ASOS/AWOS stations within ±12 h of landfall and within 300 km of the track (IEM, same retrieval convention as r1 ); ERA5 10 m wind (ARCO-ERA5, same as r1).\n- Dropouts: stations with missing observations within the peak window are listed separately and excluded from the primary score (Node B found that roughly half of stations drop out during hurricanes), with their counts reported.\n\n## Methods\nIDW, ordinary kriging, direct ERA5 interpolation, ERA5 + residual kriging, direct Holland interpolation, and Holland + residual kriging; one \"weighted Holland and ERA5\" variant may be added, provided the weights are fixed in advance and not tuned to the results. Machine learning methods are excluded (inferior to residual kriging in r2). Leave-one-station-out cross-validation.\n\n## Metrics and Criteria (Written in Advance)\n- Primary metrics: RMSE and bias of the event peak per station (maximum hourly sustained wind within the window); secondary metrics: hourly RMSE and peak gust error (gusts compared only against gusts).\n- Criteria: best \"background + residual\" method achieves ≥20% lower peak RMSE than the best pure interpolation method and outperforms it at ≥2/3 of stations → blending is worthwhile for hurricane scenarios; 10–20% improvement or only one condition met → conditional; <10% → pure interpolation suffices. Report each event individually, followed by the aggregate.\n- Additional reporting: peak errors stratified by distance to the storm center (<1×, 1–3×, >3× RMW).\n\n## Boundaries\nWorkstation local CPU, 0 CU; write only in ; all timestamps in UTC; do not mix mean winds and gusts; record assumed parameters in the parameter source table and must not present them as literature values; log new external data in PUBLIC_CITATIONS.md.\n\n## Deliverables\n (per-event and aggregate method comparison tables, one-sentence criteria conclusion, dropout station list, stratification by distance, and parameter source table), one predicted vs. observed peak scatter plot (with data sources labeled), and scripts. Report back only conclusions and numbers.",
+    "goal_zh": "AI 全球模型路径（+ NHC 官方强度）驱动公开参数化飓风边界层风场模型，站点峰值风能否达到 NHC 官方预报驱动同一模型的水平；加 AI 集合后离散能否覆盖 ASOS 实测。判断值不值得继续（Liang Hu 三维边界层模型到位后替换风场模型、扩大事件数）。任务书。",
+    "goal_en": "AI global-model tracks (+ NHC official intensity) driving a public parametric hurricane boundary-layer wind-field model: can station peak winds reach the level of the same model driven by NHC official forecasts; and with AI ensembles added, can the spread cover ASOS observations. Judge whether it is worth continuing (replace the wind-field model and expand the number of events once Liang Hu's three-dimensional boundary-layer model is in place). Brief."
+  },
+  "report": {
+    "zh": "# B1+B4 登陆飓风：AI 路径与集合到站点峰值风\n\n## 目标\nAI 全球模型路径（+ NHC 官方强度）驱动公开参数化飓风边界层风场模型，站点峰值风能否达到 NHC 官方预报驱动同一模型的水平；加 AI 集合后离散能否覆盖 ASOS 实测。判断值不值得继续（Liang Hu 三维边界层模型到位后替换风场模型、扩大事件数）。任务书。\n\n## 判据（10-14 开跑前写定，不得事后放宽）\n- 主指标：每事件每站峰值阵风（或 1 min 持续风）预报/实测比的中位绝对误差、中位偏差；登陆点 ±150 km 内各站。\n- 三链：(a) 最佳路径（HURDAT2/扩展最佳路径含 RMW）；(b) NHC 官方预报路径+强度；(c) AI 路径（AIWP）+ NHC 官方强度。同一风场模型，提前量 24/48/72 h（以登陆时刻为准）。 (b)(c) 只用业务可得信息，OFCL 不报 Pc/POCI/RMW，不得用事后 b-deck（10-14 审查 补，属输入合规、不改判据）；补充链 (c′) WeatherNext Cyclones 只报告、不进判据。\n- **B1 值得继续**：(c) 在 48 h 的中位绝对误差 ≤ 1.1 × (b)，且 ≥ 2/3 事件上 (c) 不差于 (b)；**同时** (a) 中位偏差在 ±20% 以内（否则问题在风场模型，不在 AI，结论写\"风场模型不合格\"，不评 AI）。\n- **B4 值得继续**：集合 10–90% 区间对站点实测的覆盖率在 60–95%。B4 只在 B1 过闸后做。\n- 达不到写清差在哪，不放宽。\n\n## 边界（10-15 起，Liang Hu 10-14 加严）\n- 工作站 不跑计算、不存计算数据：风场计算、站点配对、AIWP/GFS/HURDAT2 大文件下载一律在 Colab 会话或 TACC [local path omitted] 做和存（CRC 组空间约 95%，大数据优先 TACC）；工作站 只放脚本、单项 <200 MB 的小结果、图和报告；确需临时放 >1 GB 先报 B 节点。\n- 上超算仍走 ComputeOps 资源申请 + 登记，预检与提交分两条命令；CRC 默认单节点。\n- 现状（10-15 02:00 核）：本节点 工作站 上无计算在跑； 共 44 MB，无 >200 MB 文件。v2c 的 GDEX 实读当时在内存解码、未落盘。重启时任务书按本节写。\n\n## 当前状态\n**搁置（10-14，6 位审稿人都支持）。** 按重新冻结的 s2b 协议，B1 未过闸：48 h 同质 9 个事件、22 站，Pangu/OFCL 中位绝对误差比 1.021（满足 ≤1.1），但只有 5/9 个事件不差于 OFCL（需 ≥6/9）；按 10 个事件的分母为 5/10。B4 按顺序不做。这个结果不能说 AI 路径整体更好或更差。\n\n**为什么不行**\n- 两链在 48 h 都偏低 35–38%。来自预注册的输入假设：起报时刻的压差 Δp0 按 OFCL 强度缩放外推（H08 只用压差，不直接用 Vmax）、RMW 冻结在起报时刻（Nicole 200 nmi、Milton 5 nmi）、OFCL 强度本身偏低。各占多少没有拆开。\n- 路径确实影响站点风，但方向不一致：Pangu 只在 4/9 个事件上路径更近（中位 91 km，OFCL 105 km）。\n- 每个事件只有 1–4 个合格站，34/67 站在强风段断报，样本偏向外围站。\n\n**缺什么条件、什么情况下重启**：见裁决 R1–R4——业务可得的尺度和气压输入，或 Liang Hu 的模型；≥15 个可评事件且每个事件 ≥3 站；截尾处理方案；换主链必须事先预注册。任何重启都是新版本协议，不翻转本次判闸。\n\n**留给 B 节点的资产**：、v1 风场与 ASOS 配对、850 hPa 追踪器与 AIWP 远程读取、三链结果。\n\n## 已定决定\n- 2026-10-14 v2 准备到此停：严格站类高度后只有 13 例，不冻结、不跑 (a)，等重启触发 → \n- 2026-10-14 v2b 核查回来后：补齐前置并出预注册定稿候选，仍不判闸 → \n- 2026-10-14 v2 可行性回来后不开 v2 判闸，派小时同质池定向核查 → \n- 2026-10-14 B1 未过闸，节点搁置，B4 不做；撤回「路径被淹没」的归因；重启条件重写为 R1–R4 → \n- 2026-10-14 Colab 口径更正（B 节点 Lead，按 Liang Hu 原话）：不设单试验上限，预计 >100 CU 先报；用完必须 stop，同一轮只派一个执行方\n- 2026-10-14 段 2 协议修正 s2b：OFCL 12 h 插值、同质样本（Nicholas 48 h 不可评）、主 (c) 用 Pangu、(c′) 不用 Liang Hu 凭据；判据不变 → \n- 2026-10-14 (a) 链 v1 过 ±20% 闸；接受约 2 min ASOS 代理口径；派段 2 → \n- 2026-10-14 文献审查 裁决：OFCL 无 Pc/POCI/RMW，(b)(c) 不得用事后 b-deck；AI 路径先查 CIRA/Weather Lab，自追踪用 850 hPa 环流；补 (c′) WN-C；增量口径收窄为「AI 路径 + 经典参数化边界层 → 美国 ASOS 三链对比，已检索范围未见」 → \n- 2026-10-14 层级规矩（根 Lead 定）：本节点为二级，不开三级子项目；B4 要独立时报实验室 Lead，由 B 节点开同级节点；工具 bot 不得再转委托\n- 2026-10-14 B1 与 B4 合开（上级节点定）→ \n- 2026-10-14 段 1 极简模型 +50.7% 判为实现不完整，派段 1b 用完整模型预注册复测同一闸 → \n- 2026-10-14 第一步分两段：先\"取数可行性 + 事件清单 + 风场模型实现 + (a) 链\"，(a) 链过 ±20% 闸后再做 (b)(c) → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 10-14 | Grok 快查（b99be0）+ Lead 核对 | DeMaria 2025 摘要核实：AI 路径≈业务、强度系统偏弱（首 24 h 最明显）→ 强度用 NHC；AIWP README 无 TC 路径文件→需自行追踪；未见「AI 路径→参数化风场→站点风」先例（仅 Grok 一家，未经 Deep Research 印证） |\n| 10-14 | 段 1：极简 Holland + 常数 0.85，(a) 链 5 事件试算 | QC 后 4 事件 17 站，中位绝对误差 50.7%、中位偏差 +50.7%，未进 ±20%；Idalia 三站登陆前断报；属代理筛选，非正式闸 |\n| 10-14 | 段 1b：v1 预注册（CLIMADA H08 + 粗糙度 + 时距换算），(a) 链 12 事件 | 10 事件 29 站：持续风偏差 +9.9%（过闸）、中位绝对误差 21.0%；阵风偏差 −0.9%、中位绝对误差 11.2%；34/67 站截尾 |\n| 10-14 | AIWP 远程切片（Milton，FOUR，Colab CPU） | 登陆区 msl/u10/v10/u850/v850 共 88 MB、337 次请求、39 s；MSLP 最低点简易追踪只作演示 |\n| 10-14 | 段 2：(b) OFCL 链（s2a 插值修正，探索性）；Pangu Milton 48 h 试跑 | (b) 24 h：10 个事件 29 站，持续风偏差 −5.1%、中位绝对误差 29.3%；48 h：9 个事件 22 站，偏差 −37.9%、中位绝对误差 41.1%；Pangu 跑 Milton 一例约 0.95 GB、7.8 分钟，只为证明能跑通；截尾下限：(a) 2/19、(b) 48 h 11/19 站的模型峰值低于断报前的观测下限；(c′) 需要登录，没取到 |\n| 10-14 | 段 2b：s2b 协议，三链 48 h 判闸 | 同质 9 个事件、22 站：OFCL 中位 | 41.1%，Pangu 41.9%，比 1.02；事件 5/9 → 未过闸。FCN2 比 1.21、3/9；GraphCast 比 0.68、5/7（子样本）。离路径距离分层：(a) >3×RMW 偏高 +35%；(b) 48 h 远站偏低 −58% | 、 |\n| 10-14 | v2 可行性核查（只数事件，不配对） | 分钟口径 7 个预筛候选、小时口径潜在 14；R1 路线有、环境场与 Holland 拟合未闭合；不开 v2 |\n| 10-14 | v2b 小时同质池定向核查 | 2020–24 恰好 15 事件×≥3 站（零余量）；Isaias 无 Pangu；GFS 环境场 12/15 已核 |\n| 10-14 | v2c 前置补齐（站类高度、环境场、业务时刻） | 严格站类高度后 13 事件×≥3 站，不够 15；2020 环境场可取；H08 适配器缺 |\n| 10-14 | GitHub 仓库表（API 实查） | CLIMADA（480★，GPL-3）、TCRM（99★，含 Kepert BL）、TempestExtremes（151★，BSD-2，追踪器）、TCHazaRds、ParaTC、weathernext（Apache-2.0，B4 自跑集合备选） |\n\n## 参数来源表（B 节点共用）\n| 参数 | 取值 | 来源或\"假设\" | 查过哪些地方 |\n| --- | --- | --- | --- |\n| Holland B | 由每时刻 Vmax、Pc、POCI、RMW 反算；样例约 2.1–2.8，限定 0.5–4 | 假设：Holland 梯度风压差关系（Wang 等 2020 PDF 第 5 页式 7）；Vmax/0.85 取梯度风属本试验假设 | 查 HURDAT2、ATCF b-deck、Vickery 2009 PDF 第 23–24 页；未取得直接 B 观测 |\n| RMW | b-deck 第 19 栏，6 小时线性插值，海里换米 | 数据源：NHC ATCF b-deck；CIRA EBTRK 仅更新到 2021，HURDAT2 本身无 RMW | 查 CIRA EBTRK 页面及 README，逐风暴 b-deck；缺失时不代填 |\n| POCI | b-deck 第 17 栏，6 小时线性插值 | 数据源：NHC ATCF b-deck，非任意设 1010 hPa | 查 b-deck 结构及 EBTRK 文档 |\n| 梯度风→近地系数 | 0.85（全海陆相同） | 假设/简化；Vickery 2009 PDF 第 23–24 页说 0.85 为同批样本试调的比较基线，绝非其完整边界层模型；敏感范围 0.65–0.90 未完成 | 查 WTPZS77N 卡及原文，未实现其 slab/粗糙度过渡 |\n| 空气密度 | 1.15 kg m^-3 | 假设（范围 1.10–1.25；未用实况气温湿度） | 查 Wang 等 2020 PDF 第 4–5 页；本试验无热力场 |\n| 海陆粗糙度 | 暂未入模型（Vickery 示例海 0.0013 m、陆 0.03 m） | 明确缺项，不得宣称做过暴露订正；来源 WTPZS77N 卡，Vickery 2009 PDF 第 12、15、22 页 | 查 WTPZS77N 卡及原文；站点方向性土地覆盖未取 |\n| 阵风因子/平均时距 | 未入主指标：ASOS sknt 为约 2 min 持续风代理，gust_sknt 为 5 s 峰值；不互当 1 min / 3 s | ZR7S3SEJ 候选卡 PDF 第 2–3、5–6 页记录不同时距与粗糙度，2KXRIJJB 候选卡 PDF 第 2–4 页限定约 2 s 条件；未有合格的站点特定换算 | 查两张待独立复核卡、IEM 1min 字段；未假设统一阵风乘数 |\n| v1 CLIMADA H08 | CLIMADA 6.1.0，commit bb9595944fcf673152ea53e61efbafeb0b1e4406；原生 10m 1min Holland 2008 + 平移矢量 | 开源实现 第 1131–1257 行；非 Vickery slab，0.9 默认折减见源码第 61–69 行 | 查 GitHub 固定 tag 与实际运行包、v1 预注册 |\n| v1 方向暴露 | Natural Earth 10m 陆地多边形；沿模型来流反向 2/5/10 km 三点多数判陆/海；z0 陆 0.03m / 海 0.0013m；500m 参考对数廓线比 | z0 源 WTPZS77N 卡、Vickery 2009 PDF 第 12/15/22 页；500m 参考及单类地表是假设（范围 200–1000m、陆 z0 0.02–0.07m） | 查 Vickery 卡、Natural Earth 10m land、CLIMADA 不含站点方向暴露订正 |\n| v1 平均时距 | 1min→约2min sknt ×0.97；1min→5s gust_sknt 陆 ×1.30、海 ×1.20 | 全是假设，范围分别 0.95–1.00、陆 1.15–1.45、海 1.10–1.35；Vickery 与 Skerlj 2005 候选卡 ZR7S3SEJ PDF 第 2–3/5–6 页是平均定义/暴露依据，不直接给上述因子 | 查 ZR7S3SEJ、2KXRIJJB 候选卡（1992 PDF 第 2–4 页约2s/10min，不能直接套）；v1 未按观测调参 |\n| s2 (b)(c) 起报尺度与环境压 | CARQ τ=0 的 RMW/POCI 持续；无则同 cycle OFCL τ=0；二者都无则该 cycle 缺失 | 业务可得资料加持续假设，绝无事后 b-deck | 查 NHC ATCF a-deck 逐周期、审查裁决；见 |\n| s2 (b)(c) 未来中心压 | Δp(t)=Δp0×[OFCL V(t)/V(0)]^(1/0.644)；POCI 恒定；CARQ 起始压优先 | 指数借 Atkinson–Holliday 1977（西太平洋），大西洋锚点缩放是假设，非文献验证 | DTIC 摘要与 Knaff–Zehr 2007 原文复述；缺值补法见 |\n| s2 AI 850hPa 追踪 | 5×5 ζ 平滑、200 km 圆内均值、前一中心 350 km 搜索及气旋环流 >0 | 具体阈值均假设，追踪方向据 DeMaria 2025 PDF 第 14–15 页；并非复刻其 Table A2 | 查原文附录与；MSLP 只作辅助 |\n\n## 未决与下一步\n- 搁置。v2 材料停在 （PREREG_v2 候选未冻结）。重启触发：① Liang Hu 的三维边界层模型到位（替换 H08，同时解决 B 的适配问题）；或 ② 2026 季进 HURDAT2 且 AIWP 补上 Isaias 周期、HOMR 历史高度核实后，事件 ≥15×≥3。重启时先决定是否收 7.9 m（26 ft）ASOS 站做高度订正（收入后 Delta、Milton 各 3 站，可到 15，但零余量），须在看任何误差前写进预注册\n- 10-14 v2 可行性核查已回（、 未冻结）：分钟 ASOS 口径只有 7 个预筛候选；小时口径潜在 14 个（Eta 未核）；分钟与小时峰值不能混池；R1 选 OFCL 风圈 + Knaff 2007 RMW 先验 + Knaff–Zehr 2007 ΔP（要 GFS 的 V500/Penv），Holland 逆拟合是工程假设。结论：**现在不开 v2 判闸**，仍搁置\n- 10-14 20:4x 派定向核查 （排队中）：只用小时站一种采样重算 150 km 站数（旧 11 + Eta/Elsa/Fred/Henri + 2026 季 ≥50 kt 登陆），并核 GFS 业务归档能否算 V500/Penv；任务书；0 CU。达到 ≥15 事件 ×≥3 站且环境场可得，才起草冻结 v2\n- 10-14 21:54 定向核查已回：单一小时 METAR 口径，2020–24 年**恰好 15 个事件 ×≥3 站**（170 站–事件），都有同起报 Pangu 与 OFCL，余量为 0；2026 季只有 Isaias 一个 ≥50 kt 登陆，但没有 Pangu 对象；GFS f048 环境场 12/15 可取，2020 三例 AWS 404；V500 现用 10 m 风，层次待按原文核\n- 10-14 22:0x 派 （排队）：补 2020 三例环境场、核 V500 层次、按 NCEP 发布时间表定业务时刻规则、逐站核 ASOS/AWOS 与风速计高度后重数事件、查 Isaias，交可冻结的 （小时口径为主、(a) 链同口径重过 ±20%，QC 后不足 15×3 不判闸）；任务书；0 CU。回来后 Lead 冻结，再只跑 (a)\n- 10-14 22:20 前置补齐已回：2020 三例 GFS 环境场从 NCAR GDEX 实读可算（V500 改用 850 hPa，依据 Knaff 等 2014，KZ07 原文没写层次）；业务时刻按 NCEP 发布时间表统一退一个周期取 f054（属代理）；按 NWS 2025 ASOS 设备清单、风速计 8–12 m 的条件性快照，只有 **13 个事件 ×≥3 站**（Delta、Milton 各 1 站），历史高度均未经 HOMR 证实；Isaias 的 Pangu 周期是数据空洞；CLIMADA H08 的 B 是内生算出的，风圈只能拟合 RMW，适配器未写、未验证。**Lead 决定 v2 准备到此停，不冻结、不跑 (a)**，见决策\n- 预注册里「新模型峰值时刻的观测窗完整性」一项没交付，作为解释上的局限保留\n\n## 文献依据\n- 2026-10-16 数据：NOAA HRD 下投探空 10–300 m 台风风廓线 7,524 条（Ma 等 2026，Zenodo 10.5281/zenodo.21868265，CC BY 4.0；Liang Hu 批 X2 并指示存档）→ （CRC 备份）。可用于廓线形状、10–300 m 风切与 H08/经验廓线对照（海上）、重启 B1+B4 时的廓线约束；不是陆面廓线。不改本节点状态与闸门。\n- （10 张分高度模型卡）\n- （Vickery 2009 边界层/近地换算）\n- （Hurricane Gust Factors Revisited）、（Gust factors applied to hurricane winds）：阵风因子/时距换算\n- （DeMaria 2025）：AI 路径与 GFS/ECMWF 相当，可作指引（PDF pp. 5–8、11–13）；强度几乎总偏弱，72 h 后平均绝对误差约 40 kt，无强度技巧（PDF pp. 6–9、13）→ 本节点 (c) 链用 NHC 强度；「AI 路径 + 其他强度」拼接作者未验证，属本节点工程推论（PDF pp. 1、11–13）；未公开 AI 路径文件（PDF p. 14）；非登陆专门样本\n- （Radford 2025，AIWP 数据集）\n- R1 输入方法卡（10-14）：（风压关系式 7，还要 φ、c、Penv、V500；PDF 第 4–5 页，期刊第 74–75 页）、（Rankine x 不等于 Holland B）、；索引。光靠 OFCL 的 Vmax 和风圈闭合不了 Holland 参数，需要分析场或 AI 场补 Penv、V500\n- 近邻先例（10-14 litwiki 建卡，均与本节点不同：都不是「AI 路径 + 参数化边界层 → 美国 ASOS 站点峰值风」）：\n - ：NHC 风速概率，官方预报加误差分布生成 1000 个成员，用 radii-CLIPER 风场；用 best-track 风圈网格验证，不是站点峰值（PDF p. 11–12；期刊 pp. 1583–1584）——B4 的业务基线\n - ：加 GPCE 分层，Brier score 改善 1%–4%（PDF p. 11；期刊 p. 596）\n - ：WN-C 至少 50 个成员；风速概率用 IBTrACS 风圈评价；原文写明「per-location winds are left for future work」（PDF p. 7；期刊 p. 686）——本节点增量的直接定位\n - ：Pangu/AIFS 驱动三向耦合 WRF（香港 7 个 TC），路径误差比 IFS 驱动低 28%–34%；不做站点峰值验证（PDF p. 3、10）\n - ：Pangu 网格风订正加降尺度，浙江 2513 站 2-min 小时风 MAE 降 38.8%；不用参数化风场，不比峰值（PDF p. 12–13）\n- Radford 等 2025 BAMS 10.1175/BAMS-D-24-0057.1（AIWP 数据；PUBLIC_CITATIONS 已有）\n\n## Liang Hu 注",
+    "en": "# B1+B4 landfalling hurricanes: AI tracks and ensembles to station peak winds\n\n## Objective\nWhen AI global model tracks (+ NHC official intensity) drive an open parametric hurricane boundary-layer wind field model, can station peak winds reach the level of NHC official forecasts driving the same model; and after adding AI ensembles, can the spread cover ASOS observations? Determine whether it is worth continuing (replacing the wind field model once Liang Hu's 3D boundary-layer model is ready and expanding the number of events). Task brief.\n\n## Criteria (Written before launching runs on 10-14; must not be relaxed ex post)\n- Primary metric: median absolute error and median bias of the forecast-to-observed ratio of peak gust (or 1 min sustained wind) per station per event; all stations within ±150 km of the landfall point.\n- Three chains: (a) best track (HURDAT2 / Extended Best Track including RMW); (b) NHC official forecast track + intensity; (c) AI track (AIWP) + NHC official intensity. Same wind field model, lead times of 24/48/72 h (referenced to landfall time). Chains (b) and (c) use only operationally available information; since OFCL does not report Pc/POCI/RMW, post-event b-decks must not be used (added during 10-14 review as input compliance without altering the criteria); supplementary chain (c′) WeatherNext Cyclones is reported only and not included in the criteria.\n- **B1 worth continuing**: Median absolute error of (c) at 48 h ≤ 1.1 × (b), and (c) is no worse than (b) on ≥ 2/3 of events; **simultaneously**, the median bias of (a) is within ±20% (otherwise the problem lies in the wind field model rather than AI, and the conclusion should state \"wind field model unqualified\" without evaluating AI).\n- **B4 worth continuing**: Coverage of station observations by the ensemble 10–90% interval is within 60–95%. B4 is executed only after B1 passes the gate.\n- If not met, clearly state where it falls short without relaxing the criteria.\n\n## Boundaries (Effective 10-15, tightened by Liang Hu on 10-14)\n- Workstation does not run computations or store compute data: wind field calculations, station pairing, and large-file downloads of AIWP/GFS/HURDAT2 must all be executed and stored in Colab sessions or TACC [local path omitted] (CRC group space is at ~95%, so large data prioritizes TACC); the workstation only holds scripts, small results <200 MB per item, figures, and reports; if temporary storage >1 GB is truly needed, report to Node B first.\n- Supercomputer usage still goes through ComputeOps resource request + registration, with pre-check and submission separated into two commands; CRC defaults to a single node.\n- Current status (verified 10-15 02:00): No computations running on the workstation for this node; total is 44 MB, with no files >200 MB. The live GDEX reads in v2c were decoded in memory at the time and not written to disk. Upon restart, the task brief must be written in accordance with this section.\n\n## Current Status\n**Shelved (10-14, supported by all 6 reviewers).** Under the refrozen s2b protocol, B1 did not pass the gate: across 9 homogeneous events and 22 stations at 48 h, the Pangu/OFCL median absolute error ratio is 1.021 (satisfying ≤1.1), but only 5/9 events are no worse than OFCL (requiring ≥6/9); using 10 events as the denominator gives 5/10. In accordance with the sequence, B4 is not pursued. This result cannot claim that AI tracks are overall better or worse.\n\n**Why it failed**\n- Both chains underestimate by 35–38% at 48 h. This stems from the pre-registered input assumptions: the initial pressure deficit Δp0 is extrapolated by scaling with OFCL intensity (H08 only uses pressure deficit, not Vmax directly), RMW is frozen at the initialization time (Nicole 200 nmi, Milton 5 nmi), and OFCL intensity itself is biased low. The individual contribution of each factor has not been disentangled.\n- Track indeed affects station winds, but the direction is inconsistent: Pangu has a closer track on only 4/9 events (median 91 km vs. OFCL 105 km).\n- Each event has only 1–4 qualified stations, and 34/67 stations dropped out during high-wind periods, biasing the sample toward outer-periphery stations.\n\n**What conditions are missing and when to restart**: See verdict R1–R4—operationally available size and pressure inputs, or Liang Hu's model; ≥15 evaluable events with ≥3 stations per event; a censoring treatment scheme; switching the primary chain must be pre-registered in advance. Any restart constitutes a new protocol version and does not overturn the current gate verdict.\n\n**Assets left for Node B**: , v1 wind field and ASOS pairing, 850 hPa tracker and AIWP remote reading, and three-chain results.\n\n## Finalized Decisions\n- 2026-10-14 v2 preparation stops here: only 13 cases remain after strict station-type and height filtering; do not freeze or run (a), wait for restart triggers → \n- 2026-10-14 after v2b verification returned: complete prerequisites and produce a finalized pre-registration candidate, still without running the gate evaluation → \n- 2026-10-14 after v2 feasibility returned, do not open the v2 gate; dispatch a targeted verification of the hourly homogeneous pool → \n- 2026-10-14 B1 failed to pass the gate, node shelved, B4 not pursued; retract the \"track signal swamped\" attribution; rewrite restart conditions as R1–R4 → \n- 2026-10-14 Colab policy correction (Node B Lead, following Liang Hu's exact words): no single-experiment cap, report first if projected >100 CU; must stop upon completion, and dispatch only one executor per round\n- 2026-10-14 Phase 2 protocol revision s2b: OFCL 12 h interpolation, homogeneous sample (Nicholas 48 h non-evaluable), primary (c) uses Pangu, (c′) does not use Liang Hu's credentials; criteria unchanged → \n- 2026-10-14 Chain (a) v1 passed the ±20% gate; accept the ~2 min ASOS proxy definition; dispatch Phase 2 → \n- 2026-10-14 Literature review verdict: OFCL lacks Pc/POCI/RMW, so (b) and (c) must not use post-event b-decks; check CIRA/Weather Lab first for AI tracks, and use 850 hPa circulation for self-tracking; add (c′) WN-C; narrow incremental contribution scope to \"AI tracks + classical parametric boundary layer → US ASOS three-chain comparison, not found within searched scope\" → \n- 2026-10-14 Hierarchy rule (set by Root Lead): this node is Level 2 and does not open Level 3 sub-projects; if B4 needs to be independent, report to the Lab Lead for Node B to open a peer-level node; tool bots must not re-delegate\n- 2026-10-14 B1 and B4 opened jointly (set by parent node) → \n- 2026-10-14 Phase 1 minimal model (+50.7%) judged as an incomplete implementation; dispatch Phase 1b to retest the same gate with the full model under pre-registration → \n- 2026-10-14 Step 1 split into two phases: first \"data access feasibility + event list + wind field model implementation + chain (a)\", then proceed to (b) and (c) only after chain (a) passes the ±20% gate → \n\n## What Was Tried and Results\n| Date | What Was Done | One-Line Result |\n| --- | --- | --- |\n| 10-14 | Grok quick search (b99be0) + Lead check | DeMaria 2025 abstract verified: AI tracks ≈ operational, intensity systematically weak (most pronounced in first 24 h) → use NHC for intensity; AIWP README has no TC track files → requires self-tracking; no precedent found for \"AI track → parametric wind field → station wind\" (Grok only, not yet corroborated by Deep Research) |\n| 10-14 | Phase 1: Minimal Holland + constant 0.85, chain (a) 5-event trial | 4 events and 17 stations after QC, median absolute error 50.7%, median bias +50.7%, failed to enter ±20%; three Idalia stations dropped out before landfall; treated as proxy screening, not a formal gate |\n| 10-14 | Phase 1b: v1 pre-registration (CLIMADA H08 + roughness + averaging-time conversion), chain (a) 12 events | 10 events, 29 stations: sustained wind bias +9.9% (passed gate), median absolute error 21.0%; gust bias −0.9%, median absolute error 11.2%; 34/67 stations censored |\n| 10-14 | AIWP remote slicing (Milton, FOUR, Colab CPU) | Landfall region msl/u10/v10/u850/v850 totaled 88 MB, 337 requests, 39 s; simple MSLP minimum tracking for demonstration only |\n| 10-14 | Phase 2: Chain (b) OFCL (s2a interpolation fix, exploratory); Pangu Milton 48 h trial run | (b) 24 h: 10 events, 29 stations, sustained wind bias −5.1%, median absolute error 29.3%; 48 h: 9 events, 22 stations, bias −37.9%, median absolute error 41.1%; Pangu run for Milton single case took ~0.95 GB and 7.8 min, solely to prove end-to-end execution; censored lower bounds: model peak fell below pre-dropout observed lower bound at 2/19 stations for (a) and 11/19 stations for (b) 48 h; (c′) required login, not retrieved |\n| 10-14 | Phase 2b: s2b protocol, three-chain 48 h gate evaluation | Homogeneous 9 events, 22 stations: OFCL median | 41.1%, Pangu 41.9%, ratio 1.02; events 5/9 → failed gate. FCN2 ratio 1.21, 3/9; GraphCast ratio 0.68, 5/7 (subsample). Stratification by distance from track: (a) >3×RMW overestimated by +35%; (b) 48 h distant stations underestimated by −58% | , |\n| 10-14 | v2 feasibility check (counting events only, no pairing) | 7 pre-screened candidates under 1-minute definition, 14 potential under hourly definition; R1 route exists, environmental field and Holland fitting not closed; do not open v2 |\n| 10-14 | v2b targeted check of hourly homogeneous pool | Exactly 15 events × ≥3 stations in 2020–24 (zero margin); Isaias has no Pangu; GFS environmental field verified for 12/15 |\n| 10-14 | v2c prerequisite completion (station type/height, environmental field, operational timing) | After strict station type and height filtering, 13 events × ≥3 stations, short of 15; 2020 environmental fields retrievable; H08 adapter missing |\n| 10-14 | GitHub repository table (live API check) | CLIMADA (480★, GPL-3), TCRM (99★, includes Kepert BL), TempestExtremes (151★, BSD-2, tracker), TCHazaRds, ParaTC, weathernext (Apache-2.0, backup for self-running B4 ensembles) |\n\n## Parameter Source Table (Shared across Node B)\n| Parameter | Value | Source or \"Assumption\" | Where Checked |\n| --- | --- | --- | --- |\n| Holland B | Inverted at each step from Vmax, Pc, POCI, and RMW; sample values ~2.1–2.8, bounded to 0.5–4 | Assumption: Holland gradient-wind pressure-deficit relation (Wang et al. 2020 PDF p. 5 Eq. 7); taking Vmax/0.85 as gradient wind is an assumption of this experiment | Checked HURDAT2, ATCF b-deck, Vickery 2009 PDF pp. 23–24; no direct B observations obtained |\n| RMW | Column 19 of b-deck, 6-hourly linear interpolation, nautical miles converted to meters | Data source: NHC ATCF b-deck; CIRA EBTRK only updated through 2021, HURDAT2 itself has no RMW | Checked CIRA EBTRK page and README, per-storm b-decks; not imputed when missing |\n| POCI | Column 17 of b-deck, 6-hourly linear interpolation | Data source: NHC ATCF b-deck, not arbitrarily set to 1010 hPa | Checked b-deck structure and EBTRK documentation |\n| Gradient-to-surface wind factor | 0.85 (uniform over sea and land) | Assumption/simplification; Vickery 2009 PDF pp. 23–24 states 0.85 is a tuned comparison baseline on the same sample batch, by no means its full boundary-layer model; sensitivity range 0.65–0.90 not completed | Checked card WTPZS77N and original text; its slab/roughness transition was not implemented |\n| Air density | 1.15 kg m^-3 | Assumption (range 1.10–1.25; observed temperature and humidity not used) | Checked Wang et al. 2020 PDF pp. 4–5; no thermodynamic field in this experiment |\n| Sea/land roughness | Not yet in model (Vickery examples: sea 0.0013 m, land 0.03 m) | Explicit omission, must not claim exposure correction was performed; source card WTPZS77N, Vickery 2009 PDF pp. 12, 15, 22 | Checked card WTPZS77N and original text; directional land cover at stations not retrieved |\n| Gust factor / averaging time | Not in primary metric: ASOS sknt serves as ~2 min sustained wind proxy, gust_sknt as 5 s peak; not treated interchangeably as 1 min / 3 s | Candidate card ZR7S3SEJ PDF pp. 2–3, 5–6 documents different averaging durations and roughnesses, candidate card 2KXRIJJB PDF pp. 2–4 specifies ~2 s conditions; no qualified station-specific conversion available | Checked two cards pending independent review and IEM 1min fields; no uniform gust multiplier assumed |\n| v1 CLIMADA H08 | CLIMADA 6.1.0, commit bb9595944fcf673152ea53e61efbafeb0b1e4406; native 10m 1min Holland 2008 + translation vector | Open-source implementation lines 1131–1257; not Vickery slab, 0.9 default reduction factor in source lines 61–69 | Checked GitHub pinned tag, actual runtime package, and v1 pre-registration |\n| v1 directional exposure | Natural Earth 10m land polygons; land/sea majority vote across three points at 2/5/10 km upwind along model inflow; z0 land 0.03m / sea 0.0013m; logarithmic profile ratio with 500m reference height | z0 source: card WTPZS77N, Vickery 2009 PDF pp. 12/15/22; 500m reference height and single-class surface are assumptions (range 200–1000m, land z0 0.02–0.07m) | Checked Vickery card, Natural Earth 10m land; CLIMADA does not include directional station exposure correction |\n| v1 averaging time | 1min→~2min sknt ×0.97; 1min→5s gust_sknt land ×1.30, sea ×1.20 | All are assumptions, ranges 0.95–1.00, land 1.15–1.45, sea 1.10–1.35 respectively; Vickery and Skerlj 2005 candidate card ZR7S3SEJ PDF pp. 2–3/5–6 provides averaging definitions/exposure basis without directly giving the above factors | Checked candidate cards ZR7S3SEJ and 2KXRIJJB (1992 PDF pp. 2–4 ~2s/10min, cannot be applied directly); v1 was not tuned against observations |\n| s2 (b)(c) initial size and ambient pressure | Persistence of CARQ τ=0 RMW/POCI; if absent, same-cycle OFCL τ=0; if both absent, cycle is marked missing | Operationally available data plus persistence assumption, strictly no post-event b-deck | Checked NHC ATCF a-deck cycle by cycle and review verdict; see |\n| s2 (b)(c) future central pressure | Δp(t)=Δp0×[OFCL V(t)/V(0)]^(1/0.644); constant POCI; CARQ initial pressure prioritized | Exponent borrowed from Atkinson–Holliday 1977 (Western North Pacific), Atlantic anchor scaling is an assumption, not literature-validated | DTIC abstract and Knaff–Zehr 2007 text restatement; for missing-value fallback see |\n| s2 AI 850hPa tracking | 5×5 ζ smoothing, mean within 200 km circle, 350 km search radius from previous center, and cyclonic circulation >0 | Specific thresholds are all assumptions, tracking direction follows DeMaria 2025 PDF pp. 14–15; not an exact replica of its Table A2 | Checked original appendix and ; MSLP used as auxiliary only |\n\n## Open Items and Next Steps\n- Shelved. v2 materials are parked at  (PREREG_v2 candidate unfrozen). Restart triggers: ① Liang Hu's 3D boundary-layer model becomes available (replacing H08 while resolving the B adaptation issue); or ② the 2026 season enters HURDAT2, AIWP fills in the Isaias cycles, and historical anemometer heights are verified via HOMR, yielding ≥15 events × ≥3 stations. Upon restart, first decide whether to include 7.9 m (26 ft) ASOS stations with height correction (including them gives 3 stations each for Delta and Milton, reaching 15 events, though with zero margin), which must be written into the pre-registration before inspecting any errors\n- 10-14 v2 feasibility check returned (,  unfrozen): only 7 pre-screened candidates under the 1-minute ASOS definition; 14 potential under the hourly definition (Eta unverified); 1-minute and hourly peaks cannot be pooled together; R1 selects OFCL wind radii + Knaff 2007 RMW prior + Knaff–Zehr 2007 ΔP (requiring GFS V500/Penv), where Holland inverse fitting is an engineering assumption. Conclusion: **do not open the v2 gate now**, remain shelved\n- 10-14 20:4x dispatched targeted check  (queued): recalculate station counts within 150 km using only hourly-reporting stations (previous 11 + Eta/Elsa/Fred/Henri + 2026 season ≥50 kt landfalls), and check whether operational GFS archives can compute V500/Penv; task brief; 0 CU. Only draft and freeze v2 if ≥15 events × ≥3 stations are reached and environmental fields are available\n- 10-14 21:54 targeted check returned: under the single hourly METAR definition, 2020–24 has **exactly 15 events × ≥3 stations** (170 station-events), all with matching-cycle Pangu and OFCL, leaving a margin of 0; the 2026 season has only Isaias as a ≥50 kt landfall, but without Pangu objects; GFS f048 environmental fields are available for 12/15 cases, with three 2020 cases returning AWS 404; V500 currently uses 10 m wind, pending level verification against the original paper\n- 10-14 22:0x dispatched  (queued): fill in the three 2020 environmental fields, verify the V500 level, set operational timing rules per the NCEP release schedule, verify ASOS/AWOS status and anemometer heights station by station before recounting events, check Isaias, and deliver a freezable  (hourly definition as primary, chain (a) re-passing ±20% under the same definition, no gate evaluation if <15×3 after QC); task brief; 0 CU. Lead will freeze upon return, then run (a) only\n- 10-14 22:20 prerequisite completion returned: the three 2020 GFS environmental fields are computable via live reads from NCAR GDEX (V500 switched to 850 hPa following Knaff et al. 2014, as the original KZ07 paper did not specify the level); operational timing uniformly steps back one cycle to take f054 according to the NCEP release schedule (acting as a proxy); based on the conditional snapshot of the NWS 2025 ASOS equipment list with anemometer heights of 8–12 m, only **13 events × ≥3 stations** qualify (Delta and Milton have 1 station each), and historical heights are not verified via HOMR; the Pangu cycles for Isaias are a data void; B in CLIMADA H08 is computed endogenously so wind radii can only fit RMW, and the adapter is neither written nor validated. **Lead decision: stop v2 preparation here, do not freeze, and do not run (a)**; see decision\n- The pre-registered item \"observation window completeness at the time of the new model peak\" was not delivered and is retained as an interpretive limitation\n\n## Literature Basis\n- 2026-10-16 data: 7,524 NOAA HRD dropsonde 10–300 m typhoon wind profiles (Ma et al. 2026, Zenodo 10.5281/zenodo.21868265, CC BY 4.0; approved X2 by Liang Hu with instructions to archive) → (backed up on CRC). Useful for profile shape, 10–300 m wind shear, comparison against H08/empirical profiles (over ocean), and profile constraints if B1+B4 is restarted; not overland profiles. Does not alter this node's status or gates.\n-  (10 height-stratified model cards)\n-  (Vickery 2009 boundary-layer / near-surface conversion)\n-  (Hurricane Gust Factors Revisited),  (Gust factors applied to hurricane winds): gust factors / averaging-time conversion\n-  (DeMaria 2025): AI tracks are comparable to GFS/ECMWF and can serve as guidance (PDF pp. 5–8, 11–13); intensity is almost always biased low, with mean absolute error ~40 kt after 72 h and no intensity skill (PDF pp. 6–9, 13) → chain (c) in this node uses NHC intensity; splicing \"AI track + external intensity\" was not tested by the authors and represents an engineering inference by this node (PDF pp. 1, 11–13); AI track files are not publicly released (PDF p. 14); not a landfall-specific sample\n-  (Radford 2025, AIWP dataset)\n- R1 input method cards (10-14):  (wind–pressure relation Eq. 7, also requiring φ, c, Penv, V500; PDF pp. 4–5, journal pp. 74–75),  (Rankine x is not equal to Holland B), ; index. OFCL Vmax and wind radii alone cannot close the Holland parameters; analysis fields or AI fields are needed to supply Penv and V500\n- Neighboring precedents (10-14 litwiki cards created, all distinct from this node: none is \"AI track + parametric boundary layer → US ASOS station peak winds\"):\n - : NHC wind speed probabilities, generating 1000 members from official forecasts plus error distributions using the radii-CLIPER wind field; verified against best-track wind radii grids rather than station peaks (PDF pp. 11–12; journal pp. 1583–1584)—operational baseline for B4\n - : adds GPCE stratification, improving Brier score by 1%–4% (PDF p. 11; journal p. 596)\n - : WN-C with at least 50 members; wind speed probabilities evaluated using IBTrACS wind radii; the paper explicitly states \"per-location winds are left for future work\" (PDF p. 7; journal p. 686)—direct positioning of this node's incremental contribution\n - : Pangu/AIFS driving three-way coupled WRF (7 TCs affecting Hong Kong), reducing track error by 28%–34% compared to IFS-driven runs; no station peak wind verification performed (PDF pp. 3, 10)\n - : Pangu gridded wind bias correction plus downscaling across 2513 stations in Zhejiang, reducing 2-min hourly wind MAE by 38.8%; does not use a parametric wind field and does not evaluate event peaks (PDF pp. 12–13)\n- Radford et al. 2025 BAMS 10.1175/BAMS-D-24-0057.1 (AIWP data; already in PUBLIC_CITATIONS)\n\n## Liang Hu's Notes"
+  },
+  "decisions": [
+    {
+      "id": "dec-0000",
+      "ts": "2026-10-14 14:39",
+      "title": "B1+B4 开工与分段（10-14）",
+      "label": "决定",
+      "text": "# B1+B4 开工与分段（10-14）\n\n- 决定：第一步分两段。段 1：AIWP 远程切片可行性、事件清单、风场模型实现、(a) 最佳路径链对 ASOS；段 2（(a) 中位偏差在 ±20% 内才做）：(b) NHC 官方与 (c) AI 路径链。B4 集合在 B1 过闸后。\n- 为什么：判据要求 (a) 先合格，否则比较 (b)/(c) 无意义；先验证风场模型和实测配对最省钱。\n- 错了的代价：(a) 若轻松过闸，多一次派活往返，晚约半天。\n- 依据：任务书判据；风场模型 Vickery 2009 卡 （页码待 ideas 引用时补）。\n- 判据已在开跑前写进项目页，不得放宽。"
+    },
+    {
+      "id": "dec-0001",
+      "ts": "2026-10-14 14:52",
+      "title": "B1+B4 段 1 结果与段 1b（10-14）",
+      "label": "决定",
+      "text": "# B1+B4 段 1 结果与段 1b（10-14）\n- 结果：极简 Holland + 常数 0.85，(a) 最佳路径链 4 事件 17 站（QC 后）中位偏差 +50.7%，未进 ±20%。\n- 决定：不据此收「风场模型不合格」；派段 1b用完整参数化模型（Vickery 2009 slab+粗糙度过渡，或 TCRM/CLIMADA），模型、常数、时距换算、站点纳入规则先预注册（PREREG_v1.md）再对照观测，复测同一 ±20% 闸；v1 仍越界即收口，不再调参。\n- 为什么：段 1 模型缺陆上粗糙度、时距定义和平移非对称，偏高方向与这些缺项一致；0.85 是 Vickery 2009 的海上对照基线（卡片 WTPZS77N，PDF 第 23–24 页，转引自 ideas windfield_model.md，Lead 未逐页核），不是陆上换算系数。判据不变。\n- 错了的代价：若完整模型同样不合格，多花约半天、0–3 CU。"
+    },
+    {
+      "id": "dec-0002",
+      "ts": "2026-10-14 15:14",
+      "title": "裁决：B1+B4 三条文献结论审查 （10-14）",
+      "label": "决定",
+      "text": "# 裁决：B1+B4 三条文献结论审查 （10-14）\n审稿人：E·Gemini、A·GPT-6、D·GLM（3/3 有效，均\"有保留地支持\"）。证据：Grok 报告 b99be0、项目页。\n\n## Lead 亲自核实\n- NHC OFCL 不报 Pc/POCI/RMW：Lead 下载 aal142024（Milton），OFCL τ≥12 h 共 383 行，mslp/poci/rmw 非零 0 行，34 kt 风圈非零 161 行。属实。\n- WeatherNext Cyclones 公开路径：developers.google.com/weathernext/guides/weatherlab 已读——CSV/ATCF，含集合成员路径与配对实测，约 2023 至今，历史数据 CC BY 4.0；是否需注册未写。属实。\n- DeMaria 2025 追踪用 850 hPa 环流、非 MSLP：litwiki 卡 指向附录（PDF pp. 2–3、14–15）；E、A 两位独立同说，采纳（Lead 未逐页重读附录）。\n- Vickery 2009 已在 24 场美国登陆飓风 258 条峰值阵风上验证，RMW/B 系用 HWind + 站点时序主观迭代拟合、观测先标准化到开阔 10 m 3 s：E、A 同说，指向本地 Zotero 原文期刊 pp. 397–404，与卡片 WTPZS77N 一致，采纳。\n\n## 必须改\n1. **(b)(c) 链的风场输入**（E-1）：OFCL 只有路径、Vmax、34/50/64 kt 风圈。(b)(c) 不得使用事后 b-deck 的 RMW/POCI/Pc。改为：起报时刻（τ=0，业务可得的 CARQ/BEST τ=0）的 RMW、POCI 作初值，预报期按预注册方式外推（持续或文献统计 RMW 模型），Pc 由文献风压关系从 Vmax 求，或直接用 OFCL 风圈拟合 Holland 剖面（NHC 风速概率模型同类做法）。具体方案进段 2 预注册，(a) 链仍可用 b-deck。\n2. **AI 路径追踪方法**（E-2、A-1）：撤回\"从 MSLP/10 m 风用 TempestExtremes 追踪\"。顺序改为：先查 CIRA RAMMB 公开 AIWP 路径（NPNG/NGRP/NFOR 等，[external URL omitted]）能否文件级下载；不能则按 DeMaria 2025 附录的 850 hPa 环流追踪（NHC 起报位置作初猜），MSLP 只作辅助。\"AIWP 没有现成路径文件\"改写为\"NOAA S3 档无路径文件；CIRA 产品的可下载性未核实\"。\n3. **WeatherNext Cyclones 补入**（E-3、D-1）：Lead 原记\"需登录未核\"是错的，更正。新增补充链 (c′)：WN-C 路径+强度+风圈（2023 起，覆盖 Idalia、Beryl、Debby、Francine、Helene、Milton 6 个事件），作 B4 首选现成 AI 集合源；(c′) 只报告，不进 B1 判据（判据仍按 (c)，不放宽不替换）。结论 (1) 限定为\"AIWP 档内未做强度后处理的 FCN/Pangu/GraphCast（DeMaria 2025 样本）\"，不泛化为\"AI 强度都不行\"（Alet 2026 Nature 10.1038/s41586-026-10953-2 是反例）。\n4. **增量口径收窄**（E-5、A-2、D-1）：不写\"无人做过 AI 预报到站点风\"。写成\"已检索范围内未见：AI 预报路径 + 经典参数化边界层风场 → 美国 ASOS 站点峰值风的三链对比\"，并列近邻先例：NHC 风速概率 DeMaria 2009（10.1175/2009WAF2222286.1）/2013；Alet 2026（明言逐站风验证留待以后）；Vickery 2009 站点验证；Lai et al.（Pangu/AIFS 驱动 UWIN-CM，香港）；Wu 等 2026 ACDF（arXiv 2603.12828，浙江站点）。这些先例待 litwiki 建卡后才可作文献依据。\n5. **(a) 链与 Vickery 2009 条件不同**（E-4、A-3）：Vickery 的 RMW/B 是对站点时序拟合的，我们用 b-deck 原值、不拟合；因此本节点的 ±20% 闸比 Vickery 的验证更严，结果解读时须写明。判据不改（Liang Hu/B 节点定的闸，不放宽）。\n6. **仓库表补** SimCenter（Snaiki–Wu 2017 C++ 实现，R2D Hurricane Wind Simulation Tool）（A-4）与 stormwindmodel（Willoughby，美国格点峰值风/阵风，CRAN）（D-NOTE）；撤回\"未发现 Snaiki & Wu 开源实现\"。\n\n## 仅供参考\n- A：比较 (b)/(c) 时要分 early/late 指导的业务可得时刻；段 2 预注册写明用 late（事后可得）还是 early，并说明不是同等业务条件。\n- D：Pangu 系统性高估 RMW（arXiv 2511.21792 摘要）——若 (c) 用 AI 场的尺度信息需注意；本节点 (c) 不用 AI 尺度。\n- D：B4 覆盖率判据可与 NHC 风速概率对表，写明增量是物理/AI 集合而非误差气候学。\n- D：HWind 现状未核，引用前自查。\n- D 指出 Lead 记录\"CLIPER 是转述\"多余：接受，CLIPER/TCLP 即论文基线名。\n\n## 未采纳的异议\n- E 称 GenCast 加经验风压关系即可\"大幅消除强度低估、无需借用 NHC 强度\"：不改变 (c) 设计——本节点问题定义就是\"AI 路径 + 官方强度\"，且该订正在 Alet 2026 中针对 GenCast，非 AIWP 三模型；(c′) 已覆盖\"AI 自带强度\"的对照。\n- E 称 WN-C \"全面超越 HAFS/HWRF\"：未核原文数字，只作线索，不写进结论。\n\n## 文献依据\nDeMaria 2025 卡；Vickery 2009 卡 （期刊 pp. 397–404，审稿人转引）；其余先例无卡，待建。"
+    },
+    {
+      "id": "dec-0003",
+      "ts": "2026-10-14 15:40",
+      "title": "B1+B4 段 1b 过闸，派段 2（10-14）",
+      "label": "决定",
+      "text": "# B1+B4 段 1b 过闸，派段 2（10-14）\n- 结果（数字取，Lead 已核）：CLIMADA 6.1.0 H08 + 定向海陆粗糙度 + 预注册时距换算，(a) 最佳路径链 10 事件 29 站：持续风（ASOS 约 2 min）中位偏差 +9.9%、中位绝对误差 21.0%；5 s 阵风中位偏差 −0.9%、中位绝对误差 11.2%。候选 67 站中 34 站截尾，Ida、Idalia 无合格站。\n- 判定：(a) 闸（中位偏差在 ±20% 内）按冻结判据通过。判据只看偏差，中位绝对误差 21% 不在闸内，照实报告、不改判据。\n- 接受约 2 min ASOS 代理作为主闸口径。理由：(b)(c) 与 (a) 用同一风场模型、同一站点集、同一时距换算，口径误差在链间比较中基本抵消；阵风这套独立口径的偏差也接近 0。这不是\"1 min 风场验证成功\"，对外不这样写。\n- 已知偏差：截尾站多是风最大、断报的站，合格站偏向外围、风较小的站。结论只适用于这类站。\n- run2 修正属实现错误（预注册写的是剔除节点，第一次跑却把整个事件剔除了），未改常数，可接受；第一次的结果保留在 v1 根目录。\n- 下一步：段 2（(b)(c) 三链 + (c′)），输入方案先预注册。错了的代价：如果 2 min 代理不够格，(b)(c) 的比较仍然有效（同口径），只是绝对误差不能当风场精度来引用。\n- 依据：无文献依据，基于本线数据；时距与粗糙度的来源见 PREREG_v1（Vickery 2009 卡 WTPZS77N，PDF 第 12/15/22 页；Vickery & Skerlj 2005 卡 ZR7S3SEJ，作者已更正）。"
+    },
+    {
+      "id": "dec-0004",
+      "ts": "2026-10-14 18:25",
+      "title": "B1+B4 段 2 协议修正 s2b（10-14，Lead 定）",
+      "label": "决定",
+      "text": "# B1+B4 段 2 协议修正 s2b（10-14，Lead 定）\n## 情况\n段 2没能评价 48 h 闸，不是过闸也不是不过：\n- 原 PREREG_s2 假定 OFCL 每 6 h 一个节点、插值间隔上限 7 h，但 OFCL 较长时效是每 12 h 一个节点，按原规则任何窗口都凑不齐。这一点是在读取任何站点误差之前发现并公开的（PROTOCOL_DEVIATION.md）。\n- Nicholas 2021-09-12 00 UTC 那一次起报在 a-deck 里没有 OFCL。\n- Pangu 只做了 Milton 一例。\n## 决定（判据不变：29 站；48 h 时 (c) 中位绝对误差 ≤ 1.1 × (b)，且 ≥ 2/3 事件不差于 (b)）\n1. **采用 s2a 的插值修正**：OFCL 相邻节点间隔 ≤ 12 h 时允许线性插值。这属于输入实现，不涉及判据。72 h 窗口跨到 72→96 h 的 24 h 间隔，72 h 只作报告，允许 ≤ 24 h 插值并标\"粗插值\"，不进闸。\n2. **同质样本**：闸只在 (b)(c) 两条链都有输入、而且有合格站的事件上算（这是 NHC/DeMaria 做预报核验的惯例；卡片，PDF pp. 2–5）。Nicholas 的 48 h 记为\"官方无预报，不可评\"，两条链都不算，不换起报时刻。分母照实报告：预计 9 个事件、22 站。\n3. **主 (c) 仍是 Pangu**：24、48 h 全部事件都跑。FourCastNet v2、GraphCast 只跑 48 h，作次要，各报一套，不挑最好的进闸。追踪器用 s2 已经写好的 850 hPa 环流简化版，冻结不改。断链、跳点的判据写进 PREREG_s2b，之后不改。\n4. **(c′)**：Weather Lab 只试一次不需要登录的公开途径（文档里的直接下载链接或公开存储）。需要登录就记\"未取得\"并停止，**不用 Liang Hu 的 Google 凭据**。\n5. **截尾下限检验**：三条链照做，只作报告。\n6. ideas 在任何新的 (c) 观测配对之前，先把以上几条原样写进，带时间戳。s2 的原件和 s2a 的输出都保留，不覆盖。\n## 为什么\n插值和同质样本都只处理\"输入怎么取\"，不碰门槛，也不碰站点集。换起报时刻或删事件改分母都属于事后操作，所以不做。\n## 错了的代价\n如果同质样本会被认为放宽了判据：分母只是从 10 个事件减到 9 个，过闸仍要 ≥ 2/3。全部结果照实报告，可以按 10 个事件的分母复核。\n## 观察（不作结论）\ns2a 的 (b) 48 h 持续风偏差是 −37.9%（9 个事件、22 站），比 (a) 的 +9.9% 低很多。截尾站里 (b) 有 11/19 站模型峰值低于断报前的观测下限。原因可能是路径误差（登陆位置误差中位数 103 km）让风圈偏离了站点，也可能是尺度持续假设。依据：无文献依据，基于本线数据。\n\n## 补充 7（10-14 实验室 Lead 要求；只报告，不进闸）\n按站点离路径的距离分层报偏差：(a)(b)(c) 三链都做，持续风、阵风各一套。距离取站点到各链自己路径的最近距离，按该时刻各链自己用的 RMW 归一，分三档：<1×RMW、1–3×RMW、>3×RMW。另按 km 分 <50、50–100、>100 三档作对照。每档报站数、中位偏差、中位绝对误差。依据：H 节点 H2 在 794 站上看到 v1 H08 峰值偏差 +2.41 m/s（ 第 92 行，Lead 已核），提示外围风廓线或登陆后衰减偏宽或偏强。写进 PREREG_s2b 的\"附加报告\"一节，交付。\n\n## 补充 8（10-14 B 节点 Lead 更正 Colab 口径，按 Liang Hu 原话\"现阶段多用 Colab、不限 CU\"）\n派活时写的\"Colab 单试验 ≤20 CU\"作废，不设单试验上限；单试验预计 >100 CU 先停下报 B1+B4 Lead。用完必须 `colab stop`，不让会话空转，同一轮只派一个执行方。已按旧上限分段跑完的部分不重跑；为合并而重开会话也不必。"
+    },
+    {
+      "id": "dec-0005",
+      "ts": "2026-10-14 19:13",
+      "title": "裁决与搁置：B1+B4 未过闸（6/6 有效，均\"有保留地支持\"搁置）",
+      "label": "决定",
+      "text": "# 裁决与搁置：B1+B4 未过闸（6/6 有效，均\"有保留地支持\"搁置）\n审稿人：E Gemini、A GPT-6、D GLM、C DeepSeek、B Kimi、F Grok。无补位、无缺额。证据见审查卡片；结论草稿 （保留原样，以本文件为准）。\n\n## 判词（定稿）\n按公开修订并重新冻结的 s2b 协议，B1 未过闸：48 h 同质 9 事件、22 站，Pangu/OFCL 中位绝对误差比 1.021（满足 ≤1.1），不差于 OFCL 的事件 5/9（需 ≥6/9）；按原 s2 的 10 事件分母为 5/10（需 ≥7/10），Nicholas 记为不可评，不算失败。两种分母都不过闸，失败不是分母修订造成的。B1+B4 节点**搁置**，B4 按顺序不做。不能据此说 AI 路径总体优于或劣于 NHC。\n\n## Lead 亲自核实\n- 主闸数字：此前用逐站表复算，与 6 位审稿人一致（1.0209、5/9、FCN2 1.214 与 3/9、GraphCast 0.678 与 5/7）。\n- 路径误差：同质 9 事件、在实测登陆时刻的中心误差中位 OFCL 105.0 km、Pangu 90.9 km（F、E 对；D、B 说 90.9 是 11 事件值，不对）；逐事件 Pangu 只在 4/9 事件上更近；±12 h 平均路径误差中位 OFCL 96.9、Pangu 85.7 km。名义 48 h 的实际提前量是 48.5–59 h。\n- 输入：Debby 起报时 POCI−Pc = 2 hPa、RMW 75 nmi；Nicole RMW 200 nmi；Milton RMW 5 nmi（a-deck CARQ τ=0）。CLIMADA H08 由气压差算风速（`_compute_angular_windspeeds_h08`、`_bs_holland_2008`），不用输入的 Vmax，与 E 的说法一致。\n\n## 必须改（已落实在本文件和项目页）\n1. **撤回\"路径差异被小样本和共同偏差淹没\"**（E-1、A-2、F-1、C）。实际情况：中位数接近，但逐事件差异大（|Pangu−OFCL| 的中位约 68 km），Pangu 只在 4/9 事件上路径更近；输掉的 Debby、Delta、Zeta 都是 Pangu 路径更差，赢的 Helene、Nicole 却是 Pangu 路径更差、误差互相抵消才赢。所以路径确实影响站点风，只是方向不一致。原因没有被单独鉴定。\n2. **共同偏低 −35% 到 −38% 的机制**（E-2；A、B 要求不下单因结论）：候选机制有 (i) Δp 由起报时的 Δp0 按 OFCL Vmax 缩放外推，起报时风暴还弱的事件（Debby Δp0 = 2 hPa、Francine 6 hPa）会把登陆时的 Δp 压得很低；而 H08 只用 Δp，OFCL 的 Vmax 其实没有直接进风场；(ii) RMW 冻结在起报时刻（Nicole 200 nmi 是巨型假风眼，Milton 5 nmi 是微型眼）；(iii) OFCL 强度本身偏低（E 算的登陆时 Vmax 中位偏差 −14.9%，Lead 未复算）；(iv) 850 hPa 追踪中心和近地风场中心可能有偏移（D）。各自贡献多少没有拆分，**证据不足**。这些都是 s2 预注册里写定的输入假设造成的，不是 AI 本身的问题。\n3. **补报预注册要求的三项**（E-3、A-3、F）：±12 h 平均路径误差（见上）、实际提前量（48.5–59 h，24 h 档实际 24.5–35.75 h）已补。新模型峰值时刻是否仍落在 v1 观测窗内（≥648 分钟）这一项**没交付**；E 估计 (b) 9/22、(c) 7/22 的站峰值时刻落出 v1 的 ±6 h 窗。按协议不得据此重新选站，只作为解释上的局限照实写。\n4. **协议修正如实表述**（A-1、D、F）：原 s2 不可判；s2a 是探索性修正；s2b 是看过 (b) 结果和 Milton 单例之后重新冻结的（非盲）。同质分母把门槛从 7/10 轻微放宽到 6/9，已披露；两种分母都不过闸。我原来写的\"只处理输入、不改分母\"不准确，更正。登陆误差的实现用的是事件清单里固定的登陆点，不是 BEST 插值（B），只影响诊断。\n5. **距离分层的局限**（E-4、B、C、F）：(a) 远站 +35% 只有 n=3，同档阵风是 −4.8%；(c)(a) 用 6 h 节点算最近距离，(b) 用 15 min，口径不一致，可能把站分错档。H2 的 +2.41 m/s 是全样本偏差（794 个事件×站峰值，来自小时 METAR、300 km 范围），不是远站分层，不作互相印证。\n6. **重启条件改写**（全部审稿人）：GraphCast 的 AIWP 档从 2022 年才开始，2020–21 年本来就没有，\"补齐\"这一条不可执行，删掉。以下任何改动都要**新立协议、重新冻结**，不能翻转本次判闸。换风场模型或站点集，要先重过 (a) ±20% 闸。\n\n## 重启条件（定稿；满足后开新版本，不翻本次）\n- R1 尺度和气压输入：用业务可得的方法替代\"Δp0 缩放 + RMW 冻结\"，比如用 OFCL 34/50/64 kt 风圈拟合 Holland 剖面，或用 Vmax 推算 Δp 的风压关系；或者 Liang Hu 的三维边界层模型到位。重过 (a) 闸。\n- R2 事件数：失败的是逐事件条件。新版要有 ≥15 个可评事件、每事件 ≥3 个合格站（量化门槛，新协议里再定）。可加 2025 年事件，也可接 H2 的多源站网，但要统一观测口径。\n- R3 截尾：强风段断报的问题（34/67 站截尾）要有处理方案，比如多源站网或下限检验进主指标的设计。\n- R4 主链选择：要换 GraphCast（2022+）或做 AI 共识作主链，必须事先预注册；WeatherNext Cyclones 端到端链（AI 自带强度和风圈）是另一个问题，不是 B1 的重启，要能不登录取得数据。\n- 可得时刻：OFCL 比 AI 晚约 3 h 发布，新版要写明是否修正。\n\n## 仅供参考\n- D、B：24 h 只报告不进闸，Pangu 0.85 但事件 4/10；22 站配对里 Pangu 赢 12 站（符号检验 p ≈ 0.83）——两链在站点上没有实质差异。\n- C：FCN2 和 GraphCast 登陆误差都约 59 km，站点误差却差近一倍，说明单看登陆时刻的误差解释不了站点风。\n- A：代码里插值上限是 13/25 h，距离分档的边界归属和协议文字有细微差别，影响证据不足。\n- B：草稿写\"35–38%\"，实际是 −34.8%/−37.9%。\n\n## 未采纳的异议\n- E 用 BEST 强度加两链路径重算（Pangu 比 1.188、3/9）：这是新口径，不在协议里，不作判据，只作\"路径确有影响\"的旁证（Lead 未复算）。\n- 无审稿人主张不搁置；未采纳\"先补跑再定\"——F、E 都指出协议内没有可翻转主闸的检验，补跑需要新协议。\n\n## 文献依据\n近邻先例卡见项目页（DeMaria 2009/2013、Alet 2026、Lai 2025、Wu 2026）。本结论无文献依据，基于本线数据。\n## 错了的代价\n搁置不删任何东西：脚本、追踪器、事件清单、配对代码都留着；按 R1/R2 开新版本，估计 1–2 天、Colab 若干 CU。"
+    },
+    {
+      "id": "dec-0006",
+      "ts": "2026-10-14 19:15",
+      "title": "B1+B4 搁置后：派 v2 可行性核查；B2 先发 Grok 快查（2026-10-14）",
+      "label": "决定",
+      "text": "# B1+B4 搁置后：派 v2 可行性核查；B2 先发 Grok 快查（2026-10-14）\n\n## 事实（B 节点 Lead 已核）\n48 h 同质 9 事件 22 站：Pangu/OFCL 中位绝对误差比 1.0209（≤1.1 过），事件 5/9（需 6/9）→ 未过闸；两链中位偏差 −34.8% / −37.9%。审查 （6/6）支持搁置，重启条件 R1–R4 见。\n\n## Decision I made\n1. 接受搁置，本次判闸不翻。\n2. 派 B1+B4 做 v2 可行性核查（只出文件、不跑新配对、不判闸）：R2 能否凑到 ≥15 个每事件 ≥3 站的可评事件；R1 选一种业务可得尺度/气压输入并先过 (a) 闸；起草未冻结的 PREREG_v2。\n - 为什么：v1 没回答\"AI 路径链有没有用\"——两链都被预注册的输入假设压低 35–38%，路径的影响被盖住；B 是 Liang Hu 主力方向，核查只要几 CU 和一两天。依据：无文献依据，基于本线数据。\n - 错了的代价：若核查说凑不够事件或 R1 无可行方法，浪费一两天 bot 时间；v1 结论不受影响（新版须新事件集与新冻结协议，不得翻转本次）。\n3. B2 由 B 节点先发 Grok 快查（AI 生成合成台风与设计风速），有方向再开节点；Deep Research 额度用完，第二步暂缓。\n - 为什么：B1 已有结果，按节点页约定 B2 可起步；只花订阅额度。错了的代价：一次快查。"
+    },
+    {
+      "id": "dec-0007",
+      "ts": "2026-10-14 20:34",
+      "title": "B1+B4 v2 可行性回报后：不开 v2 判闸，派小时同质池定向核查（2026-10-14）",
+      "label": "决定",
+      "text": "# B1+B4 v2 可行性回报后：不开 v2 判闸，派小时同质池定向核查（2026-10-14）\n\n## 事实（已核）\n- 2020-10 后美国本土 ≥50 kt 登陆 19 个（HURDAT2 2026-09-23 版，含旧 12）；全部有 Pangu 48 h 对象；Mindy/Nicholas/Harold/Ophelia 无同起报 OFCL。\n- 分钟 ASOS（≥3 站）：7 个预筛候选（旧 4 + 新 3）。小时站 150 km：旧 12 全 ≥3 站，去 Nicholas 余 11；加新 3 为潜在 14，Eta 未核。小时与分钟峰值采样密度不同，不能混池。\n- R1：OFCL 风圈 + Knaff 2007 RMW 先验（卡 ZPYAUTZG，PDF 第 3–4、6 页）+ Knaff–Zehr 2007 ΔP 式 7（卡 D8NBE3ZE，PDF 第 4–5 页），需 GFS 业务场的 V500 与 Penv；风圈→Holland RMW/B 逆拟合无文献通用法，属工程假设。\n\n## Decision I made\n1. 不开 v2 判闸，节点保持搁置； 不冻结。\n - 为什么：R2（≥15 事件 ×≥3 站，审查 定）未满足；R1 环境场可得性未证。\n2. 派 ideas 做 0 CU 定向核查：单一小时采样口径、同一脚本重算 150 km 站数（旧 11 + Eta/Elsa/Fred/Henri + 2026 季业务最佳路径登陆），并实读 GFS 归档验证 V500/Penv 可算。\n - 为什么：小时口径是唯一可能凑够 15 个且同质的路；2026 季（未进 HURDAT2）可能补事件。依据：无文献依据，基于本线数据。\n - 错了的代价：一两小时 bot 时间、0 CU；若仍 <15，节点继续搁置，重启条件加一条\"等 2026 季 HURDAT2 发布后复数\"。\n3. 判据不动（1.1、2/3、±20%、≥15×≥3）；若改用小时口径为主分析，正式 v2 必须把 (a) 用同一小时口径重过闸。"
+    },
+    {
+      "id": "dec-0008",
+      "ts": "2026-10-14 21:59",
+      "title": "B1+B4 v2b：小时同质池恰好 15 例，补齐前置后出预注册定稿（2026-10-14）",
+      "label": "决定",
+      "text": "# B1+B4 v2b：小时同质池恰好 15 例，补齐前置后出预注册定稿（2026-10-14）\n\n## 事实（已核）\n- 单一小时 METAR 口径（150 km、登陆 ±12 h ≥75% 有效小时）：2020–24 年 15 个事件全部 ≥3 站，同起报 Pangu 与 OFCL 都在；余量为 0。站类（ASOS/AWOS）和风速计高度未核。\n- 2026 季只有 Isaias 是 ≥50 kt 美国登陆，但 AIWP 没有对应的 Pangu 对象。\n- GFS f048：2021–24 年 12 例可取，Fred/Milton 已实读算出 V500/Penv；2020 三例 AWS 404。V500 用的是 10 m 风；卡 D8NBE3ZE 只写\"400–600 km 环带平均切向风\"，没写层次，要核原文（无文献依据确认层次，待查）。\n\n## Decision I made\n1. 仍不判闸、不跑 (a)。派 ideas （0 CU）补齐 2020 环境场、V500 层次、业务时刻统一规则（按 NCEP 发布时间表，不逐案查时间戳）、逐站站类与高度 QC、Isaias，并出可冻结的；冻结后先只跑 (a) 的 ±20% 闸。\n - 为什么：数量刚好达标，任何一例失格就不满足 R2；要在看任何误差之前定下全部规则和分母。\n - 错了的代价：bot 半天、0 CU；如果 QC 后不足 15 例，按预注册写\"不判闸\"，节点继续搁置，等 2026 季进 HURDAT2、AIWP 补齐后再数。\n2. 预先写死：QC 后不足 15 事件×≥3 站就不判闸；判据 1.1、2/3、±20%、≥15×≥3 不动。"
+    },
+    {
+      "id": "dec-0009",
+      "ts": "2026-10-14 22:24",
+      "title": "B1+B4 v2 准备暂停：严格站类高度后只有 13 例（2026-10-14 22:3x）",
+      "label": "决定",
+      "text": "# B1+B4 v2 准备暂停：严格站类高度后只有 13 例（2026-10-14 22:3x）\n\n## 事实（已核）\n- 170 个站–事件里 80 个在 NWS 2025 ASOS 设备清单中有风速计高度（33 ft 61 个、26 ft 18 个、19 ft 1 个），90 个不在清单中。按\"运行年份早于事件、高度 8–12 m\"的条件性快照：13 个事件 ≥3 站，Delta、Milton 各只 1 站。历史高度（HOMR）一站也未证实。\n- 2020 三例 GFS 环境场可从 NCAR GDEX 取到；V500 用 850 hPa（依据 Knaff 等 2014，doi 10.1175/JCLI-D-13-00096.1；KZ07 卡 D8NBE3ZE PDF 第 5 页没写层次）。业务时刻按 NCEP 发布时间表统一退一周期（代理）。\n- Isaias 的 2026-10-08 00Z Pangu 周期是数据空洞，不能补。\n- CLIMADA H08 的 Holland B 由压差内生算出，风圈只能拟合 RMW；BEST 风圈→H08 的适配器还没写、没验证。\n\n## Decision I made\n1. v2 准备到此停：不冻结，不跑 (a)，节点保持搁置。\n - 为什么：R2（≥15 事件×≥3 站）按严格站类高度只到 13；要凑到 15 就得收 7.9 m 站做高度订正，仍是零余量，还要再做 HOMR 历史核查和 H08 适配器开发验证——为一个余量为 0、按事件计数判闸（2/3）统计力很弱的试验再投入不划算。科学增量也有限：AI 路径与业务路径相当已有 DeMaria 2025（卡 NR_demaria_2025，PDF pp. 5–8）。\n - 错了的代价：如果其实值得做，晚几个月；全部材料（预注册候选、站表、环境场脚本、(a) 链脚本）都留在，重启时从这里接，不用重做。\n2. 重启触发（任一）：① Liang Hu 的三维边界层模型到位（换掉 H08，同时绕开 B 的适配问题）；② 2026 季进 HURDAT2、AIWP 补齐，HOMR 历史高度核实后 ≥15×≥3。是否收 26 ft 站做高度订正，必须在看任何误差前写进预注册。\n3. 判据不动。B 节点的主力转到 B2（在跑）。"
+    }
+  ],
+  "reviews": [],
+  "results": [
+    {
+      "id": "res-0000",
+      "ts": "2026-10-14 14:47",
+      "title": "B1+B4 段 1：可复核数据入口（10-14，美东）",
+      "label": "结果",
+      "text": "# B1+B4 段 1：可复核数据入口（10-14，美东）\n\n1. 最佳路径：NHC HURDAT2 Atlantic [2026-09-23 版]([external URL omitted]，逐风暴 `L,HUbALnnYYYY.dat.gz` 中 BEST 的第 19 栏是 RMW（海里），第 17 栏 POCI（hPa）；在主样本逐风暴读回，6 小时线性插值，若缺就剔除，不能以常数填补。CIRA [EBTRK]([external URL omitted] 的公开 v3.0.2 实际仅更新到 2021，不能拿它声称有 2022–24 的 RMW；其 [README]([external URL omitted] 亦说明 RMW 并非全时期正式最佳路径字段。本次 pilot 用 NHC b-deck；HURDAT 中非整 6h 登陆位置需另外保留。\n2. 官方链 (b)：相同目录 `aALnnYYYY.dat.gz` 的 `OFCL` 是官方路径和强度（ 等）。实测 GET 返回 200，内有 Milton 的 OFCL 行；按起报时刻与实际登陆时刻选预先定义的 24/48/72 h lead，既不可用事后 BEST 替代官方强度，也不能暗中调整 AI 路径时效。NHC [ATCF 格式说明]([external URL omitted] 2 未计算官方链。\n3. AI 链 (c)：CIRA/DeMaria (2025) 研究确实使用自身的 TC tracker；本轮检索 CIRA 页面及论文，尚未找到对全部 2020–24 风暴公开可批量下载的逐预报轨迹档。实测 Milton 2024 的官方 a-deck（279 种 aid）无 PANG/GRCS/FCN2/PGWX 同名记录；这不排除另处 CIRA 内部或公开文件，故仅记“现成统一轨迹未核实可下载”。原始 [AIWP S3 README]([external URL omitted] 给出模型/时间/变量； 的 108 个具体对象逐一用 S3 list-prefix 核验，95 个存在、0 次请求错误；Pangu 2024 Francine 的 72 h 对象缺一个。最晚 00/12 UTC 起报时间与确切 lead 另有列，不可把 24 h 标签等同恰为 24 h。\n4. 原始 AIWP 四维 netCDF 每个约 7–9 GB；试了 Milton 对应 FOUR 文件的 HEAD（7,472,991,383 B），HTTP `Range: bytes=0-1023` 返回 、HDF5 签名。说明对象支持字节范围，不等于“按空间时间切片已成功”。Colab 会话先用 `h5py`[local path omitted] 缓存 Range 或远程读取做单文件单时次的经纬度/海平面气压与 10 m u/v 小块读取测量请求字节数；若 netCDF 压缩 chunk 跨全球时次，字节/请求失控就停止，不下载整文件。随后围 NHC 预报先验半径搜 MSLP 局地低值、用 850 hPa 环流复核并记录断链（DeMaria 2025 第 3 节建议环流追踪）；不能只凭一帧全域最低压。当前没有运行 Colab，也没有测得切片实际数据量/时长，不能给虚构数字。论文：[external URL omitted]；Radford 2025：[external URL omitted]\n5. ASOS：IEM [1-minute 页面]([external URL omitted] 的 [backend]([external URL omitted] 用 `station=SRQ&vars=sknt,gust_sknt&sts=2024-10-09T12:30Z&ets=2024-10-10T12:30Z&what=download&tz=UTC`。`sknt` 是档案的逐分钟持续风读数（按 ASOS 传感器解释近似运行 2 min 平均，不是验证过的独立 1 min 平均），`gust_sknthttps:/[local path omitted]?help=` 有 `gust`, `peak_wind_gust`, `sknt`，但低频/不同定义不可混到主指标。IEM 自述 raw 存档有限 QC；本次甚至出现 Ian PIE 最大持续风 82 kt、5s gust 最大仅 18 kt，判疑剔除，不可把此源当已质控真值。\n6. 中断/缺测：见 每站 24h 应 1440 条的实有数。Idalia TLH/GNV/AAF 仅 207/151/233，且都在登陆前停止；Helene TLH 0，Milton TPA/BKV 0，Ian APF 0。0 行不等于已证实物理设备故障，可能是档案缺源；另有 Milton PIE 827、GIF 858，Ian FMY 433，均会偏低估实测峰值。主展示需每站完整性与 QC 标志；不可对缺测做零风填充。没有下载任何 AIWP 原始 7–9 GB 文件到 工作站。\n\n本段费用：本地 HTTP/NHC/IEM/S3 目录查询和 CPU 脚本；Colab 未启动，耗费 0 CU。若后续先单模型、单预报切片，预算上限每试验 ≤20 CU，实测花费再报。图和 CSV 仅是公开站点数据的摘要，不保存/发布逐分钟原始序列。"
+    },
+    {
+      "id": "res-0001",
+      "ts": "2026-10-14 14:48",
+      "title": "B1+B4 (a) 最佳路径试算（10-14，美东）",
+      "label": "结果",
+      "text": "# B1+B4 (a) 最佳路径试算（10-14，美东）\n\n状态：小样本预检，非正式判据通过/失败结论。输入 NHC HURDAT2 登陆位置/路径/1 min 最大风/中心压 + b-deck 的 RMW/POCI；IEM/NCEI ASOS 1-minute 存档，均来自公开网页；原始路径见；算法见 、。每事件登陆点 150 km 圈内有 1min 档标记的机场；登陆前后 12 h 同窗，模型 15min 取峰，站点逐分钟读数取峰，未补缺测。具体每站 28 行及数据 URL 见；事件定位来源与覆盖见。图 `chain_a_ratio_pilot5.png.svg`，绿色区间预先固定为预测/实测 0.8–1.2，图注数据源：NHC HURDAT2 + NHC ATCF b-deck + Iowa Environmental Mesonet/NCEI ASOS one-minute archive。\n\n质量控制：28 个候选站中只有 18 个站有 ≥720/1440 个非缺失持续风分钟；Ian PIE 的实测最大持续风 82 kt 但最大 5 秒阵风仅 18 kt，物理自洽性不过，排掉后共 17 个、4 个事件。第五个 Idalia 三站都在登陆前停报（151–233 min），贡献 0 个合格站，不能称五事件通过检验。 保留所有剔除理由，原 未做 PIE QC，其 18 站数不用于主结论。\n\n指标定义：e=预测/观测−1；中位绝对误差=median(|e|)，中位偏差=median(e)。质量控制后 17 对：中位绝对误差 50.69%，中位偏差 +50.69%，不在事先写定的 ±20% 内。更严格只纳入 ≥1296/1440 min 的站，6 对：两指标均 44.745%，仍不在 ±20% 内；但后者仅覆盖 3 个事件、机场暴露选择很强。逐事件：\n\n| 事件 | 可用/候选站 | 中位绝对比值误差 | 中位有符号偏差 | 缺测特别说明 |\n| --- | ---: | ---: | ---: | --- |\n| Ian 2022 | 5/8 | 25.62% | +25.62% | PIE 物理不自洽剔除；FMY 几乎登陆前断报 |\n| Idalia 2023 | 0/3 | 不可算 | 不可算 | AAF/GNV/TLH 登陆前停止、仅 151–233 分钟 |\n| Francine 2024 | 4/5 | 54.95% | +54.95% | BTR 1min 档无行 |\n| Helene 2024 | 2/3 | 24.665% | +24.665% | TLH 1min 档无行；其他两站记录未满 |\n| Milton 2024 | 6/9 | 73.195% | +73.195% | TPA/BKV 无行、FMY 304 min；PIE/GIF/SPG 部分停报 |\n\n非常重要：这里比较的是 ASOS 每分钟报告的持续风读数（常见 2 min 运行平均）与一个没有明确定义平均时距的极简 Holland/常数 0.85 输出。没有达到“同一物理定义的 1 min 持续风”或阵风配对。没有海陆粗糙度订正、风暴平移与方位非对称；最大峰的缺测非随机，实测分母可能偏低。不能把 +50.69% 归咎于 AI 路径，更不能凭试算宣布科学方向失败。按冻结闸门，不得推进 (b)(c) 的优劣结论；应先把完整风场近地换算、暴露/平均时距、IEM 缺测质控修复，复测同一个未改变的 ±20% 判据。如修复后仍越界，就按项目页的“风场模型不合格”收口。当前简化实现本身按代理筛选不合格。\n\n此次只有本地 CPU/HTTP 请求，无 Colab 会话、无 HPC，Colab 花费 0 CU。没有下载或发布原始逐分钟全时序和 AIWP 大文件；图表是站级峰值摘要。"
+    },
+    {
+      "id": "res-0002",
+      "ts": "2026-10-14 14:48",
+      "title": "风场筛选实现与适用边界（10-14）",
+      "label": "结果",
+      "text": "# 风场筛选实现与适用边界（10-14）\n\n实现：，本地标准库；此次执行的是“最佳路径 + Holland (1980) 轴对称梯度风 + 常数 0.85 缩减”的最小筛选，并非 Vickery et al. (2009) 二维 slab + 分高度廓线，更非三维边界层或地形订正。选择理由是输入（路径、Pc、Vmax、RMW、POCI）能直接从 NHC 取得、公式与代码可核，便于先发现不可用的观测与结构参数。Vickery 2009 的模型是更合适的后续实现；它的 slab、海陆粗糙度过渡、dropsonde 廓线不可能用 0.85 常数替代。卡片，PDF 第 1、12、15、22–24 页（期刊 381、392、395、402–404 页），其 0.85 系数是同批观测试调的简单对照，非验证过的通用陆上因子。\n\n逐时设中心纬度 φ/经度 λ、最佳路径 Vmax [kt]、Pc [hPa]、b-deck RMW [nmi]、POCI [hPa]。线性插值 6h 数据并保留 HURDAT2 的非整点登陆，空间站心距离用 haversine。令 Δp=100(POCI−Pc) Pa，ρ=1.15 kg/m³（假设），f=2Ωsinφ，Ω=7.292115×10^-5 s^-1，R=1852 RMW (m)，r=max(3000 m, 站心距离)，x=(R/r)^B。定义 Vg,max=(0.514444 Vmax)/0.85，反算 B=ρ e (Vg,max²+f R Vg,max)/Δp；仅保留 0.5≤B≤4、8≤RMW≤200 nmi、500≤Δp≤15000 Pa。梯度风 Vg(r)=sqrt[(B Δp/ρ) x exp(−x)+(rf/2)²]−rf/2。风场速度 V10(r)=0.85 Vg(r)，每站在登陆前后 12h 的 15min 时间网格取最大。梯度风压强式见 Wang 等 (2020) PDF 第 5 页式 (7) （原 Holland 1980）；Vmax→梯度换算、ρ、RMW 插值、最小半径、B 截断是本试验假设，不得写成文献值。函数 `modelinterp` 可逐项复算。沿径向公式无风暴平移非对称、背景风、局地衰减或山地加速；尤其把海上 0.85 同时给陆上机场，必然有系统风险。\n\n时间/峰值的物理不一致：NHC Vmax 是最大 1 min 持续风；本简化模型近地系数没有赋予稳定的时间平均定义；IEM `sknt` 是每分钟输出的 ASOS 持续风，通常近似 2 min 运行平均，未确证为 1 min。同图的比值仅作代理筛选，不是任务判据要求的最终“峰值阵风或 1 min 持续风”合格验证。`gust_sknt` 是 5 s gust，卡片 ZR7S3SEJ（候选，PDF 第 2–3、5–6 页）把不同采样时距和暴露分开；2KXRIJJB（候选，PDF 第 2–4 页）约 2 s 与 10 min 的比较不能直接作为 5 s/2 min 通用乘数。本站未做阵风因子和 1→2 min 换算，故不将未预报的 gust 与实测 gust 强行配比。两卡均待独立，不当作已批准的设计值。\n\n地貌/暴露：站坐标只筛 150 km，未用机场各风向障碍或 land-cover；陆 z0=0.03 m、海 z0=0.0013 m 仅为 Vickery 示例（卡片 WTPZS77N，PDF 第 12、15、22 页），未进入代码。不能声称已地貌订正。要过闸须先实现基于方向/海陆过渡的边界层换算，且先查原文/作者代码/卡片再选值；任何后续调参都与当前冻结的 ±20% 闸区分为新模型，不可在本样本后验调系数凑闸。项目页已填参数来源表。合理敏感性待做：ρ 1.10–1.25、近地系数 0.65–0.90、粗糙度海/陆代表值与方向性变化、RMW±20%；这些是范围建议而非已运行的验证。"
+    },
+    {
+      "id": "res-0003",
+      "ts": "2026-10-14 14:49",
+      "title": "追加说明：最终采用的清单与图（不覆盖首轮产物）",
+      "label": "结果",
+      "text": "# 追加说明：最终采用的清单与图（不覆盖首轮产物）\n\n 为先按模型年代填的初版，不能用其中 当实测文件存在性。实际 S3 对象验证结果在；最终共享清单为 ：12 个登陆事件，108 个（事件×模型×lead）对象中 95 个存在。尤其 Francine 2024 的 PANG 72h 缺档；初版 events.csv 的全 True 为错误，必须以 verified 为准。原始清单与首轮图保留，以免覆盖已有结果。\n\n首轮图 横轴最大 2.2，Ian RSW 点截在边界；修正显示版 `chain_a_ratio_pilot5_v2.png.svg` 横轴到 4.2 并把持续风代理写明。最终报告请引用 v2 图，不要引用原图。\n\n实现 默认会写,已存在时不得在同目录重跑；要复算请复制到新的空子目录并从新脚本运行，保留旧成果。pilot5 的原 summary 未剔除 Ian PIE 的物理不自洽数据，最终应引用 和。"
+    },
+    {
+      "id": "res-0004",
+      "ts": "2026-10-14 15:14",
+      "title": "B1+B4 GitHub 仓库表（10-14 15:0x，GitHub API 实查；来源线索：Grok 快查报告 16 PETW/09 Handoffs/DeepResearch/20261014 1439 …）",
+      "label": "结果",
+      "text": "# B1+B4 GitHub 仓库表（10-14 15:0x，GitHub API 实查；来源线索：Grok 快查报告 …）\n\n| 仓库 | 星数 | 最近推送 | 许可证 | 对应论文/用途 | 能否在 Colab/工作站 跑 |\n| --- | --- | --- | --- | --- | --- |\n| [external URL omitted] | 99 | 2026-08-03 | GPL-3.0 类（API 报 NOASSERTION，未逐字核） | Arthur 2021 NHESS 10.5194/nhess-21-893-2021；Holland 1980/2010、Willoughby、Kepert 边界层、阵风因子 | Python+C，工作站 CPU 可跑（未实测） |\n| [external URL omitted] | 480 | 2026-10-14 | GPL-3.0 | CLIMADA `trop_cyclone`：Holland 1980/2008/2010、ER11 风场；读 IBTrACS | Python，工作站 CPU 可跑（未实测） |\n| [external URL omitted] | 10 | 2024-04-26 | GPL-3.0 | 参数化 TC 风压场（Holland 1980 + B 参数估计、入流角、背景风） | Python，轻量；维护停滞 |\n| [external URL omitted] | 6 | 2025-12-10 | GPL-3.0 | R 包，移植 TCRM 模型（Holland、Double Holland、Kepert BL）；MWR 2024 澳洲站点验证所用 | R，工作站 可跑（未实测） |\n| NHERI SimCenter R2D Hurricane Wind Simulation Tool（[external URL omitted]，具体仓库待核） | — | — | BSD 类（待核） | Snaiki & Wu 2017 线性分高度模型 C++ 实现（SimCenter 2021 报告 §6.3.1；Frontiers 2025 平台论文），接受自定义路径与地表粗糙度——审稿人 A 补 | 未实测 |\n| stormwindmodel（CRAN，[external URL omitted]；作者 geanders） | — | — | 待核 | Willoughby 模型，输入 best track，输出美国格点/县 10 m 1 min 持续风与阵风峰值——审稿人 D 补 | R，工作站 可跑（未实测） |\n| [external URL omitted] | 151 | 2026-08-10 | BSD-2-Clause | TC 追踪器（GenCast 论文用于 TC 路径）；气候型追踪器，需高层暖心判据；AIWP 强度偏弱时纯 MSLP 易断链，本节点改用 850 hPa 环流追踪 | C++，需编译；工作站 或 Colab 可跑（未实测） |\n| [external URL omitted] | 7708 | 2026-09-04 | Apache-2.0（代码）；Weather Lab 历史路径 CC BY 4.0（Lead 已核开发者文档） | WeatherNext/GenCast 系模型；Weather Lab 提供 WN-C 历史集合路径（CSV/ATCF，约 2023 起），B4 首选；自跑为最后备选 | 需 GPU，Colab A100 可能可跑（未实测，未核权重许可） |\n\n结论：风场模型有成熟开源实现，CLIMADA 最活跃，TCRM 含 Kepert 边界层与阵风换算；AI 路径先查 CIRA 与 Weather Lab 现成文件。Snaiki & Wu 2017 有 SimCenter 实现（审查 更正）；未发现 Vickery 2009 独立开源实现。许可均允许内部研究使用；GPL 代码若改写后对外分发须开源。"
+    },
+    {
+      "id": "res-0005",
+      "ts": "2026-10-14 15:14",
+      "title": "Grok 快查（b99be0）Lead 核对记录（10-14）",
+      "label": "结果",
+      "text": "# Grok 快查（b99be0）Lead 核对记录（10-14）\n- DeMaria et al. 2025 AIES：arXiv 2409.06735 摘要已核——4 模型（FourCastNetv1、FourCastNetv2-small、GraphCast-operational、Pangu），北半球 2023-05~11，7 天预报；路径误差与检测率\"comparable\"于最佳业务模型，加入共识最多降 11%；强度误差大于最简单的强度预报，且\"almost always reduce the TC intensity, especially within the first 24 h\"。报告中\"CLIPER\"是转述，摘要原文为 climatology/persistence 类基线。→ 采用：强度用 NHC 官方。页码待 litwiki 卡。\n- AIWP README（[external URL omitted]）已核：无任何 TC/track 字样；有 MSLP 与 10 m u/v；GraphCast 自 2022-01；00/12 UTC，2023 另有 06/18；记录期约 2020-09-30 起；另含 FourCastNet v1。→ 采用：需自行追踪（除非 CIRA 另有发布，ideas 段 1 在查）。\n- WeatherNext Cyclones Nature 2026（s41586-026-10953-2）：页面需登录，未核，不采用。\n- \"未找到 AI 预报路径→参数化风场→站点风的先例\"：Grok 一家之言，Deep Research 因月度额度用完（30/30）未做，暂作线索。\n- GitHub：见 github_repos.md（API 实查）。\n- 10-14 补：litwiki 卡 NR_demaria_2025_aiwp_tc_track_intensity.md 核原文，结论同上；另指出拼接方案作者未验证（PDF pp. 1、11–13），无公开路径文件（PDF p. 14）。\n- 10-14 更正：WeatherNext Cyclones 并非不可核——开发者文档公开，历史路径 CC BY 4.0、CSV/ATCF、约 2023 起；Nature 2026 为开放获取。AI 路径追踪方法改为 850 hPa 环流（DeMaria 2025 附录），不用纯 MSLP。"
+    },
+    {
+      "id": "res-0006",
+      "ts": "2026-10-14 15:14",
+      "title": "B1+B4 (a) 链 v1 预注册（冻结；观察对照前）",
+      "label": "结果",
+      "text": "# B1+B4 (a) 链 v1 预注册（冻结；观察对照前）\n\n时间：10-14 15:19 EDT。此文件在本轮 v1 结果计算前写入；上一轮 pilot 的 +50.7% 已公开，因此不可能声称完全盲态；以下常数不利用站点比值调参。之后不改此文件/规则；如需改变另建 v2。\n\n## 模型与数据\n选择 CLIMADA v6.1.0 `trop_cyclone` H08（tag commit bb9595944fcf673152ea53e61efbafeb0b1e4406，GPL-3.0）。选它而不选 Vickery 2009 slab，是因为后者无现成可直接核验的完整公开实现；也不将上一轮 0.85 Holland 冒称为完整 Vickery。CLIMADA 的 `_compute_windfields` 明确定义 10 m、1 min 风，并按风暴移动速度、半径衰减加入矢量平移非对称（源码 v6.1.0 第 1131–1257 行；H08 使用 Holland 2008 B、默认梯度到地面 0.9，源码第 61–69 行）。用该版本软件原函数，不手调强度。HURDAT2 中心、1-min 最大风与中心压，ATCF b-deck BEST 第 17/19 栏 POCI/RMW；在 ±12h 中的原始时间点间线性插值到 15min，缺一侧或超过 7h 则不外推，RMW<=0 或 POCI<=Pc 的节点剔除。原始 HURDAT 登陆特殊时点保留；仅经度/纬度/强度/气压线性插值，不据 ASOS 调节风暴。站点为 IEM ASOS 网络 HAS1MIN=1、存档覆盖事件时刻且到 HURDAT 登陆中心 150 km 内。模型峰在登陆 ±12h 取最大。\n\n## 暴露与时距（预先固定）\nCLIMADA 原始 10 m 1-min H08 场为海洋基线；站点风向来自模型 u/v，沿反向来流在 2/5/10 km 处查询 Natural Earth 10m land polygon（公开地表类）。三点中 >=2 点为陆地定陆上，否则定水面；站点是否位于 polygon 也留痕。近地粗糙度海上 z0=0.0013 m、开阔陆地 z0=0.03 m，据 Vickery et al. 2009 PDF 第 12、15、22 页；陆上系数 F=[ln(10/.03)[local path omitted](500/.03)]/[ln(10/.0013)[local path omitted](500/.0013)]，水面 F=1，粗糙度在采样点类别变化时逐时切换。500 m 中性常通量对数层和单一开阔陆地 z0 是明确假设，不是 CLIMADA 或 Vickery 完整海陆过渡；范围参考高度 200–1000 m、陆 z0 0.02–0.07 m，影响指标，仅作为敏感性说明不用于调闸。地形高程未另订正。若 Natural Earth 数据无法读取，不静默换一个暴露定义，v1 记未能执行。\n\n模型 1-min 持续风转 ASOS IEM `sknt` 约 2-min 运行平均，乘 0.97；这是保守假设（范围 0.95–1.00），不是文献实测精确值。`gust_sknt` 报告的 5-s 阵风，从模型 1-min 场乘 1.30（陆）、1.20（海），这是基于 Powell et al. 2005《Hurricane Gust Factors Revisited》PDF 第 2–3、5–6 页所述粗糙度/3–5s 与分钟风定义的暂定插值假设，非该文直接给出的普适 1min→5s 系数；范围陆 1.15–1.45、海 1.10–1.35；不能把 Krayer–Marshall 1992 的约 2s/10min 因子直接套过来（2KXRIJJB PDF 第 2–4 页）。两个时距值事先冻结并分别计算峰值。\n\n## 站点筛选与统计\n每站以模型 2-min 峰值时间 t* 为中心的 ±6h（如越出登陆 ±12h 观测窗则扩展获取到该窗口边缘），要求有效 `sknt` 独立分钟数 >=90% 的该 12h 实际分钟数（>=648/720），首次有效 <=t*、末次有效 >=t*；未达到即截尾不进两套主指标。物理 QC：持续/阵风不许负；同分钟同时有值时 gust<sknt 的记录视为不自洽、整站剔除；全站最大阵风小于最大持续风亦剔除（两峰不同时间但仍属明显异常代理）。阵风单独要求 >=1 个有效报告、模型/实测均 >0，不做假定每分钟必报阵风；缺阵风的站不进入阵风指标但持续风可留。分钟去重，缺失不填 0；请求失败与无记录分开计。此 QC 是保守预筛，不意味着 IEM 原始档已完全质控。\n\n每事件每站峰值预测/观测 - 1，median(abs(e)) 与 median(e) 在合格站上汇总；事件逐行报告，另报事件数、站点数与截尾数。主闸仅 (a) 持续风中位偏差是否在 ±20%；阵风并行诊断，不代替冻结主闸；若仍越界如实报风场模型不合格而不调参。没有合格站的事件保留在分母说明但不贡献站点指标。不会以旧 pilot 的站点选择重选、不会凭结果修改常数。资料：NHC HURDAT2、ATCF b-deck、IEM/NCEI 1min、Natural Earth 10m land；细 URL 见上一轮。使用预注册后如软件或数据不可用则明确报告未完成，不给伪数。"
+    },
+    {
+      "id": "res-0007",
+      "ts": "2026-10-14 15:35",
+      "title": "B1+B4 最佳路径链 v1：预注册复测",
+      "label": "结果",
+      "text": "# B1+B4 最佳路径链 v1：预注册复测\n\n冻结文件：（10-14 15:19 EDT；在本轮 v1 与观测对照前）；软件 CLIMADA 6.1.0 H08 commit 第 1131–1257 行。\n\n按站点 e=峰值预测/峰值观测−1，median(|e|) / median(e)。输入 NHC HURDAT2+ATCF b-deck、IEM/NCEI ASOS 1min、Natural Earth 10m land polygon；图表均标明来源。\n\n持续风（约 2min sknt，n=29）：中位绝对误差 21.02%；中位偏差 +9.89%。±20% 偏差闸：通过；但绝对误差 21.02% >20%，不应误称总体误差全在 ±20%。\n5s 阵风（gust_sknt，n=29）：中位绝对误差 11.20%；中位偏差 -0.87%。\n候选 67 站；截尾 34 站；物理 QC 剔除 3 站；请求失败 1 站；IDA 和 IDALIA 无合格站。全部 12 个事件均已尝试。\n\n| 事件 | 候选/合格 | 截尾 | 持续风中位绝对误差 / 偏差 | 阵风中位绝对误差 / 偏差 |\n| --- | ---: | ---: | ---: | ---: |\n| DELTA | 5/3 | 2 | 35.3% / -11.5% | 22.8% / -22.8% |\n| ZETA | 4/2 | 2 | 21.1% / +21.1% | 7.5% / +3.9% |\n| IDA | 4/0 | 4 | 不可算 | 不可算 |\n| NICHOLAS | 9/7 | 1 | 21.0% / -17.7% | 21.5% / -21.5% |\n| IAN | 8/4 | 3 | 25.1% / +25.1% | 8.5% / -4.0% |\n| NICOLE | 6/2 | 2 | 14.1% / +14.1% | 11.7% / +11.7% |\n| IDALIA | 3/0 | 3 | 不可算 | 不可算 |\n| BERYL | 8/2 | 6 | 36.1% / +36.1% | 25.2% / +19.2% |\n| DEBBY | 3/3 | 0 | 29.0% / +29.0% | 8.0% / +8.0% |\n| FRANCINE | 5/4 | 1 | 8.2% / +8.2% | 5.7% / -2.8% |\n| HELENE | 3/1 | 2 | 55.8% / +55.8% | 11.2% / +11.2% |\n| MILTON | 9/1 | 8 | 29.1% / +29.1% | 18.7% / +18.7% |\n\n## 执行与边界\n第一次执行把任何一个 15 min 节点缺少 RMW/POCI 的事件整体剔除，导致 Beryl 和 Francine 未入；错误运行结果原样保留在 v1 根目录的 和逐事件表。代码随后仅修正“缺失节点剔除，而非整事件剔除”的预注册实现错误，在 新目录重算，未改模型、常数或站点规则。以上正式 v1 数字来自；原输出绝不覆盖。\nIEM 原始分钟档的严重天气断报并非随机；90% 模型峰窗规则剔除了 34/67 站，Milton 只剩 1 站。自然地表仅陆/海、未解析机场不同方向具体地类与地形；500m 对数层参考高度、1min→2min 因子和 1min→5s 因子均为冻结的假设，非作者给定通用换算。IEM sknt 是约 2min 代理，不是严格 1min 配对；阵风因子虽有 Powell 等 2005 PDF 2–3、5–6 页的定义/暴露依据，其数值为假设。故“闸通过”仅限预注册的代理比较，不能说物理风场已普适验证。\n不同站的误差方向和事件样本强烈不均衡；29 个站来自 10 个事件，非 12 个事件每个都有质量合格观测。\n\nAIWP 切片单列；Colab CPU 会话已停止。B1 后续 (b)(c) 应由 Lead 判断是否接受上述 2min 代理/时距假设作为主闸再推进。\n\n文献：Vickery 等 2009 PDF 第 12/15/22 页粗糙度示例（卡 第 12 行）；Powell 等 2005 PDF 第 2–3、5–6 页（候选卡 第 62、88–92 行）；Krayer–Marshall 1992 PDF 第 2–4 页（候选卡 第 60、74–76 行）。卡片的独立审查未完成，暂按候选依据引用。"
+    },
+    {
+      "id": "res-0008",
+      "ts": "2026-10-14 15:36",
+      "title": "AIWP 远程切片与单路径可行性（10-14 EDT）",
+      "label": "结果",
+      "text": "# AIWP 远程切片与单路径可行性（10-14 EDT）\n\n对象：2024 Milton，FOUR_v200_GFS，2024-10-09 00Z 起报，S3；全文件 7,472,991,383 B。本轮在 Colab CPU 会话用 HTTPS 206 Range + HDF5 256 KiB 块缓存读取；没有把原始文件下载到 工作站，也未保存全文。逐次请求与区间读取脚本 、；机器记录三个同名。\n\n1. 初步读 HDF5 变量表及中央 25×25 的 10m u/v：17,825,792 B，68 次 HTTP 206，9.41 s（包含 Python 变量索引与网络）；确认文件含 `msl`, `u10`, `v10`, `u`, `v`，13 层中 `850` hPa 为第 2 个索引。\n2. 2024-10-10 00Z（起报 +24 h）登陆区 24–32°N、87–78°W（33×37 格）读，有限差分计算 850 hPa 涡度：88,342,528 B，337 次请求，38.76 s；局地最低 MSLP=98,131.4 Pa，在 26.75°N、83.75°W；区域 850 hPa 相对涡度最大约 7.95×10^-4 s^-1。此只是切片与变量可读性验证，不是物理轨迹验证。\n3. 使用一条起报时刻 BEST 中心作为种子（23.0°N、86.9°W），往后每 6h 于上一中心 ±2° 网格内取 MSLP 最小值（0–24h 共 5 帧），单独测得 10,485,760 B、40 请求、3.11 s。逐点坐标和气压在，三路径合图，OFCL 来自 `aal142024.dat.gz`、BEST 来自 HURDAT2。该简单追踪在 6h 取 (23.25,-87.0)，与 BEST (23.8,-85.9) 相差明显；只作为能够计算的演示，尚未做 850 hPa 环流逐帧验轨和断链检验，不得当正式 (c) 路径或 AI/NHC 误差比较。\n\n三项独立测试相加实际 HTTP 响应体 116,654,080 B、445 次请求，计时分别记录而非凭文件大小推算。会话均已 `colab stop`，回查 `sessions` 无本项目两个会话；账户仍有其他代理 A100 会话。初读 `colab usage` 全账户余额 1462.17 CU（15:12，已有并发会话）；15:34 停止第一 CPU 会话后余额 1458.87 CU（共享差额 3.30 CU，但同时别的 A100 在计费，不可归给本试验）；第二 CPU 会话前后余额均 1458.87 CU（显示精度/记账延迟）。Colab CLI 未提供按会话独立 CU 账单，不能证明本任务准确 CU 花费，也不能用共享差额断言超过 3 CU；本任务仅分配 CPU、无 A100。若需严格独立成本审计应由平台提供会话级账单。公开来源：Radford 等 2025 DOI 10.1175/BAMS-D-24-0057.1；数据 [external URL omitted]；NHC [external URL omitted] 、[external URL omitted]"
+    },
+    {
+      "id": "res-0009",
+      "ts": "2026-10-14 15:38",
+      "title": "v1 引用勘误（保留原件，不影响计算）",
+      "label": "结果",
+      "text": "# v1 引用勘误（保留原件，不影响计算）\n\n 中“Powell et al. 2005《Hurricane Gust Factors Revisited》”及 中“Powell 等 2005”作者误写。Zotero key ZR7S3SEJ 的正确作者是 Vickery, Liang Hu J. 和 Skerlj, Liang Hu F. (2005), *Journal of Structural Engineering* 131(5), 825–832，DOI，见该卡关联 dossier 第 24 行。此更正仅为文献署名，不改已冻结的数值、规则或运行输出。另：预注册及报告文字写 15:19 EDT，但 改正；NIST 假链接亦改为 Krayer 与 Marshall (1992) DOI。"
+    },
+    {
+      "id": "res-0010",
+      "ts": "2026-10-14 15:46",
+      "title": "外部复用须知（B 节点 Lead，10-14）",
+      "label": "结果",
+      "text": "# 外部复用须知（B 节点 Lead，10-14）\n- 事件清单以 为准（ 初版覆盖列有误）。清单若变，B 节点通知复用方。\n- (a) 最佳路径链正式结果在。 根目录的 和逐事件表是第一次执行的错误结果（整事件剔除，缺 Beryl、Francine），只作留档，不要复制。\n- 有合格站的 10 个事件：Delta、Zeta、Nicholas、Ian、Nicole、Beryl、Debby、Francine、Helene、Milton；Ida、Idalia 无合格站。67 个候选站中 34 个断报截尾，样本偏向外围弱风站。\n- 2 min/5 s 时距换算、500 m 参考高度为预注册假设值；引用 (a) 链误差须照写这些限定。\n- 当前复用方：H 观测–模拟融合 H2，只读复制到。"
+    },
+    {
+      "id": "res-0011",
+      "ts": "2026-10-14 16:14",
+      "title": "B1+B4 段 2 预注册 s2（观察对照前冻结）",
+      "label": "结果",
+      "text": "# B1+B4 段 2 预注册 s2（观察对照前冻结）\n\n时间：10-14 EDT。此前 (a) v1 的观测及其结果已经可见；本次不是双盲。此文件写定后不因 (b)/(c) 的 ASOS 比值而改变。12 个事先选定登陆事件，主比较为 v1 的 10 个有合格站事件、29 个 reason=eligible 站；无观测站的 IDALIA/IDA 不充当过闸事件。报告所有预选事件的输入缺失；不可用的链记缺失，不从分母悄悄排除以声称过闸。\n\n## 共同时间、验证和风场\n1. 登陆时刻取 的 HURDAT2 特殊 L 记录。名义 24/48/72 h 起报选择严格早于或等于登陆时刻减名义提前量、最近的 00/12 UTC；三个模型同一起报。实际提前量逐事件列明，24/48/72 标签不代表恰好同长。OFCL 使用该分析时刻发布约 3 h 后的正式预报（late guidance），与 00/12 UTC AI 预报不是严格同等业务可得时点；不得称严格实时公平对决。\n2. 预报 6 h 时次线性插值到 15 min，窗口登陆 ±12 h，不越界外推，最多允许相邻有效节点隔 7 h。强度 NHC OFCL Vmax 按时刻插值且 (b)(c) 共享；(c) 用该强度，而非 AI 网格自身强度。(a) 直接沿用 v1，不重算。\n3. 共同 CLIMADA 6.1.0 H08 原函数、平移矢量、10m 1-min、Natural Earth 10m 的来流反方向 2/5/10 km 多数票、海 z0=.0013m/陆 z0=.03m 与 500m 中性对数参考、持续 ×.97、阵风陆 ×1.30/海 ×1.20，均完全沿用 v1 PREREG 与；不要以观测调节。模型峰为 ±12h 最大。固定每站 v1 合格时所记录的持续风和阵风峰值观测，保证三链站点和观测相同；另报当新模型峰时刻的 v1 12h 观测完整性是否仍满足原 ≥648 分钟窗口规则，若无法取全窗，不以该站自行重选样本，只在敏感性中指出。误差 e=模型峰/固定观测峰−1，分别报全站 median(|e|), median(e) 和事件内站点 median(|e|)。事件不差于指事件内 (c) median(|e|) ≤ (b)。主判据：48 h (c) Pangu 的全站 median(|e|) ≤ 1.1×(b)，且有观测的 10 个事件至少 7 个不差于（≥2/3 向上取整）；同时 (a) v1 持续风偏差 ±20% 已过。24/72 h 只报告不入闸。还需报告两种风量，但将持续风作为冻结主指标、阵风作并行诊断，不事后挑最佳。\n4. BEST b-deck 仅用于验证预报中心位置及 (a) 链，不进入 (b)(c) 的起点、强度、压力、尺度。路径误差在登陆时刻按 6h 位置线性插值对 HURDAT2 BEST 中心计算 km，另报 ±12h 节点平均路径误差；若路径断链不填造。\n\n## 业务输入冻结\n5. 从 NHC a-deck 按 storm / cycle / OFCL 取 τ≥0 路径及 Vmax。CARQ τ=0 优先作初始中心、RMW/POCI/Pc（字段 19、17、9，按 0-based）。缺失的 RMW/POCI 才用同一 cycle OFCL τ=0；后者仍缺则该 cycle 两链风场均缺失，绝不从未来或 b-deck 补。物理筛选 RMW 0<r≤200 nmi，POCI>Pc，Pc 0<...<POCI。未来 RMW 与 POCI 固定持续，不用 AI 场估计尺度；把持续假设作为物理局限。\n6. Pc：以 CARQ τ=0 Pc 为起始、压力亏损 Δp0=POCI−Pc0，未来 Δp(t)=Δp0 [V_OFCL(t)[local path omitted](0)]^(1/0.644)，Pc(t)=POCI−Δp(t)。幂次借自 Atkinson–Holliday 1977 的 V=6.7(1010−Pc)^0.644（原始西太平洋关系，不直接适配大西洋）；以当期 CARQ 实压为锚、环境压恒定是本试验假设，而非该文确证。如果 CARQ τ=0 Pc 缺但 RMW/POCI 有，使用 Pc0=POCI−(V0/6.7)^(1/0.644) hPa，明确标假设；若初始 V0≤0 或 Pc 推算非物理则缺失。相同压力和强度给 (b)(c)，只比较路径作用，不以 BEST 拟合。参数出处：Atkinson & Holliday 1977, MWR 105:421–427，公式由 DTIC 摘要与 Knaff–Zehr 2007 原文复述核对，参考 [external URL omitted] [external URL omitted]；这些不能作为大西洋准确性证据。\n\n## AI 路径冻结\n7. 首先检索 CIRA RAMMB 提供的 NPNG/NGRP/NFOR 的文件级历史可下载 ATCF，同 storm/cycle 可核实时使用；若只见图像/不可直接拿到对应文件，则从 NOAA AIWP S3 `PANG_v100_GFS`, `FOUR_v200_GFS`, `GRAP_v100_GFS` 逐 cycle 的 850 hPa u/v 场追踪。主 (c) Pangu；FOUR 与 GRAP 次要、不能替补成主过闸。由 CARQ τ=0 中心作种子，前 6h 不采未来 BEST。空间 0.25° 网格；850 hPa 北半球相对涡度 ζ=∂v/∂x−∂u/∂y，网格差分与 5×5 格平滑；每 6h 在上一步中心 350 km 内找最大正的 200-km 半径平均 ζ 的格点（必须 >0），并要求该格点 100–400 km 内平均切向环流为气旋性 (>0)，且 MSLP 局地低值作为标记而非优化项。离散位置 6h 跳跃 >350km、无正涡度或无气旋环流，立刻标断链，不绕过节点/不重置到 BEST；连续 6h 序列的 15min 线性插值。尺度/转速在切片上不足以可靠计算时标记不可用，不改为 MSLP 最低点。任务以最小带宽读远端 HDF5 Range 切片，不把原始 7GB 文件拉到 工作站。DeMaria 等 2025 PDF pp.2–3,14–15 的 850 hPa 环流追踪为方法方向；具体阈值均为预先设定假设，不假称论文给出。\n8. (c′) 取 Google Weather Lab 历史 WeatherNext Cyclones 同 storm/cycle 的路径、自有强度/风圈，如果文件实取并有可用字段，则单独报告该链。无文件时记未取得，不用近似冒充。它不进 (c) 判据。来源约 2023 起，按实际各事件下载/成员覆盖核对，不推断全覆盖。\n\n## 附加报告：截尾站下限\n9. 对 v1 `reason=truncated` 的 34 站及其他断报站，固定该站 v1 已获取窗口内的最大 `skntgust_sknt` 为真实峰下限。分别按事件、链与提前量列出具有正的观测下限的站数，以及模型峰低于此下限的数/比例；0 条有效观测者只列无法判。模型采用同样的风向暴露及时距因子；(a) 读 v1 预测值。截尾信息只作诊断，不进入主闸。\n\n## 缺失与成本\n10. 单模型缺 cycle、CARQ 或追踪失败逐项记；三链配对需同一 29 站与同一观测，缺任何目标事件则不得宣布通过完整样本闸。CPU Colab，单试验 ≤20 CU，任务完停止；记录网络字节、时长与账单变化（并发消费时不归因）。不得覆盖 v1 结果。若起报选择使 OFCL 不含登陆后 ±12h 的末端节点，窗口未覆盖处标缺失，不用未来周期预报拼接。"
+    },
+    {
+      "id": "res-0012",
+      "ts": "2026-10-14 16:26",
+      "title": "s2 预注册实施偏差 / 独立修正试算方案（保留原 PREREG s2，不改原文）",
+      "label": "结果",
+      "text": "# s2 预注册实施偏差 / 独立修正试算方案（保留原 PREREG_s2，不改原文）\n\n10-14 EDT。在 首次运行后、读取任何站点误差统计前发现：NHC OFCL 在较长预报时段使用 12 h 节点，原预注册的「6 h 时次、最大邻点间隔 7 h」会使登陆 ±12 h 区间只剩孤立几个节点； 大量，登陆时刻误差为 null。这是公开格式导致的预注册设计错误，而不是可通过重跑解释为正常缺测。原 s2 不能提供可判闸的正式 (b) 链。\n\n可诊断的修正试算 s2a 只把 OFCL 插值允许的相邻节点间隔扩到 12 h（≤12 h，即现有 old.interp 中上限改 13 h），全部其他来源、起报、站点、风场、压力关系、指标不变。其结果标「协议修正后探索性」，不能冒充未偏离的 s2 预注册结论。若其它未预见输入问题出现，逐项公开，不凭结果调参。"
+    },
+    {
+      "id": "res-0013",
+      "ts": "2026-10-14 16:30",
+      "title": "截尾站下限检验（阶段性；c 尚未有路径）",
+      "label": "结果",
+      "text": "# 截尾站下限检验（阶段性；c 尚未有路径）\n\n下限为 v1 所获观测窗口内最大值，非真实峰；0 观测记录不可判。b 使用 s2a 12h 插值修正的探索性结果，仅完整 97 个节点窗口参与。c 未得，禁止把空列算作 0。\n\na 0h s: 可判 19，模型低于下限 2（10.5%）\n BERYL: 1/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 0/5\n NICOLE: 0/2\n ZETA: 0/1\na 0h g: 可判 19，模型低于下限 4（21.1%）\n BERYL: 2/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 1/5\n NICOLE: 0/2\n ZETA: 0/1\nb_s2a 24h s: 可判 19，模型低于下限 7（36.8%）\n BERYL: 1/5\n DELTA: 1/1\n HELENE: 1/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 4/5\n NICOLE: 0/2\n ZETA: 0/1\nb_s2a 24h g: 可判 19，模型低于下限 9（47.4%）\n BERYL: 2/5\n DELTA: 1/1\n HELENE: 1/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 5/5\n NICOLE: 0/2\n ZETA: 0/1\nb_s2a 48h s: 可判 19，模型低于下限 11（57.9%）\n BERYL: 5/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 2/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 2/5\n NICOLE: 1/2\n ZETA: 0/1\nb_s2a 48h g: 可判 19，模型低于下限 13（68.4%）\n BERYL: 5/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 2/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 3/5\n NICOLE: 2/2\n ZETA: 0/1\nb_s2a 72h s: 无可判记录\nb_s2a 72h g: 无可判记录\n\nc: 尚未取得。逐站数据见 censored_lower_bound_partial.csv。"
+    },
+    {
+      "id": "res-0014",
+      "ts": "2026-10-14 16:32",
+      "title": "AI 路径来源核查（10-14，预注册前开始）",
+      "label": "结果",
+      "text": "# AI 路径来源核查（10-14，预注册前开始）\n\nCIRA RAMMB 产品说明 [external URL omitted] 明确列 NPNG（Pangu/GFS）、NGRP（GraphCast/GFS）、NFOR（FourCastNet v2/GFS），另有 IFS 初始场的 EPNG/EGRP/EFOR；产品页面强调历史产品可能不存在。打开 2024 Milton 的 `storm.asp?storm_identifier=al142024` 与 `storm_experimental.asp?storm_identifier=al142024aal142024.dat.gz` 中这三个 aid 计数均为 0，不能把 CIRA 图示等同于 NHC a-deck 已有路径。故执行预注册的 850 hPa 自追踪，不使用先前 MSLP 最低点演示。CIRA 的内部历史数据接口尚未确证不存在，只能说本次未取得逐 storm/cycle 文件。\n\nGoogle Weather Lab 官方文档 [external URL omitted] （2026-09-03 更新）：可下载实验性 WeatherNext Cyclones 路径 CSV 或 ATCF，含预测位置、强度、时刻、成员路径和配对观测；历史数据约 2023 至今，历史 ≥1 h 按 CC BY 4.0。实际打开 [external URL omitted] 在本浏览器重定向至 Google 登录；凭据库没有该站已存登录，故本次不能进入下载 UI 或核对成员数/逐事件覆盖。文档没有明确写需要注册，也没有给固定 API/成员总数；只能说本次访问须登录，不能断言任意使用者无账号可下载。按本项目清单 2023+ 候选事件为 Idalia、Beryl、Debby、Francine、Helene、Milton；是否各有起报文件与成员数未逐个实取。(c′) 因此记未完成，不拿展示图冒充路径。"
+    },
+    {
+      "id": "res-0015",
+      "ts": "2026-10-14 16:41",
+      "title": "(c) Milton 48 h 单事件截尾站下限（不代表全样本）",
+      "label": "结果",
+      "text": "# (c) Milton 48 h 单事件截尾站下限（不代表全样本）\n\ns: 4/5 模型峰低于已观测下限；站点 GIF, PIE, RSW, SPG\ng: 4/5 模型峰低于已观测下限；站点 GIF, PIE, RSW, SPG\n逐站见 censored_lower_bound_c_pilot.csv；其它事件和提前量未计算，不能合并到完整 (c) 链。"
+    },
+    {
+      "id": "res-0016",
+      "ts": "2026-10-14 16:42",
+      "title": "B1+B4 段 2：执行报告（10-14 16:42 EDT）",
+      "label": "结果",
+      "text": "# B1+B4 段 2：执行报告（10-14 16:42 EDT）\n\n状态：未完成原预注册的 48 h B1 闸门，不能给“过/不过”的科学判词。不是把缺失算失败，也不改原项目页的 ±20% / 1.1 倍 / ≥2/3 判据。\n\n## 已做及方法合规\n- 将 v1 1.4 GB Python 环境移至 WSL，在实验室保留 （112 包）；`climada` 风场函数与 `numpy` 实际 import 通过。未碰 v1 结果。\n- 先写 才运行 (b)/(c) 观测配对。(b)(c) 只读取 NHC a-deck 同起报 CARQ τ=0 RMW/POCI/Pc、OFCL 的路径/Vmax；未来尺度冻结，Pc 按预设指数外推；BEST 仅作路径核验。(a) 直接沿用 v1。自追踪 (c) 读取 Pangu 的 850 hPa u/v，未拿 MSLP 最低点演示冒充。\n- 原预注册错误：以为 OFCL 所有时段有 6 h 节点，固定 7 h 内插间隔，实际上较长期节点多为 12 h。严格原规则下 24/48/72 h 都无任何一个完整的 97 个 15 min 节点窗口。原规则不能评价 (b)/(c)；原输出 保存。发现此问题后、读取任何站点误差汇总之前，写了；另起 s2a 仅把 OFCL 内插间隔改为允许 12 h，余项冻结。s2a 是探索性的协议修正，不冒称原预注册结果。\n- s2a 官方链 24 h：12/12 事件窗口完整，10 个有合格站事件 29 站；持续风中位绝对误差 29.28%、中位偏差 −5.10%，阵风分别 23.44%、−18.55%；登陆时刻路径误差中位 66.9 km（12 事件）。48 h：11/12 窗口完整，但 Nicholas 2021-09-12 00 UTC cycle 在 a-deck 无 OFCL 预报点，10 个有合格站事件仅 9 个/22 站可配对；持续风 41.05%、−37.89%，阵风 45.53%、−43.87%；登陆路径误差中位 103.1 km（11 事件）。72 h：0/12 窗口完整，不报站点或路径综合误差。24/48 数据来自,缺窗不是零误差，72 h 部分节点禁止拿来代全窗。\n- Pangu 48 h Milton 单事件追踪实测：12 个 6 h 点覆盖全观测窗；HTTP Range 946,339,840 字节、3610 请求、468.65 s；未下载原始大文件到 工作站。登陆中心误差 48.87 km；同次 OFCL 为 64.91 km。唯一合格站 PGD：Pangu+OFCL 强度持续风绝对误差 45.29%，OFCL 57.92%；单事件比 0.782。阵风分别 49.72%、61.33%。只是一事件/一站的代码与带宽可行性，不是 48 h 总体 (c)/(b) 比、不差于事件计数或 B1 过闸证据。数据, `c_pang_milton48_*`；这套 tracker 是预注册的 850 hPa 环流简化算法，非 DeMaria 原 Table A2 逐项复刻。其余 Pangu/FourCastNet/GraphCast 未完成，不把缺失补零或换模型。\n- 原定 34 个断报截尾站：19 个有正观测下限、15 个无可用下限；(a) 持续风 2/19、阵风 4/19 模型峰低于下限；s2a (b) 48 h 对可判 19 站分别 11/19、13/19；(c) Milton 单事件 48 h 各 4/5。逐事件逐站见。各链缺失组合未算总分母。\n- CIRA 页面列 NPNG/NGRP/NFOR，但 Milton 可面未给文件级 ATCF；NHC Milton a-deck 三 aid 均 0，故未拿到现成历史路径。Weather Lab 文档承诺约 2023 至今的 CSV/ATCF 与成员路径，实际网站本浏览器跳 Google 登录、无已存登录，不能核实成员数/6 个事件逐项覆盖，(c′) 未计算。见。\n\n## 判据与成本\n原 s2 48 h (c)/(b) 中位绝对误差之比：未可计算；不差于事件数：未可计算；正式是否过闸：未判。原因是预注册时距与实际 OFCL 节点矛盾，且 s2a 的 48 h 已固定样本中 Nicholas 无 OFCL、(c) 只完成 Milton 单事件。不能把 1/1 的结果当 ≥2/3，也不能暗中删除 Nicholas 改分母。v1 (a) 持续风偏差 +9.89% 仍在 ±20% 范围内，不等于 B1 通过。\n\n本任务使用 工作站 CPU + 公开 HTTP，未开 Colab 会话、未用超算，Colab 花费 0 CU。Milton AIWP 单文件的实际网络流量和耗时如上；其它公开数据读取流量未统一计量，不能把其称 0 字节。图 注明 NOAA NHC OFCL/BEST 源，仅显示可用官方链。\n\n## 后续所需的独立决定\n如仍要正式判闸，应由 Lead 确认在公开记录原 s2 失效后另立新版本协议：OFCL 12 h 插值、对 Nicholas 48 h 缺官方预报的处理（保留并判不可评？改入组年限？）；原来的 29 站、±20%、1.1× 与 ≥2/3 不能事后放宽。新协议冻结后再批量远程跟踪。此处没有代替 Lead/Liang Hu 改判据。"
+    },
+    {
+      "id": "res-0017",
+      "ts": "2026-10-14 17:25",
+      "title": "B1+B4 段 2b 预注册（s2b）",
+      "label": "结果",
+      "text": "# B1+B4 段 2b 预注册（s2b）\n\n冻结时间：2026-10-14 17:25 EDT；在本版任何新的 (c) 观测配对前写定。原 s2、s2a 原件和结果不覆盖。此前 s2a 的 (b) 和 Milton Pangu 单例已可见，故不是盲法。依据： 第 1–6 条及补充 7。\n\n1. 采用 s2a 的插值修正：OFCL 相邻节点间隔 ≤12 h 时允许线性插值；72 h 跨 72→96 h 的 24 h 间隔仅作报告，允许 ≤24 h 插值，标“粗插值”，不进闸；不越界外推。\n2. 闸只在 (b)(c) 两链都有输入且有 v1 合格站的同质事件算。Nicholas 48 h 记“官方无预报，不可评”，两链均不算，不换起报时刻。预计 9 事件、22 站；同时按 10 个有合格站事件分母报告对照。原 29 站集合、48 h Pangu 持续风全站中位绝对误差 ≤1.1×(b) 且 ≥2/3 可评事件不差于 (b) 的判据不变，事件不差于定义为事件内站点 |e| 中位数 ≤(b)。阵风并行报告而非事后择优。\n3. 主 (c) = Pangu：24 和 48 h 跑所有事件。FourCastNet v2、GraphCast 仅 48 h 次要结果，不替代主判闸。s2 的 850 hPa 追踪器冻结：CARQ τ=0 种子，850 hPa 相对涡度 5×5 平滑、200 km 盘均值、上一步中心 350 km 内正涡度最大且 100–400 km 气旋性平均切向风 >0；任一 6 h 点无正涡度/无气旋性或跳点 >350 km 即断链，不越过缺点接续、不重新种到 BEST，也不换 MSLP 最低点。每步只按已追踪点移动，不用未来 BEST。\n4. (c′) Weather Lab 只试一次无需登录的公开途径（文档直接下载链接或公开存储）；如要求登录则记“未取得”并停止，不使用 Liang Hu 的 Google 凭据。\n5. 截尾下限检验三条链 (a)(b)(c) 按 s2 冻结定义执行：截尾站断报前最大持续/阵风为真实峰下限，计模型峰低于下限的站数/比例；只作报告，不进闸。\n6. 在新的 (c) 观测配对前完成本文件；保留 s2 原件与 s2a 输出。风场、站点 QC、时距换算、压力和尺度外推均依，绝不依据误差调参。OFCL 与 AI 使用相同起报时间、OFCL 强度；BEST 只用于事后路径误差验证，不用于两预报链构造。HTTP Range 限量读 AIWP，不落盘原始整文件。\n\n## 附加报告（补充 7，不进闸）\n(a)(b)(c) 三链持续风和阵风均按站点至各链自身路径的最近距离及最近点时刻该链自身 RMW 归一化，分 <1×RMW、1–3×RMW、>3×RMW；并按 <50、50–100、>100 km 分档。各档报站数、中位偏差、中位绝对误差；交付。边界值归入后一档；按每站在登陆 ±12 h 内模型峰所在配对窗口的路径点最短距离，路径断链不可得则不入该链分层。此为诊断，绝不依分层改判闸。依据：Lead 决定文件第 21–22 行。\n\n成本：仅本地 CPU 或单次 ≤20 CU Colab CPU；用后停止。每项模型/提前量按事件报告失败/缺测，绝不当零误差。代码与数值输出仅写 s2b/ 新文件。"
+    },
+    {
+      "id": "res-0018",
+      "ts": "2026-10-14 17:27",
+      "title": "(c′) 无登录途径尝试（10-14 EDT）",
+      "label": "结果",
+      "text": "# (c′) 无登录途径尝试（10-14 EDT）\nGoogle 官方文档 [external URL omitted] 的“Download cyclone forecasts”只说明网页可下载 CSV/ATCF（约 2023 至今），页面可见链接只有 Weather Lab 落地页，未给固定公开直链或匿名存储对象。仅尝试这一文档途径，打开 [external URL omitted] 后跳转。按冻结 s2b 协议在此停止；未登录、未调用 Liang Hu 凭据，历史文件/成员数/事件覆盖均未取得，(c′) 不可评。"
+    },
+    {
+      "id": "res-0019",
+      "ts": "2026-10-14 17:36",
+      "title": "预览结果与正式输出区分",
+      "label": "结果",
+      "text": "# 预览结果与正式输出区分\n, （本目录根层）是在 DELTA Pangu 48 h 第一个事件完毕后，为验证评分脚本能执行而提前生成的部分样本预览；不是 s2b 全样本结果，也不可引用来判闸。原样保留，不覆盖。全部追踪结束后，正式输出另写。"
+    },
+    {
+      "id": "res-0020",
+      "ts": "2026-10-14 18:44",
+      "title": "三链截尾站观测下限检验（不进闸）",
+      "label": "结果",
+      "text": "# 三链截尾站观测下限检验（不进闸）\n\n只计 v1 reason=truncated 且记录中有正下限的站；没有完整预测窗口的链不进入该次分母。下限为断报前观测最大值，不代表真实峰。\n\na 0h s: 2/19 模型低于下限\n BERYL: 1/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 0/5\n NICOLE: 0/2\n ZETA: 0/1\na 0h g: 4/19 模型低于下限\n BERYL: 2/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 1/5\n NICOLE: 0/2\n ZETA: 0/1\nb 24h s: 7/19 模型低于下限\n BERYL: 1/5\n DELTA: 1/1\n HELENE: 1/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 4/5\n NICOLE: 0/2\n ZETA: 0/1\nb 24h g: 9/19 模型低于下限\n BERYL: 2/5\n DELTA: 1/1\n HELENE: 1/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 5/5\n NICOLE: 0/2\n ZETA: 0/1\nb 48h s: 11/19 模型低于下限\n BERYL: 5/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 2/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 2/5\n NICOLE: 1/2\n ZETA: 0/1\nb 48h g: 13/19 模型低于下限\n BERYL: 5/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 2/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 3/5\n NICOLE: 2/2\n ZETA: 0/1\nPANG 24h s: 2/19 模型低于下限\n BERYL: 0/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 1/5\n NICOLE: 0/2\n ZETA: 0/1\nPANG 24h g: 8/19 模型低于下限\n BERYL: 2/5\n DELTA: 1/1\n HELENE: 1/1\n IAN: 0/2\n IDA: 0/1\n IDALIA: 0/1\n MILTON: 4/5\n NICOLE: 0/2\n ZETA: 0/1\nPANG 48h s: 10/19 模型低于下限\n BERYL: 2/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 0/2\n IDA: 1/1\n IDALIA: 0/1\n MILTON: 4/5\n NICOLE: 1/2\n ZETA: 1/1\nPANG 48h g: 12/19 模型低于下限\n BERYL: 3/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 0/2\n IDA: 1/1\n IDALIA: 0/1\n MILTON: 4/5\n NICOLE: 2/2\n ZETA: 1/1\nFOUR 48h s: 8/19 模型低于下限\n BERYL: 2/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 0/2\n IDA: 1/1\n IDALIA: 0/1\n MILTON: 3/5\n NICOLE: 1/2\n ZETA: 0/1\nFOUR 48h g: 11/19 模型低于下限\n BERYL: 3/5\n DELTA: 1/1\n HELENE: 0/1\n IAN: 0/2\n IDA: 1/1\n IDALIA: 0/1\n MILTON: 3/5\n NICOLE: 2/2\n ZETA: 1/1\nGRAP 48h s: 6/16 模型低于下限\n BERYL: 2/5\n HELENE: 0/1\n IAN: 0/2\n IDALIA: 0/1\n MILTON: 3/5\n NICOLE: 1/2\nGRAP 48h g: 8/16 模型低于下限\n BERYL: 3/5\n HELENE: 0/1\n IAN: 0/2\n IDALIA: 0/1\n MILTON: 3/5\n NICOLE: 2/2"
+    },
+    {
+      "id": "res-0021",
+      "ts": "2026-10-14 18:45",
+      "title": "B1+B4 段 2b 执行结果（10-14 18:44 EDT）",
+      "label": "结果",
+      "text": "# B1+B4 段 2b 执行结果（10-14 18:44 EDT）\n\n## 判闸：主 (c) Pangu，48 h\n先冻结 （10-14 17:25 EDT），然后批量追踪/重新配对；s2 原件、s2a 文件和原先 Milton 试算均未覆盖。固定 v1 的 29 个合格站；Nicholas 48 h 同起报无 OFCL，按 Lead 决定不可评，9 事件、22 站构成 (b)/(c) 同质分母。误差为模型峰/固定 ASOS 峰−1，约 2 分钟持续风代理而非严格 1 分钟风。\n\n| 48 h 持续风 | (b) OFCL | (c) Pangu |\n| --- | ---: | ---: |\n| 同质样本中位 | e | | 41.05% | 41.91% |\n| 中位偏差 | −37.89% | −34.80% |\n| (c)/(b) 中位 | e | 比 | — | 1.0209 |\n| 事件内中位 | e | 不差于 OFCL | — | 5/9：Beryl、Helene、Ian、Milton、Nicole |\n\n比值 1.0209 ≤ 1.1，第一条件满足；事件条件需要至少 6/9，而实得 5/9，故 B1 的 48 h 双重闸未通过。在原 10 个有合格站事件分母下是 5/10（不足 7/10），Nicholas 仍为不可评而不是一次伪造失败。48 h 阵风：OFCL 中位 |e| 45.53%、偏差 −43.87%；Pangu 42.52%、−42.52%（并行诊断，不替代主指标）。\n\n逐事件持续风中位 |e|（%）：\n\n| 事件（站） | OFCL | Pangu | FOUR | GRAP |\n| --- | ---: | ---: | ---: | ---: |\n| Beryl (2) | 61.39 | 35.38 | 37.40 | 52.76 |\n| Debby (3) | 42.49 | 57.40 | 55.28 | 57.69 |\n| Delta (3) | 43.73 | 76.35 | 87.73 | 缺原始文件 |\n| Francine (4) | 32.91 | 42.75 | 50.85 | 31.52 |\n| Helene (1) | 46.27 | 38.23 | 50.04 | 37.25 |\n| Ian (4) | 29.94 | 6.62 | 22.19 | 13.60 |\n| Milton (1) | 57.92 | 45.29 | 47.46 | 33.14 |\n| Nicole (2) | 19.13 | 11.65 | 21.72 | 22.23 |\n| Zeta (2) | 39.85 | 65.22 | 58.02 | 缺原始文件 |\n\n次要链 FOUR 48 h 在同质 9 事件/22 站中位 |e| 49.85%，相对同期 OFCL 比 1.2143，事件不差于 3/9。GRAP 在 2020 Delta/Zeta 和 2021 Ida/Nicholas 对象 HTTP 404，48 h 只取得 8 个全窗口，其中 7 个有合格站/17 站；在其自身同质子样本，中位 |e| 27.94%，同期 OFCL 41.21%，比 0.6779，事件 5/7。GRAP 缺两件主样本，不能替换 Pangu 判闸，也不得把它的较优子样本数值冒称 9 事件结果。\n\n## 路径与提前量\n48 h 登陆时刻中心绝对误差中位数（相对 HURDAT2 BEST，km）：在主同质 9 事件中，OFCL 105.05、Pangu 90.90、FOUR 59.04；GRAP 在可得 8 件中 58.83（其 7 件有合格站子集见）。Pangu 24 h 12 件中位 58.77 km，OFCL 48 h 11 件（含无合格站事件）中位 103.12 km。各事件路径逐点坐标与 BEST 距离在 （含 (a) BEST 本身，误差按定义为 0），每事件状态在；未把 BEST 用作 AI 或 OFCL 预报输入。\n\n24 h 全 29 个合格站：Pangu 持续风中位 |e| 24.87%、偏差 −18.04%；同期 OFCL 29.28%、−5.10%；Pangu 阵风 32.63%、−31.88%，OFCL 23.44%、−18.55%。24 h 不进闸。\n\n72 h 只有官方 OFCL 用 ≤24 h 粗插值尝试，12 事件中 8 件全窗口、其中 6 件合格站 13 站：持续风中位 |e| 50.95%、偏差 −50.95%；阵风 59.89%、−59.89%；8 件登陆路径误差中位 177.67 km。Nicole、Debby、Francine 无全窗口，Nicholas 无初始可用输入。此结果只报告，不能与 48 h 判闸混用；任务未要求 AI 72 h。\n\n## 截尾下限及距离诊断\nv1 共 34 截尾站，其中 19 站有正观测下限。48 h 预测低于断报前峰下限：持续风 (a) 2/19、(b) 11/19、Pangu (c) 10/19；阵风 (a) 4/19、(b) 13/19、Pangu 12/19。FOUR 8/19、11/19；GRAP 6/16、8/16（仅已取得文件的事件）；各事件与 24 h 详见 和 、；诊断不用于重选阈值或站点。\n\n## 取得性、成本和局限\nPangu 24/48 h 各 12 事件、FOUR 48 h 12 事件均完成 850 hPa 追踪并可在有 OFCL 的事件评分；GRAP 48 h 8/12 文件取得，其余 4 次对象 404（含 2 件主样本）。全部由原代码的逐周期 HTTP Range 读取，未将整份 HDF5 文件落盘。44 次成功对象累计读取 40,269,774,848 字节（约 40.27 GB 十进制），各次读取耗时合计 13,918.84 s（四路并发，非墙钟时长）；详情 、 和日志。工作站 CPU，无 Colab/超算，Colab 费用 0 CU；远端网络的美元账单未取得，不宣称 $0。\n\n(c′) Weather Lab 官方文档未列可匿名请求的历史直链；落地页跳 Google 登录。只试一次，停止并记未取得，详见。未使用 Liang Hu 任何凭据。\n\n模型限定：AI 路径是冻结的 850 hPa 简化环流追踪，强度两链共用 OFCL，未来 RMW/POCI 固定持续，压力用假设锚定外推；因此只检验在这种共用强度/尺度与固定 H08 风场条件下换路径的效果，不是端到端 AI 与 NHC 业务产品的全面优劣。OFCL 在起报后约 3 h 发布，AI 同分析时刻，不是严格同一可得时间。ASOS 断报使强风段未观测，截尾检验表明低估风险不能从合格站分数推及所有近岸站。\n\n原始来源：NOAA NHC HURDAT2 BEST/ATCF a-deck（。根目录 等是 Delta 单例期间的代码预览，不是正式结果；说明。\n\n一句话判词：48 h Pangu 的站点中位绝对误差比符合 1.1 倍，但只有 5/9 事件不差于官方，未过预定双重闸；在本简化同质协议下 B1 不宜转成 AI 优于 NHC 的结论。"
+    },
+    {
+      "id": "res-0022",
+      "ts": "2026-10-14 18:46",
+      "title": "B1+B4 段 2b 执行结果（10-14 18:44 EDT）",
+      "label": "结果",
+      "text": "# B1+B4 段 2b 执行结果（10-14 18:44 EDT）\n\n## 判闸：主 (c) Pangu，48 h\n先冻结 （10-14 17:25 EDT），然后批量追踪/重新配对；s2 原件、s2a 文件和原先 Milton 试算均未覆盖。固定 v1 的 29 个合格站；Nicholas 48 h 同起报无 OFCL，按 Lead 决定不可评，9 事件、22 站构成 (b)/(c) 同质分母。误差为模型峰/固定 ASOS 峰−1，约 2 分钟持续风代理而非严格 1 分钟风。\n\n| 48 h 持续风 | (b) OFCL | (c) Pangu |\n| --- | ---: | ---: |\n| 同质样本中位 | e | | 41.05% | 41.91% |\n| 中位偏差 | −37.89% | −34.80% |\n| (c)/(b) 中位 | e | 比 | — | 1.0209 |\n| 事件内中位 | e | 不差于 OFCL | — | 5/9：Beryl、Helene、Ian、Milton、Nicole |\n\n比值 1.0209 ≤ 1.1，第一条件满足；事件条件需要至少 6/9，而实得 5/9，故 B1 的 48 h 双重闸未通过。在原 10 个有合格站事件分母下是 5/10（不足 7/10），Nicholas 仍为不可评而不是一次伪造失败。48 h 阵风：OFCL 中位 |e| 45.53%、偏差 −43.87%；Pangu 42.52%、−42.52%（并行诊断，不替代主指标）。\n\n逐事件持续风中位 |e|（%）：\n\n| 事件（站） | OFCL | Pangu | FOUR | GRAP |\n| --- | ---: | ---: | ---: | ---: |\n| Beryl (2) | 61.39 | 35.38 | 37.40 | 52.76 |\n| Debby (3) | 42.49 | 57.40 | 55.28 | 57.69 |\n| Delta (3) | 43.73 | 76.35 | 87.73 | 缺原始文件 |\n| Francine (4) | 32.91 | 42.75 | 50.85 | 31.52 |\n| Helene (1) | 46.27 | 38.23 | 50.04 | 37.25 |\n| Ian (4) | 29.94 | 6.62 | 22.19 | 13.60 |\n| Milton (1) | 57.92 | 45.29 | 47.46 | 33.14 |\n| Nicole (2) | 19.13 | 11.65 | 21.72 | 22.23 |\n| Zeta (2) | 39.85 | 65.22 | 58.02 | 缺原始文件 |\n\n次要链 FOUR 48 h 在同质 9 事件/22 站中位 |e| 49.85%，相对同期 OFCL 比 1.2143，事件不差于 3/9。GRAP 在 2020 Delta/Zeta 和 2021 Ida/Nicholas 对象 HTTP 404，48 h 只取得 8 个全窗口，其中 7 个有合格站/17 站；在其自身同质子样本，中位 |e| 27.94%，同期 OFCL 41.21%，比 0.6779，事件 5/7。GRAP 缺两件主样本，不能替换 Pangu 判闸，也不得把它的较优子样本数值冒称 9 事件结果。\n\n## 路径与提前量\n48 h 登陆时刻中心绝对误差中位数（相对 HURDAT2 BEST，km）：在主同质 9 事件中，OFCL 105.05、Pangu 90.90、FOUR 59.04；GRAP 在可得 8 件中 58.83（其 7 件有合格站子集见）。Pangu 24 h 12 件中位 58.77 km，OFCL 48 h 11 件（含无合格站事件）中位 103.12 km。各事件路径逐点坐标与 BEST 距离在 （含 (a) BEST 本身，误差按定义为 0），每事件状态在；未把 BEST 用作 AI 或 OFCL 预报输入。\n\n24 h 全 29 个合格站：Pangu 持续风中位 |e| 24.87%、偏差 −18.04%；同期 OFCL 29.28%、−5.10%；Pangu 阵风 32.63%、−31.88%，OFCL 23.44%、−18.55%。24 h 不进闸。\n\n72 h 只有官方 OFCL 用 ≤24 h 粗插值尝试，12 事件中 8 件全窗口、其中 6 件合格站 13 站：持续风中位 |e| 50.95%、偏差 −50.95%；阵风 59.89%、−59.89%；8 件登陆路径误差中位 177.67 km。Nicole、Debby、Francine 无全窗口，Nicholas 无初始可用输入。此结果只报告，不能与 48 h 判闸混用；任务未要求 AI 72 h。\n\n## 截尾下限及距离诊断\nv1 共 34 截尾站，其中 19 站有正观测下限。48 h 预测低于断报前峰下限：持续风 (a) 2/19、(b) 11/19、Pangu (c) 10/19；阵风 (a) 4/19、(b) 13/19、Pangu 12/19。FOUR 8/19、11/19；GRAP 6/16、8/16（仅已取得文件的事件）；各事件与 24 h 详见 和 、；诊断不用于重选阈值或站点。\n\n## 取得性、成本和局限\nPangu 24/48 h 各 12 事件、FOUR 48 h 12 事件均完成 850 hPa 追踪并可在有 OFCL 的事件评分；GRAP 48 h 8/12 文件取得，其余 4 次对象 404（含 2 件主样本）。全部由原代码的逐周期 HTTP Range 读取，未将整份 HDF5 文件落盘。44 次成功对象累计读取 40,269,774,848 字节（约 40.27 GB 十进制），各次读取耗时合计 13,918.84 s（四路并发，非墙钟时长）；详情 、 和日志。工作站 CPU，无 Colab/超算，Colab 费用 0 CU；远端网络的美元账单未取得，不宣称 $0。\n\n(c′) Weather Lab 官方文档未列可匿名请求的历史直链；落地页跳 Google 登录。只试一次，停止并记未取得，详见。未使用 Liang Hu 任何凭据。\n\n模型限定：AI 路径是冻结的 850 hPa 简化环流追踪，强度两链共用 OFCL，未来 RMW/POCI 固定持续，压力用假设锚定外推；因此只检验在这种共用强度/尺度与固定 H08 风场条件下换路径的效果，不是端到端 AI 与 NHC 业务产品的全面优劣。OFCL 在起报后约 3 h 发布，AI 同分析时刻，不是严格同一可得时间。ASOS 断报使强风段未观测，截尾检验表明低估风险不能从合格站分数推及所有近岸站。\n\n原始来源：NOAA NHC HURDAT2 BEST/ATCF a-deck（。根目录 等是 Delta 单例期间的代码预览，不是正式结果；说明。\n\n一句话判词：48 h Pangu 的站点中位绝对误差比符合 1.1 倍，但只有 5/9 事件不差于官方，未过预定双重闸；在本简化同质协议下 B1 不宜转成 AI 优于 NHC 的结论。"
+    },
+    {
+      "id": "res-0023",
+      "ts": "2026-10-14 18:48",
+      "title": "s2b 花费与流量（10-14 EDT）",
+      "label": "结果",
+      "text": "# s2b 花费与流量（10-14 EDT）\n本地 工作站 CPU 运行；Colab 会话未开启、超算未提交，故 Colab 0 CU、超算 0 SU。44 个成功 AIWP HTTP Range 对象累计取得 40,269,774,848 B（十进制 40.27 GB），每对象 、 和相应 manifest 记录每次尝试。"
+    },
+    {
+      "id": "res-0024",
+      "ts": "2026-10-14 18:48",
+      "title": "s2b 交付索引",
+      "label": "结果",
+      "text": "# s2b 交付索引\n本目录根层的 是 的原样副本；报告正文中的相对路径以 为基准解析。正式数值数据和完整路径在，根层另附便于交付的 、 和 为对照前冻结版， 为登录墙核验。"
+    },
+    {
+      "id": "res-0025",
+      "ts": "2026-10-14 20:32",
+      "title": "B1 v2 协议草稿——未冻结",
+      "label": "结果",
+      "text": "# B1 v2 协议草稿——未冻结\n\n时间：10-14 20:31 EDT。本文件只是立项可行性方案，不准据此运行新 (b)(c) 站点配对或宣布判闸。s2b 原判词不受影响。参照 的逐事件清单、原 、项目页及审查裁决。\n\n## 前置 Go/No-Go（由 Lead 在正式 v2 前定版）\n\nR1：证明每个输入在决策时业务可得、可给 H08 需要的 ΔP/RMW/B；固定环境 GFS 产品发布时间、KZ07 的 V500/Penv 环带计算、OFCL 风圈适用层级和缺风圈规则；独立定权重/范围，不以站点误差拟合。R2：核准同质观测站类并逐事件确认至少 15 个可评事件且每事件至少 3 个站；目前只有 1min 7 个预筛候选，小时池潜在 14，Eta 还没做小时验证。R3：截尾方案先登记并能执行。R4：主链默认 Pangu 850 hPa 环流路径，若改为 GraphCast 或 AI 共识，必须在任何新配对前改版预注册并解释 2020–21 缺口；不以看过结果改主链。\n\n## 单位、样本与同质分母\n\n登陆事件定义沿可行性表；多个登陆先冻结主登陆点/UTC 时间，禁止见误差后换次登陆。固定中心 150 km 及登陆±12 h 目标窗口，预先提供每事件起报实际提前量和对象列表。站点近邻、平台/陆地、传感器 10m 高度、HAS1MIN、有无有效分钟/小时、观测时距、风向暴露分别登记。主分析建议只用完整分钟 ASOS (`sknt` 约2min 持续风、`gust_sknt` 5s 报告峰)，若 R2 因样本不足需要 H2 小时站，必须先另冻结“小时同质主分析”，对 v1 分钟资料同步降采样再重过 (a)；两种密度不能混池求一个中位数。不能把 ERA5 当站点独立实测。分母为同起报 Pangu、OFCL 均存在、两链同一批观测合格且完成峰值窗口检查的事件交集；事前名单和每类缺测原因、站数都列全，Nicholas 等缺官方预报的不得当作预测失败，也不得换周期补足。报告意向事件全集分母和同质可评分母，两者都给，不能选择利于结论的分母。\n\n## 模型与操作时序\n\n(a) BEST 中心与强度，用已归档 BEST 风圈作为事后物理上限链，按与 (b)(c) 完全相同的气压/尺度求解器和站点暴露、时距；缺值不得反用 (b) 情报。先冻结模型、误差窗口及参数，再仅运行 (a)：持续风比值误差中位偏差 必须在 ±20%，报绝对误差与阵风两套、逐站审计；不合格就停止 (b)(c)。旧 (a) 过闸不能代替新输入过闸。\n\n(b) NHC 官方 OFCL 路径与强度、当时发布风圈；(c) Pangu 850 hPa 正涡度+切向环流追踪路径、**共用 (b) 的官方强度和相同气压/尺度输入**，绝不读取事后 b-deck。先以 OFCL 34/50/64 kt 风圈约束对称外侧尺度，Knaff et al. 2007 北大西洋气候 RMW 作先验而非逐案真值；Knaff–Zehr 2007 ΔP 式须使用当时已可用 GFS 大尺度 S/V500/Penv，不能将风圈冒充 S。风圈仅 34 kt、缺 Penv 或 V500、无法拟合 H08 RMW/B 时，该事件/节点按冻结缺测方案停链或使用事前指定且标“假设”的气候值，不拿站点误差倒推。卡片 PDF 3–4、6 / 期刊 783–784、786； PDF 4–5、10 / 期刊 74–75、80。H08/陆海转换和约2min/5s 因子沿 v1 若保留仍是假设，修改则新参数表先写明出处、范围、敏感性。\n\nOFCL 常在对应 AIWP 00/12 起报之后约 3 h 对外发布，不能把它视为 AI 起报同刻可得。在冻结的共同决策时刻 T=该周期 OFCL 实际公众发布日期/时刻，比较 (b)(c) 均使用 T 前可得的最晚官方强度和风圈、AI 使用 T 前已经可用的 00/12 起报及其发布时间；每事件记录 AIWP 模型起报、对象发布时间、OFCL 发布、决策 T 和到真实登陆的剩余小时数。不能凭归档文件名推定历史实际发布时间。报告同周期起报配对的实际提前量及“AI 较早可用”敏感分析，不使 AI 偷用决策后起报，也不宣称两链同一发布时刻。±12 h 路径误差与登陆时刻路径误差独立报告，BEST 只用于事后评分。\n\n## 站点峰值、截尾与计分\n\n预先指定站点的观测完整性阈值、物理 QC（沿 v1 若适用：模型峰 t*±6h 至少 90% 有效分钟，首末有有效记录；小时站则另定覆盖和两端条件），明确模型峰移出原下载窗的统一扩窗规则。三链用同一合格站交集；若三链 t* 位置不同，逐链记录 t*、落窗与截尾原因，比较窗口必须是同一事前定义的事件窗，而非挑各自有利的实测峰。不完整的观测给下限 `obs_true_peak≥obs_observed_peak`：完整站主估计 + 截尾站区间/下限敏感性同时报；右截尾未给物理上界时不允许计算虚构的有限中位数。完整率按事件、近眼距和预测峰时差分层，明确缺失并非随机。阵风与持续风分别报，不用 5s 阵风当 2min 风。\n\n主判据沿项目页，不变：48 h 同质站 (c)/(b) ≤1.1，且至少 2/3 同质可评事件的各事件内站点绝对误差中位数 (c) ≤(b)；前提 (a) 偏差 ±20%。24/72 h、阵风、路径误差、三链截尾下限、事件全集分母只报告不择优进主闸。若 Lead 考虑调整 1.1 或 2/3，这属于另一个科学判据，必须由 Lead/Liang Hu 按既定权限在冻结前决定；本草稿不擅改。若不足 15 个且每个≥3站，不判 v2 闸，只报告可行性缺口。\n\n## 在正式预注册中必须先补的字段\n\n1. 事件名单/主登陆、逐事件 48 h AIWP 与 OFCL 具体起报+发布时间、强度/风圈有效节点、GFS 当时业务产品及历史可得时刻。\n2. 从 OFCL 风圈到 H08 RMW/B 的实际优化目标、权重、约束、缺阈值 fallback 与敏感范围；BEST 风圈同算法及无圈事件规则，参数来源表逐项注明论文页码或“假设”。\n3. 同质观测站表及 10m 高度、2min/5s 时距、暴露与小时抽样一致性；三链截尾及“新模型峰 t* 是否落完整观测窗”按事件站点报表。\n4. 实际提前量、±12 h 路径误差、登陆中心误差、已观测下限违反率；全部事件和同质交集两个分母，所有失败/缺测留痕。\n\n成本：本轮只是文件设计，本地 CPU；Colab 0 CU。正式批量前按样本/HTTP Range 请求量估算 CU，并在用完 Colab 后 stop；不将 AIWP 原始整文件下载到 工作站。"
+    },
+    {
+      "id": "res-0026",
+      "ts": "2026-10-14 20:32",
+      "title": "B1 v2 可行性核查（只数事件和观测可用性，不做新预报站点配对）",
+      "label": "结果",
+      "text": "# B1 v2 可行性核查（只数事件和观测可用性，不做新预报站点配对）\n\n时间：10-14 20:31 EDT。依据：；原 s2b 失败判词保留，不能以本核查翻案。可复核原始元数据：同目录，对应生成脚本 与。无新 (a)/(b)/(c) 观测配对。\n\n## R2：样本可得性与定义\n\n从 NHC 2026-09-23 版 HURDAT2 中筛 2020-10 后美国本土首次显著登陆：登陆标志 L、登陆时 HU 或强 TS（预筛定义 Vmax≥50 kt）；同一事件多次登陆只计一次，以主美国本土登陆为锚。原来的 12 个事件加 7 个新候选，共 19 个；2025 本土 Chantal 为 45 kt，故在本预筛定义下没有新增符合的 2025 个例。这个 ≥50 kt 是本次候选界定，不是重新冻结的科学判据；若 Lead 希望包括较弱 TS，应另列敏感集合。2020-10 之前事件不在 AIWP 覆盖范围内。来源：NHC HURDAT2 上述版本及原。\n\n起报取登陆时刻减 48 h 后最近的先前 00/12 UTC AIWP 周期。新候选逐一用 S3 列表接口核了 PANG_v100_GFS 精确对象，用相同周期 ATCF a-deck 的 OFCL 行核官方预报存在；有行不等于其未来每节点均可插值，后者留给冻结后再核。已核过的旧 12 个 Pangu 48 h 均有对象；旧 Nicholas 官方同起报无预报，沿 s2b 记不可评。\n\n| 事件（年） | Pangu 对象 / 同起报 OFCL | v1 HAS1MIN 150 km：≥90% 登陆±6h 代理站数；旧事件为 v1 正式合格站数 | H2 小时站 150 km 已有通过数 | 此轮判断 |\n| --- | --- | ---: | ---: | --- |\n| Delta (2020) | 是 / 是 | 3 | 9 | 严格 1min 可候选 |\n| Zeta (2020) | 是 / 是 | 2 | 11 | 仅小时池可候选 |\n| Eta (2020) | 是 / 是 | 0/8 | 尚未跑 H2 小时事件 | 暂不可评；小时池可能补 |\n| Elsa (2021) | 是 / 是 | 3/3 | 未建 H2 事件 | 严格代理可候选 |\n| Fred (2021) | 是 / 是 | 3/7 | 未建 H2 事件 | 严格代理可候选 |\n| Henri (2021) | 是 / 是 | 17/22 | 未建 H2 事件 | 严格代理可候选 |\n| Ida (2021) | 是 / 是 | 0 | 9 | 仅小时池可候选 |\n| Mindy (2021) | 是 / 否 | 3/6 | 未建 H2 事件 | 缺同起报 OFCL，排除主对比 |\n| Nicholas (2021) | 是 / 否 | 7 | 18 | 缺同起报 OFCL，排除主对比 |\n| Ian (2022) | 是 / 是 | 4 | 9 | 严格 1min 可候选 |\n| Nicole (2022) | 是 / 是 | 2 | 15 | 仅小时池可候选 |\n| Harold (2023) | 是 / 否 | 5/9 | 未建 H2 事件 | 缺同起报 OFCL，排除主对比 |\n| Idalia (2023) | 是 / 是 | 0 | 10 | 仅小时池可候选 |\n| Ophelia (2023) | 是 / 否 | 6/7 | 未建 H2 事件 | 缺同起报 OFCL，排除主对比 |\n| Beryl (2024) | 是 / 是 | 2 | 12 | 仅小时池可候选 |\n| Debby (2024) | 是 / 是 | 3 | 12 | 严格 1min 可候选 |\n| Francine (2024) | 是 / 是 | 4 | 5 | 严格 1min 可候选 |\n| Helene (2024) | 是 / 是 | 1 | 8 | 仅小时池可候选 |\n| Milton (2024) | 是 / 是 | 1 | 6 | 仅小时池可候选 |\n\n分母解读：旧事件 1min 列是 v1 的模型峰窗口 ±6 h 完整性和物理 QC 后正式站数（并非纯观测可用性）；新事件只是登陆锚点 ±6h、有效持续风独立分钟数 ≥648 的观测可用性代理，尚未做峰值落窗及物理 QC。不同定义不可当作同等级的“合格站”相加。按更严的旧正式站数 + 新可用性代理，有 OFCL/Pangu 同起报且至少 3 站的候选是旧 4（Delta/Ian/Debby/Francine；Nicholas 虽 7 站但无同起报 OFCL）、新 3，共 **7 个预筛候选**；不是 7 个已确认 v2 可评事件。新候选全部要求在冻结后按新模型峰时补齐观测窗。\n\nH2 与 用原有小时 METAR、有效小时≥75% 且原 H08 模型峰±2h 有报的幸存站；逐站与 H2 站表交集，再筛原登陆点 150 km，得到旧 12 个全都有≥3 小时站，但 Nicholas 无 OFCL，故仅 **11 个**可作新口径候选。与新事件 Elsa/Fred/Henri 三例 1min 预筛相加，宽松潜在集合 14 个；Eta 有 OFCL/Pangu，但本次 1min 站 0/8，须另外以 H2 小时网证实才能使候选数触到 15。不能把未做的 Eta 小时核查当作已可评，也不能把 300 km 的 H2 汇总 794 站当作 150 km 的同质站网。即使 15 个潜在候选成立，重过 (a) 和逐站同质 QC 后还可能减少。当前 **未证明达到 R2 的 ≥15 个可评事件且每事件≥3 合格站**。\n\nH2 并非另一种独立风速传感器网络：H2 主要是 IEM 小时 ASOS/METAR 的更广站点池和 ERA5 背景，ERA5 是再分析/模型而非独立站点真值，WorldCover 是地表类。1min ASOS 的 `sknt` 是约 2min 持续风，`gust_sknt` 是 5s 峰；小时 METAR `sknt` 是报时前约 2min 平均、`gust` 是报时前窗口内约 5s 峰值报告而非连续逐分钟峰。均需同站高度/传感器、站点海陆与风向暴露、时距一致，并以站元数据核查 10m 基准；不能把小时 METAR 峰值与分钟峰值不经抽样校正混合。H2 的小时入选率不是 v1 分钟截尾的替代；同一分钟资料降采样成小时，测量时距可相同但极值采样密度不同。建议只设分层主分析（同一时间采样/站类）和分别报告的副分析，不混成一个站点绝对误差中位数。小时池的独立性/ASOS 与 AWOS 身份、真 10 m 高度须逐站核。\n\n## R1：输入路线选择与未闭合项\n\n选“业务 OFCL 风圈 + 强度 + 大尺度环境场”的组合，而不是事后 BEST RMW/POCI，也不把西北太平洋 AH77 的幂指数搬来大西洋：\n\n1. 对 (b)(c) 同起报、同核算时间使用已发布 OFCL Vmax、位置、平移速度、34/50/64 kt 四象限半径；先以 Knaff et al. 2007 的北大西洋气候 RMW 初值 `r_mc=36.1000−0.0492 Vmax+0.5740(lat−25)` 海里，以及 `x_c=0.1147+0.0055 Vmax−0.0010(lat−25)`。Vmax 单位 kt；这是气候先验，不是逐案观测 RMW。再用非零 OFCL 风圈约束对称外侧尺度（以四象限残差留痕，只有 34 kt 的 Fred 不可声称完整识别 RMW）。Rankine x 不能直接当 Holland B。出处：卡，PDF 第 3–4、6 页/期刊第 783–784、786 页。\n2. ΔP 候选用 Knaff–Zehr 2007 式 7：`Vsrm=Vmax−1.5 c^0.63`； hPa。Vmax、c 为 kt，V500 为 400–600 km 环带切向风，Penv 为 800–1000 km 环带平均 MSLP。**S 不是 OFCL 风圈，不能设成 R34/RMW**。气压中心，PDF 第 4–5、10、14 页/期刊第 74–75、80、84 页，原文独立样本气压 MAE 5.30 hPa（不保证本站风误差）。\n3. 把 RMW 初值与 ΔP、OFCL 风圈带入已选 H08 的前向风速方程，针对可用阈值半径做有界目标拟合 RMW 与 Holland B，强度作约束，优先保留物理可解释的 RMW/B 范围。**此 Holland 逆问题及目标权重/上下界尚无文献给出的通用常数；这一步是拟议的工程假设，不是 Knaff 原法**。必须在接触 v2 的 (a) 站点误差前，从独立的 BEST 强度/风圈资料或文献给定范围预定目标函数、惩罚与缺失风圈规则，给敏感区间；风圈不全则标识不可识别或切回预注册的气候 RMW 先验。不得从站点风调参。\n\n参数来源表：Vmax/轨迹/风圈来自同起报 OFCL a-deck（新事件）；要换须另开 v2 前冻结。\n\n## (a) 重过闸与截尾\n\n先单独冻结 v2 输入/风场/观测定义：BEST 事后轨迹作为 (a) 的中心和强度，BEST 当时风圈或扩展最佳路径风圈同一拟合器和缺测规则，绝不拿预报链独有的未来信息反灌；不可用的 BEST 风圈要保留缺测，缺失机制对齐。锁定同一站点高度、观测时距、海陆暴露和新峰值窗，先只跑 (a)；持续风站点 必须在 ±20%，同时报中位绝对误差、分事件结果和阵风副指标；未过就停止，不跑 (b)(c)。v1 曾通过的 (a) 不能自动继承到换输入/站池的 v2。\n\n截尾按预测峰时刻与观测窗口完整性预先定义可比较站；若在强风段断报，不以已观测最大值当真峰，标右截尾/下限 `true_peak≥observed_max`，主估计可采用预注册区间型损失并给最乐观/最悲观边界，另报完全观测子集；未知上界不得凭空当有限区间。模型峰 t* 超出已取观测窗，按事前统一扩展窗口取数或记不可评，不能按哪条链的成绩来选站。多链使用同一交集、逐事件截尾数、真实峰下限和两链峰时错位表均必报。\n\n## 结论与花费\n\n**不值得现在启动 v2 正式判闸**：严格 1min 仅 7 个预筛候选；宽松 H2 小时站已有 14 个潜在候选，Eta 尚可能补至 15 但没核实，且小时峰与分钟峰不可无校准混算；R1 的环境场业务可得性和 Holland 拟合闭合也待冻结。值得仅做定向的 Eta 小时站完整性、GFS 归档发布时间和 (a) 前向公式审计，满足 R1–R3 后再决定正式 v2。预计后续元数据核查为本地 CPU 小任务；正式 AIWP 路径链的网络/CPU 工作量可参照 s2b 读取 40.27 GB，具体 CU 在协议和候选站固定后估算，不预支。本次仅本地 CPU 与 HTTP 元数据/1min 下载，没有 Colab 会话，0 CU；网络美元费用未计量。\n\n引用：NHC HURDAT2 [external URL omitted]；ATCF [external URL omitted]；AIWP [external URL omitted]；IEM [external URL omitted] 已登记，新用的 Knaff et al. 2007 风圈文献已追加。"
+    },
+    {
+      "id": "res-0027",
+      "ts": "2026-10-14 21:55",
+      "title": "GFS 业务环境场可得性核查（10-14 21:54 EDT）",
+      "label": "结果",
+      "text": "# GFS 业务环境场可得性核查（10-14 21:54 EDT）\n\n结论：2021–24 年的候选同起报 GFS 0.5° f048 产品可匿名 HTTP `.idx` + Range 取到 PRMSL（海平面气压）、10 m U/V；实际解码两个事件并在 OFCL f048 业务预报中心环带计算。2020 年 Delta/Zeta/Eta 的 AWS 同路径返回 404，不能据此说历史数据不存在；NCAR GDEX d084001 声称覆盖 2020 0.25°，但本环境直接文件请求遇到 SSL 证书错误，未实读三个 2020 周期，因此“全部 15 事件 R1 闭合”尚未证实。NOMADS 是滚动实时服务，不能把今天的网页可访问性倒推历史可用时刻。GDEX: [external URL omitted] DOI 10.5065/D65D8PWK；AWS: [external URL omitted]；NCEI: [external URL omitted]\n\n方法：同旧 s2 的前一 00/12 UTC 周期；GFS，PDF 4–5、10 / 期刊 74–75、80。\n\n实际读取（逐字段字节区间及具体 URL 见，解码脚本）：\n\n| 事件 | GFS 起报→有效 (UTC) | OFCL f048 中心 | V500 (kt) | Penv (hPa) | 格点数 400–600 / 800–1000 km | HTTP 读取 |\n| --- | --- | --- | ---: | ---: | ---: | ---: |\n| Fred | 2021-08-14 12→08-16 12 | 28.7N, 87.4W | 2.1731 | 1014.080 | 236 / 423 | 869,583 B |\n| Milton | 2024-10-08 00→10-10 00 | 27.1N, 83.3W | 16.0029 | 1012.053 | 226 / 411 | 898,304 B |\n\n两例 ecCodes 解码网格 720×361、字段有效日分别为 2021-08-16 / 2024-10-10；不是简单 HEAD 检查。逐候选 `.idx` 审计 ：16 个事件中 13 个 GFS 三字段存在、3 个 2020 周期 AWS 404；其中同起报 Pangu 可得的 15 个，GFS 直接已核到 12 个、另 3 个仅 GDEX 元数据指向可行。上游 2026 Isaias 的 GFS 可得，但 Pangu 对象为零，故不能补足 Pangu 主链。\n\n业务时间边界：此轮证实“相应历史业务预报文件现在可下载”，并不证实当年 GFS 实际完成上传时间早于 OFCL 对外发布的共同决策 T；对 2020 GDEX 再发布版尤其不能以存档修改时间当历史发布时间。正式 v2 需用当年产品/公告发布时间逐案确认 T 前可得，否则相关节点按缺测。没有做任何风场–观测配对。"
+    },
+    {
+      "id": "res-0028",
+      "ts": "2026-10-14 21:55",
+      "title": "B1 v2b 小时同质站池定向核查（10-14 21:54 EDT）",
+      "label": "结果",
+      "text": "# B1 v2b 小时同质站池定向核查（10-14 21:54 EDT）\n\n本轮只有观测可用性、对象与环境场核验，没有 (a)(b)(c) 预报风–站点配对、也不判闸。选定：全事件同一 IEM 、仅 `report_type=3` 小时 METAR、 同一代码重新请求，没有把旧 H2 分数与新脚本的分数混池。某些原旧站数因此改变。IEM。\n\n| 事件 | 年份 | 150 km 候选站 | ≥75% 小时站 | Pangu/OFCL 同周期 |\n| --- | ---: | ---: | ---: | --- |\n| Delta | 2020 | 18 | 7 | 是/是 |\n| Zeta | 2020 | 22 | 11 | 是/是 |\n| Ida | 2021 | 22 | 7 | 是/是 |\n| Ian | 2022 | 23 | 9 | 是/是 |\n| Nicole | 2022 | 21 | 16 | 是/是 |\n| Idalia | 2023 | 14 | 10 | 是/是 |\n| Beryl | 2024 | 21 | 12 | 是/是 |\n| Debby | 2024 | 15 | 12 | 是/是 |\n| Francine | 2024 | 16 | 7 | 是/是 |\n| Helene | 2024 | 17 | 8 | 是/是 |\n| Milton | 2024 | 22 | 6 | 是/是 |\n| Eta | 2020 | 9 | 8 | 是/是 |\n| Elsa | 2021 | 16 | 15 | 是/是 |\n| Fred | 2021 | 13 | 10 | 是/是 |\n| Henri | 2021 | 36 | 32 | 是/是 |\n| Isaias | 2026 | 30 | 8 | 否/是 |\n\n2020–24 年 15 个候选事件全部至少 3 站，并有同起报 Pangu 对象和 OFCL；合计 170 个通过小时完整性代理的站–事件。达到 R2 的“15 个事件 ×≥3 站”数量预筛门槛，但不是 15 个已通过新模型峰窗、ASOS/AWOS 身份、高度与物理 QC 的最终可评事件；正式分母仍未锁定。Isaias 有 8 站但 Pangu 对应 2026-10-08 00 UTC 对象的 S3 精确前缀 KeyCount=0；故不能把它加进主链形成 16 个。 逐事件保存精确 key、起报及 GFS 索引核验；2026 同周期 OFCL f048 在当前 NHC aid_public a-deck 确有记录。\n\n2026 季检查 NHC 业务 b-deck 当时列出的 `bal01`–：Chantal 登陆 45 kt，未增 ≥50 kt 案。为避免混入弱风登陆，采用任务书的“登陆时 Vmax≥50 kt”，不是生涯峰值≥50 kt。\n\nR1：Fred、Milton 的 48 h GFS f048 环境场三字段已 Range 实读并算出 V500/Penv（见）；15 个候选中 AWS `.idx` 有 12 个，Delta/Zeta/Eta 的 2020 三例 AWS 路径 404、NCAR GDEX 元数据覆盖但本次未实读，实际业务发布时间也未逐案核准。因此不能宣称 R1 对全部 15 个已闭合。Knaff–Zehr 2007 原定义见卡 D8NBE3ZE PDF 第 5、10 页/期刊 75、80 页。15 是恰好达到数量预筛，任何一个因站类、高度、新峰窗、物理 QC 或历史环境场时间戳失格都会落到 15 以下，不能提前开 (b)(c) 判闸。\n\n花费与估计：本轮本地 CPU + 匿名 HTTP、Colab 0 CU、无 HPC；网络美元流量未计费/未核实。若正式 v2 仍用本地 CPU，预计 Colab 0 CU；按 s2b 约 9 事件读 40.27 GB 的一阶线性外推，15 事件 Pangu 路径网络约 67.12 GB（假设同对象/切片密度，非实测，模型和协议改变可使之偏离）；若改 Colab，CU 要在脚本与输入冻结后单独估，不能从 GB 换算。\n\n决定：值得继续“正式 v2 前置核查”，但不值得现在直接开 v2 判闸。先补齐 2020 GDEX 三周期的无凭据、业务时刻可得性证据及仪器站类/高度，然后锁定同质站、峰窗、模型常数，重做 (a) ±20% 闸；闸未通过不做 (b)(c)。项目原判据 1.1、2/3、±20%、≥15×≥3 均未修改。外部数据源：NHC HURDAT2 / b-deck / 实时公告、Iowa Environmental Mesonet 小时 ASOS/METAR、NOAA GFS AWS 与 NCAR GDEX；原始 URL 在脚本，无他人未公开数据。"
+    },
+    {
+      "id": "res-0029",
+      "ts": "2026-10-14 22:17",
+      "title": "B1 v2 预注册定稿候选——未获 Lead 冻结，禁止开跑",
+      "label": "结果",
+      "text": "# B1 v2 预注册定稿候选——未获 Lead 冻结，禁止开跑\n\n时间：10-14 22:17（美东）。只规定下一版试验；s2b 已发表的未过闸结果不改。本轮没有任何新的站点风场配对。本候选当前的 R2 站池尚未闭合，不能作为已获准执行的正式预注册。决策权在 Lead。\n\n## 固定闸门与先后顺序\n\n主池仅小时 METAR，IEM `report_type=3`（不混分钟）；15 个美国登陆事件、每事件至少 3 个可评合格站，否则不判 v2 闸。先同一风场、同一小时口径做 BEST (a)，以每站预测/观测峰比值减一的中位偏差在 ±20% 内为先决条件；不过则停，不做 (b)(c)。过后才比较 48 h：Pangu (c)[local path omitted] (b) 的同质站点中位绝对误差比 ≤1.1，并有 ≥2/3 同质可评事件各自 (c) 不差于 (b)；两个条件都须满足。B4 只在 B1 过闸后做。24/72 h、阵风、路径误差仅诊断。意向全集和可评交集分母均报告，不选择有利子集。原项目页 第 15–20 行。\n\n## 事件、时间与泄漏防线\n\n意向事件及登陆点/时刻沿 v2b 2020–24 的 15 例，主站候选是该表 `hourly_75pct=Trueinit+3h`，但实际归档公告发布时间须在冻结前由 Lead 核实；实际提前量相对于真实登陆另报。**不得把 b-deck BEST 的事后 RMW、Pc、POCI、风圈给 (b)(c)**；BEST 仅用于 (a) 与事后核验。(b)(c) 共用同周期官方 Vmax/风圈、压差/尺度，仅路径分别用 OFCL/Pangu 850 hPa 环流追踪；追踪算法沿 s2b，不选最优事后路径。OFFICIAL 若某有效节点无必要强度或无法取得 GFS 场，该节点缺测，不以事后资料补齐；若峰窗任意关键节点缺测，该事件记输入不可评。OFCL 12 h 节点按 s2b 线性插值，不越端外推；每节点保持输入可得时刻标记。\n\nGFS：NCEP/NCO 给滚动 30 日平均：00/12 UTC GFS 48 h 产品约起报后 03:51 发布，06 UTC 约 09:49，18 UTC 约 21:51；这并非各历史日实际发布时间。预先保守假设**所有所需 GFS 预报时效字段完整公开的时刻 = 起报+4 h 15 min**（比统计平均额外留约 24 min；如日异常推迟，需历史记录另审，不能称真实已发布）。决策 T 之前选最近且到 T 已满 +4h15 的周期；在 T=00/12 起报后 3 h 情况，统一退回上一 18/06 UTC 周期，取对应有效时刻预报时效比原周期 +6 h；48 h 点变 f054。 列逐事件周期。逐节点重新按同一规则取时效/场，不能用未来发布的较新周期。GDEX d084001 2020 0.25° 与 AWS GFS 2021–24 0.5° 网格分辨率不同（非同质输入），须双分辨率敏感性检查；2020 三例现已匿名实读，但其 2020 历史发布时刻未经逐案审计。不可把当前 GDEX 文件时间当历史公开时间。NCEP 页面为公布规则依据而非历史实时审计。\n\n## 尺度与压差（绝不从站点反标定）\n\nKnaff–Zehr (2007)，卡，PDF 第 4–5、10 页/期刊第 74–75、80 页：Vmax=10m/1min kt，平移 c kt，Vsrm=Vmax−1.5 c^0.63；Penv 为中心 800–1000 km 环带海平面压均值 hPa；V500 为 400–600 km 环带平均切向风 kt，S=V500/V500c；V500c=Vmax(Rmax/500)^x，x=0.1147+0.0055Vmax−0.001(φ−25)，Rmax=66.785−0.09102Vmax+1.0619(φ−25) km。式(7)：Pc=Penv+23.286−0.483Vsrm−(Vsrm/24.254)^2−12.587S−0.483φ；ΔP=Penv−Pc。**V500 风层**：KZ07 原文 PDF 第 5 页只明确“NCEP analyses 的 400–600 km 环带平均切向风”，正文未明确给 850 hPa；不能谎称其写了 850。相关 Knaff et al. (2014) 原文摘要/方法写 850 hPa V500，并称 Knaff–Zehr (2007) 的先例，[external URL omitted]；本试验工程固定为 GFS 850 hPa U/V，明确为后续同系列方法的合理选层，不是 KZ07 原文直接规定。v2b 错用 10m 风，v2c 已按 850 hPa 真实 GRIB 验证。风场四象限不能直接当作 S；KZ 气候 Rmax 不是逐案观测 RMW。遇 Vmax<15 kt 或 V500c≤0、ΔP≤0、场缺损，节点按缺测处理，不裁剪成“看起来合理”的压差。大尺度 S 的两种网格分辨率作为诊断；相对风针对冻结的同一官方中心计算，不用 BEST 中心于业务链。\n\nRMW 先验来自 Knaff et al. (2007) 卡，PDF 第 3–4、6 页/期刊第 783–784、786 页：北大西洋 rmc=36.1000−0.0492Vmax+0.5740(φ−25) nmi。本文的 Rankine x 与 Holland B **不是同一个数**。H08 与粗糙度/时距沿 v1 CLIMADA 6.1.0 固定 commit bb9595、Natural Earth 10m land、z0 海0.0013m/陆0.03m/参考500m、持续×0.97、阵风陆×1.30/海×1.20；这些仍是假设，范围和依据见 第 5–11 行。\n\n**拟冻结的风圈→H08尺度拟合工程假设（还需做无观测单元测试）**：CLIMADA v6.1.0 H08 `_bs_holland_2008` 按压差、气压变化率、纬度和平移速度计算 `hol_b`，`_v_max_s_holland_2008` 再按该 B 与压差重算 `vmaxΣ_k w_k / N_k × Σ_q(log(r_pred,k/r_obs,kq))² + 0.25(log(r/rmc))²`，w_34/50/64=1/2/3（工程假设），N_k 为该阈值有效象限数；不对“非对称半径”偷调 H08 B。剔除 r≤0、阈值≥业务 Vmax 节点，至少两个不同阈值各有≥2 象限、ΔP>0、rmc∈[5,200] nmi；其余节点缺测，不设隐含 fallback。拟做敏感性：r 下界 3–10，上界 150–250 nmi，先验系数 0.1–1，阈值等权 vs 1/2/3；只报告，绝不以站点误差择优。**尚须验证 CLIMADA H08 的实际径向函数与这个离线拟合器的数值同一性**，这比语法检查更严格；未验证不能冻结为可执行试验。(a) BEST 也用同一 RMW 拟合规则和独立 BEST 风圈/中心/强度，不借 OFCL 补洞。\n\n## 主观测、截尾与计分\n\n候选站设备前置规则：只收事件日期明确为 ASOS 且事件时风速仪高度可核为 8–12 m 的站（8–12 m 为“接近10m”的工程假设，范围 9–11 m 做敏感性；查不到身份/高度或只有 2025 快照而无历史沿革的站不进入**确认**样本）。AWOS 即使高度 10m 也不纳入此版主池，避免不同设备口径；单列替代敏感性需新协议，不能为凑数事后加入。来源优先 NCEI HOMR 事件日 中 2025 年快照高度不能证明 2020–24 的高度。这个严格规则下目前未确认 15×3，**禁止判闸**。\n\n观测按 IEM 小时 `report_type=3`，去重 UTC 小时格，`sknt≥0e=pred_peak/obs_peak−1`；先站再事件中位，主统计各站 |e| 的全池中位数，事件胜负为站级 |e| 各事件中位比较。持续风主闸；阵风并列报告不替代。最佳路径 (a) 用此完全相同观测规则与候选站重新算，绝不能沿用旧分钟 v1 的过闸。\n\n## 未闭合的冻结前核验\n\n1. 逐站 HOMR 历史高度目前**没有完成**，现有 2025 NWS 设备快照不足；保守确认数为 0（这是“证据尚未确认”非断言所有站不合格），条件性快照仅 13 事件各≥3 站，Delta、Milton 不足。Lead 需决定是补历史元数据、合法预先扩大同质站型还是停止；不能未经 Liang Hu 变更 R2 15×3。\n2. s2b 原始 `init+3h` 只是假设统一公众发报时刻，未逐案核历史公告；NCEP 滚动平均不保证 2020–24 每个 GFS 字段实际先于 T 发布。若无法核验，务必标注“保守业务时刻代理”，不可写已逐案证实。\n3. 当前提议的拟合器与 CLIMADA H08 的 B 计算耦合需核源码/单元测试；无完整风圈的事件和节点是否导致 <15×3 尚未验证。 仅拟合器与前置校验脚本候选，语法检查后不得运行 (a)。"
+    },
+    {
+      "id": "res-0030",
+      "ts": "2026-10-14 22:20",
+      "title": "B1 v2c 前置核查（10-14 22:20 美东）",
+      "label": "结果",
+      "text": "# B1 v2c 前置核查（10-14 22:20 美东）\n\n没有执行任何新的 (a)(b)(c) 模型风–站点配对，也没有判闸。结论：**目前不能把 v2 预注册冻结为可执行版**；2020 三例 GFS 场能实读，但严格历史设备高度 QC 与 H08 参数适配均尚未闭合。\n\n1. 2020 三例业务环境场：GDEX d084001 匿名 HTTPS 完整 GRIB2 在内存解码（不保留大文件）；Delta 20201007 06Z f054：850 hPa V500 22.315 kt、Penv 1013.311 hPa；Zeta 20201026 06Z f054：14.366 kt、1012.218 hPa；Eta 20201106 18Z f054：31.168 kt、1013.363 hPa。中心采用当时 OFCL f048 的位置，仅在预报有效时刻取 GFS U/V 850 hPa 和 MSLP。实际传输 1,023,692,184 bytes，三例依次 13.93/23.28/22.89 秒。字段 GRIB 有各自层次、时刻及消息偏移，见 等；这证明归档可读，不证明 2020 当日按现行产品时刻发布。v2b 的 10m V500 计算不能用于此版。Knaff–Zehr 2007 卡 D8NBE3ZE PDF 第 5 页/期刊 75 页只写 400–600 km 环带 NCEP 分析切向风，**原文没有明确写 850 hPa**；采用 850 层有后续 Knaff et al. (2014) 文献的明确出处 [external URL omitted]，而非回填给 2007。KZ07 风压式 PDF 第 10 页/期刊 80 页。\n\n2. 业务时刻：NCEP NCO 公开 的滚动 30 日平均 48h GFS 产品为 00/12 周期后约 3h50、06/18 周期后约 3h50；统一加保守余量，假设完整公开为起报后 4h15。相对 OFCL 公众报 T=AIWP 同周期起报+3 h，选 T 前最新已全发布周期，统一退至前一个 18/06Z，48h 有效点 GFS f054；15 个事件逐个起报在。**这是预注册业务时刻代理，不是历史逐案发布证明**。若 Lead 要求严格历史可得而非保守代理，本项仍未闭合；2021–24 的前周期 `.idx` 尚未逐案核对（v2b 核的是同周期 f048，不能挪作本周期可得证据）。\n\n3. 170 站–事件身份与高度：NWS 2025 设备清单的 Wind Tower Height 工作表与 Legacy ASOS In Service Dates 表逐站 ID 匹配；2025 清单中 80 个站–事件有 ASOS 条目及高度，90 个不在此 ASOS 清单（不等于已经证明 AWOS，必须逐个查其他历史站表）。以运行起始日期≤事件年、高度 8–12 m 的**条件性 2025 快照**为代理，61 站–事件、13 个事件各≥3 站；Delta、Milton 分别仅 1 站，其他 13 例为 3–17 站。2025 清单不能追证 2020–24 当时仪器型号/高度；NCEI HOMR 事件日历史逐站核验未完成，因此严格“历史已证身份和高度”的确认数当前为 0，**不能把它误称为 0 个合格站**。逐行原值/出处/条件结论在，事件计数在。在本候选的“ASOS 且历史高度已证”规则下，眼下不能确认 15×3；若 2025 清单确实穷尽历史 ASOS，条件性上限也只 13，但该穷尽性未核，不能断言最终只有 13。其余 METAR 站也许 AWOS，不可偷当 ASOS 加入。\n\n4. Isaias：AIWP S3 匿名列表 为零对象；2026/1007 有 `2026100700`，2026/1009、1010、1011、1012、1013、1014 均有日期前缀。10-08 周期缺失不是“全桶只更新到 10-07”的简单滞后，而是日期/周期空洞；目标同起报 2026100800 仍未补齐，不能换 10-07 周期让其凑 16 例。匿名桶：[external URL omitted]\n\n5. 已通过 Python 语法编译检查，含严格 `--lead-frozen` 和历史 15×3/adapter 守卫，但**没有运行过任何观测配对，也不是可独立运行的冻结链**，还缺上游 BEST 风圈至 H08 的经验证输入适配。Lead 未冻结前不可启动 (a)。判据 ±20%、1.1、2/3、≥15×≥3 未改。\n\n花费：本地 CPU/匿名 HTTP，Colab 0 CU、HPC 无作业；本轮 GDEX 约 1.024 GB 实读+NWS 表约 1.17 MB，美元流量费用未计量。正式 v2 若仍本地运行则预计 0 Colab CU；仅 Pangu 路径按 s2b 的 40.27 GB/9 事件线性外推 15 事件约 67.12 GB（粗估，非费用与非完整新增 GFS/观测流量）。当前不足 15 例的证据闸，**不建议投入该正式成本**。\n\n外部出处：NWS 2025 ASOS 装备清单 [external URL omitted]；HOMR 历史 API [external URL omitted]；NCAR GDEX 10.5065/D65D8PWK；NCEP NCO 上述发布页；AIWP 公开桶；Knaff–Zehr (2007) D8NBE3ZE、Knaff et al. (2007) ZPYAUTZG PDF 第 3–4、6 页/期刊 783–784、786 页。使用这些来源已在 补记。"
+    }
+  ],
+  "figures": [
+    {
+      "id": "fig-0000",
+      "ts": "2026-10-14 14:45",
+      "title": "chain a ratio pilot5",
+      "url": "../../img/35953a9bbd41.png"
+    },
+    {
+      "id": "fig-0001",
+      "ts": "2026-10-14 14:49",
+      "title": "chain a ratio pilot5 v2",
+      "url": "../../img/7431d77de251.png"
+    },
+    {
+      "id": "fig-0002",
+      "ts": "2026-10-14 15:35",
+      "title": "chain a v1 ratio",
+      "url": "../../img/7f3d0dc0ea6a.png"
+    },
+    {
+      "id": "fig-0003",
+      "ts": "2026-10-14 15:36",
+      "title": "aiwp milton path pilot",
+      "url": "../../img/26c535a06206.png"
+    },
+    {
+      "id": "fig-0004",
+      "ts": "2026-10-14 16:30",
+      "title": "b path errors s2a",
+      "url": "../../img/d7764da404f0.png"
+    },
+    {
+      "id": "fig-0005",
+      "ts": "2026-10-14 18:44",
+      "title": "s2b event errors",
+      "url": "../../img/75fb86032078.png"
+    },
+    {
+      "id": "fig-0006",
+      "ts": "2026-10-14 18:46",
+      "title": "s2b event errors",
+      "url": "../../img/d11e844cb3c5.png"
+    }
+  ],
+  "code": [
+    {
+      "name": "chain_a.py",
+      "group": "b_tc",
+      "url": "../../code/b_tc/chain_a.py"
+    },
+    {
+      "name": "coverage_probe.py",
+      "group": "b_tc",
+      "url": "../../code/b_tc/coverage_probe.py"
+    },
+    {
+      "name": "materialize_coverage.py",
+      "group": "b_tc",
+      "url": "../../code/b_tc/materialize_coverage.py"
+    },
+    {
+      "name": "chain_a.py",
+      "group": "pilot5",
+      "url": "../../code/pilot5/chain_a.py"
+    },
+    {
+      "name": "plot_chain_a.py",
+      "group": "b_tc",
+      "url": "../../code/b_tc/plot_chain_a.py"
+    },
+    {
+      "name": "plot_chain_a_v2.py",
+      "group": "b_tc",
+      "url": "../../code/b_tc/plot_chain_a_v2.py"
+    },
+    {
+      "name": "qc_chain_a.py",
+      "group": "b_tc",
+      "url": "../../code/b_tc/qc_chain_a.py"
+    },
+    {
+      "name": "ai_tracker.py",
+      "group": "s2",
+      "url": "../../code/s2/ai_tracker.py"
+    },
+    {
+      "name": "analyze_partial.py",
+      "group": "s2",
+      "url": "../../code/s2/analyze_partial.py"
+    },
+    {
+      "name": "c_pilot_lower_bound.py",
+      "group": "s2",
+      "url": "../../code/s2/c_pilot_lower_bound.py"
+    },
+    {
+      "name": "chain_b.py",
+      "group": "s2",
+      "url": "../../code/s2/chain_b.py"
+    },
+    {
+      "name": "chain_b_s2a.py",
+      "group": "s2",
+      "url": "../../code/s2/chain_b_s2a.py"
+    },
+    {
+      "name": "ai_tracker_s2b.py",
+      "group": "s2b",
+      "url": "../../code/s2b/ai_tracker_s2b.py"
+    },
+    {
+      "name": "diagnostics_s2b.py",
+      "group": "s2b",
+      "url": "../../code/s2b/diagnostics_s2b.py"
+    },
+    {
+      "name": "run_subset.py",
+      "group": "s2b",
+      "url": "../../code/s2b/run_subset.py"
+    },
+    {
+      "name": "run_tracks.py",
+      "group": "s2b",
+      "url": "../../code/s2b/run_tracks.py"
+    },
+    {
+      "name": "score_s2b.py",
+      "group": "s2b",
+      "url": "../../code/s2b/score_s2b.py"
+    },
+    {
+      "name": "score_ai_pilot.py",
+      "group": "s2",
+      "url": "../../code/s2/score_ai_pilot.py"
+    },
+    {
+      "name": "aiwp_path.py",
+      "group": "v1",
+      "url": "../../code/v1/aiwp_path.py"
+    },
+    {
+      "name": "aiwp_region.py",
+      "group": "v1",
+      "url": "../../code/v1/aiwp_region.py"
+    },
+    {
+      "name": "aiwp_slice.py",
+      "group": "v1",
+      "url": "../../code/v1/aiwp_slice.py"
+    },
+    {
+      "name": "chain_a_v1.py",
+      "group": "v1",
+      "url": "../../code/v1/chain_a_v1.py"
+    },
+    {
+      "name": "plot_aiwp_path.py",
+      "group": "v1",
+      "url": "../../code/v1/plot_aiwp_path.py"
+    },
+    {
+      "name": "render_results.py",
+      "group": "v1",
+      "url": "../../code/v1/render_results.py"
+    },
+    {
+      "name": "v2_existing_h2_150km.py",
+      "group": "b_tc",
+      "url": "../../code/b_tc/v2_existing_h2_150km.py"
+    },
+    {
+      "name": "v2_feasibility_probe.py",
+      "group": "b_tc",
+      "url": "../../code/b_tc/v2_feasibility_probe.py"
+    },
+    {
+      "name": "availability_audit.py",
+      "group": "v2b",
+      "url": "../../code/v2b/availability_audit.py"
+    },
+    {
+      "name": "gfs_env_probe.py",
+      "group": "v2b",
+      "url": "../../code/v2b/gfs_env_probe.py"
+    },
+    {
+      "name": "hourly_pool_probe.py",
+      "group": "v2b",
+      "url": "../../code/v2b/hourly_pool_probe.py"
+    },
+    {
+      "name": "chain_a_v2.py",
+      "group": "v2c",
+      "url": "../../code/v2c/chain_a_v2.py"
+    },
+    {
+      "name": "gfs_2020_probe.py",
+      "group": "v2c",
+      "url": "../../code/v2c/gfs_2020_probe.py"
+    },
+    {
+      "name": "make_cycle_manifest.py",
+      "group": "v2c",
+      "url": "../../code/v2c/make_cycle_manifest.py"
+    },
+    {
+      "name": "station_audit.py",
+      "group": "v2c",
+      "url": "../../code/v2c/station_audit.py"
+    }
+  ],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 20:33",
+      "text": "【委托结果 · 实验室助手】B1 v2 可行性核查：可评事件数、尺度输入方法、协议草稿（不判闸）\n不值得现在启动 v2 正式判闸：严格口径仅有 7 个预筛候选，宽松小时口径也只确认到 14 个潜在候选，且 R1 输入尚未闭合。值得先做 Eta 小时站核查、业务环境场可得性核查，再决定是否冻结并启动 v2。\n\n（附件：v2_feasibility.md）\n\n（附件：PREREG_v2_DRAFT.md）\n\n（附件：v2_new_events_probe.csv）\n\n（附件：v2_existing_h2_150km.csv）\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 20:33",
+      "text": "正在核对 v2 可行性报告的证据。核完了，接下来派一轮定向小核查，再更新项目页。Now update project page, decision, line status, and report up to B node.**结论：v2 现在不开判闸，B1+B4 继续搁置。** 我又派了一轮不花算力的定向核查，只看一件事：样本量有没有可能凑够。\n\n**核查结果**（我对过它的 csv，和报告一致）\n- 2020 年 10 月以后，美国本土 ≥50 kt 的登陆飓风共 19 个。每个都有 Pangu 48 h 预报，但其中 4 个（Mindy、Nicholas、Harold、Ophelia）找不到同一起报时刻的 NHC 官方预报，不能放进主对比。\n- 用每分钟一条的 ASOS 观测、要求每个事件至少 3 站，只有 7 个预筛候选。改用每小时一条的站点观测，潜在候选是 14 个。Eta 还没核，核过也许能补到 15。\n- 分钟观测和小时观测抓到的峰值不一样（采样越稀，抓到的峰越低），不能放在一起算一个误差中位数。所以\"14 个\"不能直接拿来和重启条件 R2 比。R2 要求至少 15 个可评事件、每个事件至少 3 站。\n- 风场尺度和气压输入（R1）有了一条全用当时公开资料的路线：用 NHC 官方的大风半径加上 Knaff 2007 的最大风半径经验式（卡 ZPYAUTZG，PDF 第 3–4、6 页），再用 Knaff–Zehr 2007 的风压关系（卡 D8NBE3ZE，PDF 第 4–5 页）。\n - 这条路线还需要 GFS 大尺度场里的两个量（500 hPa 环带风速、远场环境气压），这些场能不能从业务归档里取到还没证实。\n - 把大风半径换算成风场模型的两个形状参数，没有文献给出通用做法，只能算我们自己的工程假设。\n\n**Decision I made：** 不冻结 v2，派实验室助手做定向核查 （目前在排队，0 CU，只在本机跑）。\n- 内容：只用小时观测一种口径、同一个脚本，重新数登陆点 150 km 内的站数。范围是旧的 11 个事件，加 Eta、Elsa、Fred、Henri，再加今年（2026 季）的登陆事件。今年的事件还没进官方最佳路径库，可能补上几个。同时抽 2 个事件，实际读一次 GFS 归档，看那两个量算不算得出来。\n- 为什么：只有小时口径这一条路可能凑够 15 个、而且采样一致；今年的飓风季是唯一的新样本来源。\n- 错了的代价：bot 花一两个小时，0 CU。如果还不够 15 个，节点继续搁置，重启条件加一条\"等 2026 季官方最佳路径发布后再数\"。\n- 判据一律不动：AI 链误差不超过官方预报链的 1.1 倍、至少 2/3 的事件上不差于官方链、最佳路径链偏差在 ±20% 以内、至少 15 个事件且每个事件至少 3 站。如果正式 v2 改用小时口径，最佳路径链要按小时口径重新过 ±20% 这道闸。\n\n项目页、线况和决策记录 都已更新，也已上报 B 节点。任务书在下面，核查结果回来会自动叫醒我。\n\n\n\n\n（附件：B1B4_v2可行性_不开判闸_定向核查_20261014.md）\n\n（附件：任务书_B1B4_v2定向核查_小时同质池_20261014.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 21:58",
+      "text": "【委托结果 · 实验室助手】B1 v2 定向核查：小时同质站池与 2026 季事件、GFS 环境场可得性\n值得继续 v2 的前置核查，不值得现在启动正式判闸：单一小时站池已恰好达到 15 例的数量预筛，但任何一例在站点 QC 或 2020 年业务环境场核验中失格，就会低于原门槛。先补齐这两项，再冻结协议并重做 (a) 的 ±20% 闸。\n\n（附件：v2b_summary.md）\n\n（附件：hourly_pool_150km.csv）\n\n（附件：gfs_env_availability.md）\n\n（附件：gfs_env_probe.json）\n\n（附件：input_availability.csv）\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 21:58",
+      "text": "**结论：只用小时观测这一种口径，样本刚好够 15 个事件、余量为 0，所以还是不判闸。** 我已派实验室助手把剩下的前置条件补齐，再交一份可以冻结的预注册给我。\n\n**这轮核查结果**（对照过它交的逐事件表和环境场读取记录）\n- 口径：只用每小时一条的观测，登陆点 150 km 内，登陆前后各 12 小时里至少 75% 的小时有有效记录。15 个事件全部用同一个脚本重新数过，没有和旧口径的数字混用。\n- 样本：2020–2024 年正好 15 个事件，每个都至少 3 站（合计 170 个\"站×事件\"），也都有同一起报时刻的 Pangu 预报和 NHC 官方预报。这只是刚好过了 R2\"至少 15 个事件、每个至少 3 站\"的数量门槛，后面逐站检查时少一个事件就不够了。\n- 今年（2026 季）：只有 Isaias 一个以 ≥50 kt 登陆美国本土，但 AI 预报数据库里没有它对应时刻的 Pangu 预报，加不进来。\n- 环境场：2021–2024 年的 12 个事件能从 AWS 取到 GFS 预报场，其中 Fred 和 Milton 已经实际读出来，算出了风压关系需要的环境风速和环境气压。2020 年的 Delta、Zeta、Eta 三个在 AWS 上取不到，还没证实能从别处拿到。\n- 发现一个问题：它算环境风速用的是 10 m 风，但文献卡上没写 Knaff–Zehr 2007 原文用的是哪一层。我怀疑原文用的是 850 hPa，没核实过，所以让它去对原文。\n\n**Decision I made：** 仍然不跑任何链。派实验室助手做补齐任务 （目前在排队，0 CU，只在本机跑）。\n- 补齐内容：\n - 2020 年三个事件的环境场，换数据源实际读一次\n - 按原文确定环境风速用哪一层\n - 定一条统一的\"当时能拿到哪个 GFS 预报\"规则，依据 NCEP 公布的发布时间表\n - 170 个\"站×事件\"逐站核查测站类型（ASOS 还是 AWOS）和风速计高度，核完重新数事件\n - 查 Isaias 缺的 Pangu 预报是数据库滞后还是停更了。\n- 交付：一份可以冻结的，主分析只用小时口径；最佳路径链的计算脚本也写好，只检查语法、不运行。预注册里事先写死：\"逐站检查后不足 15 个事件、每个至少 3 站，就不判闸。\"判据一律不动。\n- 回来以后我冻结预注册，然后只跑最佳路径链的 ±20% 闸；这道闸过了，才比较 AI 路径和官方预报。\n- 为什么：数量刚好卡在门槛上，所有规则和样本范围必须在看到任何误差之前定死。\n- 错了的代价：bot 花半天，0 CU。如果逐站检查后不够 15 个事件，就按事先写好的规则不判闸，节点继续搁置，等今年的飓风季进入官方最佳路径库、AI 预报数据库也补齐以后再数。\n\n项目页、线况和决策记录 都已更新。\n\n\n\n\n（附件：B1B4_v2b_小时池15例_补齐前置_20261014.md）\n\n（附件：任务书_B1B4_v2前置补齐与预注册定稿_20261014.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 22:23",
+      "text": "【委托结果 · 实验室助手】B1 v2 前置补齐与预注册定稿候选\n给委托方：值得保留 v2 候选方案，但现在不值得冻结并启动 (a) 闸。三例 2020 环境场已证实可取；历史站类／高度尚未核成 15 例×每例 3 站，且 H08 尺度适配未验证。先补这两项，再由 Lead 决定是否冻结预注册；原判据不变。\n\n（附件：v2c_summary.md）\n\n（附件：PREREG_v2.md）\n\n（附件：station_audit_170.csv）\n\n（附件：event_qc_counts.csv）\n\n（附件：gfs_cycles_15.csv）\n\n（附件：gfs_delta_probe.json）\n\n（附件：gfs_zeta_probe.json）\n\n（附件：gfs_eta_probe.json）\n\n（附件：chain_a_v2.py）\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 22:23",
+      "text": "**结论：v2 的准备到此为止，不冻结预注册，也不跑最佳路径链。B1+B4 继续搁置。** 卡住的是样本：按测站类型和风速计高度严格筛选后，只剩 13 个事件够 3 站，达不到 15 个。\n\n**这轮核查结果**（我对过逐站表和逐事件计数）\n- **测站类型和风速计高度**：170 个\"站×事件\"里，80 个在 NWS 2025 年 ASOS 设备清单上有风速计高度，另外 90 个不在清单上。\n - 只留风速计在 8–12 m 的 ASOS 站，15 个事件里只有 13 个还有至少 3 站；Delta 和 Milton 各剩 1 站。\n - 这还只是按 2025 年清单推的。2020–2024 年当时的仪器高度，一个站都没核实。\n- **环境场**：2020 年的 Delta、Zeta、Eta 三个事件，GFS 场从 NCAR GDEX 实际读出来了，三个事件都能算。\n - 环境风速改用 850 hPa 风。Knaff–Zehr 2007 原文确实没写层次，850 hPa 的依据是 Knaff 等 2014。\n - \"当时能拿到哪个 GFS 预报\"已定成统一规则：按 NCEP 公布的发布时间，一律退回前一个周期，取 54 h 预报。这是一条代理规则，不是逐个事件查证当年的实际发布时间。\n- **Isaias**：AI 预报数据库正好缺它要用的那个周期（前后几天的都有），不是整体更新慢，补不上。\n- **风场模型**：现在用的 CLIMADA H08 风场模型，形状参数 B 是模型自己由压差算出来的，没法直接用大风半径去拟合。能拟合的只有最大风半径。把最佳路径数据接进这个模型的转换代码还没写，也没验证。\n\n**Decision I made：** v2 准备暂停。\n- 为什么：要凑到 15 个事件，得把风速计在 7.9 m 的站也收进来并做高度订正。即使这样也是零余量，还要再查历史仪器高度、再开发验证转换代码。判据又是按事件数算的（至少 2/3 的事件上不差于官方预报），15 个事件的统计力本来就弱。科学上的增量也有限：AI 路径和业务路径水平相当，DeMaria 2025 已经有结论（卡 NR_demaria_2025，PDF 第 5–8 页）。\n- 错了的代价：如果其实值得做，会晚几个月。材料都留在 （预注册候选、逐站表、环境场脚本、最佳路径链脚本），重启时从这里接着做，不用重做。\n- 重启条件（满足任一即可）：\n 1. 你的三维边界层模型到位。换掉 H08，形状参数的问题也一起没了。\n 2. 2026 季进入官方最佳路径库、AI 预报数据库补齐，历史仪器高度也核实后，事件数达到至少 15 个、每个至少 3 站。\n\n 到时要不要收 7.9 m 的站，必须在看到任何误差之前写进预注册。\n- 判据一律不动。B 节点的力量转到 B2，B2 在跑。\n\n项目页、线况和决策记录都已更新，也已上报 B 节点。本节点目前没有在跑的。\n\n\n\n\n（附件：B1B4_v2准备暂停_13例_20261014.md）\n\n（附件：v2c_summary.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-15 02:00",
+      "text": "【委托 · 来自 实验室 Lead】工作站 不跑计算新规：改项目页边界\n告知（无需回复，除非你节点在 工作站 有计算在跑）：Liang Hu 10-14 加严新规，——工作站 不跑计算、不存计算数据。风场/目录诊断、批量算例、大下载一律在 Colab（CPU/GPU）或 CRC/TACC 跑和存；工作站 只放脚本、单项 <200 MB 小结果、图和报告；确需临时放 >1 GB 先报 B 节点。10-15 C 盘只剩 46 GB。公开原始数据（RAFT/STORM/HURDAT2 大文件、GFS/ERA5 场）放 Colab 会话或 TACC [local path omitted]。上超算仍走 ComputeOps 资源申请 +，预检与提交分两条命令；CRC 默认单节点、组空间约 95%，大数据优先 TACC。重启时任务书按此写。请把这条写进你的项目页「边界」。B 节点 10-15 02:0x 查过 工作站 进程：本节点目前没有在 工作站 跑的计算。\n（原因：Liang Hu 10-14 加严；C 盘余 46 GB）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-15 02:00",
+      "text": "新规已经写进项目页的「边界」一节，放在「当前状态」前面。\n\n- **写了什么**：工作站 不跑计算、也不存计算数据。风场计算、站点配对，以及 AIWP、GFS、HURDAT2 这类大文件的下载，一律放到 Colab 会话或 TACC [local path omitted] 去做和存。工作站 只放脚本、单个小于 200 MB 的结果、图和报告；确实要在 工作站 临时放超过 1 GB 的，先报 B 节点。上超算照旧先向 ComputeOps 申请资源、用 登记，预检和提交分成两条命令；CRC 默认只用单节点；CRC 组空间约 95%，大数据优先放 TACC。重启时的任务书按这一节写。\n- **本节点现状**（10-15 02:00 查）：本节点目前没有委托在跑，也没有计算。 一共 44 MB，没有超过 200 MB 的文件。上一轮核查读的 GDEX 气象场（约 1 GB）是边下载边在内存里解码的，没有存到 工作站 磁盘上。\n\n## 结论\nB1+B4 项目页已经加了「边界」一节，写明 工作站 不跑计算、不存计算数据；以后的计算和大数据放 Colab 或 TACC [local path omitted]，超算照旧先申请资源、用 登记。本节点在 工作站 上没有计算在跑， 只有 44 MB，没有超过 200 MB 的文件，不需要清理。节点仍在搁置，以后重启时任务书会按这一节写。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-16 00:57",
+      "text": "【告知 · 来自 AI 气象】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知（Liang Hu 10-16 批 为 X2，指示数据存档并告知相应子项目；不改搁置状态与闸门，不开新实验）：NOAA HRD 下投探空 QC 后 10–300 m 风廓线 7,524 条（Ma 等 2026，arXiv 2610.11405；2001–2022，116 风暴-年，含 Katrina、Rita、Ike、Irene、Isaac、Sandy、Michael、Laura、Sally、Ida、Ian 等），每条有径向/切向风廓线、10 m 风、风暴中心、Vmax、RMW、r/RMW、方位；CC BY 4.0。位置：工作站 m 风切与 H08/对数律/幂律对照（海上）；重启 B1+B4 时 10 m→高层的廓线约束或检验集。限制：海上/近核采样，非陆面；部分 10 m 为最近高度赋值；300 m 以上不外推。B3 开时写进交接。"
+    }
+  ],
+  "files": {
+    "self": "b1b4-landfall-hurricane-ai-track-wind.json",
+    "claims": null,
+    "pdf": {
+      "zh": "../../pdf/b1b4-landfall-hurricane-ai-track-wind.zh.pdf",
+      "en": "../../pdf/b1b4-landfall-hurricane-ai-track-wind.en.pdf"
+    }
+  }
+}

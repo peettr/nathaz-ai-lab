@@ -1,0 +1,54 @@
+{
+  "id": "03690a3e",
+  "slug": "03690a3e",
+  "number": "T13.3",
+  "title": {
+    "zh": "T13.3 FEA 网格",
+    "en": "T13.3 FEA Meshing"
+  },
+  "group": "mesh",
+  "parent": "a56d8fe7",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-16 23:20",
+  "end": null,
+  "updated": "2026-10-16 23:20",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "Ansys Mechanical/MAPDL 结构网格，与 T27 配合",
+    "goal_en": "Ansys Mechanical/MAPDL structural meshing, coordinated with T27"
+  },
+  "report": {
+    "zh": "# T13.3 FEA 网格\n\n## 目标\nAnsys Mechanical/MAPDL 结构网格，与 T27 配合\n\n## 当前状态\n10-16 建页；T27 要 STEP/CDB 命名分组示范，1 个月内。T13 首步只盘点，路线经 Liang Hu 点头前不开发。盘点与路线见。\n\n## 已定决定\n- 10-16 开通，见 \n\n## 试过与结果\n| 日期 | 做了什么 | 结果 |\n| --- | --- | --- |\n\n## 参数来源表\n| 参数 | 取值 | 来源/假设 | 查过哪些地方 |\n| --- | --- | --- | --- |\n\n## 未决与下一步\n- 等路线批准（现状与路线 §4 已排期）。\n\n## 文献依据\n- 见现状与路线 §2。\n\n## Liang Hu 注",
+    "en": "# T13.3 FEA 网格\n\n## 目标\nAnsys Mechanical/MAPDL 结构网格，与 T27 配合\n\n## 当前状态\n10-16 建页；T27 要 STEP/CDB 命名分组示范，1 个月内。T13 首步只盘点，路线经 Liang Hu 点头前不开发。盘点与路线见。\n\n## 已定决定\n- 10-16 开通，见 \n\n## 试过与结果\n| 日期 | 做了什么 | 结果 |\n| --- | --- | --- |\n\n## 参数来源表\n| 参数 | 取值 | 来源/假设 | 查过哪些地方 |\n| --- | --- | --- | --- |\n\n## 未决与下一步\n- 等路线批准（现状与路线 §4 已排期）。\n\n## 文献依据\n- 见现状与路线 §2。\n\n## Liang Hu 注"
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "CAD Lead · 开子项目",
+      "ts": "2026-10-16 23:20",
+      "text": "【Liang Hu 让 T13 总控 分出的子对话】目标：Ansys Mechanical/MAPDL 结构网格，与 T27 配合。T27 已报需求：1 个月内 STEP/CDB 带命名分组→读入的示范通路（幕墙板含曲面，1e4–1e5 单元，四边形为主、连接与测点处加密）；3 个月内 CAARC 框架+核心筒、明石海峡大桥（1e5–1e6）。状态：待开工。T13 首步只盘点、不开发；路线经 Liang Hu 点头前不派开发活。项目页。等父对话路线批准后再接具体任务。"
+    }
+  ],
+  "files": {
+    "self": "03690a3e.json",
+    "claims": null,
+    "pdf": null
+  }
+}

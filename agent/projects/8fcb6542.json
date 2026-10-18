@@ -1,0 +1,60 @@
+{
+  "id": "8fcb6542",
+  "slug": "8fcb6542",
+  "number": "R25.3",
+  "title": {
+    "zh": "R25.3 AI 风压代理模型",
+    "en": "R25.3 AI wind-pressure surrogate models"
+  },
+  "group": "uwp",
+  "parent": "548d771a",
+  "depth": 1,
+  "status": {
+    "zh": "待开工",
+    "en": "Not started"
+  },
+  "status_class": "todo",
+  "done": false,
+  "start": "2026-10-16 20:44",
+  "end": null,
+  "updated": "2026-10-16 20:47",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "用高保真模拟及 TPU 数据训练 AI 模型，按来流参数与建筑外形直接预测目标建筑表面风压。",
+    "goal_en": "Train AI models on high-fidelity simulations and TPU data to directly predict surface wind pressure on target buildings from inflow parameters and building geometry."
+  },
+  "report": {
+    "zh": "# AI 风压代理模型（UBWP，公开项目（Liang Hu 10-17 撤销保密））\n\n## 目标\n用高保真模拟及 TPU 数据训练 AI 模型，按来流参数与建筑外形直接预测目标建筑表面风压。\n\n## 当前状态\n待开工：10-16 按 Liang Hu 要求先建好，等开工指令；不做研究、不派 bot、不提交作业。Liang Hu 补文献前不开工。\n\n## 已定决定\n- 2026-10-16 先建不开工 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n\n## 未决与下一步\n- 开工后：引用 CFM/Sculpt 精读卡的五条设计参考；测试集按未见干扰布局/未见目标外形/未见风向三分，基线含 POD。\n\n## 文献依据\n- （CFM PDF p.9/11/30–31；Sculpt PDF p.8/21）\n\n## Liang Hu 注",
+    "en": "# AI 风压代理模型（UBWP，公开项目（Liang Hu 10-17 撤销保密））\n\n## 目标\n用高保真模拟及 TPU 数据训练 AI 模型，按来流参数与建筑外形直接预测目标建筑表面风压。\n\n## 当前状态\n待开工：10-16 按 Liang Hu 要求先建好，等开工指令；不做研究、不派 bot、不提交作业。Liang Hu 补文献前不开工。\n\n## 已定决定\n- 2026-10-16 先建不开工 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n\n## 未决与下一步\n- 开工后：引用 CFM/Sculpt 精读卡的五条设计参考；测试集按未见干扰布局/未见目标外形/未见风向三分，基线含 POD。\n\n## 文献依据\n- （CFM PDF p.9/11/30–31；Sculpt PDF p.8/21）\n\n## Liang Hu 注"
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "城市风压 Lead · 开子项目",
+      "ts": "2026-10-16 20:44",
+      "text": "【Liang Hu 让 线况与派活 分出的子对话】UBWP 项目，不对外公开。目标：用高保真模拟（及 TPU）数据训练 AI 模型，按来流参数与建筑外形直接预测目标建筑表面风压。项目页；父页：；参考精读卡：。状态：待开工——等开工指令，不做研究、不派 bot、不提交作业。"
+    },
+    {
+      "role": "bot",
+      "who": "城市风压",
+      "ts": "2026-10-16 20:44",
+      "text": "「AI 风压代理模型」子项目已经接手，现在是待开工状态。按交接要求，我没有做研究，没有派 bot，也没有提交作业。\n\n几样东西都已就位，我逐一核过：\n- **项目页**在，状态写的是\"待开工\"。父页\"城市建筑风压预测\"的子项目清单和线况表 都已登记这个子项目。\n- **先建不开工的决定**已记录在。\n- **开工后直接用的设计参考**已写在项目页\"未决与下一步\"里，来自 CFM/Sculpt 那篇精读卡：\n - 建筑几何的编码方式\n - 生成一组瞬时场再算脉动和峰值\n - 测试集分三类：没见过的周边布局、没见过的目标建筑外形、没见过的风向\n - 基线里放 POD。\n\n你发开工指令后，我先把这一步要读的文献交给 litwiki 补进本项目的文献库，再提出数据方案。数据方案包括：用 TPU 还是我们自己的模拟数据、训练集多大、测试集怎么划分。\n\n本项目不对外公开，这一条已写进项目页，以后派活的任务书里也都会写上。"
+    }
+  ],
+  "files": {
+    "self": "8fcb6542.json",
+    "claims": null,
+    "pdf": null
+  }
+}

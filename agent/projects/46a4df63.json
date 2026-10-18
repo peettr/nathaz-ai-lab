@@ -1,0 +1,60 @@
+{
+  "id": "46a4df63",
+  "slug": "46a4df63",
+  "number": "T13.2",
+  "title": {
+    "zh": "T13.2 CFD 网格",
+    "en": "T13.2 CFD Meshing"
+  },
+  "group": "mesh",
+  "parent": "a56d8fe7",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-16 23:20",
+  "end": null,
+  "updated": "2026-10-17 08:00",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "OpenFOAM snappyHexMesh/blockMesh、Gmsh、Fluent Meshing 网格模板（CRC 上跑）",
+    "goal_en": "Meshing templates for OpenFOAM snappyHexMesh/blockMesh, Gmsh, and Fluent Meshing (run on CRC)"
+  },
+  "report": {
+    "zh": "# T13.2 CFD 网格\n\n## 目标\nOpenFOAM snappyHexMesh/blockMesh、Gmsh、Fluent Meshing 网格模板（CRC 上跑）\n\n## 当前状态\n10-16 建页；R16.5 要 CAARC 带建筑 LES polyMesh，11 月上旬。T13 首步只盘点，路线经 Liang Hu 点头前不开发。盘点与路线见。\n\n## 已定决定\n- 10-16 开通，见 \n\n## 试过与结果\n| 日期 | 做了什么 | 结果 |\n| --- | --- | --- |\n\n## 参数来源表\n| 参数 | 取值 | 来源/假设 | 查过哪些地方 |\n| --- | --- | --- | --- |\n\n## 未决与下一步\n- 等路线批准（现状与路线 §4 已排期）。\n\n- R16.5 现有网格脚本（只读参考）：CAARC LES autocfd_caarc_benchmark_20261006/les_L1_empty_20261009/（build_package.py、analyse_grading.py、repair_grading.py，blockMesh 1177 万）；CAARC RANS ...[local path omitted]（mesh_design.json，289 万）；Silsoe RANS autocfd_silsoe_cube_20261006/mean_cp_validation_v3_building/（50 万/170 万）；Silsoe WALE ...[local path omitted]（257 万）。\n- R16.5 已知痛点：CAARC L1 低行列式单元（靠分级修复脚本）；Silsoe snappy 41,372 凹单元（书面例外放行）；D420 M0 网格无生成脚本、不可重建；无棱柱层。另有 D420 平地加冠层大域需求（无建筑）。\n\n## 文献依据\n- 见现状与路线 §2。\n\n## Liang Hu 注",
+    "en": "# T13.2 CFD 网格\n\n## 目标\nOpenFOAM snappyHexMesh/blockMesh、Gmsh、Fluent Meshing 网格模板（CRC 上跑）\n\n## 当前状态\n10-16 建页；R16.5 要 CAARC 带建筑 LES polyMesh，11 月上旬。T13 首步只盘点，路线经 Liang Hu 点头前不开发。盘点与路线见。\n\n## 已定决定\n- 10-16 开通，见 \n\n## 试过与结果\n| 日期 | 做了什么 | 结果 |\n| --- | --- | --- |\n\n## 参数来源表\n| 参数 | 取值 | 来源/假设 | 查过哪些地方 |\n| --- | --- | --- | --- |\n\n## 未决与下一步\n- 等路线批准（现状与路线 §4 已排期）。\n\n- R16.5 现有网格脚本（只读参考）：CAARC LES autocfd_caarc_benchmark_20261006/les_L1_empty_20261009/（build_package.py、analyse_grading.py、repair_grading.py，blockMesh 1177 万）；CAARC RANS ...[local path omitted]（mesh_design.json，289 万）；Silsoe RANS autocfd_silsoe_cube_20261006/mean_cp_validation_v3_building/（50 万/170 万）；Silsoe WALE ...[local path omitted]（257 万）。\n- R16.5 已知痛点：CAARC L1 低行列式单元（靠分级修复脚本）；Silsoe snappy 41,372 凹单元（书面例外放行）；D420 M0 网格无生成脚本、不可重建；无棱柱层。另有 D420 平地加冠层大域需求（无建筑）。\n\n## 文献依据\n- 见现状与路线 §2。\n\n## Liang Hu 注"
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "CAD Lead · 开子项目",
+      "ts": "2026-10-16 23:20",
+      "text": "【Liang Hu 让 T13 总控 分出的子对话】目标：OpenFOAM blockMesh/snappyHexMesh、Fluent Meshing（CRC 上 ansys/2025R2）的网格模板（CRC 上跑，工作站 不跑）。状态：待开工。T13 首步只盘点、不开发；路线经 Liang Hu 点头前不派开发活。项目页。等父对话路线批准后再接具体任务。"
+    },
+    {
+      "role": "relay",
+      "who": "CAD Lead · 转达",
+      "ts": "2026-10-17 08:00",
+      "text": "【告知 · 来自 建模网格】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知（10-17）：Liang Hu 批 A9，开发顺序 13.1→13.2→13.3→13.4，13.2 在 13.1 之后开工（目标 11 月上旬交 R16.5 CAARC 带建筑 LES 网格）。CFD 教程网格类资料抄送 T13：（ICEM、Fluent Meshing、ANSYS Mesh 归 T28 主学；R16.5-T02 东岳 snappyHexMesh 指南、R16.5-T03 Chalmers 网格三途径、4_1–4_4meshing.pdf 与 13.2 直接相关）。Liang Hu 原话：\"重要的是学会，形成可用的库\"——学习卡要落到可复用模板并在本组算例上跑通。R16.5 现有脚本与痛点已记在。"
+    }
+  ],
+  "files": {
+    "self": "46a4df63.json",
+    "claims": null,
+    "pdf": null
+  }
+}
