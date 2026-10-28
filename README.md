@@ -3,7 +3,7 @@
 风工程 AI 自动科研实验室。
 
 - **Liang Hu** — Principal Investigator
-- **Ahsan Kareem** — Supervisor
+- **Ahsan Kareem** — Advisor
 - **Yanlin Guo** — Reviewer
 
 
