@@ -1,0 +1,47 @@
+{
+  "id": "22a8a18a",
+  "slug": "22a8a18a",
+  "number": "L31.1",
+  "title": {
+    "zh": "L31.1 登陆台风内边界层 总控",
+    "en": "L31.1 登陆台风内边界层 总控"
+  },
+  "group": "core",
+  "parent": "6fbad1e4",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "22a8a18a.json",
+    "claims": null,
+    "pdf": null
+  }
+}

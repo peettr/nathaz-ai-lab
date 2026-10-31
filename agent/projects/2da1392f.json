@@ -1,0 +1,47 @@
+{
+  "id": "2da1392f",
+  "slug": "2da1392f",
+  "number": "L29.4",
+  "title": {
+    "zh": "L29.4 结构优化与拓扑优化的工程采用 总控",
+    "en": "L29.4 结构优化与拓扑优化的工程采用 总控"
+  },
+  "group": "better",
+  "parent": "05a74edc",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "2da1392f.json",
+    "claims": null,
+    "pdf": null
+  }
+}

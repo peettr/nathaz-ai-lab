@@ -1,0 +1,254 @@
+{
+  "_note": "Presentation-only map for the 'Trustworthy Wind Engineering' tab (tickets 0457/0458/0467). Maintained on the website side; it does not touch the project register. Names, status and links are read live from center.json / data*.json by code. Prose follows research statement v5 (five thrusts); zh is a translation (English is the source). Keep the C-group items English only.",
+  "tab": {
+    "en": "Trustworthy Wind Engineering",
+    "zh": "可信风工程"
+  },
+  "title": {
+    "en": "Trustworthy Wind Engineering in the AI Era",
+    "zh": "AI 时代的可信风工程"
+  },
+  "quote": "It was the best of times, it was the worst of times, … it was the spring of hope, it was the winter of despair.",
+  "intro": {
+    "en": "In less than a year, AI agents have moved from writing code snippets toward executing extended research workflows. Yet the same speed that accelerates discovery can produce convincing but unreliable results just as quickly. For a field whose conclusions end up in design codes and structures that people trust with their lives, this is a central question of the coming decade: <em>how can wind engineering results remain trustworthy when much of the work is done by AI agents?</em> The issue is whether a wind model, a predicted load, or a design decision is supported by evidence strong enough for its intended use.",
+    "zh": "不到一年，AI 智能体已从写几行代码走向执行完整的研究流程。然而，加速发现的同一种速度，也会同样快地产出看似可信、实则不可靠的结果。风工程的结论最终进入设计规范，进入人们以生命相托的结构，因此这是未来十年的核心问题：<em>当大部分工作由 AI 智能体完成时，风工程的结果如何仍然可信？</em>问题在于：一个风场模型、一个预测荷载、一项设计决策，是否有足够强的证据支撑其预期用途。"
+  },
+  "system": {
+    "title": {
+      "en": "The research system",
+      "zh": "研究系统"
+    },
+    "en": "The work runs on a human-in-the-loop agent-swarm research system: about 150 agents in a lead-executor hierarchy, supported by tools for WRF, CFD, FEA, literature review, and high-performance computing, with one researcher directing the work through a management interface. Results undergo automated checks and review by multiple LLMs before reaching the researcher for final approval. The system serves both as infrastructure for human-led research and as a testbed for studying how scientific conclusions can be made trustworthy at scale. Its live progress is public on this site.",
+    "zh": "这些工作运行在一套“人在回路”的智能体集群研究系统上：约 150 个智能体按 Lead—执行者层级协作，配有 WRF、CFD、有限元、文献和高性能计算工具，由一位研究者通过管理界面指挥全局。结果在送到研究者手中做最终批准之前，要经过自动检查和多个大模型的审阅。该系统既是人主导研究的基础设施，也是研究“如何大规模保证科学结论可信”的试验平台。它的实时进展在本站公开。",
+    "codes": []
+  },
+  "lines": [
+    {
+      "id": "thrust1",
+      "title": {
+        "en": "Thrust 1. Meteorological wind engineering: meteorology as the benchmark",
+        "zh": "方向一 · 气象风工程：以气象学为基准"
+      },
+      "intro": {
+        "en": "The first level is the benchmark against which wind engineering is measured. Meteorology's standard of trustworthiness is the one wind engineering should meet. Weather forecasting is verified every day against independent observations, and its skill is measured and reported; wind-engineering conclusions are rarely tested this way. A new discipline, which I call <em>meteorological wind engineering</em>, is taking shape between the two fields. It brings into wind engineering not only the findings of operational meteorology but also its modeling, observation, and verification paradigms and standards, from extreme winds to aerodynamics, structural dynamics, and design wind loads. In each case, the end point is not simply a better wind field but a more defensible assessment of structural loads and performance.",
+        "zh": "第一个层次是衡量风工程的基准。气象学的可信标准，就是风工程应当达到的标准。天气预报每天都用独立观测来检验，预报技巧被度量并公布；而风工程结论很少这样被检验。两个领域之间正在形成一门新的学科，我称之为<em>气象风工程</em>。它不仅把业务气象的研究发现，也把其建模、观测与检验的范式和标准，带入风工程，涵盖从极端风到空气动力学、结构动力学和设计风荷载的全过程。无论哪种情形，终点都不只是更好的风场，而是对结构荷载与性能更站得住脚的评估。"
+      },
+      "groups": [
+        {
+          "label": {
+            "en": "Landfalling tropical cyclones: internal boundary layer and near-surface wind structure",
+            "zh": "登陆台风：内边界层与近地面风结构"
+          },
+          "codes": [
+            "L31.1",
+            "L31.2",
+            "R23.3"
+          ]
+        },
+        {
+          "label": {
+            "en": "Thunderstorm downbursts along the complete chain, from event reconstruction to design loads",
+            "zh": "雷暴下击暴流：从事件重建到设计荷载的完整链条"
+          },
+          "codes": [
+            "R16",
+            "R23.4"
+          ]
+        },
+        {
+          "label": {
+            "en": "See also: downslope windstorms in mountain terrain (listed under Collaboration)",
+            "zh": "另见：山地下坡风暴（见合作部分）"
+          },
+          "codes": [
+            "C38.1"
+          ]
+        },
+        {
+          "label": {
+            "en": "AI weather models for wind engineering, including low-altitude aviation",
+            "zh": "面向风工程的 AI 天气模型，含低空飞行"
+          },
+          "codes": [
+            "R23.2",
+            "R21.2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thrust2",
+      "title": {
+        "en": "Thrust 2. Revisiting the field: setting the right course",
+        "zh": "方向二 · 重新审视本领域：把握正确方向"
+      },
+      "intro": {
+        "en": "The second level is the research field itself. I am systematically re-examining the main research directions of the past fifteen years to establish which findings are reliable, correct misunderstandings, and guide practical applications. The questions include structural nonlinearity in wind-resistant design; why performance-based and resilience frameworks rarely reach final design; why structural and topology optimization are not widely adopted in practice; what uncertainty quantification can and cannot deliver; and unified benchmarks for tasks with a proliferation of methods. Each comparison will have a clear purpose and distinguish genuine advances from tuning.",
+        "zh": "第二个层次是研究领域本身。我正在系统地重新审视过去十五年的主要研究方向，以确定哪些发现可靠、纠正误解，并指导实际应用。问题包括：抗风设计中的结构非线性；性能化与韧性框架为何很少进入最终设计；结构与拓扑优化为何未在实践中普及；不确定性量化能做到什么、做不到什么；以及为方法泛滥的任务建立统一基准。每项比较都有明确目的，区分真正的进步与调参。"
+      },
+      "groups": [
+        {
+          "label": {
+            "en": "Re-examining the main conclusions of the past fifteen years with open, reproducible benchmarks; where surrogates and PINO stand",
+            "zh": "用公开、可复现的基准重新检验近十五年的主要结论；代理模型与 PINO 的定位"
+          },
+          "codes": [
+            "L29.1",
+            "L29.3",
+            "L29.5",
+            "L29.6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thrust3",
+      "title": {
+        "en": "Thrust 3. Reproducible and verifiable research",
+        "zh": "方向三 · 可复现、可验证的研究"
+      },
+      "intro": {
+        "en": "The third level is each study. In engineering research, what must be trusted is the conclusion, and that requires an evidence chain from the claim back to verified data, physical validation, and original sources. Two foundations support this chain. The first is a <em>verified data foundation</em>: a full-text literature database and dataset catalog on which studies must draw, together with concept cards that trace core quantities (return period, averaging time, reference pressure, load factors) back to codes and primary sources approved by human experts. The second is <em>verification methods</em>, with evidence standards tailored to the study type and time scale. The same standards apply whether a result comes from an agent or a conventional method.",
+        "zh": "第三个层次是每一项研究。在工程研究中，必须被信任的是结论，而这需要一条从结论回溯到经核实的数据、物理验证和原始来源的证据链。两块基石支撑这条证据链。其一是<em>经核实的数据基础</em>：研究必须依托的全文文献库和数据集目录，以及把核心量（重现期、平均时距、参考压力、荷载系数）追溯到规范和经人类专家认可的原始文献的概念卡。其二是<em>验证方法</em>，按研究类型和时间尺度制定相应的证据标准。无论结果来自智能体还是传统方法，适用同一套标准。"
+      },
+      "groups": [
+        {
+          "label": {
+            "en": "Evidence standards, a review layer tested with planted errors, and concept cards",
+            "zh": "证据标准、用埋错测试检验的审稿层、概念卡"
+          },
+          "codes": [
+            "L29.7"
+          ]
+        },
+        {
+          "label": {
+            "en": "The verified data foundation: literature database and dataset catalog",
+            "zh": "经核实的数据基础：文献库与数据集目录"
+          },
+          "codes": [
+            "T12"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thrust4",
+      "title": {
+        "en": "Thrust 4. Problems chosen for their use",
+        "zh": "方向四 · 因其用途而选择的问题"
+      },
+      "intro": {
+        "en": "The fourth level is the choice of problems. I choose them based on my own judgment of what is genuinely useful, as my contribution to a healthy and trustworthy research field. The first is the <em>real-time wind digital twin</em>. Conventional CFD is generally too slow to remain synchronized with evolving weather and structural conditions. Can a twin be fast enough to keep pace and still be trusted, and how would we know when it is wrong? Two routes are open: a GPU-based lattice-Boltzmann digital-twin wind tunnel, and learned surrogates, including geometry-aware models and physics-informed neural operators (PINO). Both must be benchmarked against independent measurements and strong conventional baselines. Other problems range from CFD inflow-generation equivalence and non-Gaussian pressures on glass facades to modern probabilistic methods, wind codes, and wind-turbine resilience.",
+        "zh": "第四个层次是问题的选择。我依据自己对“什么真正有用”的判断来选择问题，作为我对健康、可信的研究领域的贡献。首先是<em>实时风数字孪生</em>。传统 CFD 通常太慢，无法与不断变化的天气和结构状态保持同步。孪生体能否既快到跟得上、又值得信任？我们又如何知道它何时出错？目前有两条路线：基于 GPU 的格子玻尔兹曼数字孪生风洞，以及学习型代理模型，包括几何感知模型和物理信息神经算子（PINO）。两者都必须与独立实测和强有力的传统基线对照。其他问题包括 CFD 入流生成方法的等价性、玻璃幕墙的非高斯风压、现代概率方法、风荷载规范演变以及风电机组韧性等。"
+      },
+      "groups": [
+        {
+          "label": {
+            "en": "Real-time digital twins: the bottleneck is CFD",
+            "zh": "实时数字孪生：瓶颈在 CFD"
+          },
+          "codes": [
+            "R21",
+            "R25",
+            "L31.3",
+            "L31.7"
+          ]
+        },
+        {
+          "label": {
+            "en": "Other problems of interest: inflow-generation equivalence, non-Gaussian pressures, wind codes, probabilistic methods, turbine resilience",
+            "zh": "其他关注的问题：入流生成等价性、非高斯风压、风荷载规范、概率方法、风电机组韧性"
+          },
+          "codes": [
+            "L31.4",
+            "L31.5",
+            "L31.6",
+            "L31.8",
+            "L31.9"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thrust5",
+      "title": {
+        "en": "Thrust 5. The physical end: experiments, devices, and robots",
+        "zh": "方向五 · 物理端：实验、装置与机器人"
+      },
+      "intro": {
+        "en": "AI cannot yet replace the work closest to the physical world, and this is where the system's predictions are ultimately tested. The work combines the system's digital workflow with automated wind-tunnel testing of thunderstorm and other characteristic flows, which existing facilities still struggle to generate. It includes inerter-based vibration control, from algorithm to product: a tuned fluid inerter damper has been tested experimentally and is being prepared for practical use in long-span roofs, tall buildings, and wind turbines. Because robots and test automation are closely linked, I will start this work early, and robotics is a long-term direction in its own right. Finally, experience in designing a large, next-generation multi-wind-tunnel complex will help develop experimental capacity and make effective use of existing facilities.",
+        "zh": "AI 尚不能取代最贴近物理世界的工作，而系统的预测最终要在这里接受检验。这部分工作把系统的数字化流程与雷暴及其他特征流的自动化风洞试验结合起来，而现有设施仍难以产生这类流场。它还包括惯容减振，从算法到产品：调谐流体惯容阻尼器已通过实验检验，正准备用于大跨屋盖、高层建筑和风电机组。机器人与试验自动化密切相关，我将尽早开始这项工作；机器人本身也是一个长期方向。此外，设计大型下一代多风洞群的经验，将有助于发展实验能力、有效利用现有设施。"
+      },
+      "groups": [
+        {
+          "label": {
+            "en": "Automated wind-tunnel testing of characteristic flows, and inter-laboratory calibration",
+            "zh": "特征流的自动化风洞试验与实验室间比对"
+          },
+          "codes": [
+            "L30.1",
+            "L30.3"
+          ]
+        },
+        {
+          "label": {
+            "en": "Inerter-based vibration control, from algorithm to product",
+            "zh": "惯容减振：从算法到产品"
+          },
+          "codes": [
+            "L30.2"
+          ]
+        },
+        {
+          "label": {
+            "en": "Robotics, later serving wind-tunnel testing",
+            "zh": "机器人，之后服务于风洞测试"
+          },
+          "codes": [
+            "L30.4"
+          ]
+        },
+        {
+          "label": {
+            "en": "Experimental capacity: a platform for low-altitude aircraft, and bluff-body aerodynamics",
+            "zh": "实验能力：低空飞行器平台与钝体气动"
+          },
+          "codes": [
+            "R14",
+            "L37"
+          ]
+        }
+      ]
+    }
+  ],
+  "collab": {
+    "title": {
+      "en": "Collaboration first",
+      "zh": "Collaboration first"
+    },
+    "en": "The system changes how collaboration starts: a collaboration can begin with preliminary results rather than a blank proposal, and collaborators can join remotely and direct their own lines of work with the same agents, records, and review.",
+    "zh": "The system changes how collaboration starts: a collaboration can begin with preliminary results rather than a blank proposal, and collaborators can join remotely and direct their own lines of work with the same agents, records, and review.",
+    "codes": [
+      "C38",
+      "C39",
+      "C40"
+    ]
+  },
+  "footer": {
+    "en": "This view groups part of the center's work by research program; the full list is under Projects.",
+    "zh": "此视图按研究主线归并了中心的一部分工作；完整清单见“项目进展”。"
+  },
+  "intro2": {
+    "en": "My answer is not to slow down. It is to move toward AI as quickly as it moves toward us and to build new ways of doing research that keep expert judgment and physical evidence at their center. The research program is therefore built around <em>trustworthy wind engineering in the AI era</em>.",
+    "zh": "我的回答不是放慢脚步，而是：AI 向我们走来多快，我们就向 AI 走去多快，并建立新的研究方式，使专家判断与物理证据始终处于中心。因此，这一研究计划围绕<em>AI 时代的可信风工程</em>展开。"
+  },
+  "program": {
+    "title": {
+      "en": "Research program",
+      "zh": "研究计划"
+    },
+    "en": "The program has one overarching goal: <em>trustworthy wind engineering</em>. Trustworthiness is not simply an additional requirement for AI-generated results. It concerns how winds are represented, how loads and responses are calculated, how uncertainty enters design, and how conclusions are tested against the physical world. The program is organized around the levels at which it builds trust: benchmarking wind engineering against meteorology, revisiting what the field believes, making each study reproducible and verifiable, and choosing problems that matter in practice. A fifth thrust addresses the physical end, where all of this is tested.",
+    "zh": "这一研究计划只有一个总目标：<em>可信的风工程</em>。可信性不只是对 AI 生成结果的额外要求，它关系到风如何被表示、荷载与响应如何计算、不确定性如何进入设计、结论如何接受物理世界的检验。计划按建立信任的几个层次展开：以气象学为基准检验风工程、重新审视本领域的共识、让每一项研究可复现可验证、选择在实践中真正有用的问题；第五个方向面向物理端，一切最终在那里接受检验。"
+  }
+}

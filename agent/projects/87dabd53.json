@@ -1,0 +1,47 @@
+{
+  "id": "87dabd53",
+  "slug": "87dabd53",
+  "number": "L31.9",
+  "title": {
+    "zh": "L31.9 气候变化与设计风速 总控",
+    "en": "L31.9 气候变化与设计风速 总控"
+  },
+  "group": "core",
+  "parent": "6fbad1e4",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "87dabd53.json",
+    "claims": null,
+    "pdf": null
+  }
+}

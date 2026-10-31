@@ -1,0 +1,755 @@
+{
+  "id": "9b35e6de",
+  "slug": "l-convective-scale-ai-nowcast",
+  "number": "R23.4b",
+  "title": {
+    "zh": "R23.4b 对流尺度AI与雷暴短临",
+    "en": "R23.4b Convection-scale AI and thunderstorm nowcasting"
+  },
+  "group": "wx",
+  "parent": "d0f7457a",
+  "depth": 2,
+  "status": {
+    "zh": "搁置",
+    "en": "Shelved"
+  },
+  "status_class": "pause",
+  "done": true,
+  "start": "2026-10-14 14:21",
+  "end": "2026-10-27 21:25",
+  "updated": "2026-10-27 21:25",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "# 任务书：对流尺度 AI 模型第一步——能否在 Colab 跑、能否报出雷暴地面强风\n\n## 目标\n回答两件事：(1) 公开的约 3 km 对流尺度 AI 模型里，哪些能在我们的 Colab A100 上真正跑起来；(2) 跑得起来的那个，在 5–10 个下击暴流/强雷暴事件上，0–6 h 起报的地面强风能报出几成，和 HRRR 业务预报比差多少。最终目标是上规模后报（几十到几百个事件），所以脚本要写成\"事件清单 → 取初值 → 推理 → 对 ASOS\"的批处理。\n\n## 交付物（写到）\n1. ：候选模型表——StormCast（earth2studio 内有）、WoFSCast、FuXi-Nowcast、CorrDiff-HRRR 等（你查到的都列）：分辨率、区域、提前量、输出变量（10 m 风/阵风/气压层或模式层廓线）、训练年份、初值需求、权重与代码是否公开、许可证（原文摘句）、Colab A100 实测能否跑、单次推理耗时与显存。\n2. ：5–10 个事件（地点、时间、ASOS 站、实测峰值风及来源、最近探空站），必须在模型训练年份之外、在模型区域内；优先用 SPC/Storm Events 里 ASOS 测到 ≥50 kt 的雷暴大风。说明怎么挑的。\n3. + 图 + 原始日志 + 脚本：按下面判据给每事件、每提前量（1/2/3/6 h 起报）的结果表。\n4. ：同批事件，AI 模型（若输出廓线）与 HRRR 在探空站最近格点的廓线 vs 实测 RAOB，比 MUCAPE、DCAPE、0–6 km 风切。\n5. 一句结论：值得继续 / 不值得，以及扩到几十上百个事件需要多少 GPU 时间。\n\n## 判据（已写定，不得事后改）\n- 每事件取 ASOS 实测峰值所在站；模型取以该站为中心 ±25 km、观测峰值时刻 ±1 h 内 10 m 风（有阵风变量也报）最大值；另报 ±10 km/±0.5 h 作敏感性。\n- 基线：同提前量 HRRR 业务预报（10 m 风与 GUST 字段）；起报时刻 HRRR 分析的持续性。\n- 指标：峰值比（模型/观测）、峰值时间与位置偏差、≥25.7 m/s 是否报出。\n- 值得继续：1–6 h 提前量上 AI 峰值比不低于 HRRR 的 90%，且 ≥2/3 事件优于持续性；单事件单次起报推理 ≤10 GPU 分钟。\n\n## 边界\n- Colab A100，现阶段不限 CU；预计超过 100 CU 先停下回报。用完必须 `colab stop`，回报时给 `colab ls` 无残留证据。不上超算。\n- 数据只用公开来源（AWS HRRR、AIWP、Iowa Mesonet ASOS、SPC、NOAA Storm Events、UWyo/IGRA 探空），大文件不落 工作站。\n- 模型权重许可证逐个核，非商业条款写明；新用到的数据/代码/模型补进，图表角注写数据来源。\n- 文章没给的参数先查后假设，假设标明。\n- 某个模型跑不起来就写清卡在哪，换下一个，不要停下来问；全部跑不起来也算结果。\n- 不需要再请示",
+    "en": "# Brief: Convective-Scale AI Models Step 1 — Can They Run on Colab and Nowcast Severe Thunderstorm Surface Winds?\n\n## Objective\nAnswer two questions: (1) Among public ~3 km convective-scale AI models, which ones can actually run on our Colab A100 GPUs? (2) For a model that runs, across 5–10 downburst / severe thunderstorm events at 0–6 h lead times, what fraction of severe surface winds can it capture, and how does it compare against operational HRRR forecasts? Because the ultimate goal is scaled-up hindcasting (dozens to hundreds of events), the scripts must be structured as a batch pipeline: \"event list → fetch initial conditions → inference → verify against ASOS\".\n\n## Deliverables\n1. Candidate model table — StormCast (available in Earth2Studio), WoFSCast, FuXi-Nowcast, CorrDiff-HRRR, etc. (list all found): resolution, domain, lead time, output variables (10 m wind / gust / pressure-level or model-level profiles), training years, initial-condition requirements, public availability of weights and code, license (exact quote), verified ability to run on Colab A100, and single-run inference wall time and VRAM usage.\n2. Event table — 5–10 events (location, timestamp, ASOS station, observed peak wind and source, nearest radiosonde station), strictly outside the model's training years and inside the model domain; prioritize thunderstorm wind events in SPC / Storm Events where ASOS recorded ≥50 kt. Document the selection protocol.\n3. Evaluation table + figures + raw logs + scripts: per-event, per-lead-time (1/2/3/6 h initialization) results under the criteria below.\n4. Profile comparison: for the same events, compare vertical profiles from the AI model (if it outputs profiles) and HRRR at the grid point nearest the radiosonde station against observed RAOB soundings across MUCAPE, DCAPE, and 0–6 km wind shear.\n5. One-sentence verdict: worth continuing / not worth continuing, plus the estimated GPU time required to scale up to dozens or hundreds of events.\n\n## Criteria (Fixed Ex Ante, No Post-Hoc Changes)\n- For each event, take the ASOS station that recorded the observed peak; for the model, take the maximum 10 m wind (and gust variable, if available) within ±25 km of that station and ±1 h of the observed peak time; also report ±10 km / ±0.5 h as a sensitivity check.\n- Baselines: operational HRRR forecast at the same lead time (both 10 m wind and GUST fields), plus persistence of the HRRR analysis at initialization time.\n- Metrics: peak ratio (model / observation), peak timing and location offsets, and binary detection of ≥25.7 m/s.\n- Threshold to continue: across 1–6 h lead times, the AI peak ratio reaches at least 90% of HRRR's, beats persistence in ≥2/3 of events, and takes ≤10 GPU minutes per event per initialization.\n\n## Boundaries\n- Run on Colab A100, uncapped CU at this stage, but pause and report first if usage is projected to exceed 100 CU. Must run `colab stop` after each session and include `colab ls` evidence of zero leftover sessions in the report. Do not use the cluster.\n- Use only public data sources (AWS HRRR, AIWP, Iowa Mesonet ASOS, SPC, NOAA Storm Events, UWyo/IGRA soundings); do not store large raw files on the workstation.\n- Verify model weight licenses individually and note any non-commercial clauses; add newly used datasets, code, and models to the citations registry, and label data provenance in figure footnotes.\n- Look up parameters omitted from papers (in the paper, repo, or config files) before making assumptions, and explicitly label any assumptions.\n- If a model fails to run, document the exact blocker and move to the next candidate without stopping to ask; if none of the models can run, that itself is a valid result.\n- No further confirmation needed before starting.",
+    "goal_zh": "判断约 3 km 的对流尺度 AI 模型（StormCast、WoFSCast 等）能否直接给出雷暴与地面阵风，并能否批量做几十到几百个事件的预报/后报——这是雷暴方向唯一能上规模的路线（Liang Hu 10-14）。第一步交付：公开模型能否在 Colab A100 跑的核实表；5–10 个有站点实测的下击暴流/强雷暴事件 0–6 h 起报 vs ASOS 与 HRRR 的检验表；同批事件 AI/HRRR 探空 vs 实测探空（L2 的前置门槛）。",
+    "goal_en": "Judge whether convective-scale AI models at about 3 km (StormCast, WoFSCast, etc.) can directly give thunderstorms and surface gusts, and whether they can do batch forecasts/hindcasts of tens to hundreds of events — this is the only route in the thunderstorm direction that can scale up (Liang Hu, 10-14). Step 1 deliverables: a verification table of whether the public models run on a Colab A100; a verification table for 5–10 downburst / severe-thunderstorm events with station observations, 0–6 h forecasts vs ASOS and HRRR; and AI/HRRR soundings vs observed soundings for the same events (the prerequisite gate for L2)."
+  },
+  "report": {
+    "zh": "# 对流尺度 AI 与短临（L / M / L2）\n\n## 目标\n判断约 3 km 的对流尺度 AI 模型（StormCast、WoFSCast 等）能否直接给出雷暴与地面阵风，并能否批量做几十到几百个事件的预报/后报——这是雷暴方向唯一能上规模的路线（Liang Hu 10-14）。第一步交付：公开模型能否在 Colab A100 跑的核实表；5–10 个有站点实测的下击暴流/强雷暴事件 0–6 h 起报 vs ASOS 与 HRRR 的检验表；同批事件 AI/HRRR 探空 vs 实测探空（L2 的前置门槛）。\n\n## 当前状态\n\n10-28 Lead 复审 （6/6，与 结论一致；本轮为重复送审，Lead 当时未查到）：维持未通过、否定结果（限本配置）。补齐文档：误报无区分力数值化为事后补定（DEVIATIONS D8）；只报告项任一成员命中 33/120 对 33/120、成员最大峰值比 1.096；日簇区间不是配对区间；35 dBZ 只核到事件侧。定稿；决策。\n10-27 S2 结论定稿 （Lead 核过：主判据逐位一致；只报告项带日簇区间——HRRRCast 启发式 BS 差 −0.028 [−0.073,0.016]、命中差 +0.108 [0.023,0.197]、峰值比 1.161，仅误报差 +0.100 [0.048,0.156] 不过）。\n10-27 21:45 六审 （6/6）裁决：S2 合取**未通过**成立；误报按 §1.3 记无区分力；停止类别 = **否定结果（仅限冻结配置：StormCast V1 + 方法 a 阵风诊断 + P≥0.3/成员中位，2 h）**，剩余归因未拆开——同一 AI 场换 HRRRCast 启发式口径时 BS/命中/峰值点估计过线、误报 16/120 对 4/120（只报告、事后）。S4 不跑、S3 不开；新口径检验须新预注册+新盲样本（约 180 CU），已作为建议报上级。裁决；草案定稿派 r23-4。\n10-27 21:25 Lead 核审：误报算符更正成立（DEVIATIONS D7；与预注册 §4.3 一致，diff 只动算符与路径），合并 2640 条成功记录逐条可溯源、无重复无冲突，四个点估计独立复算一致。S2 冻结合取闸门**未过**（BS、命中、峰值比三项不过，与更正无关）；按预注册 §6 S4 不跑，S3 不自动开。停止类别候选：本配置\"否定结果\"，六审 进行中，裁决前不对外写结论。决策。\n10-27 21:22 EDT：第三轮 S2 VM2 的 120–239 组全部完成，最终检查点、日志、done 标记已拉回；Colab 已 stop，私有及账户会话列表均无活动会话。合并 VM1 后冻结样本 120 事件+120 对照、各 10 个成功成员，CPU 评分得 BS/命中/峰值比未通过，误报通过，因此本回报配置的 S2 上规模合取闸门未通过。整轮约 176.4 CU（分配时长×6.77 CU/h 估算，非独立账单），低于 A193 的 185 CU。冻结评分脚本误报差加号实现有误，保留初版结果并在独名修正版改为减号；需 Lead 核审。结论草案和审计：、；不外推至业务实时预报或一般 AI/HRRR 优劣。\n10-27 13:00 EDT：第三轮 S2 第二台；科学判据仍未评估。\n10-16 **搁置**（5/6 有效，裁决）。搁置的是\"StormCast V1/CONUS + 10 m 风×1.6677 阵风代理 + 事后 ERA5 条件\"这一配置的扩样：按冻结门槛两代都未达扩样标准（V1 20 事件、CONUS 12 事件 53/54 组）。**不是**\"对流尺度 AI 不如 HRRR\"：命中差异不显著（McNemar p 0.22–1.0），判据 1 换集合最大口径即全过，任一成员 ≥25.7 m/s 计数 AI 不少于 HRRR GUST（V1 9/11/9 vs 8/8/6），V1 含已见 7 例，阵风只用了常数系数。为什么不继续：现有设计已经回答不了\"值不值得上规模\"，再扩样只是在不显著的差距上花钱（CONUS 约 700 CU/百事件）。重启条件（任一出现即重新立题、重新预注册判据，不直接恢复扩样）：① 盲样本 + 雷暴风核实 + 有对流无强风对照 + 预注册集合聚合与概率型判据 + 样本量估算；② 混合层风廓线阵风诊断代替常数系数；③ 出现原生阵风输出或训练期外可检的公开对流尺度模型；④ 改为不要求站点峰值的批量用途（改目标，须 Liang Hu 定）。第二轮共约 212 CU。M 已收口；L2 未启动。\n\n## 第二轮判据（10-14 冻结，事后不得放宽）\n见 \"判据\"一节：1–3 h 每档 AI 阵风估计峰值比中位 ≥ HRRR GUST 的 0.9 倍；≥25.7 m/s 判别（集合 P≥0.3 记报出）在事件+无事件样本上命中率不低于 HRRR GUST、误报率不高于其 1.5 倍；GFS 真预报条件相对 ERA5 下降不超过 20%。阵风系数 1.6677 固定（2022 拟合）。宽窄窗并列、窗边比例、两个 HRRR 基线；持续性只作附录。\n\n## 第一步的判据（开跑前写定）\n- 检验对象：每事件取 ASOS 实测峰值风所在站点；模型取以该站为中心 ±25 km、观测峰值时刻 ±1 h 内的 10 m 风（有阵风变量就同时报阵风）最大值。基线：同提前量的 HRRR 业务预报（10 m 风与 GUST）、起报时刻 HRRR 分析的持续性。\n- 指标：峰值比（模型峰值/观测峰值）、峰值时间与位置偏差、≥25.7 m/s（50 kt）是否报出。\n- \"值得继续\"：在 1–6 h 提前量上，AI 模型峰值比不低于 HRRR 的 90%，且在至少 2/3 事件上优于持续性；并且单事件单次起报推理 ≤10 GPU 分钟（上规模的前提）。达不到写清差在哪，不放宽判据。\n- 事件必须在所用权重的训练期之外：StormCast V1（训练 2018-07—2021-12，权重 Apache-2.0）用 2022 年后事件；StormCast-CONUS（训练到 2025-09-30，权重 OpenMDW-1.1）用 2025-10 后事件。\n\n## 怎样走向上规模\n第一步脚本按\"事件清单 → 自动取 HRRR 初值 → 推理 → 自动对 ASOS\"写成批处理；过闸后扩到 SPC/Storm Events 里几十到几百个有 ASOS 实测的雷暴大风事件做后报统计；M 的 AIWP 统计给出环境可预报提前量，决定 L2 能否做\"预报\"还是只做\"后报\"。L2 的 CM1 集合在超算跑，规模化交 CM1 线或转正式项目。\n\n## 边界\n- 层级（根 Lead 10-14，5 层上限）：本节点是二级节点，不再开三级子项目；需要细分时在本节点内用任务，或报上级节点 Lead（雷暴与对流尺度）开同级二级节点。\n- 往下只剩两跳：本节点 → bot（ideas）→ 工具；任务书不得让工具 bot（gpu-gemini、审稿人、litwiki 等）再委托别人。\n- 子树列表不按父节点分组，层级以界面项目树为准。\n- 算力与数据：Colab 优先，不设单试验上限（母项目 10-14 按 Liang Hu 原话\"现阶段多用 Colab、不限 CU\"对齐，原\"单试验 ≤20 CU\"作废）；单试验预计超过 100 CU 先停下报上级；用完必须 colab stop，不让会话空转；同一轮只派一个执行方。L 第二轮照旧：整轮 ≤200 CU，累计 120 CU 报上级一次，到 200 CU 停下报上级。超算单作业 ≤50 SU，走资源申请与；L2 的 CM1 集合由 CM1 线跑，我们只交 input_sounding 格式廓线。\n- 计算与存储地点（Liang Hu 10-14 加严）：工作站 不跑计算、不存计算数据（10-15 01:59 C 盘余 46 GB）。求解器、推理、训练、批量算例、大下载一律在 Colab 或 CRC/TACC 跑和存；工作站 只放脚本、单项 <200 MB 的小结果、图和报告，拉回的检查点保持小文件，大中间件留在 Colab/集群；确需在 工作站 临时放 >1 GB 先报上级。CRC 组空间约 95%，新的大数据优先放 TACC [local path omitted] 或 [local path omitted]；CRC 默认单节点。任务书一律写明在哪算、结果放哪。\n\n## 已定决定\n- 2026-10-14 文献审查 裁决：StormCast 两版权重分开；FuXi-Nowcast 改为反例（强阵风阈值不如持续性）；补 HRRRCast 候选（公开版 6 km、GUST 为后处理诊断、气压层到 200 hPa、GFS 边界），撤回\"只有 StormCast 可用\"；Cook 10% 收窄口径；撤回 Collins 外推；新意按窄口径写 → \n- 2026-10-14 开立，第一步全在 Colab/工作站，CM1 部分先问 CM1 线 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 10-16 | 第二轮 CONUS 段（B 46.2 + B2 少量 + B3 78.1 CU，估算）：12 个 2026 事件 + 6 对照，53/54 组（缺 1 对照 3 h 组 1 成员） | **按冻结判据不通过**。宽窗 AI/观测 1/2/3 h 0.67/0.74/0.68，HRRR GUST 0.79/0.82/0.81，HRRR10×系数 0.84/0.94/0.86；AI/HRRR GUST 0.85/0.90/0.84 → 判据 1 只 2 h 过；命中 AI 1/1/0 vs HRRR GUST 4/2/3（/12）→ 判据 2 不过；误报两者 0。缺的对照组只影响误报，不改结论 |\n| 10-15 | 第二轮段 A：V1+ERA5 条件全样本 20 事件 + 10 无事件对照 × 1/2/3 h × 10 成员（本会话约 25.7 CU，费率估算） | **按冻结判据不通过**。宽窗峰值比 AI/HRRR GUST/HRRR10×系数：1 h 0.68/0.73/0.90，2 h 0.68/0.71/0.75，3 h 0.64/0.75/0.85 → 判据 1（AI ≥0.9×HRRR GUST）1 h 0.93 过、2 h 0.96 过、3 h 0.85 不过；判据 2 命中 AI 4/5/4 vs HRRR GUST 8/8/6（/20）不过；对照误报两者 0/10。连同系数放大的 HRRR 10 m 风也多数比 AI 好。窄窗两者都只到 0.4–0.5。窗边 AI 成员 133–143/300 |\n| 10-15 | 第二轮闸门段：V1 在第一步 7 事件上跑通阵风管线（本会话约 11.7 CU，费率×时长估算） | 管线与用时过闸：单组 173–312 s、成员中位 22 s（预估 55 s），约 0.3–0.6 CU/组。科学结果（已见样本，非盲测）：宽窗 AI/观测 1–3 h 0.51/0.59/0.62，HRRR GUST 0.75/0.73/0.77；AI 命中 0/3、0/3、0/2（HRRR GUST 的命中数）。合并 10 事件：AI/HRRR GUST 中位 1 h 0.84、2 h 0.88、3 h 1.01；≥25.7 命中 AI 3/2/2、HRRR GUST 6/6/4。窄窗两者 7 例全不中 |\n| 10-14 | 第二轮第②段 V1/ERA5（旧口径 ≤20 CU，计入本轮；账户余额降 18.03 CU 为上界） | 153 行检查点；完整 10 成员组 13 个：事件 3（AMA、CDS、CID）×1/2/3 h，对照 4 组（CDS 3 档、CID L1）；对照 9/10 有邻站 METAR <40 kt 交叉，CNK 无邻站。中间汇总（不作裁决）：AI/观测中位 1 h 0.79、2 h 0.83、3 h 0.77，HRRR GUST 0.91/0.92/0.79；≥25.7 命中 AI 3/3、2/3、2/3，HRRR GUST 3/3、3/3、2/3；对照误报两者 0。算力：本段约 7 个新组用 ≤18 CU，按此速度 ≥20+≥10 全量约需 200 CU 以上，单组用时须在闸门段实测核对 |\n| 10-14 | 第二轮第①段 HRRRCast GPU 兼容性（约 1.1 CU） | 权重再次校验通过；隔离 Python 3.10 + TensorFlow 2.15.1 能识别 A100，但加载 .keras 时内核持续卡住，事件推理未跑通。Decision：HRRRCast 暂缓（公开版 6 km、训练期覆盖 2023、环境不通），只有 V1 段过关后才再试，届时用 2024-04 后事件 |\n| 10-14 | 第二轮部分执行（先导） | V1 两例（AMA 65 kt、CDS 62 kt）×1/2/3 h×10 成员：阵风代理（AI 10 m 风×1.6677，2022 年拟合）宽窗 AI/观测 0.77–1.04，与 HRRR GUST 0.72–0.92 相当，P(≥25.7) AMA 1.0、CDS 0.3–0.7；CONUS 在 A100 80GB 可跑（前向 97 s/2 步，20.6 GB），OKC 2026 一例 L1 AI/观测 0.66、P=0；CONUS 气压字段只到 p20hl（约 440 hPa）；GFS 条件单成员烟测通过；HRRRCast 权重校验通过但训练期 2021-03—2024-03 覆盖 2023 事件，前处理未通、未推理。第一会话被平台回收（pruned，已报平台）。三条判据全部未评估 |\n| 10-14 | HRRRCast 可用性核实 | 有公开权重（约 203 MB）；但公开版是 6 km、气压层只到 200 hPa、GUST 为后处理诊断（因子 1.4）、权重无单独许可、训练期未核；未在 Colab 实跑 |\n| 10-14 | 第一步观测与基线补充：IEM ASOS 1 分钟档逐例核峰值；WoFSCast 仓库核权重 | 6/7 例 1 分钟档与报告峰值同分钟同值；OFK 同分钟缺测（窗内最大 53 kt，METAR PK WND 记 56 kt），单列待复核；同源比对不能证明无站内质控删峰。≥25.7 m/s 命中：AI 0/28、HRRR GUST 8/28、HRRR 10 m 1/28。WoFSCast 仓库无权重、无 release，配置指向内部路径 → 暂不可用。第一轮不过的判定不变 |\n| 10-14 | M：AWS AIWP（Pangu、GraphCast Operational）40 个 2023–24 ASOS ≥50 kt 雷暴大风日，提前 12–120 h，对 13 层 ERA5，基线日变化对齐持续性，逐参数判据 | DCAPE、0–1 km 风切全部五档过；0–6 km 风切 Pangu 五档过、GraphCast 到 72 h；MUCAPE/MLCAPE 两模型五档都不过（中位误差常低于持续性，但逐事件只赢 14–25/40，不到 2/3）。验证时刻取最近 00/12 UTC，偏离风峰可达 6 h；只验环境不验阵风 |\n| 10-14 | 第一步：StormCast V1（训练 2018-07—2021-12，中部美国 512×640）在 7 个 2023–24 ASOS 雷暴大风事件×1/2/3/6 h 起报 | 按预设门槛不过：AI/HRRR10 峰值比中位 1 h 0.85、2 h 0.61（3 h 1.11、6 h 1.01）；AI 0/28 报出 ≥25.7 m/s；6/7 事件优于持续性；单组 ≤88 s，100 事件×4 起报约 6 GPU 小时。口径问题：AI 与 HRRR10 都是 10 m 平均风，对 ASOS 阵风只有 0.3–0.5，HRRR GUST 0.75；单成员；条件场用事后 ERA5。探空：模式层只 14 层到约 440 hPa，CAPE 不可用于 L2。WoFSCast 无公开权重/初值，FuXi-Nowcast 无权重，CorrDiff 权重受限 |\n| 10-14 | Deep Research 核对（298d34） | 两份报告一致：对流尺度 AI 模型都没有对地面雷暴强风做过站点检验（检索缺席）；实际可用只有 StormCast；DR 把 HRRR 强风偏差错挂到 Fovell 2022，实为 Collins 2024 WAF PDF p10（阵风 −11.32 m/s，冷季下坡风）；ASOS 质控误删约 10% 对流峰值（Zotero DZF9GFUU PDF p1）；无\"AI 探空→CM1\"先例。送审 |\n| 10-14 | Grok 文献快查 + 核对 StormCast 模型卡、FuXi-Nowcast 摘要 | StormCast 现行权重训练 2018-07–2025-09、全 CONUS 3 km、OpenMDW-1.1 可商用、有 10 m 风无阵风 → 检验事件须在 2025-10 后；FuXi-Nowcast 有阵风但只限华东、未见权重；未找到\"AI 探空→CM1\"先例 |\n\n## 参数来源表\n| 参数 | 取值 | 来源或\"假设\" | 查过哪些地方 |\n| --- | --- | --- | --- |\n| 检验邻域 ±25 km/±1 h | 25 km、1 h | 假设：约 8 个 3 km 格点、覆盖对流位置误差；敏感性：另报 ±10 km/±0.5 h | 待文献快查 |\n| 强风阈值 | 25.7 m/s（50 kt） | NWS severe wind 标准 | — |\n\n## 未决与下一步\n- 10-22 03:30 VM1 磁盘写满，S2 停在 120/240（60 个事件 + 60 个配对对照；单元 120 的 10 个成员需重跑）。已用约 91.3 CU；整轮外推按有效单价 180.1 CU、按保守单价 182.1 CU，超过 180，所以没开 VM2。已向上级报告并请求批到 185 CU（更正）。批了之后，VM2 先修磁盘泄漏再续跑。记录。\n- 10-21 19:32 Lead 重估：已用约 37.2–37.5 CU，单元 20–47 完成；外推 175.7–177.6 CU，加 VM2 开销后 177.6–179.5 CU，仍在 180 内。wx 的回访名额被两条过期回访占着，VM2 改由我在 10-22 04:26 回访时直接派。\n- 10-21 19:30 S2 续跑：VM1（wx-r234b-s2-r20-129-1021，16:28 开）跑单元 20–129，19:23 已到单元 46 前后。前 10 组实测本会话 6.77 CU/h，即 0.721 CU/组；外推全轮 175.6–177.5 CU，未计第二个 VM 的开销，离 180 的余量只有约 2.5–4.4 CU。keepalive 原配置 --keep 5 曾自动删掉 2 份早期非终态检查点，已改为 --keep 1000。已派 wx 收尾：每 40 组重估一次，VM1 跑完后开 VM2 跑 130–239，最后评分、写结论草案并上报。我约了 10-22 04:26 兜底回访。\n- 10-21 13:11 S2 首批 20 组完成（会话 wx-r234b-s2-v1-1021；20/20 组 10/10 成员；387.7 s/组，按 6.85 CU/h 合 0.738 CU/组）。按此外推整轮约 178.9 CU，超过 160，wx 停机上报。Liang Hu 批 A188，上限提到 180 CU。13:3x 派 wx 续跑第 20–239 组；按 D6 分两个先后的 VM 跑（剩余约 23.7 h，超过单个 VM 24 h 寿命），实测单价与保守单价两种都报。\n- 10-21 Liang Hu 批 A172，放行 S2（Colab ≤160 CU）；平台已登记闸门。09:5x 派 wx 跑 S2（任务书），因网关委托名额满正在排队。首批 20 组跑完后报会话名、单组 CU 与整轮重估。\n- 10-16 01:52 第三轮预注册已冻结：\n - 定稿，SHA256 在。\n - 依据审查 的裁决和决策记录。\n - 已派 wx 执行 S0+S1（Colab，≤12 CU）。\n - 10-16 02:10 wx 交回预筛（约 1.7 CU）：暂定 V1 295 条、CONUS 127 条（尚未做格网边界核对和对照配对，不算冻结样本）；S1 未开始。02:20 补派 ：S0 收尾后接做 S1，两单合计 ≤12 CU。\n - 10-16 02:28 交回：S0 两单按 A100 单价估约 3.4 CU，超过分段估计 3 CU，wx 停机；样本未冻结，S1 未开始（格网核对已确认暂定候选都在网格内）。我记为偏离 D1：分段 CU 只是预算估计，S0 上调到 ≤5，S0+S1 合计仍 ≤12。02:36 派 一次做完 S0 冻结和 S1。\n - 10-16 03:26 交回，停在记账问题上：CPU 会话按 A100 单价 6.85 CU/h 记账，估到约 9.8 CU 停机。合格事件预备数为 V1 301、CONUS 132，临时抽样 120/80；对照配对尚未完成。我记为偏离 D2：CPU 会话改按实测单价记账。03:36 派 完成对照配对、样本冻结和 S1。\n - 10-16 04:56 核实： 在 CPU 会话后台配对对照，22/200，暂无缺对照；CPU 实测约 0.08 CU/h，D2 记账得到证实。wx 预约 07:45 回访后接着冻结样本、做 S1。已留言要求 S1(a) 用 HRRR wrfnat 的全部原生层。\n - 10-16 10:49 S0 冻结：events_r3.csv（…）、controls_r3.csv（…），V1 120 个、CONUS 80 个事件，200 个对照全部配上（合格池 V1 301、CONUS 132；改用 35 dBZ 时增加 0 个）。11:13 S1 首次结果：(a) 1.113 / r=0.915，(b) 1.00，(c) 不过（AI 的 Z1hl−地形为 −26～39 m）。Lead 复核发现 θv 的气压单位用错（Pa 当 hPa），首次结果作废，记为 D3；高度改为锚定 HRRR 最低层，记为 D4。11:32 派 wx 重跑 S1。累计约 4.3 CU。\n - 10-16 11:38 S1 修正版**全部通过**：(a) 公式/业务 fg10m 中位比 0.99999、r=0.982（10 个事件，4370 个格点×时次）；(b) 只用 StormCast 的 14 层时，峰值中位比 1.000；(c) 锚定后两个事件 860 列 NaN=0、PBL 顶全部找到。AI 的 Z1hl 有漂移（−26～39 m），按 D4 锚定；层高不单调的列按 D5 处理。合计约 6.4 CU。已报上级，**S2（V1 120+120，约 144 CU）等母项目放行**。\n - (原计划) S1 过闸后报上级。**S2 等母项目放行，不直接开。**\n- 10-16 上级「AI 气象」同意方向，放行 S0+S1（约 9 CU，以审查后定稿为前提）。已派 litwiki 建卡（Benjamin 2020 阵风诊断原文、雷达对流阈值），定稿审查 （`--count 3`）已发出，重点问 V1 80+80 的功效是否够、事件多于 80 时是否提到 100 以上。两者都回来后裁决、冻结草案、放行 S0+S1。\n - litwiki 已交回（10-16），我抽查了 Benjamin 2020 PDF 第 14 页和第 16 页原文，属实。定稿时要改两处：\n 1. 混合层顶判据改为 θv(hl1，约 8 m) + 0.5 K（Benjamin 2020 PDF 第 14 页 / 报告第 10 页），只在 PBL 内取最大（PDF 第 16 页 / 报告第 12 页）。这样就不再需要 q2m 的假设。\n 2. 雷达阈值 40 dBZ 仍按“假设”处理：文献只有 MRMS 合成反射率 >40 dBZ 的依据（Liu 2021，技术说明第 2 页），另以 Roberts & Rutledge 2003 的 >35 dBZ（PDF 第 1 页 / 期刊第 562 页）做敏感性分析。\n 卡片位置：、`H9ENWPG3_*`、`NR_liu_2021_*`。S1 闸门过了报上级；**S2 不直接开**，由上级转母项目放行。\n- 10-16 第三轮预注册草案已写好，**只做了设计、没有花算力**：。L 仍为搁置，放不放行由上级「AI 气象」定。草案要点：\n - 盲样本：V1 用 2022、2024、2025-01–09 的事件，CONUS 用全国 2025-10 以后的事件；对照为“有对流、无强风”，与事件 1:1 配对。\n - 阵风改用 HRRR 混合层诊断（Collins 2024 式 (1)，期刊第 708 页），需要重跑并保存 hl1–hl20 各层。\n - 主时效定为 2 h；主判据三条：Brier 不劣、命中/误报不劣（界限 0.15）、峰值比 ≥0.9。\n - 样本量：V1 80 个事件 + 80 个对照，CONUS ≥50 个。\n - 分段：S0 抽样冻结 + S1 试点 + S2 V1 盲测，约 105 CU；全部五段约 570 CU；S2 及以后每段都要先经上级放行。\n - 定稿前：Benjamin 2020 原文和雷达阈值交 litwiki 建卡；定稿按冻结协议送审 `\n- 10-15 12:50 B 会话 11:25 守护停机（46.19 CU，230 行、20 组完整）；B2 新会话启动即报 OptionalDependencyError 退出，无新增结果（已报平台）。12:58 派 wx 开 B3：照原 B 装齐可选依赖后从 230 行续满 54 组，整轮剩约 81 CU（累计约 134），到限停下报。\n- 10-15 母项目批：CONUS 段 B 跑满 54 组，整轮上限 215 CU，取代\"到 200 停\"；同一段 B 续跑，不重算、不另开同名会话；超 215 停下报上级。已告知 ideas。出结果：不过则搁置前送 6 人，通过直接报上级。上规模成本（CONUS 约 700 CU、V1 约 140 CU）只记录，不据此放行。\n- 10-15 10:42 按段 B 实际耗时重算（上级要求）：B 会话已跑约 6.0 h、约 41 CU（6.85 CU/h 估），完成 17/54 组。每组（1 事件×1 提前量×10 成员）墙钟：1 h 约 14 分、2 h 约 20.5 分、3 h 约 27 分（自回归步数越多越慢），平均约 20.5 分 ≈ 2.3 CU/组——比 05:20 用的 13 分/组慢约 1.6 倍（那 2 组只是 1 h）。第二轮累计约 83 + 41 ≈ 124 CU，已过 120（已报上级）。剩 37 组约 87 CU，整轮预计约 210 CU，会碰 200 上限：到 200 CU 停下，用已完成的约 49/54 组按冻结判据出判定并写明样本数（事件优先，缺口落在对照）。05:20 那句\"预计约 175、不会碰 200\"按实测改正。\n - 上规模的直接证据：CONUS 单卡 A100 每组约 20 分钟，100 事件×3 提前量 = 300 组 ≈ 100 GPU 小时 ≈ 700 CU；V1 每组 3–5 分钟，同规模约 20 GPU 小时 ≈ 140 CU。\n- 10-15 05:20 第二轮算账核对（上级 Lead 要求）：\n - 分段（单位 CU；\"上界\"=共享账户余额下降，含同期其他会话；\"估\"=本会话时长×约 6.85 CU/h）：先导段 ≤26.8（上界）；第①段 HRRRCast 约 1.1（估）；第②段 V1 ≤18.0（上界）；闸门段约 11.7（估）；段 A 约 25.7（估）；段 B 至 05:10 约 3.3（估）。合计约 86.6。\n - 口径：项目页旧数\"上界约 58\"是段 A 之前的累计（≤46 + 11.7）；回报里\"约 84/87\"= 58 + 段 A 25.7（+ 段 B 3.3）。没有重复计入或漏计，两数时间点不同。其中先导段与第②段是上界，实际偏低。\n - 段 B 预估：约 13 分钟/组、约 1.65 CU/组（前 2 组含安装与权重加载，实际每组应略低），54 组约 89 CU；到 05:10 已计 3.3，剩约 86，加一次续开会话的安装加载约 2–3 CU。整轮预计约 175 CU，会过 120（届时报上级），不会碰 200。我 05:10 说\"大概率碰 200 上限\"算错了，撤回。\n - 10:40 回访按段 B 实际每组耗时再重算一次写在这里。\n- 10-15 05:10 CONUS 段（第二轮段 B）在跑：约 27 分钟完成 2/54 组，CONUS 每组远慢于 V1。上级 Lead 批：到单会话 50 CU 直接续开新会话（从检查点续），整轮 ≤200 CU，过 120 CU 报一次；到 200 CU 未完就用已完成组按冻结判据出判定并写明样本数；报每组 GPU 分钟与 CU，并估算 100 事件×3 提前量的成本。\n- 10-15 ：r2 下 >100 KB 文件（含 gate_7events 检查点）被根 Lead 清理时搬到 TACC lab_archive（清单），TACC 恢复后由根 Lead 校验拉回；续跑只从 Colab [local path omitted] 恢复，判定若只差这批文件则注明\"工作站 检查点在 TACC，未比对\"。 原因即此，已告知平台。\n- 第二轮累计 Colab（上界，含共享账户其他会话）：先导段 ≤26.8 + 第①段约 1.1 + 第②段 ≤18.0 ≈ ≤46 CU；120 CU 时报上级。闸门段 已过（10-15 00:26）；累计上界约 46 + 11.7 ≈ 58 CU。已放段 A（V1 补齐到 ≥20 事件 + ≥10 对照，≤50 CU）与段 B（CONUS 2026 事件 + ≥6 对照，≤50 CU）；GFS 段等判据 1、2 有模型通过再派。\n- ideas 第二轮（任务书，排在 M 之后）：阵风换算、10 成员集合、≥20 事件 + ≥10 无事件对照、GFS 真预报条件、StormCast-CONUS 在 2025-10 后事件上试跑并核垂直层数；判据已写定。 10-14 18:20 预检：估算约 163 CU 超 100 CU 闸门停下（候选 666 条）；Lead 曾放行 200 CU，10-14 上级 Lead 更正为每段 ≤20 CU（200 CU 待母项目批）；去掉 6 h、成员成批推理，顺序 HRRRCast → V1 ERA5 → GFS 条件 → CONUS 2026 事件。\n- 上级 Lead 10-14 补两条判读（已转 ideas，不改判据）：报最大值落在窗边（≥0.9×半径）的比例，窄窗与宽窗并列——第一轮约 20/28 组 AI 宽窗最大值在 20–25 km，多半是背景风；持续性基线太弱，\"6/7 优于持续性\"不作技巧证据，结论以 HRRR GUST 与\"HRRR 10 m×同一阵风系数\"两个基线为准。 第一轮复核：宽窗最大值落在窗边（≥22.5 km）AI 18/28、HRRR10 13/28、HRRR GUST 14/28；窄窗（10 km/±0.5 h）三者 ≥25.7 m/s 都是 0/28。\n- L2 探空：StormCast V1 只到约 440 hPa，不能直接给 CM1；候选改用 HRRR 气压层产品或 CONUS 版（看第二轮核层数）。\n- 10-14 探空补充：CM1 取列规则已写成可测试脚本 （合成测试 2/2 过），七例 RAOB 与 ASOS 峰值时差 0.25–4.35 h（3 例 >3 h）；真正的 CM1 对流前列还没取：要逐例雷达首个 ≥35 dBZ 时刻、HRRR 反射率与陆地掩膜，原始廓线也没存，现有 soundings.md 只作参考，不能当 L2 交接。Decision：L2 取列与 input_sounding 等第二轮判出\"值得继续\"后再做（用 HRRR/HRRRCast 原生层 + NEXRAD/MRMS），现在不派。\n- M 已完成（见上表）：AI 全球模型能提前 3–5 天报准风切和 DCAPE，CAPE 在 0.5–5 天都不稳定。对 L2 的含义：后报用 HRRR/ERA5 分析抽探空；做预报时 CAPE 是短板，只能靠对流尺度模型的短提前量（第二轮 HRRRCast 有 CAPE 与 20 层）。M 不再追加。\n- Grok 快查已核（见上表）；Deep Research 已核，审查 已裁决；HRRRCast 已加进第二轮；GitHub 仓库表由 ideas 在 models.md 里给。\n- 10-14 CM1 线回复：不重复（他们只从 HRRR f00 取列）；取列规则可借，已转 ideas；2022 年后有实测峰值的只有 NIP 2022-06-03、ALTU 2023-07-03（都在 StormCast 现行训练期内，不作检验事件）；L2 小集合（10–20 成员）由 CM1 线跑，我们按 input_sounding 格式交廓线，排期在 CRC [local path omitted] 空间恢复、其子项目 C/B 开跑之后。\n\n## 文献依据\n- PDF p3：97 探空驱动 CM1 下击暴流集合（L2 先例）\n- 近域先例（未建卡）：CGsNet Xiao 等 2023 GMD 10.5194/gmd-16-3611-2023；Lagerquist 等 2017 WAF 10.1175/WAF-D-17-0038.1；FuXi-Nowcast arXiv 2512.08974v2（阵风站点检验，13.9/17.2 m/s 不如持续性）；HRRRCast arXiv 2507.05658；Cook 2023 Meteorology 10.3390/meteorology2020017；Collins 等 2024 WAF（Zotero PU6IMCA9）PDF 第 10 页\n-；KYSQSJZT（Bolgiani 2020）\n- 父项目 AI 气象判断表 1b 行：StormCast arXiv 2408.10958、WoFSCast 10.1029/2024GL112383、FuXi-Nowcast arXiv 2512.08974、Das 2024 10.1038/s41612-024-00834-8（尚未建卡）\n\n## Liang Hu 注\n- 10-14：能到 3 km 尺度、捕捉到有利条件后，可考虑用 CM1 降尺度；降水更难预报，也是后续可考虑的灾害（P，暂不开）。最终目标是上规模的预报和后报；现阶段多用 Colab，不限 CU。\n\n## 10-22 引文滚雪球（Liang Hu 要求全部子项目重滚）\n- 池 （4625 篇，初筛 1733，只由滚雪球 884；含 Semantic Scholar）。选 13 篇交 LitWiki 第七批（待提交，后台自动重试）。\n- 题名层面值得注意：AIWP 模型直接出强对流预报（aies-d-25-0065.1）、AI 预报＋Transformer 后处理中期强天气（aies-d-25-0045.1）、AI 模型对风暴影响的个例比较（arXiv:2511.01665）。可能补充\"AI 对流背景场只到 12–24 h\"的文献对照，建卡核原文前不改结论。\n\n## 10-22 第七批核验\n- **结论口径要收窄**：\"AI 全球模型对流背景场只到 12–24 h\"只限本线三个事件、按局地环境量（CAPE 等）判断。White 2026（卡 NR_r23b7_01，AIES，10.1175/aies-d-25-0065.1）用 Pangu 环境场＋随机森林做 1–8 天强对流（风/雹/龙卷）危险概率，2024 年测试，各时效 BSS>0，到第 7 天仍与 GEFS-MLP 相当（出版 PDF p.7，Lead 抽核相符）；Hua 2026 类似（3–8 天）。二者预报的是区域危险发生概率而非局地环境量或站点阵风，不是同口径反例，但说明\"AI 背景场＋统计后处理\"这条路在中期尺度有技巧。\n- 本线其余判断（StormCast 配置未达标、v2 限定空白）不变；ProbSevere v3、Jahan 2024（WRF＋ML 阵风）、Hallgren 2024（激光雷达训练的局地轮毂风）为邻近先例。",
+    "en": "# 对流尺度 AI 与短临（L / M / L2）\n\n## 目标\n判断约 3 km 的对流尺度 AI 模型（StormCast、WoFSCast 等）能否直接给出雷暴与地面阵风，并能否批量做几十到几百个事件的预报/后报——这是雷暴方向唯一能上规模的路线（Liang Hu 10-14）。第一步交付：公开模型能否在 Colab A100 跑的核实表；5–10 个有站点实测的下击暴流/强雷暴事件 0–6 h 起报 vs ASOS 与 HRRR 的检验表；同批事件 AI/HRRR 探空 vs 实测探空（L2 的前置门槛）。\n\n## 当前状态\n\n10-28 Lead 复审 （6/6，与 结论一致；本轮为重复送审，Lead 当时未查到）：维持未通过、否定结果（限本配置）。补齐文档：误报无区分力数值化为事后补定（DEVIATIONS D8）；只报告项任一成员命中 33/120 对 33/120、成员最大峰值比 1.096；日簇区间不是配对区间；35 dBZ 只核到事件侧。定稿；决策。\n10-27 S2 结论定稿 （Lead 核过：主判据逐位一致；只报告项带日簇区间——HRRRCast 启发式 BS 差 −0.028 [−0.073,0.016]、命中差 +0.108 [0.023,0.197]、峰值比 1.161，仅误报差 +0.100 [0.048,0.156] 不过）。\n10-27 21:45 六审 （6/6）裁决：S2 合取**未通过**成立；误报按 §1.3 记无区分力；停止类别 = **否定结果（仅限冻结配置：StormCast V1 + 方法 a 阵风诊断 + P≥0.3/成员中位，2 h）**，剩余归因未拆开——同一 AI 场换 HRRRCast 启发式口径时 BS/命中/峰值点估计过线、误报 16/120 对 4/120（只报告、事后）。S4 不跑、S3 不开；新口径检验须新预注册+新盲样本（约 180 CU），已作为建议报上级。裁决；草案定稿派 r23-4。\n10-27 21:25 Lead 核审：误报算符更正成立（DEVIATIONS D7；与预注册 §4.3 一致，diff 只动算符与路径），合并 2640 条成功记录逐条可溯源、无重复无冲突，四个点估计独立复算一致。S2 冻结合取闸门**未过**（BS、命中、峰值比三项不过，与更正无关）；按预注册 §6 S4 不跑，S3 不自动开。停止类别候选：本配置\"否定结果\"，六审 进行中，裁决前不对外写结论。决策。\n10-27 21:22 EDT：第三轮 S2 VM2 的 120–239 组全部完成，最终检查点、日志、done 标记已拉回；Colab 已 stop，私有及账户会话列表均无活动会话。合并 VM1 后冻结样本 120 事件+120 对照、各 10 个成功成员，CPU 评分得 BS/命中/峰值比未通过，误报通过，因此本回报配置的 S2 上规模合取闸门未通过。整轮约 176.4 CU（分配时长×6.77 CU/h 估算，非独立账单），低于 A193 的 185 CU。冻结评分脚本误报差加号实现有误，保留初版结果并在独名修正版改为减号；需 Lead 核审。结论草案和审计：、；不外推至业务实时预报或一般 AI/HRRR 优劣。\n10-27 13:00 EDT：第三轮 S2 第二台；科学判据仍未评估。\n10-16 **搁置**（5/6 有效，裁决）。搁置的是\"StormCast V1/CONUS + 10 m 风×1.6677 阵风代理 + 事后 ERA5 条件\"这一配置的扩样：按冻结门槛两代都未达扩样标准（V1 20 事件、CONUS 12 事件 53/54 组）。**不是**\"对流尺度 AI 不如 HRRR\"：命中差异不显著（McNemar p 0.22–1.0），判据 1 换集合最大口径即全过，任一成员 ≥25.7 m/s 计数 AI 不少于 HRRR GUST（V1 9/11/9 vs 8/8/6），V1 含已见 7 例，阵风只用了常数系数。为什么不继续：现有设计已经回答不了\"值不值得上规模\"，再扩样只是在不显著的差距上花钱（CONUS 约 700 CU/百事件）。重启条件（任一出现即重新立题、重新预注册判据，不直接恢复扩样）：① 盲样本 + 雷暴风核实 + 有对流无强风对照 + 预注册集合聚合与概率型判据 + 样本量估算；② 混合层风廓线阵风诊断代替常数系数；③ 出现原生阵风输出或训练期外可检的公开对流尺度模型；④ 改为不要求站点峰值的批量用途（改目标，须 Liang Hu 定）。第二轮共约 212 CU。M 已收口；L2 未启动。\n\n## 第二轮判据（10-14 冻结，事后不得放宽）\n见 \"判据\"一节：1–3 h 每档 AI 阵风估计峰值比中位 ≥ HRRR GUST 的 0.9 倍；≥25.7 m/s 判别（集合 P≥0.3 记报出）在事件+无事件样本上命中率不低于 HRRR GUST、误报率不高于其 1.5 倍；GFS 真预报条件相对 ERA5 下降不超过 20%。阵风系数 1.6677 固定（2022 拟合）。宽窄窗并列、窗边比例、两个 HRRR 基线；持续性只作附录。\n\n## 第一步的判据（开跑前写定）\n- 检验对象：每事件取 ASOS 实测峰值风所在站点；模型取以该站为中心 ±25 km、观测峰值时刻 ±1 h 内的 10 m 风（有阵风变量就同时报阵风）最大值。基线：同提前量的 HRRR 业务预报（10 m 风与 GUST）、起报时刻 HRRR 分析的持续性。\n- 指标：峰值比（模型峰值/观测峰值）、峰值时间与位置偏差、≥25.7 m/s（50 kt）是否报出。\n- \"值得继续\"：在 1–6 h 提前量上，AI 模型峰值比不低于 HRRR 的 90%，且在至少 2/3 事件上优于持续性；并且单事件单次起报推理 ≤10 GPU 分钟（上规模的前提）。达不到写清差在哪，不放宽判据。\n- 事件必须在所用权重的训练期之外：StormCast V1（训练 2018-07—2021-12，权重 Apache-2.0）用 2022 年后事件；StormCast-CONUS（训练到 2025-09-30，权重 OpenMDW-1.1）用 2025-10 后事件。\n\n## 怎样走向上规模\n第一步脚本按\"事件清单 → 自动取 HRRR 初值 → 推理 → 自动对 ASOS\"写成批处理；过闸后扩到 SPC/Storm Events 里几十到几百个有 ASOS 实测的雷暴大风事件做后报统计；M 的 AIWP 统计给出环境可预报提前量，决定 L2 能否做\"预报\"还是只做\"后报\"。L2 的 CM1 集合在超算跑，规模化交 CM1 线或转正式项目。\n\n## 边界\n- 层级（根 Lead 10-14，5 层上限）：本节点是二级节点，不再开三级子项目；需要细分时在本节点内用任务，或报上级节点 Lead（雷暴与对流尺度）开同级二级节点。\n- 往下只剩两跳：本节点 → bot（ideas）→ 工具；任务书不得让工具 bot（gpu-gemini、审稿人、litwiki 等）再委托别人。\n- 子树列表不按父节点分组，层级以界面项目树为准。\n- 算力与数据：Colab 优先，不设单试验上限（母项目 10-14 按 Liang Hu 原话\"现阶段多用 Colab、不限 CU\"对齐，原\"单试验 ≤20 CU\"作废）；单试验预计超过 100 CU 先停下报上级；用完必须 colab stop，不让会话空转；同一轮只派一个执行方。L 第二轮照旧：整轮 ≤200 CU，累计 120 CU 报上级一次，到 200 CU 停下报上级。超算单作业 ≤50 SU，走资源申请与；L2 的 CM1 集合由 CM1 线跑，我们只交 input_sounding 格式廓线。\n- 计算与存储地点（Liang Hu 10-14 加严）：工作站 不跑计算、不存计算数据（10-15 01:59 C 盘余 46 GB）。求解器、推理、训练、批量算例、大下载一律在 Colab 或 CRC/TACC 跑和存；工作站 只放脚本、单项 <200 MB 的小结果、图和报告，拉回的检查点保持小文件，大中间件留在 Colab/集群；确需在 工作站 临时放 >1 GB 先报上级。CRC 组空间约 95%，新的大数据优先放 TACC [local path omitted] 或 [local path omitted]；CRC 默认单节点。任务书一律写明在哪算、结果放哪。\n\n## 已定决定\n- 2026-10-14 文献审查 裁决：StormCast 两版权重分开；FuXi-Nowcast 改为反例（强阵风阈值不如持续性）；补 HRRRCast 候选（公开版 6 km、GUST 为后处理诊断、气压层到 200 hPa、GFS 边界），撤回\"只有 StormCast 可用\"；Cook 10% 收窄口径；撤回 Collins 外推；新意按窄口径写 → \n- 2026-10-14 开立，第一步全在 Colab/工作站，CM1 部分先问 CM1 线 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 10-16 | 第二轮 CONUS 段（B 46.2 + B2 少量 + B3 78.1 CU，估算）：12 个 2026 事件 + 6 对照，53/54 组（缺 1 对照 3 h 组 1 成员） | **按冻结判据不通过**。宽窗 AI/观测 1/2/3 h 0.67/0.74/0.68，HRRR GUST 0.79/0.82/0.81，HRRR10×系数 0.84/0.94/0.86；AI/HRRR GUST 0.85/0.90/0.84 → 判据 1 只 2 h 过；命中 AI 1/1/0 vs HRRR GUST 4/2/3（/12）→ 判据 2 不过；误报两者 0。缺的对照组只影响误报，不改结论 |\n| 10-15 | 第二轮段 A：V1+ERA5 条件全样本 20 事件 + 10 无事件对照 × 1/2/3 h × 10 成员（本会话约 25.7 CU，费率估算） | **按冻结判据不通过**。宽窗峰值比 AI/HRRR GUST/HRRR10×系数：1 h 0.68/0.73/0.90，2 h 0.68/0.71/0.75，3 h 0.64/0.75/0.85 → 判据 1（AI ≥0.9×HRRR GUST）1 h 0.93 过、2 h 0.96 过、3 h 0.85 不过；判据 2 命中 AI 4/5/4 vs HRRR GUST 8/8/6（/20）不过；对照误报两者 0/10。连同系数放大的 HRRR 10 m 风也多数比 AI 好。窄窗两者都只到 0.4–0.5。窗边 AI 成员 133–143/300 |\n| 10-15 | 第二轮闸门段：V1 在第一步 7 事件上跑通阵风管线（本会话约 11.7 CU，费率×时长估算） | 管线与用时过闸：单组 173–312 s、成员中位 22 s（预估 55 s），约 0.3–0.6 CU/组。科学结果（已见样本，非盲测）：宽窗 AI/观测 1–3 h 0.51/0.59/0.62，HRRR GUST 0.75/0.73/0.77；AI 命中 0/3、0/3、0/2（HRRR GUST 的命中数）。合并 10 事件：AI/HRRR GUST 中位 1 h 0.84、2 h 0.88、3 h 1.01；≥25.7 命中 AI 3/2/2、HRRR GUST 6/6/4。窄窗两者 7 例全不中 |\n| 10-14 | 第二轮第②段 V1/ERA5（旧口径 ≤20 CU，计入本轮；账户余额降 18.03 CU 为上界） | 153 行检查点；完整 10 成员组 13 个：事件 3（AMA、CDS、CID）×1/2/3 h，对照 4 组（CDS 3 档、CID L1）；对照 9/10 有邻站 METAR <40 kt 交叉，CNK 无邻站。中间汇总（不作裁决）：AI/观测中位 1 h 0.79、2 h 0.83、3 h 0.77，HRRR GUST 0.91/0.92/0.79；≥25.7 命中 AI 3/3、2/3、2/3，HRRR GUST 3/3、3/3、2/3；对照误报两者 0。算力：本段约 7 个新组用 ≤18 CU，按此速度 ≥20+≥10 全量约需 200 CU 以上，单组用时须在闸门段实测核对 |\n| 10-14 | 第二轮第①段 HRRRCast GPU 兼容性（约 1.1 CU） | 权重再次校验通过；隔离 Python 3.10 + TensorFlow 2.15.1 能识别 A100，但加载 .keras 时内核持续卡住，事件推理未跑通。Decision：HRRRCast 暂缓（公开版 6 km、训练期覆盖 2023、环境不通），只有 V1 段过关后才再试，届时用 2024-04 后事件 |\n| 10-14 | 第二轮部分执行（先导） | V1 两例（AMA 65 kt、CDS 62 kt）×1/2/3 h×10 成员：阵风代理（AI 10 m 风×1.6677，2022 年拟合）宽窗 AI/观测 0.77–1.04，与 HRRR GUST 0.72–0.92 相当，P(≥25.7) AMA 1.0、CDS 0.3–0.7；CONUS 在 A100 80GB 可跑（前向 97 s/2 步，20.6 GB），OKC 2026 一例 L1 AI/观测 0.66、P=0；CONUS 气压字段只到 p20hl（约 440 hPa）；GFS 条件单成员烟测通过；HRRRCast 权重校验通过但训练期 2021-03—2024-03 覆盖 2023 事件，前处理未通、未推理。第一会话被平台回收（pruned，已报平台）。三条判据全部未评估 |\n| 10-14 | HRRRCast 可用性核实 | 有公开权重（约 203 MB）；但公开版是 6 km、气压层只到 200 hPa、GUST 为后处理诊断（因子 1.4）、权重无单独许可、训练期未核；未在 Colab 实跑 |\n| 10-14 | 第一步观测与基线补充：IEM ASOS 1 分钟档逐例核峰值；WoFSCast 仓库核权重 | 6/7 例 1 分钟档与报告峰值同分钟同值；OFK 同分钟缺测（窗内最大 53 kt，METAR PK WND 记 56 kt），单列待复核；同源比对不能证明无站内质控删峰。≥25.7 m/s 命中：AI 0/28、HRRR GUST 8/28、HRRR 10 m 1/28。WoFSCast 仓库无权重、无 release，配置指向内部路径 → 暂不可用。第一轮不过的判定不变 |\n| 10-14 | M：AWS AIWP（Pangu、GraphCast Operational）40 个 2023–24 ASOS ≥50 kt 雷暴大风日，提前 12–120 h，对 13 层 ERA5，基线日变化对齐持续性，逐参数判据 | DCAPE、0–1 km 风切全部五档过；0–6 km 风切 Pangu 五档过、GraphCast 到 72 h；MUCAPE/MLCAPE 两模型五档都不过（中位误差常低于持续性，但逐事件只赢 14–25/40，不到 2/3）。验证时刻取最近 00/12 UTC，偏离风峰可达 6 h；只验环境不验阵风 |\n| 10-14 | 第一步：StormCast V1（训练 2018-07—2021-12，中部美国 512×640）在 7 个 2023–24 ASOS 雷暴大风事件×1/2/3/6 h 起报 | 按预设门槛不过：AI/HRRR10 峰值比中位 1 h 0.85、2 h 0.61（3 h 1.11、6 h 1.01）；AI 0/28 报出 ≥25.7 m/s；6/7 事件优于持续性；单组 ≤88 s，100 事件×4 起报约 6 GPU 小时。口径问题：AI 与 HRRR10 都是 10 m 平均风，对 ASOS 阵风只有 0.3–0.5，HRRR GUST 0.75；单成员；条件场用事后 ERA5。探空：模式层只 14 层到约 440 hPa，CAPE 不可用于 L2。WoFSCast 无公开权重/初值，FuXi-Nowcast 无权重，CorrDiff 权重受限 |\n| 10-14 | Deep Research 核对（298d34） | 两份报告一致：对流尺度 AI 模型都没有对地面雷暴强风做过站点检验（检索缺席）；实际可用只有 StormCast；DR 把 HRRR 强风偏差错挂到 Fovell 2022，实为 Collins 2024 WAF PDF p10（阵风 −11.32 m/s，冷季下坡风）；ASOS 质控误删约 10% 对流峰值（Zotero DZF9GFUU PDF p1）；无\"AI 探空→CM1\"先例。送审 |\n| 10-14 | Grok 文献快查 + 核对 StormCast 模型卡、FuXi-Nowcast 摘要 | StormCast 现行权重训练 2018-07–2025-09、全 CONUS 3 km、OpenMDW-1.1 可商用、有 10 m 风无阵风 → 检验事件须在 2025-10 后；FuXi-Nowcast 有阵风但只限华东、未见权重；未找到\"AI 探空→CM1\"先例 |\n\n## 参数来源表\n| 参数 | 取值 | 来源或\"假设\" | 查过哪些地方 |\n| --- | --- | --- | --- |\n| 检验邻域 ±25 km/±1 h | 25 km、1 h | 假设：约 8 个 3 km 格点、覆盖对流位置误差；敏感性：另报 ±10 km/±0.5 h | 待文献快查 |\n| 强风阈值 | 25.7 m/s（50 kt） | NWS severe wind 标准 | — |\n\n## 未决与下一步\n- 10-22 03:30 VM1 磁盘写满，S2 停在 120/240（60 个事件 + 60 个配对对照；单元 120 的 10 个成员需重跑）。已用约 91.3 CU；整轮外推按有效单价 180.1 CU、按保守单价 182.1 CU，超过 180，所以没开 VM2。已向上级报告并请求批到 185 CU（更正）。批了之后，VM2 先修磁盘泄漏再续跑。记录。\n- 10-21 19:32 Lead 重估：已用约 37.2–37.5 CU，单元 20–47 完成；外推 175.7–177.6 CU，加 VM2 开销后 177.6–179.5 CU，仍在 180 内。wx 的回访名额被两条过期回访占着，VM2 改由我在 10-22 04:26 回访时直接派。\n- 10-21 19:30 S2 续跑：VM1（wx-r234b-s2-r20-129-1021，16:28 开）跑单元 20–129，19:23 已到单元 46 前后。前 10 组实测本会话 6.77 CU/h，即 0.721 CU/组；外推全轮 175.6–177.5 CU，未计第二个 VM 的开销，离 180 的余量只有约 2.5–4.4 CU。keepalive 原配置 --keep 5 曾自动删掉 2 份早期非终态检查点，已改为 --keep 1000。已派 wx 收尾：每 40 组重估一次，VM1 跑完后开 VM2 跑 130–239，最后评分、写结论草案并上报。我约了 10-22 04:26 兜底回访。\n- 10-21 13:11 S2 首批 20 组完成（会话 wx-r234b-s2-v1-1021；20/20 组 10/10 成员；387.7 s/组，按 6.85 CU/h 合 0.738 CU/组）。按此外推整轮约 178.9 CU，超过 160，wx 停机上报。Liang Hu 批 A188，上限提到 180 CU。13:3x 派 wx 续跑第 20–239 组；按 D6 分两个先后的 VM 跑（剩余约 23.7 h，超过单个 VM 24 h 寿命），实测单价与保守单价两种都报。\n- 10-21 Liang Hu 批 A172，放行 S2（Colab ≤160 CU）；平台已登记闸门。09:5x 派 wx 跑 S2（任务书），因网关委托名额满正在排队。首批 20 组跑完后报会话名、单组 CU 与整轮重估。\n- 10-16 01:52 第三轮预注册已冻结：\n - 定稿，SHA256 在。\n - 依据审查 的裁决和决策记录。\n - 已派 wx 执行 S0+S1（Colab，≤12 CU）。\n - 10-16 02:10 wx 交回预筛（约 1.7 CU）：暂定 V1 295 条、CONUS 127 条（尚未做格网边界核对和对照配对，不算冻结样本）；S1 未开始。02:20 补派 ：S0 收尾后接做 S1，两单合计 ≤12 CU。\n - 10-16 02:28 交回：S0 两单按 A100 单价估约 3.4 CU，超过分段估计 3 CU，wx 停机；样本未冻结，S1 未开始（格网核对已确认暂定候选都在网格内）。我记为偏离 D1：分段 CU 只是预算估计，S0 上调到 ≤5，S0+S1 合计仍 ≤12。02:36 派 一次做完 S0 冻结和 S1。\n - 10-16 03:26 交回，停在记账问题上：CPU 会话按 A100 单价 6.85 CU/h 记账，估到约 9.8 CU 停机。合格事件预备数为 V1 301、CONUS 132，临时抽样 120/80；对照配对尚未完成。我记为偏离 D2：CPU 会话改按实测单价记账。03:36 派 完成对照配对、样本冻结和 S1。\n - 10-16 04:56 核实： 在 CPU 会话后台配对对照，22/200，暂无缺对照；CPU 实测约 0.08 CU/h，D2 记账得到证实。wx 预约 07:45 回访后接着冻结样本、做 S1。已留言要求 S1(a) 用 HRRR wrfnat 的全部原生层。\n - 10-16 10:49 S0 冻结：events_r3.csv（…）、controls_r3.csv（…），V1 120 个、CONUS 80 个事件，200 个对照全部配上（合格池 V1 301、CONUS 132；改用 35 dBZ 时增加 0 个）。11:13 S1 首次结果：(a) 1.113 / r=0.915，(b) 1.00，(c) 不过（AI 的 Z1hl−地形为 −26～39 m）。Lead 复核发现 θv 的气压单位用错（Pa 当 hPa），首次结果作废，记为 D3；高度改为锚定 HRRR 最低层，记为 D4。11:32 派 wx 重跑 S1。累计约 4.3 CU。\n - 10-16 11:38 S1 修正版**全部通过**：(a) 公式/业务 fg10m 中位比 0.99999、r=0.982（10 个事件，4370 个格点×时次）；(b) 只用 StormCast 的 14 层时，峰值中位比 1.000；(c) 锚定后两个事件 860 列 NaN=0、PBL 顶全部找到。AI 的 Z1hl 有漂移（−26～39 m），按 D4 锚定；层高不单调的列按 D5 处理。合计约 6.4 CU。已报上级，**S2（V1 120+120，约 144 CU）等母项目放行**。\n - (原计划) S1 过闸后报上级。**S2 等母项目放行，不直接开。**\n- 10-16 上级「AI 气象」同意方向，放行 S0+S1（约 9 CU，以审查后定稿为前提）。已派 litwiki 建卡（Benjamin 2020 阵风诊断原文、雷达对流阈值），定稿审查 （`--count 3`）已发出，重点问 V1 80+80 的功效是否够、事件多于 80 时是否提到 100 以上。两者都回来后裁决、冻结草案、放行 S0+S1。\n - litwiki 已交回（10-16），我抽查了 Benjamin 2020 PDF 第 14 页和第 16 页原文，属实。定稿时要改两处：\n 1. 混合层顶判据改为 θv(hl1，约 8 m) + 0.5 K（Benjamin 2020 PDF 第 14 页 / 报告第 10 页），只在 PBL 内取最大（PDF 第 16 页 / 报告第 12 页）。这样就不再需要 q2m 的假设。\n 2. 雷达阈值 40 dBZ 仍按“假设”处理：文献只有 MRMS 合成反射率 >40 dBZ 的依据（Liu 2021，技术说明第 2 页），另以 Roberts & Rutledge 2003 的 >35 dBZ（PDF 第 1 页 / 期刊第 562 页）做敏感性分析。\n 卡片位置：、`H9ENWPG3_*`、`NR_liu_2021_*`。S1 闸门过了报上级；**S2 不直接开**，由上级转母项目放行。\n- 10-16 第三轮预注册草案已写好，**只做了设计、没有花算力**：。L 仍为搁置，放不放行由上级「AI 气象」定。草案要点：\n - 盲样本：V1 用 2022、2024、2025-01–09 的事件，CONUS 用全国 2025-10 以后的事件；对照为“有对流、无强风”，与事件 1:1 配对。\n - 阵风改用 HRRR 混合层诊断（Collins 2024 式 (1)，期刊第 708 页），需要重跑并保存 hl1–hl20 各层。\n - 主时效定为 2 h；主判据三条：Brier 不劣、命中/误报不劣（界限 0.15）、峰值比 ≥0.9。\n - 样本量：V1 80 个事件 + 80 个对照，CONUS ≥50 个。\n - 分段：S0 抽样冻结 + S1 试点 + S2 V1 盲测，约 105 CU；全部五段约 570 CU；S2 及以后每段都要先经上级放行。\n - 定稿前：Benjamin 2020 原文和雷达阈值交 litwiki 建卡；定稿按冻结协议送审 `\n- 10-15 12:50 B 会话 11:25 守护停机（46.19 CU，230 行、20 组完整）；B2 新会话启动即报 OptionalDependencyError 退出，无新增结果（已报平台）。12:58 派 wx 开 B3：照原 B 装齐可选依赖后从 230 行续满 54 组，整轮剩约 81 CU（累计约 134），到限停下报。\n- 10-15 母项目批：CONUS 段 B 跑满 54 组，整轮上限 215 CU，取代\"到 200 停\"；同一段 B 续跑，不重算、不另开同名会话；超 215 停下报上级。已告知 ideas。出结果：不过则搁置前送 6 人，通过直接报上级。上规模成本（CONUS 约 700 CU、V1 约 140 CU）只记录，不据此放行。\n- 10-15 10:42 按段 B 实际耗时重算（上级要求）：B 会话已跑约 6.0 h、约 41 CU（6.85 CU/h 估），完成 17/54 组。每组（1 事件×1 提前量×10 成员）墙钟：1 h 约 14 分、2 h 约 20.5 分、3 h 约 27 分（自回归步数越多越慢），平均约 20.5 分 ≈ 2.3 CU/组——比 05:20 用的 13 分/组慢约 1.6 倍（那 2 组只是 1 h）。第二轮累计约 83 + 41 ≈ 124 CU，已过 120（已报上级）。剩 37 组约 87 CU，整轮预计约 210 CU，会碰 200 上限：到 200 CU 停下，用已完成的约 49/54 组按冻结判据出判定并写明样本数（事件优先，缺口落在对照）。05:20 那句\"预计约 175、不会碰 200\"按实测改正。\n - 上规模的直接证据：CONUS 单卡 A100 每组约 20 分钟，100 事件×3 提前量 = 300 组 ≈ 100 GPU 小时 ≈ 700 CU；V1 每组 3–5 分钟，同规模约 20 GPU 小时 ≈ 140 CU。\n- 10-15 05:20 第二轮算账核对（上级 Lead 要求）：\n - 分段（单位 CU；\"上界\"=共享账户余额下降，含同期其他会话；\"估\"=本会话时长×约 6.85 CU/h）：先导段 ≤26.8（上界）；第①段 HRRRCast 约 1.1（估）；第②段 V1 ≤18.0（上界）；闸门段约 11.7（估）；段 A 约 25.7（估）；段 B 至 05:10 约 3.3（估）。合计约 86.6。\n - 口径：项目页旧数\"上界约 58\"是段 A 之前的累计（≤46 + 11.7）；回报里\"约 84/87\"= 58 + 段 A 25.7（+ 段 B 3.3）。没有重复计入或漏计，两数时间点不同。其中先导段与第②段是上界，实际偏低。\n - 段 B 预估：约 13 分钟/组、约 1.65 CU/组（前 2 组含安装与权重加载，实际每组应略低），54 组约 89 CU；到 05:10 已计 3.3，剩约 86，加一次续开会话的安装加载约 2–3 CU。整轮预计约 175 CU，会过 120（届时报上级），不会碰 200。我 05:10 说\"大概率碰 200 上限\"算错了，撤回。\n - 10:40 回访按段 B 实际每组耗时再重算一次写在这里。\n- 10-15 05:10 CONUS 段（第二轮段 B）在跑：约 27 分钟完成 2/54 组，CONUS 每组远慢于 V1。上级 Lead 批：到单会话 50 CU 直接续开新会话（从检查点续），整轮 ≤200 CU，过 120 CU 报一次；到 200 CU 未完就用已完成组按冻结判据出判定并写明样本数；报每组 GPU 分钟与 CU，并估算 100 事件×3 提前量的成本。\n- 10-15 ：r2 下 >100 KB 文件（含 gate_7events 检查点）被根 Lead 清理时搬到 TACC lab_archive（清单），TACC 恢复后由根 Lead 校验拉回；续跑只从 Colab [local path omitted] 恢复，判定若只差这批文件则注明\"工作站 检查点在 TACC，未比对\"。 原因即此，已告知平台。\n- 第二轮累计 Colab（上界，含共享账户其他会话）：先导段 ≤26.8 + 第①段约 1.1 + 第②段 ≤18.0 ≈ ≤46 CU；120 CU 时报上级。闸门段 已过（10-15 00:26）；累计上界约 46 + 11.7 ≈ 58 CU。已放段 A（V1 补齐到 ≥20 事件 + ≥10 对照，≤50 CU）与段 B（CONUS 2026 事件 + ≥6 对照，≤50 CU）；GFS 段等判据 1、2 有模型通过再派。\n- ideas 第二轮（任务书，排在 M 之后）：阵风换算、10 成员集合、≥20 事件 + ≥10 无事件对照、GFS 真预报条件、StormCast-CONUS 在 2025-10 后事件上试跑并核垂直层数；判据已写定。 10-14 18:20 预检：估算约 163 CU 超 100 CU 闸门停下（候选 666 条）；Lead 曾放行 200 CU，10-14 上级 Lead 更正为每段 ≤20 CU（200 CU 待母项目批）；去掉 6 h、成员成批推理，顺序 HRRRCast → V1 ERA5 → GFS 条件 → CONUS 2026 事件。\n- 上级 Lead 10-14 补两条判读（已转 ideas，不改判据）：报最大值落在窗边（≥0.9×半径）的比例，窄窗与宽窗并列——第一轮约 20/28 组 AI 宽窗最大值在 20–25 km，多半是背景风；持续性基线太弱，\"6/7 优于持续性\"不作技巧证据，结论以 HRRR GUST 与\"HRRR 10 m×同一阵风系数\"两个基线为准。 第一轮复核：宽窗最大值落在窗边（≥22.5 km）AI 18/28、HRRR10 13/28、HRRR GUST 14/28；窄窗（10 km/±0.5 h）三者 ≥25.7 m/s 都是 0/28。\n- L2 探空：StormCast V1 只到约 440 hPa，不能直接给 CM1；候选改用 HRRR 气压层产品或 CONUS 版（看第二轮核层数）。\n- 10-14 探空补充：CM1 取列规则已写成可测试脚本 （合成测试 2/2 过），七例 RAOB 与 ASOS 峰值时差 0.25–4.35 h（3 例 >3 h）；真正的 CM1 对流前列还没取：要逐例雷达首个 ≥35 dBZ 时刻、HRRR 反射率与陆地掩膜，原始廓线也没存，现有 soundings.md 只作参考，不能当 L2 交接。Decision：L2 取列与 input_sounding 等第二轮判出\"值得继续\"后再做（用 HRRR/HRRRCast 原生层 + NEXRAD/MRMS），现在不派。\n- M 已完成（见上表）：AI 全球模型能提前 3–5 天报准风切和 DCAPE，CAPE 在 0.5–5 天都不稳定。对 L2 的含义：后报用 HRRR/ERA5 分析抽探空；做预报时 CAPE 是短板，只能靠对流尺度模型的短提前量（第二轮 HRRRCast 有 CAPE 与 20 层）。M 不再追加。\n- Grok 快查已核（见上表）；Deep Research 已核，审查 已裁决；HRRRCast 已加进第二轮；GitHub 仓库表由 ideas 在 models.md 里给。\n- 10-14 CM1 线回复：不重复（他们只从 HRRR f00 取列）；取列规则可借，已转 ideas；2022 年后有实测峰值的只有 NIP 2022-06-03、ALTU 2023-07-03（都在 StormCast 现行训练期内，不作检验事件）；L2 小集合（10–20 成员）由 CM1 线跑，我们按 input_sounding 格式交廓线，排期在 CRC [local path omitted] 空间恢复、其子项目 C/B 开跑之后。\n\n## 文献依据\n- PDF p3：97 探空驱动 CM1 下击暴流集合（L2 先例）\n- 近域先例（未建卡）：CGsNet Xiao 等 2023 GMD 10.5194/gmd-16-3611-2023；Lagerquist 等 2017 WAF 10.1175/WAF-D-17-0038.1；FuXi-Nowcast arXiv 2512.08974v2（阵风站点检验，13.9/17.2 m/s 不如持续性）；HRRRCast arXiv 2507.05658；Cook 2023 Meteorology 10.3390/meteorology2020017；Collins 等 2024 WAF（Zotero PU6IMCA9）PDF 第 10 页\n-；KYSQSJZT（Bolgiani 2020）\n- 父项目 AI 气象判断表 1b 行：StormCast arXiv 2408.10958、WoFSCast 10.1029/2024GL112383、FuXi-Nowcast arXiv 2512.08974、Das 2024 10.1038/s41612-024-00834-8（尚未建卡）\n\n## Liang Hu 注\n- 10-14：能到 3 km 尺度、捕捉到有利条件后，可考虑用 CM1 降尺度；降水更难预报，也是后续可考虑的灾害（P，暂不开）。最终目标是上规模的预报和后报；现阶段多用 Colab，不限 CU。\n\n## 10-22 引文滚雪球（Liang Hu 要求全部子项目重滚）\n- 池 （4625 篇，初筛 1733，只由滚雪球 884；含 Semantic Scholar）。选 13 篇交 LitWiki 第七批（待提交，后台自动重试）。\n- 题名层面值得注意：AIWP 模型直接出强对流预报（aies-d-25-0065.1）、AI 预报＋Transformer 后处理中期强天气（aies-d-25-0045.1）、AI 模型对风暴影响的个例比较（arXiv:2511.01665）。可能补充\"AI 对流背景场只到 12–24 h\"的文献对照，建卡核原文前不改结论。\n\n## 10-22 第七批核验\n- **结论口径要收窄**：\"AI 全球模型对流背景场只到 12–24 h\"只限本线三个事件、按局地环境量（CAPE 等）判断。White 2026（卡 NR_r23b7_01，AIES，10.1175/aies-d-25-0065.1）用 Pangu 环境场＋随机森林做 1–8 天强对流（风/雹/龙卷）危险概率，2024 年测试，各时效 BSS>0，到第 7 天仍与 GEFS-MLP 相当（出版 PDF p.7，Lead 抽核相符）；Hua 2026 类似（3–8 天）。二者预报的是区域危险发生概率而非局地环境量或站点阵风，不是同口径反例，但说明\"AI 背景场＋统计后处理\"这条路在中期尺度有技巧。\n- 本线其余判断（StormCast 配置未达标、v2 限定空白）不变；ProbSevere v3、Jahan 2024（WRF＋ML 阵风）、Hallgren 2024（激光雷达训练的局地轮毂风）为邻近先例。"
+  },
+  "decisions": [
+    {
+      "id": "dec-0000",
+      "ts": "2026-10-14 14:23",
+      "title": "对流尺度 AI 与短临子项目开工（2026-10-14）",
+      "label": "决定",
+      "text": "# 对流尺度 AI 与短临子项目开工（2026-10-14）\nDecision：开立 L（并入 M、L2）。第一步全在 Colab A100/工作站：StormCast 等公开模型可跑性核实 → 5–10 个训练期外、有 ASOS 实测的下击暴流/强雷暴事件 0–6 h 起报 vs HRRR 业务预报与持续性；同批事件 AI/HRRR 探空 vs 实测探空；M 用 AWS AIWP 回算统计环境提前量。判据开跑前写定（见项目页）。CM1 部分先问。\n为什么：Liang Hu 10-14 同意 L 为雷暴方向唯一能上规模的路线，并要求第一步说明如何走向批量。\n错了的代价：Colab 若干 CU 与 1–2 天；判据不过就搁置。\n依据：父项目判断表 1b/4 行；JFT4WRDC PDF p3。"
+    },
+    {
+      "id": "dec-0001",
+      "ts": "2026-10-14 15:17",
+      "title": "对流尺度 AI 第一步结果与第二轮（2026-10-14）",
+      "label": "决定",
+      "text": "# 对流尺度 AI 第一步结果与第二轮（2026-10-14）\n结果：StormCast V1，7 事件 28 组，按预设门槛（AI/HRRR 10 m 峰值比 ≥0.9）不过（1 h 0.85、2 h 0.61），0/28 报出 ≥25.7 m/s；优于持续性 6/7；速度过关。证据。\nDecision：不上规模、也不搁置，派第二轮同口径复判（阵风换算、10 成员集合、≥20 事件 + 无事件对照、GFS 真预报条件、StormCast-CONUS 试 2025-10 后事件），判据开跑前写定。第一轮\"不过\"的记录保留，不追改。\n为什么：第一轮的比较量是 10 m 平均风对 ASOS 阵风，AI 和 HRRR 同样只到 0.3–0.5，门槛主要测到的是口径而不是模型；单成员扩散模型噪声大；样本 7 个。\n错了的代价：若同口径仍不过，多花约 1 天和若干十 CU；届时搁置。\n依据：本线数据；HRRR 强风低估见 Collins 等 2024 WAF（Zotero PU6IMCA9）PDF 第 10 页。"
+    },
+    {
+      "id": "dec-0002",
+      "ts": "2026-10-14 18:24",
+      "title": "L 第二轮 Colab 上限放宽到整轮 200 CU（2026-10-14，母项目 Lead）",
+      "label": "决定",
+      "text": "# L 第二轮 Colab 上限放宽到整轮 200 CU（2026-10-14，母项目 Lead）\n\n- Decision I made：L 对流尺度 AI 与雷暴短临第二轮（StormCast/HRRRCast 阵风换算、10 成员、≥20 事件 + ≥10 无事件对照，预估约 163 CU）整轮上限 200 CU，覆盖母项目\"单试验 ≤20 CU\"边界，仅限本轮。\n- 条件：先跑第一段（≤20 CU）作闸门——阵风换算管线在第一步 7 事件上与 ASOS 阵风同口径跑通、单组推理时间与预估相符，L 节点 Lead 核过再放后续；后续每个 Colab 会话 ≤50 CU、用完 stop、同一轮只一个执行方；累计到 120 CU 时报一次花费与已出结果；判据开跑前冻结，不得事后放宽；超 200 CU 停下报母项目。\n- 为什么：Liang Hu 10-14 原话\"最终目标是上规模的预报和后报；现阶段多用 Colab，不限 CU\"；第二轮就是检验上规模那一步；第一步单组推理 ≤88 s，预估有依据；每段 ≤20 CU 只增加会话开关和拖延，不降低风险，风险由第一段闸门控制。\n- 错了的代价：最坏约 200 CU（约 37 A100 小时）换来一个\"不过\"的结论；第一段闸门把无效花费控制在约 20 CU。\n- 未送审：不是超算作业，预估 <200 CU、分会话执行；无文献依据，属资源决定。"
+    },
+    {
+      "id": "dec-0003",
+      "ts": "2026-10-14 18:24",
+      "title": "L 第二轮算力：先按每段 ≤20 CU 执行，整轮 200 CU 报母项目（2026-10-14，雷暴与对流尺度节点 Lead）",
+      "label": "决定",
+      "text": "# L 第二轮算力：先按每段 ≤20 CU 执行，整轮 200 CU 报母项目（2026-10-14，雷暴与对流尺度节点 Lead）\n- 做了什么：L 节点给第二轮放行 200 CU（预估 163 CU），超出母项目给本节点的\"单试验 Colab ≤20 CU\"边界。改为四段（HRRRCast → V1 ERA5 → GFS 条件 → CONUS 2026 事件）各 ≤20 CU 执行，同时向母项目 Lead 申请整轮放宽到 200 CU。\n- 为什么：上级边界明确写\"任务书原文里的『不限 CU』以本条为准\"，本节点不能自行越过；但 Liang Hu 10-14 原话是\"现阶段多用 Colab，不限 CU\"，且第二轮正是验证上规模的一步，所以请示放宽而不是砍掉。\n- 错了的代价：若母项目维持 20 CU，第二轮分段执行，慢一些、会话开关次数多；若放宽，分段期间损失的只是时间。\n\n- 10-14 更新：母项目 Lead 批准整轮 200 CU，本条的每段 ≤20 CU 只保留在第一段闸门上。"
+    },
+    {
+      "id": "dec-0004",
+      "ts": "2026-10-15 00:29",
+      "title": "对流尺度 AI 第二轮算力放行（2026-10-14）",
+      "label": "决定",
+      "text": "# 对流尺度 AI 第二轮算力放行（2026-10-14）\nideas 预检估算第二轮约 163 CU，按任务书 100 CU 闸门停下。Decision：上限提到 200 CU；只跑 1/2/3 h（判据只看 1–3 h）；同一起报 10 成员共用初值成批推理；顺序 HRRRCast → V1（ERA5 条件）→ GFS 条件 → CONUS（2026 事件）。判据不变。\n为什么：Liang Hu 10-14 定现阶段 Colab 不限 CU；余额 1437 CU；去掉 6 h 和成批推理后实际预计约 100 CU 上下。\n错了的代价：最多约 200 CU（约 37 GPU 小时），占余额约 14%。\n\n## 更正（10-14 晚，上级 Lead）\n母项目边界是单试验 Colab ≤20 CU，200 CU 放行超出边界、撤回。改为第二轮四段各算一个试验、每段 ≤20 CU，段间 stop，同一时间一个会话；整轮 200 CU 由上级 Lead 向母项目申请，批了再放。先例：节点算力上限以母项目边界为准，不以任务书引述的 Liang Hu 原话自行放宽。\n\n## 再更正（10-14 晚）\n母项目 Lead 批准第二轮整轮 200 CU，取代\"每段 ≤20 CU\"。执行：先闸门段 ≤20 CU（第一步 7 事件跑通阵风管线、核单组用时），本节点核过再放后续；每会话 ≤50 CU；120 CU 报一次，200 CU 停。已排队的\"续做：V1 ERA5 段\"若先执行，计入本轮，与闸门段合计 ≤40 CU 后停下等核。\n\n## 闸门段核过（10-15）\n管线跑通，单组 173–312 s，约 0.3–0.6 CU/组，优于预估 → 放后续。段 A：V1 补齐 ≥20 事件 + ≥10 对照（≤50 CU）；段 B：CONUS 2026 事件（≤50 CU）。GFS 段推迟到判据 1、2 有模型通过后——判据 3（GFS 相对 ERA5 下降 ≤20%）只在前两条通过时才影响结论，这是顺序安排，不改判据。合并 10 事件中间值：AI/HRRR GUST 中位 0.84/0.88/1.01，命中 AI 3/2/2 vs HRRR 6/6/4，偏向不通过。"
+    },
+    {
+      "id": "dec-0005",
+      "ts": "2026-10-15 04:42",
+      "title": "StormCast V1 第二轮全样本不通过（2026-10-15）",
+      "label": "决定",
+      "text": "# StormCast V1 第二轮全样本不通过（2026-10-15）\n结果：20 个 2023–24 ASOS ≥50 kt 雷暴大风事件 + 10 个无事件对照，1/2/3 h × 10 成员，阵风代理 = AI 10 m 风 × 1.6677（2022 拟合）。冻结判据：1）AI/HRRR GUST 峰值比中位 1 h 0.93、2 h 0.96 过，3 h 0.85 不过；2）≥25.7 m/s 命中 AI 4/5/4 vs HRRR GUST 8/8/6，不过；误报两者 0/10。判据 3（GFS）因前两条不过不再跑。证据。\nDecision：接受\"V1 不通过\"，不对 V1 扩到上百事件；等 CONUS 段结果，若也不过则 L 搁置。\n为什么：判据开跑前冻结；命中数只有 HRRR 的一半左右，连\"HRRR 10 m 风×同系数\"这个简单基线也多数更好。\n错了的代价：若阵风换算方法本身压低了 AI，可能低估了 StormCast；重启条件里写\"有原生阵风输出或更好的阵风诊断时重试\"。\n依据：本线数据，无文献依据。限制：条件场为事后 ERA5（回报，非真预报）；2/10 对照独立核验不足。"
+    },
+    {
+      "id": "dec-0006",
+      "ts": "2026-10-15 10:43",
+      "title": "L 第二轮 CONUS 段补满 54 组，整轮上限 215 CU（2026-10-15，母项目 Lead）",
+      "label": "决定",
+      "text": "# L 第二轮 CONUS 段补满 54 组，整轮上限 215 CU（2026-10-15，母项目 Lead）\n\n- Decision I made：L 第二轮 CONUS 段不在 200 CU 停在约 49/54 组，改为跑满 54 组，整轮上限 215 CU（原 200）；判据仍按冻结版，不改。\n- 为什么：实测每组约 2.3 CU，剩 5 组约 12 CU；按\"事件优先\"停会缺无事件对照组，判定要带\"缺组\"限定，命中率/虚警的分母不完整；多花约 12 CU 换完整、可直接判的样本，比留一个带口子的结论划算。\n- 错了的代价：多花约 12–15 CU（约 2–3 A100 小时）。\n- 超 200 CU 已报根。上规模成本（CONUS 100 事件×3 提前量约 700 CU、V1 约 140 CU）只作记录，不据此放行任何上规模运行；要做须先过判据并按规矩送审。\n- 依据：无文献依据，属资源决定；数字来自 （本线数据）。"
+    },
+    {
+      "id": "dec-0007",
+      "ts": "2026-10-16 00:40",
+      "title": "L 第二轮 CONUS 不通过，搁置前送 6 人审查（2026-10-16）",
+      "label": "决定",
+      "text": "# L 第二轮 CONUS 不通过，搁置前送 6 人审查（2026-10-16）\n结果：StormCast-CONUS，12 个 2026 年 ASOS ≥50 kt 雷暴大风事件 + 6 对照，1/2/3 h×10 成员，53/54 组（缺 1 个对照 3 h 组的 1 成员）。冻结判据：判据 1 AI/HRRR GUST 0.85/0.90/0.84，只 2 h 过；判据 2 命中 AI 1/1/0 vs HRRR GUST 4/2/3，不过；误报两者 0。证据。V1 已不通过。\nDecision：接受 CONUS 不通过（53/54 组足以定论，缺的组只影响误报）；不补跑最后一组、不再花 Colab。拟把 L 搁置，按上级要求先 \n为什么：两代模型同口径都明显少报强风；放弃路线须审（公共规则第 2 类）。\n错了的代价：若审查认定阵风代理系统性压低 AI，需另设阵风诊断复评（在已有检查点上后处理即可，约 0 CU）。\n依据：本线数据，无文献依据；第二轮累计约 212 CU（上限 215）。"
+    },
+    {
+      "id": "dec-0008",
+      "ts": "2026-10-16 01:11",
+      "title": "L 对流尺度 AI 与雷暴短临：搁置（2026-10-16）",
+      "label": "决定",
+      "text": "# L 对流尺度 AI 与雷暴短临：搁置（2026-10-16）\nDecision：按审查 裁决，L 状态改\"搁置\"，搁置对象限定为\"StormCast V1/CONUS + 10 m 风×1.6677 阵风代理 + 事后 ERA5\"配置的扩样；不对外表述为\"对流尺度 AI 不如 HRRR\"。\n为什么：冻结门槛两代都未过（判据 2 按 P≥0.3 六档命中均低于 HRRR GUST）；但审查与复算显示差异不显著、判据 1 对集合聚合敏感、含已见样本，再扩样回答不了\"值不值得上规模\"。\n错了的代价：若对流尺度 AI 实际可用，晚一轮；重启按裁决中四条条件重新预注册（混合层阵风诊断在已有事件上复算可先做，V1 约 0.5 CU/组）。\n依据：本线数据，无文献依据；裁决。审查 5/6 有效（Gemini 额度用尽，未重派）。"
+    },
+    {
+      "id": "dec-0009",
+      "ts": "2026-10-16 01:20",
+      "title": "L 第三轮：预注册定稿送审，审过放行 S0+S1（2026-10-16，雷暴与对流尺度节点 Lead）",
+      "label": "决定",
+      "text": "# L 第三轮：预注册定稿送审，审过放行 S0+S1（2026-10-16，雷暴与对流尺度节点 Lead）\n- 做了什么：同意 L 第三轮预注册草案的方向；定稿前补卡（Benjamin 2020、雷达 40 dBZ 阈值），定稿协议送 S0（抽样核实）+S1（阵风诊断试点），约 9 CU；S2（累计约 105 CU）由本节点转母项目放行；S3/S4 另议。\n- 为什么：第二轮审查 的结论是\"按冻结门槛未达扩样标准、但差异不显著\"，问题在设计（已见样本、常数系数阵风、聚合口径未冻结），不是已证明无用；Liang Hu 10-14 定的目标是上规模的预报/后报，这条是唯一可上规模的路线。S0+S1 便宜且自带闸门。\n- 错了的代价：若第三轮仍不过，S0–S2 约 105 CU 换来\"盲样本下仍不过\"的确定结论；S1 闸门不过则只花约 9 CU。\n- 依据：本线数据（第二轮 scores.csv、审查 裁决）；无新增文献依据。"
+    },
+    {
+      "id": "dec-0010",
+      "ts": "2026-10-16 11:41",
+      "title": "L 第三轮预注册冻结，放行 S0+S1（10-16）",
+      "label": "决定",
+      "text": "# L 第三轮预注册冻结，放行 S0+S1（10-16）\n\n- **做了什么**：\n - 审查 收到 3 份有效意见，裁决后改完全部“必须改”，冻结定稿，SHA256 记在。\n - 按上级「AI 气象」10-16 的批准，派 wx 执行 S0+S1，上限 12 CU，在 Colab 上跑。\n - S2 不开跑，等上级转母项目放行。\n- **为什么**：上级已批准“审过放行 S0+S1”；审查意见全部可以在定稿里修正，不涉及改变方向。\n- **关键改动**：\n - 已见样本按显式清单剔除（第一轮有 2 个 2024 年事件）\n - 阵风 PBL 顶判据按 Benjamin 2020 原文改为 θv(约 8 m) + 0.5 K（卡片 VDS4SD3F，PDF 第 14 页）\n - 样本量用确定性规则，V1 上限 120\n - 命中判据加“点估计 ≥ −0.05”\n - S1 增加粗层检验。\n- **错了的代价**：S0+S1 最多花 12 CU。如果定稿仍有漏洞，S1 结束后可以另记“偏离预注册”，S2 还没开，偏离不会影响已有的主结果。\n- 依据：裁决；卡片 VDS4SD3F、EG5BI4TB、NR_liu_2021。\n\n## 10-16 11:50 S0/S1 结果\n- S0 在 10:49 冻结：V1 120 个、CONUS 80 个事件，配上 200 个对照，缺 0 个（合格池 V1 301、CONUS 132）。\n- S1 首次结果因 θv 的气压单位错误作废（D3）。修正后重跑，(a) 中位比 0.99999、r=0.982，(b) 1.000，(c) 通过（D4 锚定；层高不单调按 D5 处理）。\n- 合计约 6.4 CU（保守上界）。\n- Decision I made：判 S1 通过，报上级申请 S2；第 4 节判据未改。错了的代价：如果上级推翻 D4，本轮就停在 S1，已花的约 6.4 CU 中只有 S1 的部分浪费。"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rev-0000",
+      "ts": "2026-10-14 14:42",
+      "title": "对流尺度 AI 文献核对（Grok 511eb7 + Deep Research 298d34），10-14",
+      "label": "审查材料",
+      "text": "# 对流尺度 AI 文献核对（Grok 511eb7 + Deep Research 298d34），10-14\n## 一、核对表\n| 说法 | 出处（报告） | 我的核对 | 取舍 |\n| --- | --- | --- | --- |\n| StormCast：3 km、99 状态变量+26 条件变量、u10m/v10m、无阵风；现行权重训练 2018-07-12–2025-09-30，测试 2025-10–12，全 CONUS 1024×1792；权重 OpenMDW-1.1 可商用 | Grok；DR 写\"Apache-2.0\" | HF 模型卡 nvidia/stormcast-conus 原文（10-14 读）。Apache-2.0 是 earth2studio 代码许可（GitHub API：1196 星，10-14 有推送），权重是 OpenMDW-1.1 | 采用模型卡口径；DR 的\"Apache\"只适用于代码 |\n| StormCast 论文：反射率 FSS/RMSE 1–6 h 与 HRRR 相当，冷池形态与功率谱真实；**无**对 ASOS/Mesonet 地面风的检验 | 两份报告一致 | 未读论文原文（arXiv 2408.10958） | 线索；\"无地面风检验\"作为待补空白，不作文献结论 |\n| WoFSCast：GraphCast 改，WoFS 训练（2019–2021 春），对 MRMS 做对象检验；GitHub NOAA-NSSL/frdd-wofs-cast，Apache-2.0 | DR；Grok 说无公开仓库 | GitHub API：仓库存在，Apache-2.0，6 星，最后推送 2024-12-06；权重是否公开未核；只覆盖 WoFS 每日移动小区域，初值需 WoFS 分析（不公开归档的可能性大） | 采用\"代码公开\"；能否用于后报由 ideas 核实 |\n| FuXi-Nowcast：华东、≤12 h、输出阵风，CSI 优于 CMA-MESO；对 HRCLDAS 格点检验；未见权重 | 两份报告 | arXiv 2512.08974 摘要：阵风是输出、区域华东；检验对象摘要未写 | 不可用于我们（区域与权重），只作方法先例 |\n| 所有对流尺度 AI 模型都**没有**用 ASOS/Mesonet 对 ≥50 kt 雷暴阵风做过独立检验 | 两份报告一致（缺席断言） | 两份独立报告一致，但仍是检索缺席 | 采用为\"两次检索均未找到\"，非已证明不存在 |\n| HRRR 对强风系统性低估：>20 m/s 时风速偏差 −13.70、阵风 −11.32 m/s | DR 归于 Fovell & Gallagher 2022（10.1175/WAF-D-21-0176.1） | **张冠李戴**：数字出自 Collins 等 2024 WAF（WAF-D-23-0036.1，怀俄明/科罗拉多冷季下坡风）PDF 第 10 页（期刊页 714），本地 Zotero PU6IMCA9；Fovell & Gallagher 2022 存在（Crossref）但内容未核 | 采用数字、改出处；限定：冷季下坡风，非雷暴大风 |\n| ASOS 2013 后实时质控误删约 10% 对流阵风峰值 | DR（\"MDPI 无作者\"）；Grok 提到 Cook 预印本 | 本地 Zotero DZF9GFUU（2023 预印本 engrXiv 10.31224/2992）PDF 第 1 页：\"The peak gust is culled in around 10% of these events\"，450 站，孤立雷暴与活跃冷锋 | 采用（预印本）；对试验的影响：ASOS 实测峰值可能缺失，需加 Mesonet 与原始 1 分钟数据交叉 |\n| 无\"AI 输出探空 → CM1 集合\"先例；有\"观测/HRRR/ERA5 探空 → CM1\"先例（如 Pearson 等 2023 JTECH 10.1175/JTECH-D-22-0130.1 用 Nashville 探空驱动 CM1；JFT4WRDC 97 探空集合） | 两份报告一致 | Pearson 2023 题目与作者 Crossref 核对一致；JFT4WRDC 已在库（PDF p3） | 采用为检索缺席；L2 若做成有新意 |\n| 生成式扩散模型缓解峰值平滑（功率谱）；但对 ≥50 kt 命中率无证据 | DR | 未读原文 | 线索 |\n| 3 km 只能勉强分辨下击暴流（核心 1–4 km），峰值被平滑；Bolgiani 2020 两篇 | Grok | DOI 均查到；KYSQSJZT 已在库，页码未核 | 定性采用 |\n| GBM 混合回归预测单体 10 km/90 min 内 ≥50 kt | DR，无出处 | 查不到来源 | 不采用 |\n| DR 把 MetNet-3 写成 Google DeepMind、FuXi-Nowcast 写成\"复旦&SAIS\"等机构细节 | DR | 未核 | 不采用 |\n\n## 二、对子项目判断与第一步设计的影响\n1. 第一步的空白是真实的：AI 对流尺度模型对地面雷暴强风没有独立站点检验 → 我们的 5–10 事件检验有新意，也是\"上规模后报\"前必须过的门。\n2. 可用模型实际只有 StormCast（全 CONUS、HRRR 初值公开、权重可商用）。WoFSCast 代码公开但依赖 WoFS 初值，FuXi-Nowcast 只限华东且无权重。\n3. 基线 HRRR 本身对强风大幅低估（冷季下坡风 −11 m/s 阵风偏差），所以\"AI 峰值比 ≥ HRRR 的 90%\"这一判据门槛不高；应同时报相对观测的绝对峰值比。\n4. 观测端：ASOS 约 10% 对流峰值被质控误删 → 事件挑选与检验加 Mesonet 交叉，并把\"ASOS 峰值缺失\"单独记录。\n5. L2 无直接先例，有新意；但前提是 M 与探空对比显示环境够准。\n\n## 三、初判（送审）\n- L 路线：值得做第一步试验（中-高，维持）；文献不能回答\"能报出几成\"，须靠我们的检验。\n- 可用模型：StormCast 为主，WoFSCast 视初值可得性，FuXi-Nowcast 不可用。\n- L2：中-高，有新意，排在环境检验之后。"
+    },
+    {
+      "id": "rev-0001",
+      "ts": "2026-10-14 18:25",
+      "title": "裁决：对流尺度 AI 文献结论审查 （2026-10-14）",
+      "label": "审查裁决",
+      "text": "# 裁决：对流尺度 AI 文献结论审查 （2026-10-14）\n审稿人：E（Gemini）、A（GPT-6）、D（GLM），3/3 有效，均\"有保留地支持\"。我逐条核对后裁决如下。\n\n## 必须改\n1. **StormCast 两个权重分开写**（E）。核：models.md 与 HF 模型卡：V1 中部 512×640、训练 2018-07-01—2021-12-31、**权重 Apache-2.0**；CONUS DiT、全 CONUS、训练到 2025-09-30、权重 OpenMDW-1.1。第一步实际用的是 V1，2023–24 事件在训练期外，有效；\"只能用 2025-10 后事件\"只对 CONUS 版成立。ALO 2024-05-21 落在 V1 的附加评估窗（2024-05-08—06-15），不是训练期，保留但注明。V1 论文的反射率技能不等于 CONUS 版已验证（A、D）。\n2. **FuXi-Nowcast 改为反例**（E、A）。核 arXiv 2512.08974v2 全文：阵风在华东 >1300 个站点所在格点检验，阈值 10.8/13.9/17.2 m/s；原文\"FuXi-Nowcast becomes the best-performing model after the first few hours at 10.8 m/s, but Persistence and PySTEPS remain superior at 13.9 and 17.2 m/s\"；训练 2019–2023 年 4–9 月。所以\"没有地面风站点检验\"不成立，空白只能写窄口径；它在强阵风阈值上不如持续性，是\"AI 难报强阵风极值\"的直接反例。\n3. **补 HRRRCast，撤回\"只有 StormCast 可用\"**（A；D 要求补 CorrDiff 行）。核 GitHub NOAA-GSL/HRRRCast-live（MIT，21 星，10-09 有推送）README：HRRR 初值 + **GFS 边界**、扩散集合、20 个气压层 6 变量、诊断量含 **GUST、GUST_CONV**、CAPE/CIN；引文 Abdi 等 arXiv 2507.05658。权重下载途径 README 未写明，可用性证据不足。改为\"已核对的候选中，StormCast V1 已实测可跑；HRRRCast 待核权重；WoFSCast 无公开权重与初值；FuXi-Nowcast 无权重；CorrDiff-ERA5-HRRR 权重受限、需 80 GB、为诊断式降尺度（models.md 已有此行）；Jua EPT-2 未见权重\"。HRRRCast 有阵风诊断和 20 层廓线，对第二轮与 L2 都更对口，并入第二轮。\n4. **ASOS 质控\"约 10%\"收窄口径并改正式出处**（A、E）。正式版 Cook 2023, Meteorology 2(2):276–294, DOI 10.3390/meteorology2020017（Crossref 核）。\"约 10%\"是用 2014 年前记录模拟 Test 10 时、被误删事件中删到峰值的比例，不是所有对流事件的实测缺失率；被删观测不可恢复，IEM 的 ASOS 归档不能当未质控原始数据。第一步按\"ASOS 已测到 ≥50 kt\"挑事件，主站峰值不受影响；Mesonet 交叉只在空间/无事件检验和\"模型报强风而 ASOS 无记录\"时需要。\n5. **撤回\"HRRR 基线偏弱→90% 门槛不高\"的推导**（A、D）。Collins 2024 出处更正成立（三位都核到 PDF 第 10 页），但它是冬季怀俄明/科罗拉多下坡风，不能外推到暖季雷暴。门槛宽松的真正原因是口径：10 m 小时风对 3 s 阵风，同时压低 AI 与 HRRR。\n6. **判据定义补齐、结论收窄**（三位）。\"≥HRRR 的 90%\"是单向幅值条件，不约束接近观测、不罚过报，且没写分母字段。第一轮 ideas 按 HRRR 10 m 风判（不过），记录照旧不改；第二轮已改为 AI 阵风估计对 HRRR GUST 和\"HRRR 10 m×同一阵风系数\"、加无事件对照算误报、加 GFS 真预报条件场（对应 A 的信息截止问题）、10 成员固定种子。第一轮结论只表述为\"所选强风事件里邻域 10 m 风幅值与超阈值表现、条件场为事后 ERA5 的回报\"，不称站点阵风精度或预报技能。\n7. **新意按窄口径写**（D、A、E）。近域先例：CGsNet（Xiao 等 2023 GMD 10.5194/gmd-16-3611-2023，雷达+深度学习对流阵风短临，站点插值格点检验）、Lagerquist 等 2017 WAF 10.1175/WAF-D-17-0038.1（GBRT 预测 0–90 min 单体 10 km 内 ≥50 kt，Crossref 核到；DR 那条\"查不到出处\"的说法即此文，改为采用为先例，数值待读原文）、MetNet-3 的站点地面风检验、FuXi-Nowcast。空白只能写为\"本轮未检出：原生 3 km CAM 仿真 AI 对美国 ASOS ≥50 kt 雷暴阵风的独立检验\"，\"AI 探空→CM1\"写\"未检出直接先例\"，不称首创。\n\n## 仅供参考\n- Pearson 2023 JTECH 题目作者我已 Crossref 核；Bolgiani 页码仍待核。\n- WoFSCast 星数随时间变（4/6），以快照日期标注。\n- 第一轮持续性基线 3–6 h 退化（E）——上级 Lead 已同样指出，第二轮持续性降为附录。\n\n## 未采纳的异议\n- D 主张\"主判据对 HRRR 10 m 风，GUST 只附报\"。不采纳：观测是 3 s 阵风，E、A 都指出拿 10 m 风作分母会出现\"两边都漏报却算通过\"的假阳性；第二轮以 HRRR GUST 为主，10 m 风同表附报。D 担心的\"事后挑字段\"已由第二轮开跑前写定字段解决。\n- E 认为第一轮无需 Mesonet：部分采纳（见第 4 条），不在第一轮补做。\n\n## 对判断的影响\nL 维持\"探索中\"，第一步结论不变（按预设门槛不过）。第二轮加 HRRRCast 候选，以同口径复判；同口径仍不过则搁置。\n\n## 10-14 晚补记（ideas 核实 HRRRCast）\n公开仓库确有权重（net-diffusion/model.keras，Git LFS，约 203 MB，匿名可取）；但该版本是 6 km（HRRR 隔点 530×900），不是 NOAA 公告里的 3 km（官网称 3 km 为计划）；气压层 20 层最低到 200 hPa，抽不到 100 hPa；GUST 是后处理诊断（10 m 风×1.4、低层最大风、垂直速度增强取最大），不是网络直接预测；权重无单独许可声明；训练期未核。第 3 条里\"3 公里\"\"可抽上层探空\"据此更正。Cook 2023 页码以 Crossref 为准：276–294。证据。"
+    },
+    {
+      "id": "rev-0002",
+      "ts": "2026-10-16 00:39",
+      "title": "L（对流尺度 AI 与雷暴短临）拟搁置：证据摘要（2026-10-16）",
+      "label": "审查材料",
+      "text": "# L（对流尺度 AI 与雷暴短临）拟搁置：证据摘要（2026-10-16）\n冻结判据（\"判据\"）：1）1–3 h 每档 AI 阵风代理峰值比中位 ≥0.9×HRRR GUST；2）≥25.7 m/s 判别（集合 P≥0.3 记报出）命中不低于 HRRR GUST，且对照误报率 ≤1.5×HRRR GUST；3）GFS 真预报条件相对 ERA5 下降 ≤20%（仅 1、2 通过时才跑）。阵风代理 = AI 10 m 风 × 1.6677（2022 年 HRRR GUST/10 m 拟合，不用检验事件）。宽窗 25 km/±1 h，窄窗 10 km/±0.5 h。条件场为事后 ERA5（回报，非业务预报）。\n\n## StormCast V1（训练 2018-07—2021-12），20 个 2023–24 ASOS ≥50 kt 事件 + 10 对照\n| 提前 | AI/观测 | HRRR GUST/观测 | HRRR10×系数/观测 | AI/HRRR GUST | 命中 AI/HRRR GUST | 误报 |\n| --- | --- | --- | --- | --- | --- | --- |\n| 1 h | 0.68 | 0.73 | 0.90 | 0.93 | 4/20 vs 8/20 | 0/10 vs 0/10 |\n| 2 h | 0.68 | 0.71 | 0.75 | 0.96 | 5/20 vs 8/20 | 0 vs 0 |\n| 3 h | 0.64 | 0.75 | 0.85 | 0.85 | 4/20 vs 6/20 | 0 vs 0 |\n判据 1：1、2 h 过，3 h 不过；判据 2：三档不过。来源。\n\n## StormCast-CONUS（训练到 2025-09-30），12 个 2026 年事件 + 6 对照，53/54 组（缺 1 个对照的 3 h 组，9/10 成员）\n| 提前 | AI/观测 | HRRR GUST/观测 | HRRR10×系数/观测 | AI/HRRR GUST | 命中 AI/HRRR GUST | 误报 |\n| --- | --- | --- | --- | --- | --- | --- |\n| 1 h | 0.67 | 0.79 | 0.84 | 0.85 | 1/12 vs 4/12 | 0/6 vs 0/6 |\n| 2 h | 0.74 | 0.82 | 0.94 | 0.90 | 1/12 vs 2/12 | 0/6 vs 0/6 |\n| 3 h | 0.68 | 0.81 | 0.86 | 0.84 | 0/12 vs 3/12 | 0/5 vs 0/5 |\n判据 1：仅 2 h 过；判据 2：三档命中都低于 HRRR GUST，不过（缺的对照组只影响误报，不改变命中结论）。来源 （scores.csv、summary.json）。\n\n## 其他相关\n- 两模型都比\"HRRR 10 m 风×同系数\"这一简单基线差。窄窗（10 km）两者都只到观测的 0.4–0.5。宽窗最大值大量落在窗边（V1 AI 成员 133–143/300）。\n- 成本：CONUS 每组（1 事件×1 提前量×10 成员）单卡 A100 约 14/20/27 分钟（1/2/3 h），100 事件×3 提前量约 100 GPU 小时 ≈ 700 CU；V1 每组 3–5 分钟。\n- 其他候选：WoFSCast 无公开权重与初值；FuXi-Nowcast 只限华东、无权重；HRRRCast 公开版 6 km、训练期覆盖 2021-03—2024-03、GPU 加载卡死未跑通；CorrDiff 权重受限、诊断式。见 、。\n- 文献：对流尺度 AI 未见对 ASOS ≥50 kt 雷暴阵风的独立检验；FuXi-Nowcast 在 13.9/17.2 m/s 阵风阈值不如持续性（arXiv 2512.08974v2）。审查 裁决。\n- 本线数据，无文献依据的部分：阵风系数、全部检验数字。\n\n## 拟定搁置理由与重启条件（待审）\n理由：两代 StormCast 在同口径阵风代理下，对 ≥50 kt 雷暴大风的命中只有 HRRR GUST 的约 1/4–2/3，峰值比多档低于 0.9；连\"HRRR 10 m×系数\"都赢不了；CONUS 上规模成本约 700 CU/百事件。\n重启条件：(1) 出现原生阵风输出或经检验的阵风诊断的对流尺度 AI 模型；(2) HRRRCast 3 km 版或其他公开权重模型（训练期外可检）；(3) 有不依赖 10 m 风×常数系数的阵风换算（如用边界层风廓线的诊断）并能在 V1 上复评；(4) 研究组转向需要大批量但对峰值要求较低的用途（如强风环境概率）。"
+    },
+    {
+      "id": "rev-0003",
+      "ts": "2026-10-16 01:11",
+      "title": "裁决：L 对流尺度 AI 拟搁置审查 （2026-10-16）",
+      "label": "审查裁决",
+      "text": "# 裁决：L 对流尺度 AI 拟搁置审查 （2026-10-16）\n派发：6 位中 5 份有效（A GPT-6、B Kimi、C DeepSeek、D GLM、F Grok）；E Gemini 因订阅额度用尽失败、无人补位，本轮只审一轮，不重派。A/B/D/F 有保留地支持，C 不支持强结论。我已用两份 scores.csv 复核关键数字。\n\n## 必须改\n1. **判据 1 的集合聚合方式没有冻结，而且会翻转结论**（B、C、D、F）。冻结文本只写\"AI 阵风估计峰值比中位 ≥0.9×HRRR GUST\"，评分取的是 10 成员中位（闸门段结果里声明过，但不在冻结判据里）。我复算：改用集合最大，AI/HRRR GUST 峰值比 V1 1.18/1.26/1.10、CONUS 1.08/1.13/1.01，三档全过。→ 判据 1 的\"多档低于 0.9\"不再作为搁置理由，裁决只说\"按集合中位口径 V1 3 h、CONUS 1/3 h 未过，口径未冻结，集合最大口径下全过\"。\n2. **判据 2 按冻结的 P≥0.3 不过，但差异不显著、且对 P 阈值敏感**（B、C、D、F）。P≥0.3 是冻结的（任务书\"判据\"节），所以\"按冻结判据不过\"成立；但 McNemar 逐事件检验 p 在 0.22–1.0，单档都不显著；\"任一成员 ≥25.7 m/s\"计数下 AI 反而不少于 HRRR GUST（我复算 V1 9/11/9 vs 8/8/6，CONUS 4/7/3 vs 4/2/3）。对照误报两边全 0，误报腿实际没检验到。→ 不能写\"AI 确实不如 HRRR\"，只能写\"按冻结门槛未达扩样标准；两者差异在本样本下不显著\"。\n3. **结论收窄到已检验的配置**（A、F、C）：只适用于 StormCast V1/CONUS + \"10 m 风×1.6677\"阵风代理 + 事后 ERA5 条件（回报，非业务预报）+ 宽窗 25 km/±1 h + 1–3 h + 集合中位与 P≥0.3。不推广到整条\"对流尺度 AI 与雷暴短临\"、M（已收口）、L2、未评分的模型或未做的廓线阵风诊断。\n4. **已见样本放大了差距**（A、F）：V1 的 20 例含第一轮已见 7 例（它们三档 AI 命中都是 0）和先导 3 例；F 去掉 7 例后判据 1 三档都过。摘要必须写明 20 例非全盲。\n5. **阵风系数的边界写清**（A、D、C、B）：1.6677 = 9 个 2022 案例（与检验事件无交集）HRRR +2 h、25 km 内、10 m ≥5 m/s 的逐格 GUST/风速中位再取案中位。同系数乘 HRRR 10 m 风后各档都不低于 HRRR GUST，所以没有证据表明系数压低 AI；但常数系数没有对流增强自由度，任务书允许的方法 (a)（混合层风阵风诊断）本轮没做，AI 的阵风能力只对\"常数系数代理\"检验过（C）。\n6. **对照与交付状态如实写**（A、B、F）：V1 10 个对照中 CDS、AMA 未独立核验；CONUS 对照 6 个、3 h 档缺 1 组，summary.json 的 criterion2 记为 null（命中腿 0/12 vs 3/12 已失败）；判据 3（GFS 真预报）与 6 h 交付未评估——\"仅 1、2 通过才跑 GFS\"是 10-15 的执行顺序决定（\"闸门段核过\"节），不是冻结判据原文。\n7. **数值更正**（A、C、D、F）：命中比实际范围 0–2/3（CONUS 3 h 0/12 vs 3/12）；窄窗\"两者 0.4–0.5\"只指两个 AI 模型，CONUS HRRR GUST 窄窗为 0.56/0.60/0.63；文献空白按 裁决写窄口径（\"本轮未检出原生 3 km CAM 仿真 AI 对美国 ASOS ≥50 kt 雷暴阵风的独立检验\"，Lagerquist 2017 为 ≥50 kt 先例）。\n8. **重启条件重新冻结**（A、F）：见下。\n\n## 仅供参考\n- 窗边比例 AI 与 HRRR GUST 同量级，不构成 AI 特有缺陷（C、A）。\n- CONUS 2 h 判据 1 只以 0.0005 过线（C）。\n- 部分 CONUS 事件（MCK 2026-02-25、CSM 2026-05-16）METAR 无 TS，可能非雷暴风（C），重启时事件须核 NCEI 事件类型与雷达。\n- V1 样本集中在 2023-02—06，无盛夏（C）；\"约 700 CU/百事件\"是外推不是账单（A、D、F）。\n- V1 3 h 0.85 是两中位之比，逐事件配对比中位 0.96（F）。\n\n## 未采纳的异议\n- C 主张\"先补做方法 (a) 阵风诊断再裁决搁置\"。不采纳为前置条件：冻结判据下已不过，\"不扩样\"不依赖它；方法 (a) 需要模式层原始场，现有检查点只存窗口极值，要重跑（V1 约 0.5 CU/组）。改为写进重启后的第一步。\n- F 主张\"不搁置整条路线\"。采纳其限定：状态按实验室四档写\"搁置\"，但搁置对象写明是\"本配置的扩样\"，不是对路线的否定；M 已收口，L2 等环境检验。\n\n## 裁决\n按冻结门槛，两代 StormCast + 常数系数阵风代理未达\"扩到上百事件\"的标准，不扩样，暂停此配置（状态搁置）。不得表述为\"对流尺度 AI 不如 HRRR\"：差异不显著、对集合聚合与 P 阈值敏感、含已见样本、阵风只用了常数系数代理。\n重启条件（重新冻结，任一出现即**重新立题**，必须重新预注册判据后才放行计算，不直接恢复扩样）：\n1. 预注册的第三轮：只用未见事件（V1 用 2022–2025-09 候选，CONUS 用 2025-10 后），事件须核为雷暴风；对照含\"有对流但无强风\"的日子；判据事先写定集合聚合（同时报中位、最大，主判据用概率型评分如可靠性/Brier 与命中-误报）；做样本量估算。\n2. 阵风用混合层风廓线诊断（任务书方法 a）代替常数系数，先在已有事件上复算。\n3. 出现有原生阵风输出、或公开权重且训练期外可检的对流尺度 AI 模型（HRRRCast 当前公开版 6 km、GPU 未跑通，不算已满足）。\n4. 用途转向不要求站点峰值的批量应用（强风环境概率等）——这是改目标，须 Liang Hu 定。"
+    }
+  ],
+  "results": [
+    {
+      "id": "res-0000",
+      "ts": "2026-10-14 14:26",
+      "title": "Grok 快查核对（10-14，报告 16 PETW/09 Handoffs/DeepResearch/20261014 1422 … 511eb7）",
+      "label": "结果",
+      "text": "# Grok 快查核对（10-14，报告 …_511eb7）\n| 报告说法 | 核对 | 取舍 |\n| --- | --- | --- |\n| StormCast 训练 HRRR 2018-07–2021、区域中部美国 | HF 模型卡（10-14 读）：现行权重训练 2018-07-12–2025-09-30，测试 2025-10–12，全 CONUS 1024×1792 3 km；OpenMDW-1.1 可商用；99 状态+26 条件变量；有 u10m/v10m，无阵风 | 论文版与现行权重不同；检验事件须在 2025-10 后 |\n| StormCast 对 FSS/RMSE 与 HRRR 相当、有冷池结构；未对 ASOS 阵风检验 | 未读原文 | 线索；正好是我们第一步要补的空白 |\n| WoFSCast 无公开权重，18 成员 6 h 约 30–40 s/1 GPU | 未核；ESSOAr DOI 查不到 | 线索，由 ideas 查 GitHub |\n| FuXi-Nowcast 输出阵风、对站点检验胜 CMA-MESO | arXiv 摘要：确有阵风输出，区域华东，2024-04–07；摘要未写阵风检验对象，未见代码权重 | 只限华东、无权重 → 对我们不可用，作方法先例 |\n| NowcastNet 不出风 | 与父项目判断一致 | 采用（不用于阵风） |\n| 无\"AI/CAM 探空 → CM1 集合\"先例 | 缺席断言 | 待 Deep Research 复核；L2 若成立有新意 |\n| 3 km 对下击暴流核心（1–4 km）只能勉强分辨，峰值被平滑；Bolgiani 2020 两篇 | DOI 均查到；KYSQSJZT 已在库 | 采用定性结论，页码待核 |"
+    },
+    {
+      "id": "res-0001",
+      "ts": "2026-10-14 15:05",
+      "title": "对流尺度 AI 地面强风：冻结试验结果",
+      "label": "结果",
+      "text": "# 对流尺度 AI 地面强风：冻结试验结果\n\n样本：7 个 NCEI 雷暴大风 ASOS 事件、28 组（每事件 1/2/3/6h）。原始逐组结果；原始 Colab 日志；输入事件。\n\n## 判据与限制\n\nASOS 峰值来自 NOAA Storm Events 的 MG/ASOS，IEM 同站 METAR 的 gust/PK WND 交叉核对；1kt=0.514444m/s。峰值时刻以 NCEI 事件时间为准（IEM PK WND 同分钟或数分钟内，events.csv 的 IEM「报告有效时刻」并不总是物理峰值分钟）。时间为 UTC，回复中的操作时间为美东。\n以 ASOS 站点为中心，预测格点最大合成 10m 风：宽窗半径25km、峰值±1h；窄窗半径10km、峰值±0.5h。按最近 UTC 整点选择验证中心，起报为中心减1/2/3/6h；宽窗和窄窗均对模型及基线同样应用。位置偏差为最大风格点距站点，时间偏差为该时次与 NCEI 峰值之差。持久性取同起报 HRRR 分析的10m风25km最大值。\n注意：ASOS 是短时阵风，StormCast 输出是 10m 水平风，不是阵风；不能将无阵风的模型结果宣称为阵风技巧。HRRR GUST 单列，HRRR 10m水平风作为同量比较。模型以 HRRR 99场初始化、但用事后 ERA5 条件（模型训练匹配、非纯业务可用输入）；因此这里是回报，不是业务预报。随机扩散单成员未固定噪声种子，复跑峰值可能变化。\n\n## 每事件、每起报结果\n\n表内「AI/HRRR10/GUST」为宽窗最大风速 m/s 与其对 ASOS 峰值的比；窄窗一列为 AI/HRRR10/GUST 最大值 m/s；25.7m/s 命中按宽窗判。\n\n| NCEI ID/站/观测峰值 | 提前量/起报 UTC | AI 宽窗 | HRRR10 宽窗 | HRRR GUST 宽窗 | AI/HRRR10/GUST 窄窗 m/s | AI时差min/距km | AI/HRRR10/GUST ≥25.7 | 分析持续性m/s | 单组墙钟s/峰显存GB |\n| --- | --- | ---: | ---: | ---: | --- | --- | --- | ---: | ---: |\n| 1089702 DSM 54kt | 1h 2023-04-20T03:00 | 9.0/0.32 | 8.7/0.31 | 18.3/0.66 | 5.8/7.6/15.9 | +4/24.8 | 否/否/否 | 11.3 | 42/9.5 |\n| 1089702 DSM 54kt | 2h 2023-04-20T02:00 | 7.8/0.28 | 7.5/0.27 | 14.8/0.53 | 4.7/4.2/7.4 | -56/24.5 | 否/否/否 | 6.9 | 42/9.5 |\n| 1089702 DSM 54kt | 3h 2023-04-20T01:00 | 7.3/0.26 | 14.1/0.51 | 27.1/0.97 | 4.7/10.2/23.1 | -56/23.7 | 否/否/是 | 6.2 | 50/9.5 |\n| 1089702 DSM 54kt | 6h 2023-04-19T22:00 | 10.1/0.36 | 12.5/0.45 | 21.1/0.76 | 8.6/11.0/18.0 | -56/12.6 | 否/否/否 | 7.7 | 85/9.5 |\n| 1102083 CNK 52kt | 1h 2023-05-08T01:00 | 14.5/0.54 | 16.0/0.60 | 25.7/0.96 | 10.5/9.8/17.5 | +31/24.4 | 否/否/是 | 7.4 | 44/6.3 |\n| 1102083 CNK 52kt | 2h 2023-05-08T00:00 | 13.1/0.49 | 21.6/0.81 | 30.5/1.14 | 10.1/9.0/15.1 | -29/21.4 | 否/否/是 | 9.0 | 42/6.3 |\n| 1102083 CNK 52kt | 3h 2023-05-07T23:00 | 17.7/0.66 | 15.9/0.59 | 25.7/0.96 | 16.9/11.6/20.6 | -29/11.1 | 否/否/是 | 7.6 | 51/6.3 |\n| 1102083 CNK 52kt | 6h 2023-05-07T20:00 | 15.6/0.58 | 12.3/0.46 | 19.7/0.74 | 6.7/5.8/8.8 | +31/17.7 | 否/否/否 | 5.8 | 85/6.3 |\n| 1114169 SWO 51kt | 1h 2023-06-18T03:00 | 8.2/0.31 | 16.4/0.63 | 26.6/1.01 | 5.5/4.4/7.3 | +39/24.7 | 否/否/是 | 5.9 | 33/6.3 |\n| 1114169 SWO 51kt | 2h 2023-06-18T02:00 | 11.2/0.43 | 19.5/0.74 | 27.6/1.05 | 3.9/3.5/7.0 | -21/24.7 | 否/否/是 | 4.0 | 42/6.3 |\n| 1114169 SWO 51kt | 3h 2023-06-18T01:00 | 11.8/0.45 | 15.2/0.58 | 23.5/0.90 | 6.0/5.7/9.5 | +39/23.7 | 否/否/否 | 3.8 | 52/6.3 |\n| 1114169 SWO 51kt | 6h 2023-06-17T22:00 | 10.7/0.41 | 10.6/0.40 | 18.5/0.70 | 6.6/3.0/4.5 | +39/23.7 | 否/否/否 | 5.0 | 88/6.3 |\n| 1107992 LNK 52kt | 1h 2023-07-04T23:00 | 14.2/0.53 | 26.5/0.99 | 38.6/1.44 | 7.8/6.4/10.0 | -15/20.2 | 否/是/是 | 7.7 | 39/6.3 |\n| 1107992 LNK 52kt | 2h 2023-07-04T22:00 | 12.2/0.46 | 21.8/0.82 | 31.5/1.18 | 4.9/5.0/6.8 | -15/24.9 | 否/否/是 | 7.3 | 42/6.3 |\n| 1107992 LNK 52kt | 3h 2023-07-04T21:00 | 21.1/0.79 | 13.6/0.51 | 20.6/0.77 | 4.0/5.8/7.4 | -15/23.6 | 否/否/否 | 5.7 | 52/6.3 |\n| 1107992 LNK 52kt | 6h 2023-07-04T18:00 | 5.3/0.20 | 4.6/0.17 | 7.3/0.27 | 2.6/4.2/5.5 | +45/12.7 | 否/否/否 | 6.1 | 86/6.3 |\n| 1111438 OFK 56kt | 1h 2023-07-12T09:00 | 4.2/0.15 | 4.9/0.17 | 8.8/0.30 | 2.2/4.9/7.5 | +9/24.5 | 否/否/否 | 6.5 | 40/6.3 |\n| 1111438 OFK 56kt | 2h 2023-07-12T08:00 | 9.0/0.31 | 5.0/0.17 | 8.2/0.28 | 2.7/3.8/6.8 | +9/20.3 | 否/否/否 | 4.3 | 42/6.3 |\n| 1111438 OFK 56kt | 3h 2023-07-12T07:00 | 5.2/0.18 | 4.7/0.16 | 8.5/0.29 | 2.7/4.0/7.6 | +9/22.6 | 否/否/否 | 4.5 | 51/6.3 |\n| 1111438 OFK 56kt | 6h 2023-07-12T04:00 | 3.7/0.13 | 9.6/0.33 | 13.4/0.47 | 2.8/6.9/10.8 | +9/22.8 | 否/否/否 | 6.2 | 88/6.3 |\n| 1180878 ALO 61kt | 1h 2024-05-21T07:00 | 11.2/0.36 | 11.5/0.37 | 17.2/0.55 | 5.9/8.8/16.2 | -6/17.2 | 否/否/否 | 9.5 | 38/6.3 |\n| 1180878 ALO 61kt | 2h 2024-05-21T06:00 | 11.2/0.36 | 7.7/0.25 | 13.0/0.41 | 8.6/7.3/12.3 | -6/24.8 | 否/否/否 | 10.4 | 42/6.3 |\n| 1180878 ALO 61kt | 3h 2024-05-21T05:00 | 13.1/0.42 | 9.2/0.29 | 14.9/0.48 | 6.0/6.1/13.7 | +54/24.0 | 否/否/否 | 4.7 | 51/6.3 |\n| 1180878 ALO 61kt | 6h 2024-05-21T02:00 | 5.2/0.17 | 8.0/0.26 | 13.4/0.43 | 3.0/5.7/10.3 | -6/24.3 | 否/否/否 | 3.6 | 87/6.3 |\n| 1203698 DSM 57kt | 1h 2024-08-01T00:00 | 5.0/0.17 | 11.9/0.40 | 21.9/0.75 | 2.3/3.9/7.7 | +40/15.9 | 否/否/否 | 3.9 | 38/6.3 |\n| 1203698 DSM 57kt | 2h 2024-07-31T23:00 | 7.6/0.26 | 12.6/0.43 | 21.4/0.73 | 3.2/2.0/4.7 | +40/23.8 | 否/否/否 | 5.1 | 42/6.3 |\n| 1203698 DSM 57kt | 3h 2024-07-31T22:00 | 10.9/0.37 | 9.5/0.32 | 21.6/0.74 | 5.1/2.1/4.8 | -20/23.7 | 否/否/否 | 5.3 | 51/6.3 |\n| 1203698 DSM 57kt | 6h 2024-07-31T19:00 | 9.4/0.32 | 6.2/0.21 | 10.3/0.35 | 4.4/4.9/9.1 | +40/18.2 | 否/否/否 | 5.4 | 86/6.3 |\n\n## 预定闸门核对\n\n1h：AI 峰值比中位 0.32，HRRR10 0.40，HRRR GUST 0.75；AI/HRRR10 比的中位 0.85；AI ≥25.7 有 0/7，HRRR GUST 有 3/7。\n2h：AI 峰值比中位 0.36，HRRR10 0.43，HRRR GUST 0.73；AI/HRRR10 比的中位 0.61；AI ≥25.7 有 0/7，HRRR GUST 有 3/7。\n3h：AI 峰值比中位 0.42，HRRR10 0.51，HRRR GUST 0.77；AI/HRRR10 比的中位 1.11；AI ≥25.7 有 0/7，HRRR GUST 有 2/7。\n6h：AI 峰值比中位 0.32，HRRR10 0.33，HRRR GUST 0.47；AI/HRRR10 比的中位 1.01；AI ≥25.7 有 0/7，HRRR GUST 有 0/7。\n事件 1089702：AI 对观测的绝对峰值比误差优于同起报持久性 3/4 组；≥3/4 才计为该事件优于持续性。\n事件 1102083：AI 对观测的绝对峰值比误差优于同起报持久性 4/4 组；≥3/4 才计为该事件优于持续性。\n事件 1114169：AI 对观测的绝对峰值比误差优于同起报持久性 4/4 组；≥3/4 才计为该事件优于持续性。\n事件 1111438：AI 对观测的绝对峰值比误差优于同起报持久性 2/4 组；≥3/4 才计为该事件优于持续性。\n事件 1203698：AI 对观测的绝对峰值比误差优于同起报持久性 4/4 组；≥3/4 才计为该事件优于持续性。\n事件 1180878：AI 对观测的绝对峰值比误差优于同起报持久性 4/4 组；≥3/4 才计为该事件优于持续性。\n事件 1107992：AI 对观测的绝对峰值比误差优于同起报持久性 3/4 组；≥3/4 才计为该事件优于持续性。\n本样本优于持续性事件数 6/7（门槛 ≥2/3）；单次最长端到端墙钟 88s，包含数据下载、推理与基线，不等同纯 GPU 前向，但低于10 GPU分钟上界。假定独立起报、同速率，100事件×4起报约 6.1 GPU墙钟小时（还不含探空处理、失败重试、排队；共享缓存/批量可减少）。\n\n数据：NOAA NCEI Storm Events 年度 CSV，Iowa Environmental Mesonet ASOS，NOAA AWS HRRR 分析/预报，Copernicus ERA5 经 ARCO，NVIDIA StormCast V1/Earth2Studio；具体 URL/版本与许可见 、。"
+    },
+    {
+      "id": "res-0002",
+      "ts": "2026-10-14 15:13",
+      "title": "同批事件探空核对",
+      "label": "结果",
+      "text": "# 同批事件探空核对\n\n数据源：IEM 公开 RAOB JSON（逐例 URL 见）；AI 用 StormCast V1 的 HRRR 混合层，HRRR 业务同起报+3h 的混合层；初值 HRRR 99 场，AI 外条件为事后 ARCO ERA5。原始探空，计算程序，日志 、。\n\n站点取 2024 年后仍报告且最近的 IGRA 站（ 含站点坐标和与 ASOS 距离）；探空取距 ASOS 峰值最近的 00/12Z，可能在峰值之后，绝不冒称同分钟实测。AI/HRRR 起报同为探空时刻前3h，模式在探空站最近格点取廓线。\n\n计算定义：MetPy most_unstable_cape_cin（最不稳定气块，MUCAPE），downdraft_cape（DCAPE），bulk_shear（观测站首个有风层起 0–6km 的矢量差模）；温湿以 p/t/q 换算露点，风速风向对 RAOB 换算 u/v；压力/高度 QC、去重。模式层有14个可用完整层，仅到约 440hPa；观测 MUCAPE/DCAPE 用完整可用温湿层到 100hPa，纵深不同，不可直接做无偏误差归因。RAOB 温湿和风分别利用有效层，不强行只取同时有五要素的少数层。\n\n| 事件/探空站/探空 UTC | 距 ASOS km | 层数 AI/HRRR/RAOB温湿/RAOB风 | MUCAPE AI/HRRR/RAOB J/kg | DCAPE AI/HRRR/RAOB J/kg | 0–6km 切变 AI/HRRR/RAOB m/s |\n| --- | ---: | --- | --- | --- | --- |\n| 1089702 KOAX 2023-04-20T00:00 | 226.9 | 14/14/36/39 | 788.47/846.26/2014.26 | 829.99/974.41/1121.66 | 31.05/23.69/23.5 |\n| 1102083 KTOP 2023-05-08T00:00 | 181.7 | 14/14/64/37 | 1114.7/0.0/3351.98 | 1286.83/1379.22/1584.35 | 16.32/15.32/17.22 |\n| 1114169 KLMN 2023-06-18T00:00 | 61.0 | 14/14/9/9 | 0.0/0.0/1462.3 | 1081.89/1086.78/833.84 | 21.64/22.63/21.67 |\n| 1111438 KOAX 2023-07-12T12:00 | 115.5 | 13/13/67/38 | 0.0/0.0/1000.42 | 512.65/189.33/768.21 | 14.15/16.1/31.46 |\n| 1203698 KOAX 2024-08-01T00:00 | 226.9 | 14/14/126/129 | 498.77/50.67/313.01 | 613.68/763.18/1452.73 | 20.11/12.76/29.5 |\n| 1180878 KDVN 2024-05-21T12:00 | 183.4 | 14/14/57/3 | 480.63/559.39/2813.64 | 807.31/768.21/945.99 | 18.12/18.44/—(观测风层3个) |\n| 1107992 KOAX 2023-07-05T00:00 | 61.8 | 14/14/41/38 | 0.0/778.54/3037.41 | 905.66/938.64/1043.95 | 17.34/16.03/20.91 |\n\n质量与解释：KDVN 2024-05-21 12Z 探空只有3个可用风层，0–6km 观测风切标为缺失，不用 MetPy 少点插值结果作证据。KLMN 2023-06-18 00Z 只有9个温湿层，MUCAPE/DCAPE 不稳定；KOAX 2023-07-12 12Z 在峰值后，不能作为先验。混合层最高仅约440hPa 且地形决定低层取样，MUCAPE/DCAPE 与完整 RAOB 非同层厚；若要定量审查需统一截断、相同温度/比湿的垂向插值并测敏感性。\n\n本轮探空只作为伴随物理环境诊断，不进入已固定的地面强风通过门槛。来源：Iowa Environmental Mesonet RAOB API [external URL omitted]，NOAA IGRA2 站表 [external URL omitted]，NOAA AWS HRRR，Copernicus ERA5/ARCO，NVIDIA StormCast V1。"
+    },
+    {
+      "id": "res-0003",
+      "ts": "2026-10-14 18:03",
+      "title": "探空补充：CM1 对流前取列规则与现有七例的差距",
+      "label": "结果",
+      "text": "# 探空补充：CM1 对流前取列规则与现有七例的差距\n\n此补充不覆盖 或已归档的。旧对照是“离 ASOS 最近 RAOB 的 00/12Z，模型从探空前 3 h 起报，探空站最近格点”；不是 CM1 合格的对流前陆地列。旧七例与 NIP/ALTU 两例不是同一事件样本。后两例不加入本次现行 CONUS 权重检验；旧七例实际使用的是 StormCast V1 权重（训练到 2021），也不是现行 CONUS 权重。\n\n## 规则（仅借用，未宣称七例已完成）\n\n依据 CM1 `MultiEvent_B_E5_timing_rule_20261013.md:5–11`、`MultiEvent_B_E5_land_column_20261014.md:3–8`：站旁首次 ≥35 dBZ 的时间记为 T_anchor；HRRR f00 取 T_anchor−45 分钟以前的最晚整点。站周 ≤50 km 由近到远找 LAND=1 格点；该点 20 km 内，在最接近上述整点的 WSR-88D 最低仰角体扫和同一小时 HRRR 模拟组合反射率中均无 ≥20 dBZ。候选区无观测雷达覆盖/数据缺失不得当作无回波。没有合格列则标不可评估。AI 和 HRRR 都用同一经纬度、同一分析时刻取廓线；HRRR f00 原生层及同点、同刻分析是参照，不以最近探空站列替代。该具体 45 min/20 km/20 dBZ 门槛由 CM1 本线事先固定；不是文献给定的普适常数。\n\n`cm1_column_rule.pycm1_preconvective_hrrr_analysis_utc` 和经纬度留空（见审计 CSV）。\n\n## 时差审计\n\n 用核对过的 ASOS 物理峰值分钟和存档 RAOB 时刻计算，符号为 RAOB−ASOS 峰值；这不是 RAOB−对流前时刻：后者须等 T_anchor 才能求出。相对于 ASOS 峰值，DSM/KOAX 2023-04-20 为 −3.933 h，CNK/KTOP −2.400 h，SWO/KLMN −4.350 h，OFK/KOAX +2.150 h，DSM/KOAX 2024-08-01 −1.333 h，ALO/KDVN +3.917 h，LNK/KOAX −0.250 h。前三者中的 DSM 和 SWO 及 ALO 共三例峰值时差 >3 h，仅供参考；OFK 和 ALO 探空发生于 ASOS 峰值之后，也不是先验观测。与真正对流前时间的 >3 h 分类仍未知，不能用峰值时间差替代。\n\n## 后续输入与不能伪造的交付\n\n需要逐例原始雷达体扫及网格投影、HRRR 当时 REF/CREF、LAND 与原生层 f00，才可按上述规则求取；AI 可在同一位置和时刻重新推理/抽廓线。已有 `soundings_raw.jsonlinput_sounding`。CM1 已有只读格式实例 ：首行地面气压(hPa)、位温(K)、水汽混合比(g/kg)，其余行 z_AGL(m)、位温(K)、混合比(g/kg)、u/v(m/s)；待获得同一对流前合格陆地列的原生层后，另存 AI/HRRR 文件并核对地面 2 m 温湿与地面压力，不能把具体湿度 kg/kg 当 g/kg。格式实例不等于已有有效事件输入。\n\n结论：现有 只说明旧探空点 3h 对照，不能作为 CM1 同点同刻背景或 L2 交接。时差审计和选列核已落盘，但七例 CM1 实际列、起报 HRRR f00 廓线及可用 `input_sounding` 尚未生成；保留为空而不伪造。"
+    },
+    {
+      "id": "res-0004",
+      "ts": "2026-10-14 18:15",
+      "title": "观测端与 HRRR 基线补充（美东 10-14）",
+      "label": "结果",
+      "text": "# 观测端与 HRRR 基线补充（美东 10-14）\n\n本补充不更改既定判据、原始 28 组 、 或图。实测权重是 （训练至 2021），不是 2025 年训练截止的 StormCast-CONUS。旧结果是在事后 ERA5 条件场下得到的回算，不能称严格业务预报。\n\n## ASOS 原始 1 分钟交叉核查\n\n脚本 逐例请求 Iowa Environmental Mesonet 的 NCEI ASOS 1 分钟档案 `gust_sknt`（5 秒阵风，单位 kt），于 NCEI 峰值时刻前后各约 1 h 比较；逐例 URL、记录数、精确时刻数值和窗口最大值见。不是独立仪器，也不是未质控传感器原始序列；与 METAR/Storm Events 同源，无法以二者一致证明不存在 ASOS 站内 QC 删除。已查到的峰值真实事件选择还可能存在条件抽样偏差。\n\n| NCEI ID/站 | 报告峰值 kt / UTC | 1 分钟同分钟 kt | 1 分钟 ±1 h 最大 kt / UTC | 观测状态 |\n| --- | --- | ---: | --- | --- |\n| 1089702 DSM | 54 / 2023-04-20 03:56 | 54 | 54 / 03:56 | 一致 |\n| 1102083 CNK | 52 / 2023-05-08 02:24 | 52 | 52 / 02:24 | 一致 |\n| 1114169 SWO | 51 / 2023-06-18 04:21 | 51 | 51 / 04:21 | 一致 |\n| 1111438 OFK | 56 / 2023-07-12 09:51 | 缺测 | 53 / 09:56 | 需单列：原始 1 分钟未复核到 56 kt；但 IEM METAR 与 NCEI 56 kt 同值，故并非可断言是假峰值，亦不能断言由 QC 删除 |\n| 1203698 DSM | 57 / 2024-08-01 01:20 | 57 | 57 / 01:20 | 一致 |\n| 1180878 ALO | 61 / 2024-05-21 08:05 | 61 | 61 / 08:05 | 一致 |\n| 1107992 LNK | 52 / 2023-07-05 00:15 | 52 | 52 / 00:15 | 一致 |\n\n六例一分钟记录与已归档 ASOS 峰值同分钟、同数值；OFK 一例缺少同分钟 1 分钟记录，但有 METAR 的 PK WND 独立格式交叉。这不是本轮可推断的“约 10% 删峰比例”：Cook (2023) 的约 10% 是对历史对流事件模拟 QC 的研究结论，不适合直接乘到七例。IEM 1 分钟档个别分钟缺失；要辨识源头删除，需另一仪器/网络（如有站旁 Mesonet）和原始质控标识，不能把本次同源比对说成独立传感器核实。本轮没有获取覆盖各站的独立 Mesonet 观测，因此 OFK 保留疑点，扩样前优先复核。\n\n## 每事件绝对比与阈值\n\n 保留未四舍五入的值，可重算。阈值命中为 AI 0/28 组；HRRR GUST 8/28 组；HRRR 10 m 风 1/28 组。对照本轮 10 m 风与短时阵风的物理定义不同，绝对比不等于无偏的同量精度；HRRR GUST 单列同为阵风诊断量，不能拿 Collins 等冷季怀俄明/科罗拉多复杂地形的约 −11 m/s 偏差对本轮暖季雷暴作数值订正。Collins 等 (2024) 原文摘要的适用域明确为“2016–22 winter months over Wyoming and Colorado”；这仅支持基线不应被当作完美真值。按本轮自身观测，上述绝对比和命中结果才是判据证据。\n\n## WoFSCast 可获取性\n\n截至本次核查，官方 仓库 `master` tree SHA `46a1271ee0a27a5b715b4686cdbfea0cd1f86dcf`，GitHub API 返回 166 条且 `truncated=false`，无可供下载的已训练 `.npz` 权重文件；release API 返回空列表。 明列 与，均是本地绝对路径，不是公开下载 URL。README 只讲装源代码和评估程序，没有发布权重/配套 WoFS 初值。因而目前可证“该仓库未提供可公开直接下载的一套权重 + 初始化/边界数据”，不等于证明互联网上或其他 WoFS 数据档绝不存在；也不能拿 HRRR 直接代 WoFS 成员/边界。代码 Apache-2.0（repo license），不可推断未公开权重的许可证、显存或运行时长。\n\n核查链接：\n- [external URL omitted]\n- [external URL omitted]\n- [external URL omitted]\n- [external URL omitted]\n\n文献依据：Cook (2023), *Meteorology* 2:276–294, [external URL omitted] （本地 Zotero DZF9GFUU 预印本 PDF 第 1 页）；Collins 等 (2024), *Weather and Forecasting* 39:705–723, [external URL omitted] （委托方指出本地 PDF 第 10 页强风样本偏差；这里未将数值迁移）。观测来源 NOAA NCEI Storm Events 年度 CSV、IEM METAR 与 IEM NCEI ASOS 1 分钟档，详见上述脚本、CSV 和。\n\n结论：补充验证未改变既定失败判定；尤其 OFK 的一分钟缺测提醒，当前 7 例不应被说成观测绝无漏峰。现有 WoFSCast 公共仓库也不足以立即做同标准 A100 回算；要试它，先取得有明确使用条款的权重及匹配 WoFS 初值/边界公开档。其他模型不能因 StormCast V1 结果而被否定。"
+    },
+    {
+      "id": "res-0005",
+      "ts": "2026-10-14 18:22",
+      "title": "第二轮补充：窗边比例与基线（未运行第二轮）",
+      "label": "结果",
+      "text": "# 第二轮补充：窗边比例与基线（未运行第二轮）\n\n本补充只增加报告项，原三项联合判据与 100 CU 先停闸门不变。 为此前预检报告；本文件不覆盖其内容或第一轮结果。平台提示的 是 的稀疏站网融合任务，非本项 StormCast；未新建运行根、重提或复用该任务的 Colab 会话。\n\n## 已有 7 事件的只读窗边核查（已见样本，非第二轮验证）\n\n 逐行读取第一轮，产出。每种模型 28 组，各自的宽窗最大值距站 ≥0.9×25=22.5 km 记为窗边：StormCast V1 10 m 风 18/28（64.3%），HRRR 10 m 风 13/28（46.4%），HRRR GUST 14/28（50.0%）。这与“约 20 组”同量级但以记录的取整后距离按新阈值精确计数是 18 组。窗边只是空间代理，不能单凭它证明最大值为背景风。\n\nCSV 每个事件、提前量、模型各一行，同表并列宽窗（25 km/±1 h）和窄窗（10 km/±0.5 h）的风速、相对观测峰值比及 ≥25.7 m/s 判别，同时保留两个窗口最大格点距站。第一轮宽窗命中组数：AI 0/28，HRRR10 1/28，HRRR GUST 8/28；窄窗三者均 0/28。这只是既有 7 例的未订正 10 m 风结果，非阵风换算或集合评分。数据来源：NOAA Storm Events、IEM ASOS、AWS HRRR、ERA5/ARCO、NVIDIA StormCast V1；原始链接见第一轮 与。\n\n## 第二轮预先确定的呈现和公平基线\n\n每个起报×事件/无事件×模型（V1/CONUS）×条件场（ERA5/GFS）×提前量，主表同一行列出：AI 阵风估计的宽/窄窗集合中位、最大与 P(≥25.7 m/s)、HRRR GUST 宽/窄窗、HRRR 10 m 风乘同一阵风系数后的宽/窄窗；每项附其宽窗最大值是否位于 ≥22.5 km 的比例（按各组合有效组分子/分母，不跨组混合）。事件另列各自相对 ASOS/Mesonet 观测阵风的绝对峰值比；无事件报是否过阈值以计误报。若固定系数是按 2022 拟合组得到的标量，则两种预测均使用同一标量；若是随空间/时刻/变量变化的函数，应在逐格逐时的 10 m 风上应用同一预先拟合函数后，各自重新取窗口极值，不可直接乘以不同位置的窗口最大 HRRR GUST/10 m 风比，亦不可用检验期 GUST 反算系数。训练和检验严格隔离。\n\n主裁决仍以已写定的 HRRR GUST 比较、事件+无事件命中/误报及 GFS 相对 ERA5 衰减三条件为准；乘同系数的 HRRR10 是附加强基线，不改变既定数值闸门。持续性只放附录，不作为技巧证据。不足之处明确标未评估：目前没有已拟合的阵风系数、第二轮事件观测、10 成员概率、GFS 或 CONUS 推理，因此不能生成这些新列的实测值，也不能根据第一轮表判定第二轮通过。\n\n第二轮完整计划按独立运行外推约 163.4 CU，超过任务书的“预计 >100 CU 先停下回报”，故未开启本任务 Colab 会话；具体预算及现有会话只读清单见 、。未触碰其他任务会话。"
+    },
+    {
+      "id": "res-0006",
+      "ts": "2026-10-14 18:24",
+      "title": "第二轮补充：HRRRCast 候选与 ASOS 质控口径（10-14 美东）",
+      "label": "结果",
+      "text": "# 第二轮补充：HRRRCast 候选与 ASOS 质控口径（10-14 美东）\n\n此处仅做来源与可下载性核查，不更改判据、不改动第一轮结果。第二轮 100 CU 先停闸门仍有效，未为此启动/复用 Colab、未做 HRRRCast 事件推理。\n\n## HRRRCast-live 可取得什么\n\n- 官方代码 [external URL omitted]，MIT `LICENSE` 原文：“Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software”。许可文件在仓库根目录；权重未看到单独许可声明，不能仅以代码许可推定模型权重独立再分发条款。\n- 仓库完整 master tree（GitHub API 返回 51 条，`truncated=false`）有，Git LFS 指针 `oid sha256:2edef5a5a32cd31f9a6b89ea0b0a54f36d4c528fc20990645debf9446a9315a5`，标示 203112115 字节（约 203 MB）。公开 HEAD 返回 200、Content-Length 203112115；HTTP Range 0–15 返回 206、Content-Range 0-15/203112115，前 16 字节为 ZIP/Keras 格式头。故不是“只有代码无权重”；匿名读取得到真实权重文件的首段，但未下载整文件或核完整 SHA256，也未加载、推理或测 A100。GitHub release v1 无附件不是无权重证据。 同仓库公开。下载使用 Git LFS/media 地址而非只取 134 字节指针；实际运行前仍需全量下载验 SHA256、装载与依赖适配。\n- README 给定输入 HRRR 分析/预报与 GFS 边界、6 km（原 HRRR 隔点，530×900）、逐小时滚动与扩散集合；默认输入 6 个气压层变量×20 层，预测动态场通道数依配置。 第 43 行明确层值 `[200,300,350,400,450,500,550,600,650,700,750,800,825,850,875,900,925,950,975,1000]` hPa；最低气压 200 hPa，不含 100 hPa，因此现行默认配置不能直接抽至 100 hPa 的 L2 探空。不能把“20 层”误写成“到 100 hPa”。NOAA 模型页也称未来 3 km/9 年为计划，不是本权重能力：[external URL omitted] README 证实；正式盲测前须核对，不能假定第二轮所选 2022–2026 事件全在其训练期外。\n- 的 `compute_wind_gust`（第 464 行起）产出 GUST、GUST_FACTOR、GUST_CONV：GUST 是由 10m 风经验因子、低层最大风与垂直速度增强三者取最大所得的后处理诊断，不是明确经短时阵风真值训练的直接网络输出；默认经验因子 1.4（第 464 行），GUST_CONV 是其对流增强候选（第 543 行），与最终 GUST 不等同。比较时须并列保存两字段，并报告模型及 HRRR GUST 对观测的比，不能称“神经网络直接预测阵风”。\n- README/ 有未来 GFS 时次或未来 synoptic cycle 的处理；严格“起报时可用”检验必须审每个 GFS cycle 的发布时间和源 GRIB URL，防止把事件后才发行的场混入真预报条件。当前仅检索代码，未验证此条件。\n\n## 第二轮执行状态\n\n若预算闸门允许正式开跑，HRRRCast 已是有公开权重的候选，应以同批且处于其训练期外的事件/对照、相同时间/空间窗和原判据，与 StormCast 分模型并列评估；成员随机种子与初值固定，GUST/GUST_CONV 两字段分列，报告宽窄窗、窗边比例及两条 HRRR 阵风基线。当前缺完整权重校验、训练期证明、运行时测量与合格事件，因此“可下载权重”不等于“Colab 已跑通”，本轮所有比较门槛未评估。早先 StormCast 第二轮名义预算约 163.4 CU，已越过任务书的 >100 CU 先停回报线；增加 HRRRCast 只会增加未量化工作量，不得自行开整批计算。\n\n## Cook 2023 与观测处理\n\n正式版 Cook, N. J. (2023), *Meteorology* 2(2):276–294, DOI [external URL omitted] （Crossref metadata 的页码也是 276–294；委托中 274–291 与出版信息不符）。摘要/§3.2 将 2014 年前 ASOS 数据模拟施加 Test 10：约 10% 的该研究所选对流阵风事件的峰值会被删除；不是所有当代 ASOS 事件普遍缺峰率，更不能对七例直接作漏峰概率订正。该文结论“recovery of erroneously culled observations is not possible”；IEM 的归档一分钟资料仍是站内 QC 后归档数据，不是可恢复的未质控传感器原始时序。对已报道强风事件保留 METAR/分钟分钟戳核对与缺失疑点，但独立 Mesonet 交叉主要用于无事件对照和“模型报强风而 ASOS 无记录”的情况，以免把漏观测算成模型误报。独立资料不全的对照不得默认标成真阴性。\n\n第一轮统一表述为“所选强风事件里邻域 10 m 风幅值、使用事后 ERA5 条件场的回报”；不得推广为真预报雷暴阵风技巧或一切无事件误报能力。\n\n## 核查证据（10-14 美东）\n\nGitHub tree [external URL omitted]；README [external URL omitted]；LICENSE [external URL omitted]；层值 [external URL omitted]；阵风 [external URL omitted]；边界 [external URL omitted]；NOAA 模型介绍 [external URL omitted]；Cook [external URL omitted]"
+    },
+    {
+      "id": "res-0007",
+      "ts": "2026-10-14 20:34",
+      "title": "第二轮预检与预算闸门（未运行推理，不是评分结果）",
+      "label": "结果",
+      "text": "# 第二轮预检与预算闸门（未运行推理，不是评分结果）\n\n2026-10-14 18:17 美东检查全账户 Colab：A100 `lab-ace-stochastic-` 与一项 CPU 会话在运行；本任务未创建会话、没有覆盖第一轮文件，也没有运行任何第二轮推理。平台提示的 属于 的 H 稀疏站网 ERA5 融合，并非本任务；本任务目录在，没有发现原有 r2 结果。因此不重提 H、不复用其会话。`colab sessions` 此时记录的上述两个会话并非本任务，不能擅自停止。\n\n## 已完成的只读来源预筛\n\n 读取 NOAA NCEI Storm Events 年度 bulk CSV 的 2022–2026 最新索引，筛选 Thunderstorm Wind、MG、≥50 kt、来源或叙述出现 ASOS、位置含三字母站码，并用 V1 美国中部的保守经纬外框 (34–44°N, 102–91°W) 作预筛。 有 666 条候选：2022 年 123，2023 年 160，2024 年 181，2025 年 141，2026 年 61；298 个不同 UTC 日。2026 候选仅 2–7 月（末项 07-01 UTC），不能说已有完整 2026 暖季。此表是候选，不等于模型真实网格覆盖或已核实 ASOS 原始分钟峰值；NOAA 记录时间仍须和 PK WND 的物理峰值分钟核对；无事件控制须用完整报表与分钟观测核实，不能由本表空白推定。初版 7 事件结果已被看过，若复用须标为已见样本而非盲测。\n\n来源：NOAA NCEI 年度 CSV [external URL omitted] （每条候选保存具体 URL）。模型卡 V1 [external URL omitted]，CONUS [external URL omitted] 2025-09-30，现列 2026 候选只能经独立观测核验后作其测试。\n\n## 开跑前冻结的判据（照，不调整）\n\nV1≥20 训练后事件、同区同季≥10 无事件对照；至少 10 个固定随机种子/起报，1/2/3/6 h；≥10 事件的 GFS 条件与 ERA5 条件并列，CONUS≥10 个 2025-10 后事件单列。只以 2022 年拟合事件建立阵风系数 HRRR GUST/HRRR 10m 风，绝不以检验事件或检验期 HRRR GUST 拟合；模型、站与时间严格配对。AI 阵风估计和 HRRR GUST 与观测按站 ±25 km/峰值 ±1h 比，±10 km/±0.5h 敏感性另列。集合成员先固定种子再报最大、中位、P(阵风≥25.7m/s)。三个联合门槛原样执行：1–3h 各档 AI/观测峰值比中位≥HRRR GUST/观测的0.9；P≥0.3 的命中率≥HRRR GUST 且误报率≤其1.5；GFS 条件下第一门槛相对 ERA5 下降≤20%。未计算处一律标为“未评估”，不得记作失败或通过。\n\n## 100 CU 先停报的量化依据\n\n第一轮 28 组实际成功运行耗时合计 1530.7s，均值 54.6679s/单成员/事件/提前量，含数据传输和 HRRR 基线，不等于纯 GPU 前向。当前共享账户用量标示 A100 约 5.38 CU/小时。按逐成员独立串行外推，仅 V1 20 事件+10 对照、四档、10 成员为 1200 组，约 18.22 GPU 墙钟小时/98.04 CU；其中 10 事件另跑 GFS 条件约 32.68 CU；CONUS 10 事件四档 10 成员即使用 V1 同速再约 32.68 CU。名义合计约 163.40 CU，尚未含训练组、CONUS 加载与变慢风险。共享初值/基线和复用缓存可能缩短实际时间，CONUS 大域也可能加长；因此这是粗预算，不是下限或账单。按委托“预计超过100 CU先停下回报”，未启动 GPU。Colab 无本任务待停会话，`colab sessions` 的其他会话保留原状。\n\n## 补充核查（HRRRCast 与观测口径）\n\n官方 HRRRCast-live 仓库的 Git LFS 权重文件匿名可读（HEAD 200，Range 206；尚未全量下载/验哈希），与 WoFSCast“未找到公开权重”不同；默认 20 个气压层最低气压 200 hPa，不到 100 hPa； 是代码诊断量，不是网络直接输出。详见， 已补行；因 100 CU 先停闸门，此次未测试 A100，也未评估同批事件。Cook 2023 的约 10% 仅是特定历史模拟 Test 10 的删峰比例；IEM 归档不可恢复已删观测。Mesonet 交叉重点用于无事件对照和模型报强风而 ASOS 未报的情况。第一轮结论限于所选事件邻域 10 m 风、事后 ERA5 条件场的回报。平台提醒的 与 均是 UrbanTALES 学习曲线任务，目标与目录都不属于本轮对流尺度 AI；未复用或触碰它们的 Colab 会话。\n\n## 未完成项目\n\n 的分钟观测核实、无事件对照、拟合/测试严格隔离、GFS 实际适配、10 成员推理、CONUS A100 80GB high-mem 显存和垂直顶层实测、评分表与图均未完成。不能按现有数据判断第二轮是否值得扩样。V1/CONUS 模型卡都列混合层索引至 hl30（跳过部分中间层）；它们是否实际覆盖 100 hPa 必须用输出的 p_hl30 与地形/时刻范围核实，不由层数猜测。\n\n## 后续执行回报（10-14 20:33 美东）\n以上为算力放行前的历史预检状态，部分事项已有 pilot；请以不覆盖原记录的 、 和原始 JSONL 为当前证据。V1 仅两事件完成三档十成员，CONUS 仅一事件 L1 十成员；长批 Colab 被平台以 `pruned` 中断，其余验收未评估。已手动停止第二会话，第一会话被平台终止；现无本任务活跃会话。"
+    },
+    {
+      "id": "res-0008",
+      "ts": "2026-10-14 20:34",
+      "title": "对流尺度 AI 第二轮：执行回报（部分完成，不能裁决闸门）",
+      "label": "结果",
+      "text": "# 对流尺度 AI 第二轮：执行回报（部分完成，不能裁决闸门）\n\n10-14 20:33 美东。第一轮和原有 均未覆盖；本文件记录真实执行。数据来源：NOAA NCEI Storm Events 年度明细、Iowa Environmental Mesonet ASOS/METAR、NOAA AWS HRRR 与 GFS、Google ARCO-ERA5、NVIDIA Earth2Studio 0.19.0 StormCast V1/CONUS；逐条 URL 在事件表、原始 JSONL、。图 亦注明来源。\n\n## 样本与预先锁定口径\n\n。与 IEM 同源核对不可能恢复被 ASOS 质控删去的阵风；没有把 Cook (2023) 特定模拟的约 10% 当通用漏报率。 从相同站点/时刻前一周构造 10 条候选：NOAA 当年 Storm Events 在 50 km/±3 h 内无雷暴大风/强风/龙卷/冰雹记录、本站 METAR ±3 h 最大阵风 <40 kt；这些候选尚无独立 Mesonet 交叉，因此不能视为已证实真阴性，也不能用于最终误报率。\n\n阵风代理选方案 (b)：。对 AI 和 HRRR 10 m 风乘同一个标量，HRRR GUST 原生值单列。不以检验期 HRRR GUST 调整系数。这个系数是经验代理而非 StormCast 输出阵风的物理诊断。\n\n采用固定成员种子 101–110；每成员相同起报 HRRR 初值与 ARCO 条件来源，但 Earth2Studio，只列确有 10 成员的组合。\n\n## 实际运行与数值（仅 pilot，禁止当作通过/失败）\n\nV1：Colab A100 high-mem 成功运行 2023 年两例（AMA、CDS）各 1/2/3 h × 10 成员，共 60 个有配对 HRRR 基线的成员；第三例 CID 仅首个成员，排除评分。第一个会话的原始增量检查点 为 68 行，包含 7 行 HRRR 基线和 61 行 AI；其余 VM 数据未归档。另对已见 DSM 事件完成 L2 的 10 成员工程 pilot，不计入新样本。\n\n完整 V1 两例的宽窗阵风代理中位（m/s），与 HRRR GUST 和观测阵风比：AMA L1 34.811 / 30.561 / 1.041（AI/观测），L2 30.130 / 30.704 / 0.901，L3 30.317 / 26.492 / 0.907；CDS L1 25.151 / 26.495 / 0.789，L2 26.336 / 26.540 / 0.826，L3 24.469 / 23.089 / 0.767。其集合 P(≥25.7 m/s) AMA 为 1/1/1，CDS 为 0.3/0.7/0.4；窗边成员比例 AMA 0.4/0.3/0.3、CDS 0.3/0.6/0.5。宽窄窗及同系数 HRRR10 基线见 CSV；这些是两例的先导观察，不是 ≥20 例验收。\n\n真预报条件：）。GFS 仅 6 小时周期，故不能把 02Z 当作 GFS 02Z 同起报；保守选至少早 6 h 周期，具体历史发布时刻未逐文件证实。单成员无法算真预报版相对 ERA5 集合的下降。\n\nCONUS： 在 A100 80GB high-mem 完成 2026-04-04 OKC 实例 2 步，网格 1024×1792，前向 97.42 s，峰值 GPU 分配 20.62 GB；安装与加载经，不足以判断 CONUS 门槛。\n\nHRRRCast：公开 Git LFS 权重在 Colab 完整下载，203112115 字节、SHA256 `2edef5a5a32cd31f9a6b89ea0b0a54f36d4c528fc20990645debf9446a9315a5`，与仓库指针一致；官方代码 MIT，但权重未见独立许可。默认 Colab Python 3.13/TensorFlow 2.21 不兼容旧 Keras 归档；隔离 Python 3.10/TensorFlow 2.15 可在 CPU 成功载入输入 329/输出 138 通道的模型，但该隔离环境没有可用 CUDA 库，尚缺 HRRR 20 层分析、GFS 边界整场的可运行前处理；因此没有事件预报，不能冒充和 StormCast 并列评分。Abdi 等 arXiv:2507.05658v1 的训练期为 2021-03—2024-03，V1 所选 2023 案例落入其训练期；即使跑通也不能当独立检验，须以 2026 交集另验。\n\n## 平台中断、预算与未完成项\n\n第一会话 `ideas-convective-r2-1014` 在长批中自动 `session_terminated`，历史日志理由为 `pruned`（10-14 19:43 美东； 第 27 条），丢失 VM 后续进度；已向平台 Lead 发，请其查清自动回收规则，没有让它代跑。本地归档的是 19:32 下载的 68 行；没有把后续未归档行当结果。第二会话 `ideas-convective-r2-cont-1014colab stop`；最终 `colab sessions` 不含本任务两个会话，其他任务会话未动。共享账户余额由 1435.14 到 1408.38 CU，总下降 26.76 CU 含别的任务会话，不能归为本任务精确消耗，明显未触及本任务 200 CU 上限。\n\n未完成既定验收：V1 ≥20 事件完整 1/2/3h、≥10 已证实无事件对照、≥10 事件 GFS/ERA5 成对集合、CONUS ≥10 事件，以及 HRRRCast 同批可比集合；因此三条联合门槛——事件峰值比、命中且误报率、GFS 下降≤20%——全部标“未评估”。不能凭 pilot 建议扩到上百事件，也不能判任何模型不值得。若平台提供稳定且可归档的长跑机制，应按现有清单分片续做，先核独立无事件资料，已存 68 行不得重复当新结果。当前 是执行与续做脚本， 仅适用于完整 10 成员组；本轮未伪造所缺汇总表。"
+    },
+    {
+      "id": "res-0009",
+      "ts": "2026-10-14 20:35",
+      "title": "对流尺度模型可跑性（2026-10-14，美东）",
+      "label": "结果",
+      "text": "# 对流尺度模型可跑性（2026-10-14，美东）\n\n本表把「美国雷暴地面强风可检验」与仅可运行区分；实测只适用于确实测试的 StormCast V1。公开代码许可不能代替权重许可。训练时间一律指所列具体权重，不把架构论文年份当训练年份。\n\n| 模型/权重 | 网格/区域/提前量 | 10 m 风、阵风、廓线 | 初值/训练时段 | 代码/权重许可原文与公开状态 | 本次 Colab A100 40GB 实测 |\n| --- | --- | --- | --- | --- | --- |\n| StormCast V1 | 3 km，美国中部 512×640 格；1 h 步长，试至 6 h | 、。 |\n| StormCast-CONUS | 3 km 全 CONUS 1024×1792，1 h | 10m u/v +99场含混合层；无 GUST | HRRR+ERA5 2018-07-12—2025-09-30；2023/24 事件均在训练期！ | 权重模型卡：“governed by the Linux Foundation OpenMDW License Agreement, version 1.1”；“ready for commercial or non-commercial use”；代码 Apache-2.0；公开。[external URL omitted] | 未试：训练期污染本批历史事件；需 2025-10 后 ASOS 事件另立清单。不得将 V1 的 9.46GB 误报为该全域模型显存。 |\n| HRRRCast-live （NOAA-GSL） | CONUS 6 km（HRRR 隔点，530×900），逐小时至 18 h（NOAA 介绍）；3 km 是未来计划 | 10m u/v，气压层 U/V/VVEL/T/HGT/q ×20 层（默认 200–1000 hPa，无 100 hPa）；GUST/GUST_CONV 是推理后诊断，不是直接网络输出 | HRRR 初值 + GFS 边界；训练起止年份未在已核 README 与权重指针确证，需另核 | 代码仓库 MIT：“Permission is hereby granted, free of charge ... to deal in the Software without restriction”；公开 Git LFS 权重 203112115 B，匿名 HTTP HEAD=200、Range=206（ZIP 头），归一化统计亦公开；未看到权重独立许可声明。[external URL omitted] | 未在 Colab 跑，未全量取权重/验哈希或测显存。第二轮预算 >100 CU 先停，详见。 |\n| WoFSCast `frdd-wofs-cast` | WoFS 可移动 3 km、约 900 km 区域，5 min 输出，论文重点 0–2h；6h 系统能力有报道但不是本轮实测 | 约105 状态场，需逐配置核对是否含 10m 风及阵风；不确定 | WoFS 成员预报初值/边界；论文使用 2019—2021 的 131 个春季个例 | 代码 LICENSE 首行“Apache License Version 2.0, January 2004”；仓库递归树 166 文件未发现权重文件或明确公开下载，故权重许可未核实。[external URL omitted] [external URL omitted] | 未运行：公共权重/通用历史 WoFS 初值组合未落实；不可拿 HRRR 初值直接冒充 WoFS。耗时显存未知。 |\n| FuXi-Nowcast | 1 km，中国东部；至 12 h | 近地风速、阵风、雷达、降水；廓线输出未证实 | 雷达/站点/HRCLDAS + FuXi-2.0；训练年份待核 | Zenodo v1 仅 README、inference.py、data_util.py、requirements.txt 四文件，没有 ONNX 权重；README 明言 “You will need: an ONNX model file” 且 `load_zarr` 缺失；权重许可未公开核实。[external URL omitted] [external URL omitted] | 美国事件不在训练区域，且缺权重，不能用于本批；显存耗时不测。 |\n| CorrDiff ERA5→HRRR (`CorrDiffEra5Hrrrgpu:80gb`，本机 A100 40GB；不能把 ERA5 验证时刻降尺度当提前预报。 |\n| 原 CorrDiff Taiwan | 约 3 km 台湾，诊断降尺度 | 依具体包；不适用本批美国 ASOS | ERA5→WRF 2018—2021；区域不符 | Earth2Studio 代码 Apache-2.0；具体权重许可本轮未核。[external URL omitted] | 未跑，区域不符。 |\n\n注意：本次 StormCast 采用小时 ERA5/ARCO 作为粗分辨率条件场，而不是默认 GFS_FX；这样与所用权重的 ERA5 配对一致，但历史 ERA5 是事后再分析，含未来同化信息，不能把本试验叫作严格实时预报。初始高分辨率场仍用同一时刻的公开 HRRR 分析；业务基线使用同一次起报的 HRRR 预报。要验证可业务化，需改用可用的实时条件预报源并单独做域偏移检验。主运行在 Colab，任何临时大数组/模型权重没有落在 工作站。\n\n第二轮更新（10-14 20:33 美东；上表“本次”列是第一轮历史状态，不应再当最新）：StormCast-CONUS 在 A100 80GB high-mem 实际跑通 2026-04-04 OKC 两步，1024×1792，前向 97.42 s、GPU 分配峰值 20.62 GB；另跑 OKC L1 十成员 pilot，非 ≥10 事件完整评分。其变量表有 99 项、u/v/t/q/Z 的 hl30，却只输出 `p1hl` 至 `p20hl` 的部分层压，无 `p30hl`，本站 p20hl≈441 hPa，不能直接核 hl30 是否到 100 hPa。HRRRCast 完整权重在 Colab 验过 SHA256 `2edef5a5a32cd31f9a6b89ea0b0a54f36d4c528fc20990645debf9446a9315a5`，隔离 TensorFlow 2.15 CPU 可载入 329→138 通道，GPU 推理与事件评分尚未跑通；Abdi 等 arXiv:2507.05658v1 指训练 2021-03—2024-03，2023 V1 样本不能兼作其训练外验证。完整当前状态在。"
+    },
+    {
+      "id": "res-0010",
+      "ts": "2026-10-14 20:50",
+      "title": "第二轮第①段：HRRRCast GPU 兼容性限额试跑（10-14 20:49 美东）",
+      "label": "结果",
+      "text": "# 第二轮第①段：HRRRCast GPU 兼容性限额试跑（10-14 20:49 美东）\n\n口径：本段上限 20 CU；前一条 200 CU 放行不再适用。独立会话 `ideas-r2-hrrrcast-1014colab sessions` 已不含本会话，其他会话未动。来源：、终端会话/用量回显。\n\n官网仓库 Git LFS 权重再次完成匿名下载、大小 203112115 字节、SHA256 `2edef5a5a32cd31f9a6b89ea0b0a54f36d4c528fc20990645debf9446a9315a5` 与仓库指针吻合；执行核在。隔离 Python 3.10 的，日志显示 TensorFlow 2.15.1 识别 A100 80GB（设备可用），但加载）。\n\n本段没有完成 HRRRCast 并列评分；后续第②段若启动须另建自己专属会话和目录、单独读前后 usage、控制 ≤20 CU，并先核无事件候选的独立观测。既有 V1 两事件完整 pilot 的 68 行检查点不能当新算例重算或覆盖。原定 1/2/3 小时、10 成员、同阵风系数两 HRRR 基线、双窗口及窗边比例的判据没有修改。"
+    },
+    {
+      "id": "res-0011",
+      "ts": "2026-10-14 22:42",
+      "title": "对流尺度 AI 第二轮，第②段 V1/ERA5 限额续做回报",
+      "label": "结果",
+      "text": "# 对流尺度 AI 第二轮，第②段 V1/ERA5 限额续做回报\n\n10-14 22:39 美东。仅本段 StormCast V1 + 事后 ARCO-ERA5 条件，1/2/3 h、固定 seed 101–110；阵风代理沿用冻结的 2022 年 HRRR 训练集系数 1.6677111737。、 与先前 68 行检查点只读复用；AMA、CDS 已完成组跳过，未重算。平台提示 是另一线 H 配对小试，与此段的目标、目录、会话不重合；没有触碰它。GFS、CONUS、HRRRCast 本段均未启动。\n\n## 保存与算力\n\n第一会话 `ideas-convective-r2-v1seg2-1014` 在完成对照 C1075354 的 L1 后，下一次 CLI 连接丢失；确认 VM 空闲、下载 79 行检查点并停止。续跑会话 `ideas-convective-r2-v1seg2b-1014` 上传该检查点，远程幂等脚本跳过已有行；`colab-keepalive` 每 4 分钟执行只读代码并下载检查点。预算守护以共享账户余额作为保守上界，在累计余额下降 18.03 CU（1396.12→1378.09）时停止。由于同期其他会话计费，18.03 CU 不能全归本任务；本段本身不超过 18.03 CU，低于 20 CU。最终 `colab sessions` 均不含本任务两个会话；其他任务会话未停止。逐组完成后程序立即在 VM 追加并 fsync；受 CLI 限制，下载是每 4 分钟及终止前一次，而非严格每组立即下载，未声称满足这一子要求。终止时正在算的 C1087366 L2 seed110 不计入完整组。须披露一次操作失误：保活器未显式设置 `--keep`，默认轮换删除了此前由它下载的若干时间戳副本（违反现有结果不得自行删除的要求）；原 68 行检查点、逐步另存的本地检查点及最终 153 行完整结果均保留，未丢失已完成行。未来续做已将禁止默认轮换写入 Colab 技能，必须保留全部副本或另行获批。\n\n最终 有 153 行且均为 status=ok。合格十成员+HRRR 配对的事件 3 例（AMA、CDS、CID）×三档，共 9 组；无事件对照 CDS 3 档、CID 1 档，共 4 组，另有 CID L2 九成员未评分。共 13 组；报告的“完整事件 3、完整对照 1”要求该个案三个提前量齐全。对照与事件交替推进、每个个案按 1/2/3 h 顺序完成，因此预算边界留下不齐全个案。未达到目标 ≥20 事件 + ≥10 对照，任何正式门槛均未评估。\n\n对照交叉：IEM 同站记录和 NCEI 无风报筛选之外，再取州 ASOS 网络 GeoJSON 站点元数据及 50 km 内邻站 METAR 的 ±3 h 风速。10 个候选中 9 个至少有一座邻站可读取、所读阵风均 <40 kt；CNK 的 50 km 内无可用邻站峰值，标记未独立核验。邻站低风不能证明所有无事件，也不能恢复 ASOS 已被质控删掉的峰值；这些对照仍是有局限的负例。逐站 URL 与值在，原始观测来源为 IEM，事件目录来源 NOAA NCEI；模型为 NVIDIA Earth2Studio StormCast V1，条件场 ARCO-ERA5、初值与预报基线 NOAA HRRR。\n\n## 中间汇总，仅作为部分样本\n\n宽窗 AI 是十成员阵风代理的中位；P≥25.7 m/s 以成员比例≥0.3 判报。HRRR 10m×同系数亦另列在；窄窗与宽窗在同一 CSV 各自并列。窗边为 25 km 宽窗中最大点距站≥22.5 km。以下中位峰值比皆为预测/实测阵风，误报只按已交叉核查对照计，不能作最终误报率。\n\n| 提前量 | 事件 / 对照组 | AI/观测 | HRRR GUST/观测 | HRRR 10m×系数/观测 | AI/HRRR GUST 命中事件 | AI/HRRR GUST 误报对照 | AI 窗边成员比例中位 |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n| 1 h | 3 / 2 | 0.789 | 0.914 | 0.955 | 3/3 / 3/3 | 0/2 / 0/2 | 0.40 |\n| 2 h | 3 / 1 | 0.826 | 0.918 | 0.878 | 2/3 / 3/3 | 0/1 / 0/1 | 0.50 |\n| 3 h | 3 / 1 | 0.767 | 0.792 | 0.878 | 2/3 / 2/3 | 0/1 / 0/1 | 0.45 |\n\n表与原始 JSONL 可由 重算。这里 3 个事件中的 AMA/CDS 为上一会话已做先导，新增完整事件 CID 一例；这些 2023 事件在 V1 训练期外。事件样本太少、对照也不齐，不可据上表裁决或外推。\n\n文件：（唯一评分源）、（含宽窄窗、两基线、P、窗边）、（在上一级目录）、本目录。后续若获单独续做额度，只从 恢复、先补完 CID 对照 L2 seed110，再推进其他事件/对照，绝不把 9 成员组计作 10 成员。\n\n结论：本段算力闸门内得到可复核的部分配对与负例；因样本未满，扩到上百事件的三项联合判据仍“未评估”，不能判定成功或失败。"
+    },
+    {
+      "id": "res-0012",
+      "ts": "2026-10-15 00:27",
+      "title": "第二轮七事件闸门段（10-15 00:26 美东）",
+      "label": "结果",
+      "text": "# 第二轮七事件闸门段（10-15 00:26 美东）\n\n本段只检验第一步 中的七个 2023–24 ASOS 雷暴大风事件，StormCast V1（Earth2Studio 0.19.0 默认）、事后 ARCO-ERA5 条件，1/2/3 h、固定种子 101–110。2022 年训练事件拟合的阵风系数 1.6677111736957388 冻结；AI 10 m 风幅值乘此系数，仅是阵风代理，不是模型原生阵风。观测峰值按 的物理峰值分钟，不是第一版 的 METAR 报告分钟。各事件原始来源链接在该 CSV 与检查点的 `ncei_url`、`iem_url` 字段。没有新拟合或改动既定判据。\n\n## 完成与防重\n\n本段从上一段完整保留的 153 行 续存到远端同一；本段七个 ID 与该 153 行无交集。最终 384 行，前 153 行逐行完全相同；新增 231 行恰为 21 个事件×提前量配对组，每组 HRRR 一行和 StormCast 十种子十行，全部 `status=ok`，没有重复成功键。每个成员与组完成就远端 fsync 追加；每四分钟只读执行保活及下载带新时间戳的检查点（`--keep 100`，未轮换删结果）。同组初值 HRRR 与 ARCO 条件通过 `Cached` 包装仅抓取一次，每个成员复用；日志计 84 次缓存未命中（每组四种请求）。本段新会话 `ideas-convective-r2-gate7-1014` 不与其他任务同名；完成后已 stop，私有及全局 `colab sessions` 均无本会话，别人的会话未触碰。平台先前的 是另一线 H 配对小试，不是此运行。\n\n## 结果（宽窗：25 km、±1 h）\n\n比值为预测最大阵风代理（AI 取十成员中位）或 HRRR 最大阵风/ASOS 峰值；“HRRR10×系数”用同一固定系数。P≥0.3 表示十成员至少三名超过 25.7 m/s。窄窗（10 km、±0.5 h）在同一张逐组 与宽窗并列，含峰值时间/距离偏差；下表仅为概览。\n\n| 提前量 | 事件数 | AI/观测宽窗中位 | HRRR GUST/观测 | HRRR10×系数/观测 | AI/HRRR GUST 中位比值 | AI/HRRR GUST 命中 | 窄窗 AI/HRRR GUST/观测中位 | 窗边 AI 成员/70、HRRR10/7、HRRR GUST/7 |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |\n| 1 h | 7 | 0.505 | 0.746 | 0.674 | 0.677 | 0/3 | 0.330/0.373 | 29/4/3 |\n| 2 h | 7 | 0.591 | 0.731 | 0.717 | 0.809 | 0/3 | 0.347/0.266 | 36/4/5 |\n| 3 h | 7 | 0.624 | 0.771 | 0.846 | 0.809 | 0/2 | 0.341/0.362 | 28/2/5 |\n\n“窗边”定义距站 ≥22.5 km；不是风暴定位正确率。窄窗两系统在这七例的三档均未命中 25.7 m/s。该七例是旧第一步已见样本，属于管线可跑性与相同事件的口径重估，不能当作盲测、也不能代替 ≥20 事件＋≥10 无事件对照的正式判据。七事件的 AI/HRRR GUST 宽窗比均未过 0.9，但不能据此裁定整轮是否值得扩到上百事件；无事件误报、GFS 真预报条件亦未在此段评价。OFK 的 1 分钟 ASOS 该分钟缺测、METAR PK WND 佐证但待独立复核；其他 ASOS 同源记录吻合不代表不存在站内质控漏峰。\n\n## 耗时与算力\n\n21 个“事件×提前量×十成员＋HRRR”组的墙钟详见 和逐组同列 ：1 h 中位 173.02 s、2 h 239.79 s、3 h 311.57 s；组耗时总和 84.66 分钟，成员中位 22.32 秒，较开跑前约 55 秒/成员的粗估更快。以本会话 A100 High-RAM 前后账号速率差约 6.8 CU/h 换算，组内约 9.67 CU；从 10-14 22:44 分配至 10-15 00:26 停会话（包含安装、权重加载与取数）约 1.70 h、约 11.65 CU，低于闸门段 20 CU。这是费率×时间估计，不是独立会话账单。\n\n账号 `colab usagegroup_CU_est_6p85_per_hr`；没有 Colab 提供的逐组独立计费读数。\n\n文件：（分组与缓存、远端追加），（验证 153 行前缀、21 组完整性并评分），（全部原始行）、（逐组真实墙钟）、（远端原始日志）、 的先前条目。未引入新的外部来源。\n\n一句话判断：阵风代理批处理在七例上跑通且组时长可接受，但旧七例宽窗 1–3 h 的 AI 中位峰值比均明显低于 HRRR GUST；本段既无负例，也不具正式扩样门槛所需样本数。请 Lead 核完此闸门段再决定后续，不自行开下一段。"
+    },
+    {
+      "id": "res-0013",
+      "ts": "2026-10-15 00:49",
+      "title": "cnk kansas mesonet audit",
+      "label": "结果",
+      "text": "CNK 2023-05-02 18:14Z 对照独立核查（美国中部地方时原站峰值 26 kt，IEM；NCEI 50 km/±3 h 无风报）。Kansas Mesonet REST 的 2023-05-02 15:14–21:14 UTC 五分钟记录：Belleville 2W（距 CNK 29.4 km）WSPD10MMAX 最大 11.30 m/s = 21.96 kt；Clay（46.2 km）WSPD10MMAX 最大 9.67 m/s = 18.80 kt；Scandia（34.9 km）仅 WSPD2MMAX 最大 9.13 m/s，非同高，仅旁证。原始字段单位见 [external URL omitted] 的 WSPD10MMAX = m/s；站坐标见 [external URL omitted]；[external URL omitted] ASOS 站网最大值均低于 40 kt，故作为可用负例；仍无法证明每个 50 km 格点均无漏报。"
+    },
+    {
+      "id": "res-0014",
+      "ts": "2026-10-15 04:40",
+      "title": "第二轮段 A：V1/ERA5 全样本（10-15 04:25 美东）",
+      "label": "结果",
+      "text": "# 第二轮段 A：V1/ERA5 全样本（10-15 04:25 美东）\n\n冻结的 1/2/3 h、种子 101–110、StormCast V1+事后 ERA5 条件、2022 年独立拟合因子 1.6677111736957388；宽窗 25 km/±1 h，窄窗 10 km/±0.5 h。20 个事件（含第一轮已见 7 例与先导 3 例）和 10 个候选无事件对照共 90 个事件×提前量组，每组 HRRR GUST、HRRR 10m×同系数和 AI 十成员均齐全。384 行旧数据前缀保留于最终 990 行检查点，新算 56 组、606 行，全部 status=ok；旧 384 行单独旧检查点文件意外消失，已报平台，最终文件前 384 行仍在、未重算。无事件核查：CID/IML/BRL/SWO/DSM/FYV/ICT 有独立邻站 METAR，CNK 由 Kansas Mesonet Belleville 2W、Clay 的 5 分钟 10m 最大风核实低于 40 kt；CDS 与 AMA 的已有邻站审计只重复同一机场，独立确认未完成，故 10 候选的误报统计另受这两例不确定性约束。ASOS/IEM 档已受站内质控，不能恢复删峰。来源 NOAA NCEI Storm Events、NOAA AWS HRRR、IEM ASOS、Kansas Mesonet、ARCO-ERA5、NVIDIA StormCast（PUBLIC_CITATIONS.md）。\n\n| 提前量 | AI/观测峰值比宽/窄 | HRRR GUST/观测宽/窄 | HRRR10×系数/观测宽/窄 | 宽窗事件命中 AI/HRRR | 宽窗对照误报 AI/HRRR | 窗边宽窗 AI成员/HRRR GUST/HRRR10（分母 300/30/30） | 冻结判据1/2 |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| 1 h | .676/.490 | .728/.516 | .899/.474 | 4/20 vs 8/20 | 0/10 vs 0/10 | 133/13/16 | 通过/不通过 |\n| 2 h | .680/.445 | .709/.412 | .752/.430 | 5/20 vs 8/20 | 0/10 vs 0/10 | 141/21/19 | 通过/不通过 |\n| 3 h | .642/.413 | .752/.462 | .847/.477 | 4/20 vs 6/20 | 0/10 vs 0/10 | 143/14/12 | 不通过/不通过 |\n\n逐事件、每个提前量的宽窄窗与位置/时间偏差、集合概率及三种峰值见；汇总见；图 （图注列出 NOAA/IEM/NVIDIA/ARCO 来源）。10 个对照里 2 个独立核验不足，但判据2的事件命中率已经逐档低于 HRRR，负例即使全核也不能挽回该项联合要求。不以持续性声称技巧。这里是事后 ERA5 条件的回报，不是业务实时预报；GFS 真预报条件按 Lead 的先后顺序未运行。\n\n本段会话 给出每两分钟余额与停止回执；Colab 会话列表已核实没有本段。远端日志 、56 组耗时 、最终完整原始行 、完成标记 `marker_1015_041813.done`；缓存复用初值与条件场，按成员及组远端追加、每约 12 分钟下载一次检查点（≤30 分钟）。"
+    },
+    {
+      "id": "res-0015",
+      "ts": "2026-10-15 05:16",
+      "title": "CONUS B 段续做交接（10-15 05:15 美东）",
+      "label": "结果",
+      "text": "# CONUS B 段续做交接（10-15 05:15 美东）\nLead 最新授权：当前 B 会话达单会话 50 CU（现有守护按约 48 CU 留安全余量停止）后，若 12 事件未完，新名 B2 会话从已保存检查点续，不重算；同一时刻一会话，整轮估算总计 ≤200 CU；跨 120 CU 单独回报。需要每组墙钟/GPU 分钟和按会话费率 CU、100 事件×3 时效投影。10-15 05:14 核实 B 仍在同一会话运行，远端 37 行检查点/2 行完整组，第三组进行中；已有 10:40 回访负责接续。守护停止前须核远端/本地 final 行数，另复制归档、SHA256；若守护先行停止，基于已下载且验证的最新检查点创建 B2，严禁从 工作站 旧检查点重算或从 TACC 自取。\n当前自有会话 ideas-convective-r2-B-1015，私有 registry，自动预算守护 segment_watch.py（--cap 48 --rate 6.85）正在运行，colab-keepalive 同名服务在运行，--keep 200。05:10 远端 checkpoint 36 行、groups 2 行、done 不存在；05:14 已下载独立副本 checkpoint_1015_0514.jsonl，SHA256 7c54254fe419baa079199a0b15420e6b66b28019a3fa9e7aced6a8cae46b6152。共享账户 05:10 余额 1272.20 CU，当前会话估算 3.31 CU；非独立计费。现有 10:40 Research Chat 回访涵盖此任务；到时先检查实际会话/守护与预算，若已停则按新授权直接开新名 B2，从最新校验检查点续；若仍运行，复约到预计停时，不得另开重复会话。\n候选固定清单 segment_b_manifest.csv（12 事件、6 对照），批处理脚本 continue_conus_b.py 生成自 continue_v1_a.py；必须在新 VM 上传两脚本和清单、最新 checkpoint 到，并核成功键无重复、检查点原前缀。 使用单组共用源缓存、种子 101–110；新会话下载所有关键脚本与小结果后 stop。评分用 score_segments.py，判据仍冻结。"
+    },
+    {
+      "id": "res-0016",
+      "ts": "2026-10-15 13:05",
+      "title": "RUN STATUS",
+      "label": "结果",
+      "text": "B3 10-15 13:04 EDT：会话 ideas-convective-r2-B3-1015，A100 high-mem；安装 earth2studio[stormcast]==0.19.0 与 natten==0.21.6+torch2110cu130 均退出 0。原 conus_smoke.py 实际前向成功，见 smoke_b3_result.json。源 230 行检查点 SHA-256 4f155aabbcbad40ee40cc1ee518e4dc2f1e82f9452a8a931099ab723477edeeb；远端启动前逐字节检验，首次 keepalive 拉回仍相同。唯一有效 detached PID 2287；从第 21 组续跑。失败的 launch 第一次仅生成 segment_b3.start 标识，TypeError 在 Popen 之前；修正后 v2 单次启动。后台 keepalive 每 240 秒 exec、每五轮拉取（≤20 分钟），不轮转已有结果。独立 wx-conus-b3-budget-1015.service 每两分钟核算 6.85 CU/h，按保守分配起点 12:59 到 78 CU 时拉回小文件并 stop；保留约 3 CU 余量以满足总余 81 CU。不以共享账户余额变化归因本单。回访 10-16 00:34 EDT（ 回执）。\n\n下一轮：先核实 budget_b3.jsonl 终态、keepalive 状态、每条本地 checkpoint 的行数/哈希和会话停止；不可重跑成员。如完成 54×11=594 行，用 score_conus_b3.py（已修正原脚本 CONUS 事件门槛误写 10 → 12，原脚本不动）按 wide/narrow 分别评分，并计算每组成员 runtime_sec 汇总的 GPU 分钟×6.85/60；报告中位与范围、样本数。若未满按局部样本呈现描述，冻结判据未评判；勿追加 CU。写最终小结果只能到本目录和指定 final_conus 目录，创建唯一版本名，不覆盖旧结果。"
+    }
+  ],
+  "figures": [
+    {
+      "id": "fig-0000",
+      "ts": "2026-10-14 15:07",
+      "title": "peak ratio",
+      "url": "../../img/4bd675459229.png"
+    },
+    {
+      "id": "fig-0001",
+      "ts": "2026-10-14 20:30",
+      "title": "pilot peak ratio",
+      "url": "../../img/c1fb3619ae62.png"
+    },
+    {
+      "id": "fig-0002",
+      "ts": "2026-10-15 04:39",
+      "title": "v1 verdict",
+      "url": "../../img/0488b1e3429f.png"
+    }
+  ],
+  "code": [
+    {
+      "name": "audit_asos_1min_20261014.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/audit_asos_1min_20261014.py"
+    },
+    {
+      "name": "audit_cm1_sounding_alignment.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/audit_cm1_sounding_alignment.py"
+    },
+    {
+      "name": "batch.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/batch.py"
+    },
+    {
+      "name": "cm1_column_rule.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/cm1_column_rule.py"
+    },
+    {
+      "name": "fetch_raob.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/fetch_raob.py"
+    },
+    {
+      "name": "make_events.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/make_events.py"
+    },
+    {
+      "name": "make_results.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/make_results.py"
+    },
+    {
+      "name": "make_soundings.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/make_soundings.py"
+    },
+    {
+      "name": "check_control_neighbors.py",
+      "group": "r2",
+      "url": "../../code/r2/check_control_neighbors.py"
+    },
+    {
+      "name": "check_domain.py",
+      "group": "r2",
+      "url": "../../code/r2/check_domain.py"
+    },
+    {
+      "name": "check_runtime.py",
+      "group": "r2",
+      "url": "../../code/r2/check_runtime.py"
+    },
+    {
+      "name": "continue_conus_b.py",
+      "group": "r2",
+      "url": "../../code/r2/continue_conus_b.py"
+    },
+    {
+      "name": "continue_v1_a.py",
+      "group": "r2",
+      "url": "../../code/r2/continue_v1_a.py"
+    },
+    {
+      "name": "conus_10_pilot.py",
+      "group": "r2",
+      "url": "../../code/r2/conus_10_pilot.py"
+    },
+    {
+      "name": "conus_hrrr_pilot.py",
+      "group": "r2",
+      "url": "../../code/r2/conus_hrrr_pilot.py"
+    },
+    {
+      "name": "conus_smoke.py",
+      "group": "r2",
+      "url": "../../code/r2/conus_smoke.py"
+    },
+    {
+      "name": "conus_variables.py",
+      "group": "r2",
+      "url": "../../code/r2/conus_variables.py"
+    },
+    {
+      "name": "e2s_introspect.py",
+      "group": "r2",
+      "url": "../../code/r2/e2s_introspect.py"
+    },
+    {
+      "name": "e2s_io_peek.py",
+      "group": "r2",
+      "url": "../../code/r2/e2s_io_peek.py"
+    },
+    {
+      "name": "e2s_source_peek.py",
+      "group": "r2",
+      "url": "../../code/r2/e2s_source_peek.py"
+    },
+    {
+      "name": "find_replacement_control.py",
+      "group": "r2",
+      "url": "../../code/r2/find_replacement_control.py"
+    },
+    {
+      "name": "fit_gust_2022.py",
+      "group": "r2",
+      "url": "../../code/r2/fit_gust_2022.py"
+    },
+    {
+      "name": "gate_runner.py",
+      "group": "gate_7events",
+      "url": "../../code/gate_7events/gate_runner.py"
+    },
+    {
+      "name": "score_gate.py",
+      "group": "gate_7events",
+      "url": "../../code/gate_7events/score_gate.py"
+    },
+    {
+      "name": "gfs_smoke.py",
+      "group": "r2",
+      "url": "../../code/r2/gfs_smoke.py"
+    },
+    {
+      "name": "hrrrcast_compat_probe.py",
+      "group": "r2",
+      "url": "../../code/r2/hrrrcast_compat_probe.py"
+    },
+    {
+      "name": "hrrrcast_load_test.py",
+      "group": "r2",
+      "url": "../../code/r2/hrrrcast_load_test.py"
+    },
+    {
+      "name": "hrrrcast_weight_probe.py",
+      "group": "r2",
+      "url": "../../code/r2/hrrrcast_weight_probe.py"
+    },
+    {
+      "name": "install_natten.py",
+      "group": "r2",
+      "url": "../../code/r2/install_natten.py"
+    },
+    {
+      "name": "install_natten_pinned.py",
+      "group": "r2",
+      "url": "../../code/r2/install_natten_pinned.py"
+    },
+    {
+      "name": "install_stormcast.py",
+      "group": "r2",
+      "url": "../../code/r2/install_stormcast.py"
+    },
+    {
+      "name": "install_tf_cuda.py",
+      "group": "r2",
+      "url": "../../code/r2/install_tf_cuda.py"
+    },
+    {
+      "name": "pilot_v1_10.py",
+      "group": "r2",
+      "url": "../../code/r2/pilot_v1_10.py"
+    },
+    {
+      "name": "plot_segments.py",
+      "group": "r2",
+      "url": "../../code/r2/plot_segments.py"
+    },
+    {
+      "name": "prepare_conus_b.py",
+      "group": "r2",
+      "url": "../../code/r2/prepare_conus_b.py"
+    },
+    {
+      "name": "run_v1_gfs.py",
+      "group": "r2",
+      "url": "../../code/r2/run_v1_gfs.py"
+    },
+    {
+      "name": "run_v1_main.py",
+      "group": "r2",
+      "url": "../../code/r2/run_v1_main.py"
+    },
+    {
+      "name": "run_v1_segment2_group.py",
+      "group": "r2",
+      "url": "../../code/r2/run_v1_segment2_group.py"
+    },
+    {
+      "name": "score_pilot.py",
+      "group": "r2",
+      "url": "../../code/r2/score_pilot.py"
+    },
+    {
+      "name": "score_r2.py",
+      "group": "r2",
+      "url": "../../code/r2/score_r2.py"
+    },
+    {
+      "name": "score_segments.py",
+      "group": "r2",
+      "url": "../../code/r2/score_segments.py"
+    },
+    {
+      "name": "gpu_load_probe.py",
+      "group": "segment1_hrrrcast_20261014",
+      "url": "../../code/segment1_hrrrcast_20261014/gpu_load_probe.py"
+    },
+    {
+      "name": "budget_watch.py",
+      "group": "segment2_v1_20261014",
+      "url": "../../code/segment2_v1_20261014/budget_watch.py"
+    },
+    {
+      "name": "host_runner.py",
+      "group": "segment2_v1_20261014",
+      "url": "../../code/segment2_v1_20261014/host_runner.py"
+    },
+    {
+      "name": "remote_batch.py",
+      "group": "segment2_v1_20261014",
+      "url": "../../code/segment2_v1_20261014/remote_batch.py"
+    },
+    {
+      "name": "score_partial.py",
+      "group": "segment2_v1_20261014",
+      "url": "../../code/segment2_v1_20261014/score_partial.py"
+    },
+    {
+      "name": "launch_b3.py",
+      "group": "segment_b3_20261015",
+      "url": "../../code/segment_b3_20261015/launch_b3.py"
+    },
+    {
+      "name": "score_conus_b3.py",
+      "group": "segment_b3_20261015",
+      "url": "../../code/segment_b3_20261015/score_conus_b3.py"
+    },
+    {
+      "name": "smoke_b3.py",
+      "group": "segment_b3_20261015",
+      "url": "../../code/segment_b3_20261015/smoke_b3.py"
+    },
+    {
+      "name": "watch_b3.py",
+      "group": "segment_b3_20261015",
+      "url": "../../code/segment_b3_20261015/watch_b3.py"
+    },
+    {
+      "name": "launch_b2_20261015.py",
+      "group": "segment_b_20261015",
+      "url": "../../code/segment_b_20261015/launch_b2_20261015.py"
+    },
+    {
+      "name": "segment_watch.py",
+      "group": "r2",
+      "url": "../../code/r2/segment_watch.py"
+    },
+    {
+      "name": "select_candidates.py",
+      "group": "r2",
+      "url": "../../code/r2/select_candidates.py"
+    },
+    {
+      "name": "select_controls_conus.py",
+      "group": "r2",
+      "url": "../../code/r2/select_controls_conus.py"
+    },
+    {
+      "name": "select_controls_r2.py",
+      "group": "r2",
+      "url": "../../code/r2/select_controls_r2.py"
+    },
+    {
+      "name": "torch_version.py",
+      "group": "r2",
+      "url": "../../code/r2/torch_version.py"
+    },
+    {
+      "name": "verify_r2_candidates.py",
+      "group": "r2",
+      "url": "../../code/r2/verify_r2_candidates.py"
+    },
+    {
+      "name": "window_baseline_audit.py",
+      "group": "r2",
+      "url": "../../code/r2/window_baseline_audit.py"
+    },
+    {
+      "name": "raob_full.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/raob_full.py"
+    },
+    {
+      "name": "reconcile_peaks.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/reconcile_peaks.py"
+    },
+    {
+      "name": "select_events.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/select_events.py"
+    },
+    {
+      "name": "smoke.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/smoke.py"
+    },
+    {
+      "name": "soundings.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/soundings.py"
+    },
+    {
+      "name": "verify_events.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/verify_events.py"
+    },
+    {
+      "name": "verify_manifest.py",
+      "group": "convective_ai",
+      "url": "../../code/convective_ai/verify_manifest.py"
+    }
+  ],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-24 21:41",
+      "text": "【委托 · 来自 AI 气象】最新报告置顶（Liang Hu 要逐条看）\nLiang Hu 10-24 指令：本轮回复只写三行——报告路径、一句话现状、待 Liang Hu 定的事（已批的不列），不做别的工作、不开计算、不下载文献。\n内容：报告 （10-24 补记）；现状：S2 停在 120/240（已用 91.3 CU），磁盘修复已备；待定：A193 上限 180→185 CU。"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-24 21:41",
+      "text": "报告：（10-24 补记在第 62 行）\n现状：S2 从 10-22 03:30 起停在 120/240，原因是 VM1 磁盘满了，已用 91.3 CU。磁盘修复脚本已准备好并核过，整轮跑完预计要 180.1–182.1 CU，超过已批的 180。\n等 Liang Hu 批/定：A193，把上限从 180 提到 185 CU。批了就修好后跑完；不批，已完成的 120 组只当探索性结果用。\n\n\n\n## 结论\n- 报告：（10-24 补记）\n- 现状：S2 停在 120/240（VM1 磁盘满，已用 91.3 CU），修复脚本已备好并核过；整轮预计 180.1–182.1 CU，超出已批的 180。\n- 等 Liang Hu 批/定：A193，上限 180→185 CU。\n\n（附件：00_进展与计划_20261021.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 08:06",
+      "text": "【委托 · 来自 R23.4 雷暴与对流尺度】R23.4b S2 第二台续跑第 120–239 组（185 CU 内）\n请在本子项目对话（R23.4b，闸门已批 A172）内把下面任务派给本线 bot r23-4 执行（ R23.4b 开头），提交阶段核回执后交回；结果出来按任务书 --report。任务书原文：\n【S2 续跑第二台：补完第 120–239 组（Liang Hu A193 已批 185 CU）】\n背景：第三轮 S2（冻结预注册）10-22 03:30 因 VM1 磁盘满停在 120/240（单元 0–119 = 冻结清单前 60 事件 + 60 配对对照，每组 10/10 成员）；已用 91.3 CU（有效单价 6.77 CU/h）。Liang Hu 10-22 批 A193：整轮上限 180→185 CU。\n目标：在 185 CU 内把单元 120–239 跑完（单元 120 的对照预报已成功不重算，其 10 个成员重跑），然后在关掉 GPU 后按预注册第 4.3 节评分，写结论草案。\n材料（都在）：s2_worker_resume_1022.py（sha256 …）、s2_resume_launch_1022.py（…）、改动说明 S2_磁盘泄漏修复_改动说明_1022.md（按其「开机时要做」一节执行）、rescue 检查点 ckpt_20_130_1022_0330_rescue.jsonl；events_r3.csv、controls_r3.csv 按原路径。\n边界：\n- 冻结清单、单元顺序、种子 101–110、1/2/3 h 时效（2 h 主时效）、阵风诊断、判据全部不变；不改样本、不删组。\n- 一台 Colab A100 高内存 VM 跑完，会话名用新名（如 r234b-s2-vm2-1027），不复用旧会话名；按 colab-keepalive 正式路径，本地 CLI 超时不等于失败；同一轮只一个执行方。\n- 前 5 组核对 PURGE 日志剩余空间是否稳定；diskstop/.failed 出现即拉回检查点、停 VM、报我。\n- 每 40 组按实测重估整轮 CU（算式写出：已用 + 剩余组×单组秒×6.77/3600）；外推超 185 CU 立刻停在当前组、拉回检查点、停 VM、报我，不自行改样本。\n- 跑完立即 colab stop 并核实无残留；评分不占 GPU。\n- 结论草案只写到本配置、本样本（StormCast V1 + 混合层阵风诊断、120+120 盲样本），不写“AI 不如/优于 HRRR”之类归因；数字从结果表程序化生成。\n- 写入范围： 下新文件，以及 的当前状态一节；不改旧检查点与旧脚本。\n交回：提交阶段交会话名、开跑时间、前 5 组 PURGE 剩余空间、首批实测单组秒数与整轮重估 CU。全部跑完评分后用 R23.4（附结论草案路径与累计 CU），我再送 6 人。\n（原因：Liang Hu 10-22 批 A193（上限 185 CU），10-27 催办；根对话 R23.4 无独立启动方案，闸门只能从已批的 R23.4b 对话派计算）"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 08:06",
+      "text": "正在派活给 r23-4，被闸门拦了，排查是不是编号识别的问题。任务**还没派出去**，被平台的计算闸门拦住了。\n\n- **卡在哪：** 我在 R23.4b 对话里用 ` 派这次续跑，被拒绝，提示是「本项目启动方案尚未经 Liang Hu 批准（编号 R23.4）」。闸门列表里 R23.4b 显示已批（10-21 A172），但闸门按智能体 `r23-` 把它认成了 R23.4。我换成显式指定 R23.4b 再试，结果一样。这应该是换 Lead 后编号没对上的平台问题。我没有改写标题绕过闸门，也没有自己开 Colab。\n- **已做：**\n - 材料核过：、 的 sha256 与任务书一致，修复改动说明和 rescue 检查点都在。\n - 没有重复在途：Colab 当前没有活动会话，也没有同类委托在排队或在跑。\n - 已报平台 Lead（标了紧急），请它让闸门按对话编号 R23.4b 放行。\n - 任务书已按你给的原文和边界写好存档。新会话名定为 `r234b-s2-vm2-1027`。交回要求只列提交阶段的四项：会话名和开跑时间、前 5 组 PURGE 剩余空间、首批单组秒数和整轮重估 CU（写出算式）、keepalive 的命令和日志路径。\n- **下一步：** 平台回复修好后，我马上在本对话按原样重派。\n\n\n\n## 结论\n- **状态：** S2 第 120–239 组续跑任务**还没派出去**。在 R23.4b 对话里派给 r23-4 时，闸门把它认成 R23.4（未批）拦下，R23.4b 本身是已批的 A172。目前没有开 Colab，也没花 CU，累计仍是 91.3 CU。\n- **处理：** 已报平台 Lead（紧急），请它按 R23.4b 放行。任务书已存好，平台回复后立即重派；提交阶段的回执拿到后，我核过再交回。\n- **卡住（待平台）：** 这是平台问题，不需要 Liang Hu 定。\n- **任务书：** \n\n\n\n⚠️ 任务书_S2续跑VM2_20261027.md: 文件在，不在该 agent 可附件的目录内（允许：工作区；共享区；共享区；共享区）。可把文件复制到 下再标记；若这个目录本该允许，请告诉平台 Lead"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 08:14",
+      "text": "【自动初查 · 未通过】你交回的结果还缺下面几项（按派活方的验收清单）：\n- 在正文和文件 中都没找到：实测单组秒数与整轮重估 CU（含算式）：仅列任务要求和通用公式，未提供实测单组秒数、代入实测值的算式及整轮重估 CU。\n\n验收清单：\nColab 会话名与开跑时间\n前 5 组 PURGE 剩余空间\n实测单组秒数与整轮重估 CU（含算式）\n\n请补齐后重新给出完整的结论（包括已经做好的部分）；确实做不到的，写明原因和已经尝试过什么。"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 08:14",
+      "text": "先看平台有没有修好闸门，修好了就重派。验收清单要的三项都还交不出来，因为续跑没开始，没有实测数据。我没有用估算值代替实测去凑这几项。\n\n**为什么没开跑**\n- 10-27 08:15 我又查了一次，闸门还是按 R23.4（未批）拦下派活，R23.4b 本身是已批的 A172。\n- 我报给平台 Lead 的问题（标了紧急）还在排队，平台在处理上一件事，还没接手。\n- Colab 目前没有活动会话。没花新的 CU，累计仍是 91.3 CU。\n- 我没有改标题去绕闸门，也没有自己开 Colab，两样都算绕过平台闸门。\n\n**三项的现状**\n1. 会话名和开跑时间：会话名定为 `r234b-s2-vm2-1027`；还没开跑，所以没有开跑时间。\n2. 前 5 组 PURGE 剩余空间：没开跑，没有读数。\n3. 单组秒数和整轮重估 CU：没开跑，拿不到实测单组秒数，也就没有代入实测值的重估。计算口径已写进任务书：91.3 + 剩余组数 × 单组秒数 × 6.77 / 3600 ≤ 185 CU。\n\n**已经做好的**\n- 两个脚本的 sha256 核过，与任务书一致；修复改动说明和 rescue 检查点都在。\n- 没有重复的委托或会话。\n- 任务书已存档，包括全部边界、停机条件和交回要求。\n\n**下一步**\n平台回复放行后，我马上在 R23.4b 对话把任务派给 r23-4，等它交回会话名、开跑时间、PURGE 读数和实测重估后，我核过再一次交回完整结论。\n\n## 结论\n- **还没开跑，验收清单三项都暂时交不出：** 10-27 08:15 再查，闸门仍按 R23.4（未批）拦截 R23.4b（已批 A172）里的派活。平台工单 （紧急）还在排队。没开 Colab，累计仍是 91.3 CU。\n- **实测单组秒数和整轮重估 CU：** 没有实测数据，所以写不出来。计算口径已写定：91.3 + 剩余组数 × 单组秒数 × 6.77 / 3600 ≤ 185 CU。\n- **已尝试：** 按子项目编号 R23.4b 派活，派活时显式指定 R23.4b 重试，08:15 再查一次闸门，三次都被拦。已报平台。没有绕过闸门。\n- **卡住（待平台）：** 不需要 Liang Hu 定。平台放行后我立即重派，拿到会话名、开跑时间、前 5 组 PURGE 读数和实测重估后一并交回。\n- 任务书：\n\n\n\n⚠️ 任务书_S2续跑VM2_20261027.md: 文件在，不在该 agent 可附件的目录内（允许：工作区；共享区；共享区；共享区）。可把文件复制到 下再标记；若这个目录本该允许，请告诉平台 Lead"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 08:28",
+      "text": "【委托结果 · 平台】闸门误拦：R23.4b（已批 A172）对话内派计算被按 R23.4 拦下\n确认是闸门误判：它按 agent r23-认成 R23.4（未批），没看对话标题和 --sub-code。R23.4b 本身已于 10-21 批准（A172）。\n- **现在就能重派**：平台已临时放行 R23.4，到 10-27 14:28 截止，请在 里重新 ` 派 S2 Colab 续跑。用量按 A193 已批的 185 CU 走。这个临时放行只用于 R23.4b，R23.4a 未批，不要借它派活。\n- **根治**：（高）会让闸门按「对话标题编号 > --sub-code > agent 默认」认项目，并做回归测试：R23.4b 放行、R23.4a 仍拦。修好后撤掉临时放行，并通知。\n- **14:28 前若还没修好**：如果续跑之后还需要再派活，告诉我，我再续临时放行。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 08:28",
+      "text": "平台确认是闸门误判，已临时放行到 10-27 14:28。我 10-27 08:29 把续跑任务重新派给了 r23-4。\n\n- 任务书就是之前存档的那份，没改：\n - 会话名：`r234b-s2-vm2-1027`\n - 跑单元 120–239，上限 185 CU（A193），其余边界和停机条件照原文。\n- 验收清单还没交齐。会话名、开跑时间、前 5 组 PURGE 剩余空间、实测单组秒数和整轮重估 CU，都要等 r23-4 交回。拿到后我先核对，再一次交回完整结论。\n- 平台在修根本问题，让闸门按对话标题编号认项目。在那之前，临时放行 14:28 到期；之后如果还要派活，我再请平台续期。\n\n## 结论\n- **已派出：** S2 第 120–239 组续跑已派给 r23-4（10-27 08:29），上限 185 CU。闸门误拦已由平台临时放行（至 14:28），根治在。\n- **还没交的：** 会话名和开跑时间、前 5 组 PURGE 剩余空间、实测单组秒数和整轮重估 CU，都在等 r23-4 交回。我核过后一次交齐。\n- **不需要 Liang Hu 定的事。**"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 08:41",
+      "text": "【平台·】闸门已修好：R23.4b（A172 已批）对话派活现在按标题编号认项目，R23.4a 仍拦。临时放行 R23.4 已撤。请把 S2 续跑（Liang Hu A193 已批 185 CU，上游）重新派一次。"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 08:41",
+      "text": "S2 续跑这次没有重派，因为 08:29 派出的委托 还在跑。现在再派一次，会出现两个执行方同时跑同一轮，任务书明确不允许。\n\n- **：** 10-27 08:41 查是 running，r23-4 正在子对话里准备。Colab 还没有活动会话，所以还没开始用新的 CU。\n- **闸门：** 已经修好，临时放行也撤了。这对它接下来起 Colab 和登记应该没有影响，因为这些都在 R23.4b 对话里，按标题编号认项目。如果它还是被拦，我再报平台。\n- **待交回：** 会话名、开跑时间、前 5 组 PURGE 剩余空间、实测单组秒数和整轮重估 CU，等 r23-4 交回。我核过后一次交齐。\n\n## 结论\n- 闸门已修好。S2 续跑已经在执行（08:29 派出，08:41 状态 running），没有重派，避免同一轮有两个执行方。\n- 提交阶段的回执（会话名和开跑时间、前 5 组 PURGE 剩余空间、实测单组秒数和整轮重估 CU）交回后，我核过再一并交出，上限仍按 A193 的 185 CU。\n- 不需要 Liang Hu 定的事。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 08:42",
+      "text": "【 已关】闸门误拦子项目：R23.4b（A172 已批）对话内派活被按 agent r23-→ R23.4 拦，不看对话标题编号与 --sub-code\n结果：闸门认字母后缀子项目，R23.4b 放行、R23.4a 仍拦，临时放行已撤， 已通知重派\n完整处理记录：工作目录 show 0420）。这是你报的问题，请按结果核对；有疑问直接回我。"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 08:42",
+      "text": "我自己跑了一遍闸门检查， 的修复结果对得上，不用再回平台。\n\n- **R23.4b：** 派活放行，闸门按 10-21 已批的 A172 认。\n- **R23.4a：** 派活仍被拦，提示启动方案未批。\n\nS2 续跑没有重派，因为 08:29 派出的委托 还在执行。r23-4 交回会话名、开跑时间、前 5 组 PURGE 剩余空间和整轮 CU 重估后，我核过再一起交出。\n\n## 结论\n- 的修复已核过，结果正确：R23.4b 派活放行（A172），R23.4a 仍被拦。\n- S2 续跑由委托 执行，上限是 A193 批的 185 CU。提交阶段的回执我核过后交出。\n- 没有需要 Liang Hu 定的事。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 09:33",
+      "text": "【委托结果 · R23.4 雷暴与对流尺度智能体】R23.4b S2 第二台续跑第 120–239 组（185 CU 内）\nS2 第二台已开跑：会话 r234b-s2-vm2-1027 于 10 月 27 日 08:48:57 EDT 分配，08:51:40 在 A100 高内存 VM 上启动后台续跑。单元 120 的旧基线已跳过；首批 120–124 组各有 10/10 成员成功。\n\n前五组 PURGE 后剩余空间均为 205.09 GB，未见 diskstop 或 failed。实测单组平均 368.06 秒；截至 09:27:55，整轮估算为 91.3＋2338.33×6.77/3600＋115×368.06×6.77/3600＝约 175.30 CU，低于 185 CU 上限。这是费率估算，不是单会话独立账单。\n\nkeepalive 已运行并拉回增量检查点；命令、日志路径及回访安排见提交记录：\n\n\n全样本尚未跑完，预注册判据未评分。已安排约 40 组时复核预算；完成或触发停机条件后将拉回结果、停 VM 并报告。需要 Liang Hu 判断：否。\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 09:33",
+      "text": "S2 第二台已经在跑。我把 r23-4 交回的提交记录逐项核过，与实际情况一致，验收清单齐了。\n\n**会话和开跑时间**\n- 会话名 `r234b-s2-vm2-1027`，跑在 A100 高内存 VM 上，10-27 08:48:57 分配，08:51:40 起跑。\n- 09:33 我用这个会话自己的状态文件查过：会话在线，后台进程还活着，最新一行日志是第 125 组、成员 110 成功。\n- 内核显示 IDLE 是正常的：续跑在 VM 后台进程里跑，不占前台执行。\n\n**前 5 组 PURGE 后剩余空间**\n- 第 120–124 组每组读数都是 205.09 GB，没有往下掉，说明磁盘泄漏已修住。\n- 没出现 diskstop，也没出现 failed。\n- 5 组都是 10/10 成员成功。第 120 组的对照预报沿用原检查点，没有重算。\n\n**单组秒数和整轮 CU 重估**\n- 5 组实测分别是 357.3、372.0、371.1、369.8、370.1 秒，均值 368.06 秒。\n- 重估算式：91.3 + 2338.33 × 6.77 / 3600 + 115 × 368.06 × 6.77 / 3600 ≈ 175.30 CU。这个算式我复算过，结果相同。离 185 CU 上限约 9.7 CU。\n- 剩余 115 组约 11.8 小时，预计 10-27 21:30 前后跑完。\n- 这是按会话时长乘单价估的，不是单独的会话账单。\n\n**keepalive 和检查点**\n- keepalive 已作为系统服务在跑，09:30 状态正常。\n- 增量检查点已拉回本地 3 份，最新一份 57 行。\n- 启动前 5 个输入文件的 sha256 都核对过。\n\n**接下来**\n- 12:57 r23-4 会按约 40 组做第一次预算复核。\n- 外推超过 185 CU，或出现 diskstop/failed，它会停在当前组、拉回检查点、关掉 VM，并立即上报。\n- 跑完后它会关掉 GPU，按预注册第 4.3 节评分、写结论草案，再上报。我收到后送 6 人。\n\n提交记录：\n\n\n\n## 结论\n- **会话和开跑：** S2 第二台 `r234b-s2-vm2-1027`（A100 高内存）10-27 08:51:40 开跑，09:33 核实在线、进程在跑，已到第 125 组。\n- **前 5 组 PURGE 剩余空间：** 第 120–124 组均为 205.09 GB，没有往下掉，磁盘泄漏已修住；无 diskstop 或 failed，每组 10/10 成员成功。\n- **单组秒数和整轮 CU：** 实测单组均值 368.06 秒。整轮重估为 91.3 + 2338.33 × 6.77 / 3600 + 115 × 368.06 × 6.77 / 3600 ≈ 175.3 CU（已复算），在 185 CU 上限内。预计 10-27 21:30 前后跑完。\n- **后续安排：** 12:57 第一次预算复核。超限或磁盘出错即停机上报；跑完后关 GPU、评分、写结论草案再上报，我收到后送 6 人。\n- **需要 Liang Hu 定的事：** 无。\n\n⚠️ 提交阶段_20261027.md: 文件在，不在该 agent 可附件的目录内（允许：工作区；共享区；共享区；共享区）。可把文件复制到 下再标记；若这个目录本该允许，请告诉平台 Lead"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 13:01",
+      "text": "【委托结果 · R23.4 雷暴与对流尺度智能体】回访回报：「R23.4 雷暴与对流尺度 → R23.4 雷暴与对流尺度智能体」R23.4b S2 第二台续跑第 120–239 组（185 CU 内）\n10 月 27 日 13:00 EDT 核查：会话 r234b-s2-vm2-1027 仍在运行，keepalive 正常。续跑单元 120–159 已完成 40/120 组，每组 10/10 成员成功；单元 120 的基线沿用 VM1 检查点。PURGE 后剩余空间最低 205.08 GB，未见 diskstop 或 failed。\n\n实测平均 370.18 秒/组。整轮重估为 91.3＋15098.49×6.77/3600＋80×370.18×6.77/3600＝175.39 CU，低于 185 CU 上限约 9.61 CU；这是按会话时长估算，并非独立账单。40 组检查点已另存为：\n\n\n已预约 16:43 EDT 再查预算与停机条件，回访号 42040082-5bc1-4c9c-b73e-316a12062151。全样本尚未完成，科学判据未评分；需要 Liang Hu 判断：否。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 13:01",
+      "text": "13:00 的第一次预算复核过了：整轮仍在 185 CU 上限内，续跑照常进行，不用停。r23-4 报的情况我自己核过，具体如下。\n\n**检查点内容**\n- 40 组检查点里一共 440 行，全部是 ok。\n- 单元 120–159 每组都是 10/10 成员。\n- 对照预报覆盖单元 121–160。单元 120 的对照沿用 VM1 原检查点，所以不在这份里；单元 160 的对照已经跑完，它的 10 个成员正在跑。\n\n**预算重估**\n- 算式：91.3 + 15098.49 × 6.77 / 3600 + 80 × 370.18 × 6.77 / 3600 ≈ 175.39 CU。我复算过，结果一致。\n- 离 185 CU 上限还差约 9.6 CU。这个数是按会话时长乘单价估的，不是单独的会话账单。\n\n**运行状态**\n- 12:59 keepalive 日志显示进程还在跑，会话已用 4.2 小时，离 24 小时上限还剩 19.8 小时。\n- PURGE 后剩余空间最低 205.08 GB，没有出现 diskstop 或 failed。\n\n**接下来**\n- 剩 80 组，约 8.2 小时，预计 21:15 前后跑完。\n- 16:43 第二次查预算，中间不需要人管。\n- 跑完后 r23-4 会关掉 VM、打分、写结论草案再上报，我收到后送 6 人。\n\n## 结论\n- **进度：** S2 第二台已完成 40/120 组（单元 120–159），全部 10/10 成员成功，检查点已逐行核过。\n- **预算：** 实测每组 370.18 秒，整轮重估约 175.4 CU（已复算），在 185 CU 上限内；磁盘稳定在 205 GB 左右，没有出现 diskstop 或 failed。\n- **下一步：** 16:43 再查一次预算，预计 21:15 前后跑完，之后评分、写草案，再送 6 人。\n- **需要 Liang Hu 定的事：** 无。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 16:44",
+      "text": "【委托结果 · R23.4 雷暴与对流尺度智能体】回访回报：「R23.4 雷暴与对流尺度 → R23.4 雷暴与对流尺度智能体」R23.4b S2 第二台续跑第 120–239 组（185 CU 内）\n10 月 27 日 16:44 EDT 核查：r234b-s2-vm2-1027 的后台作业和 keepalive 均在运行。单元 120–195 连续完成，共 76/120 组；独名拉回检查点核实这 76 组各有 10/10 成员成功。最近五组 PURGE 后剩余空间为 205.07、205.07、205.07、205.06、205.06 GB，未见 diskstop 或 failed。\n\n实测平均 371.15 秒/组。按指定口径，整轮重估为 91.3＋28508.96×6.77/3600＋44×371.15×6.77/3600＝175.62 CU，低于 185 CU 上限约 9.38 CU；这是费率估算，并非独立账单。检查点与核查记录位于 vm2_1027/，检查点名为 incremental_120_240_gate76_1027_1644.jsonl。\n\n作业尚未结束，评分未进行。已预约 17:14 EDT 的第 80 组预算闸门回访，回访号 -a823-4669-9c8f-97c155c8364f；若触发超限或失败条件，将立即保全检查点并停机。需要 Liang Hu 判断：否。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 16:44",
+      "text": "16:44 的第二次复核过了，S2 续跑正常，不用停。r23-4 报的情况我自己核过，具体如下。\n\n**进度**\n- 单元 120–195 已连续跑完，共 76/120 组。\n- 我逐行读了 76 组的检查点：每组都是 10 个成员，没有一行失败。\n\n**预算**\n- 整轮重估按这个式子算：91.3 + 28508.96 × 6.77 / 3600 + 44 × 371.15 × 6.77 / 3600 ≈ 175.62 CU。我复算过，结果一样。\n- 离 185 CU 上限还有约 9.4 CU。这是按会话时长乘费率估的，不是单独的会话账单。\n\n**运行状态**\n- 16:44 的 keepalive 日志显示进程还在跑，会话已用 7.9 小时，离 24 小时上限还剩 16.1 小时，够用。\n- 磁盘剩余稳定在 205.06–205.07 GB，没有出现 diskstop 或 failed。\n\n**接下来**\n- 剩 44 组，约 4.5 小时，预计 21:15 前后跑完。\n- 17:14 第 80 组时再做一次预算复核。\n- 跑完后 r23-4 会关掉 VM、评分、写结论草案再上报。我收到后送 6 人。\n\n## 结论\n- **进度：** S2 第二台已完成 76/120 组（单元 120–195），每组都是 10/10 成员成功，检查点我已逐行核过。\n- **预算：** 整轮重估约 175.6 CU，已复算，在 185 CU 上限内。磁盘稳定在约 205 GB，没有出现 diskstop 或 failed。\n- **下一步：** 17:14 再复核一次预算。预计 21:15 前后跑完，之后评分、写草案，再送 6 人。\n- **需要 Liang Hu 定的事：** 无。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 17:17",
+      "text": "【委托结果 · R23.4 雷暴与对流尺度智能体】回访回报：「R23.4 雷暴与对流尺度 → R23.4 雷暴与对流尺度智能体」R23.4b S2 第二台续跑第 120–239 组（185 CU 内）\n10 月 27 日 17:16 EDT 核查：会话 r234b-s2-vm2-1027 的后台作业与 keepalive 均正常。单元 120–200 连续完成，共 81/120 组，每组 10/10 成员成功；201 尚在运行。PURGE 后剩余空间最低 205.06 GB，未见 diskstop 或 failed。独名检查点已拉回：。\n\n实测均值 371.3309 秒/组。按指定口径，整轮重估为 91.3＋30458.30×6.77/3600＋39×371.3309×6.77/3600＝175.8125 CU，低于 185 CU 上限约 9.1875 CU。这是费率估算，不是独立账单；未触发停机条件，评分尚未开始。\n\n已预约 21:29 EDT 完工及预算回访，回访号 -7681-46b0-9736-f90ef1304246。需要 Liang Hu 判断：否。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 17:17",
+      "text": "17:16 这次复核通过：预算还在 185 CU 以内，续跑照常进行，不需要停。\n\n**进度：** 单元 120–200 已连续跑完，共 81/120 组。我逐行读了检查点，这 81 组都是 10 个成员齐全，没有一行失败。单元 201 正在跑，检查点里已有它 1 个成员的结果。\n\n**预算：** 整轮重估 91.3 + 30458.30 × 6.77 / 3600 + 39 × 371.33 × 6.77 / 3600 ≈ 175.81 CU，我复算的结果一样。离 185 CU 上限还有约 9.2 CU。这个数是按会话时长乘单价估的，不是单独出的账单。\n\n**运行状态：** 17:14 的 keepalive 日志显示进程还在跑。会话已开 8.4 小时，离 24 小时上限还剩 15.6 小时。磁盘剩余最低 205.06 GB，没有出现 diskstop 或 failed。\n\n**接下来：** 剩下 39 组大约要 4 小时，预计 21:15 前后跑完。21:29 安排了完工和预算回访。跑完后 r23-4 会关掉 VM、按预注册评分、写结论草案再上报，我收到后送 6 人。\n\n## 结论\n- **进度：** S2 第二台已完成 81/120 组（单元 120–200），每组 10/10 成员成功，检查点我已逐行核过。\n- **预算：** 整轮重估约 175.8 CU（已复算），在 185 CU 上限以内。磁盘稳定在约 205 GB，没有触发任何停机条件。\n- **下一步：** 预计 21:15 前后跑完，21:29 回访核实完工和预算；之后评分、写草案，再送 6 人。\n- **需要 Liang Hu 定的事：** 无。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-27 21:24",
+      "text": "【委托结果 · R23.4 雷暴与对流尺度智能体】回访回报：「R23.4 雷暴与对流尺度 → R23.4 雷暴与对流尺度智能体」R23.4b S2 第二台续跑第 120–239 组（185 CU 内）\n本配置、本次 120＋120 盲样本的 S2 冻结主闸门未通过；不能据此外推为 AI 与 HRRR 的一般优劣结论。完工核查：；修正版结论草案：。需要 Liang Hu 判断：否。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "R23.4 雷暴与对流尺度",
+      "ts": "2026-10-27 21:24",
+      "text": "先核两件事：机器是否已经停掉，以及 bot 改评分脚本的那一处。S2 第 120–239 组已全部跑完。结果是：在本配置、本样本（StormCast V1 加混合层阵风诊断，120 个事件和 120 个对照）上，S2 的冻结主闸门**没有通过**。r23-4 的完工核查和结论草案我都核过了，下面是核对结果。\n\n**运行与费用**\n- 10-27 约 21:22 会话已关闭，我查过 Colab 上没有残留会话。\n- 第二台按会话时长估约 85.0 CU，整轮约 176.4 CU，在 185 CU 上限内。这是按时长乘单价估的，不是单独出的账单。\n\n**样本**\n- 我自己读了合并后的检查点：240 个单元都是 10 个成员齐全，种子 101–110 各一条，没有重复；240 个对照预报也都在。\n- 另有 10 条失败记录，是首组以前就有的失败诊断，不计入有效结果。没有缺失，也没有剔除。\n\n**评分脚本改过一处，我核过**\n- 冻结的评分脚本 第 87 行把误报差写成了 false_a **+** false_h。同一脚本第 126 行和 174 行的定义都是相减，所以这是笔误。修正版只把这里改成减号，另外只改了本地输入路径，并因合并成一个输入文件，相应放宽了一条分段检查（这条检查不影响评分）。阈值、bootstrap 和样本都没动。\n- 这处修正不影响结论。按原来的加号算，误报差是 0.058，超过 0.05，误报一项会判不通过；但另外三项本来就不通过，总闸门的结论一样。\n\n**四项冻结判据**（按 UTC 日簇重抽 5000 次，均有效）\n\n| 判据 | 实测 | 要求 | 结果 |\n| --- | --- | --- | --- |\n| BS 差（AI − HRRR） | +0.070，单侧 95% 上界 +0.106 | 上界 < +0.02 | 不通过 |\n| 事件命中率差 | 0.100 − 0.275 = −0.175，下界 −0.237 | 下界 > −0.15 且点估计 ≥ −0.05 | 不通过 |\n| 对照误报率差 | −0.008，上界 +0.023 | 上界 < +0.15 且点估计 ≤ +0.05 | 通过 |\n| 峰值比中位数 | 0.863，90% 区间 [0.803, 0.911] | ≥ 0.9 | 不通过 |\n\n**另报的指标**（不进主判据）\n- 前 k 个单元里的事件数：k=12 时 AI 9/12、HRRR 12/12；k=60 时 AI 46/60、HRRR 51/60。\n- 雷暴的实测阵风落在 10 个成员峰值范围内的比例只有 0.125。\n- ROC AUC 为 0.611。\n- 去掉 98 个单元后再算一遍，方向不变。\n\n**草案要改的两处**\n- 草案的数据来源一行写的是原脚本，应改成修正版脚本。\n- 结论句是模板话\"未全部通过或误报无区分力\"，应写明是 BS、命中率、峰值比三项不通过。\n\n这两处送审时一并请审稿人核。草案的措辞已限定在本配置、本样本，没有写\"AI 不如 HRRR\"一类的说法。\n\n**下一步**：按任务书，R23.4 送 6 人。要审的是三件事：误报差的改动、两台机器结果的合并、四项判据的读法。审查结束前，这个结论不对 Liang Hu 下\"成立\"。\n\n完工核查：\n\n结论草案：\n\n\n## 结论\n- **完工：** S2 单元 120–239 已跑完，240 个单元各 10 个成员加 1 个对照预报，无缺失、无剔除、无重复（已逐条核过）。10-27 约 21:22 已关 VM 并核实无残留。整轮约 176.4 CU（按时长乘单价估算），在 185 CU 上限内。\n- **结果（本配置、本 120+120 盲样本）：** 冻结主闸门未通过。BS 差 +0.070（上界 +0.106，要求 < +0.02），命中率差 −0.175，峰值比 0.863（要求 ≥ 0.9），这三项不通过；误报率差 −0.008，通过。不能外推为 AI 与 HRRR 的一般优劣。\n- **要审的改动：** 原评分脚本第 87 行误报差的笔误（写成相加）已改为相减，与脚本自身的定义一致，阈值和样本未动。按原写法算总闸门结论也不变。草案的来源脚本名和结论句两处需修正，请审查时一并核。\n- **结论草案：** \n- **下一步：** R23.4 送 6 人。\n- **需要 Liang Hu 定的事：** 无。\n\n⚠️ S2_完工核查与结论_20261027.md: 文件在，不在该 agent 可附件的目录内（允许：工作区；共享区；共享区；共享区）。可把文件复制到 下再标记；若这个目录本该允许，请告诉平台 Lead\n\n⚠️ S2_结论草案.md: 文件在，不在该 agent 可附件的目录内（允许：工作区；共享区；共享区；共享区）。可把文件复制到 下再标记；若这个目录本该允许，请告诉平台 Lead"
+    }
+  ],
+  "files": {
+    "self": "l-convective-scale-ai-nowcast.json",
+    "claims": null,
+    "pdf": {
+      "zh": "../../pdf/l-convective-scale-ai-nowcast.zh.pdf",
+      "en": "../../pdf/l-convective-scale-ai-nowcast.en.pdf"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "42a5e62f",
+  "slug": "42a5e62f",
+  "number": "L29.1",
+  "title": {
+    "zh": "L29.1 抗风设计中的结构非线性 总控",
+    "en": "L29.1 抗风设计中的结构非线性 总控"
+  },
+  "group": "better",
+  "parent": "05a74edc",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "42a5e62f.json",
+    "claims": null,
+    "pdf": null
+  }
+}

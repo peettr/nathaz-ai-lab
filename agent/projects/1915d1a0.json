@@ -1,0 +1,47 @@
+{
+  "id": "1915d1a0",
+  "slug": "1915d1a0",
+  "number": null,
+  "title": {
+    "zh": "合作对接",
+    "en": "合作对接"
+  },
+  "group": "plat",
+  "parent": "39257059",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-28 09:44",
+  "end": null,
+  "updated": "2026-10-31 00:13",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "1915d1a0.json",
+    "claims": null,
+    "pdf": null
+  }
+}

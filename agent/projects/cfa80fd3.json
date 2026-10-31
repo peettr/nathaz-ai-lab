@@ -1,0 +1,47 @@
+{
+  "id": "cfa80fd3",
+  "slug": "cfa80fd3",
+  "number": "L31.2",
+  "title": {
+    "zh": "L31.2 台风/飓风伴随的风结构：从气象到风工程 总控",
+    "en": "L31.2 台风/飓风伴随的风结构：从气象到风工程 总控"
+  },
+  "group": "core",
+  "parent": "6fbad1e4",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "cfa80fd3.json",
+    "claims": null,
+    "pdf": null
+  }
+}

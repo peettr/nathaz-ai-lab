@@ -1,0 +1,192 @@
+{
+  "id": "62165c82",
+  "slug": "62165c82",
+  "number": "L31.8e",
+  "title": {
+    "zh": "L31.8e 台风特征流动对风机的影响",
+    "en": "L31.8e Impact of Typhoon-Specific Flow Features on Wind Turbines"
+  },
+  "group": "core",
+  "parent": "de5038d9",
+  "depth": 2,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-25 18:10",
+  "end": null,
+  "updated": "2026-10-25 20:08",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8e 快查A：眼墙/风眼过境风向急转、急流与负切变对风机」（Gemini 联网快查）失败：超过 20 分钟仍未完成，按超时处理。用时约 21 分钟。需要的话改一下问题后重新发起，或告诉 Liang Hu。",
+    "en": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8e 快查A：眼墙/风眼过境风向急转、急流与负切变对风机」（Gemini 联网快查）失败：超过 20 分钟仍未完成，按超时处理。用时约 21 分钟。需要的话改一下问题后重新发起，或告诉 Liang Hu。",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 开子项目",
+      "ts": "2026-10-25 18:10",
+      "text": "【Liang Hu 让 L31.8 风机抗台风多灾害韧性与性能化设计 分出的子对话】你是 L31.8e Lead。先读共用交接 （闸门 plan_only：只做文献与方案，不算、不提交；10-29 前交 00_启动方案.md 并 --report 上级）。\nLiang Hu 问（5）：台风中的特征流动对此影响如何（参考 L31.1 和 L31.2）。\n本子项目要回答：登陆内边界层、眼墙区近地风与急流、负切变/超梯度风、滚涡、mesovortices、雨带、台风诱发雷暴与龙卷、风向急转（眼过境）等特征流动，对风机（轮毂与叶轮高度 50–250 m、叶轮跨度内的切变/转向/相干）各环节的影响：荷载与失稳触发、控制跟踪能力（偏航速率 vs 风向变率）、疲劳与极值；现有观测（雷达、激光雷达、下投探空、风电场 SCADA）与模拟（LES、WRF/CM1 耦合 OpenFAST）先例；工程表征（廓线、谱、相干、阵风持时）如何进入风机荷载计算。按核心实验室研究程序：气象文献为主、风工程文献为辅，先做文献图谱并记文献量。\n参考只读：L31.1 页 与 L31.1_工作/；L31.2 页 、L31.2b_眼墙区近地风.md 与 L31.2_工作/（含 L31.2e 文献图谱索引）；L31.8 H 环线索（Sanchez-Gomez、Kapoor、Müller、Wang 2023 Kaimal −24.2%）。不重复 L31.1/L31.2 的气象工作，只做→风机这一段，需要它们的结论写进回报由上级转。\n目录："
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:10",
+      "text": "进度：已读交接、L31.1/L31.2 页和 H 环线索，正在查库并发起 Grok 快查和引文滚雪球。进度：Gemini 联网快查三份（Grok 熔断）和引文滚雪球都在后台跑；我在读已有原文卡，准备矩阵。进度：快查和滚雪球还在跑（完成会自动叫醒我）；先用已核原文卡起草方案和矩阵。进度：方案初稿和矩阵 v0 已写好；在补两处卡片路径，三份快查和滚雪球仍在排队，回来后会自动叫醒我再补文献量并上报。L31.8e 的启动方案初稿和矩阵 v0 写好了，还不能报上级：三份文献快查和引文滚雪球都还没出结果，方案里的文献量和矩阵要等它们回来才能补完。\n\n**方案**：。只写了文字，没有计算，也没有派计算任务。\n\n**矩阵 v0 的初步判断**（基于已有原文卡，没送审）\n- 矩阵是 10 类特征流动 × 风机六栏，每格标证据强弱。\n- **入流表征**有不少定量文献，主要是模拟：\n - 飓风 Laura 的大涡模拟里，风眼过境时 35 分钟内风向转了 144°\n - 眼墙区风向 30 秒内变 30°\n - 叶轮范围内上下风向可差 35° 以上\n - 风谱用 Kaimal 时，叶片摆振根部弯矩比用实测谱低 24.2%。\n- **控制跟踪、失稳触发**两栏几乎都没有文献，只有我自己的推断，没有原文依据。\n- **最值得先查清的一条链**：眼墙区和风眼过境时风向变得太快，偏航跟不上（Laura 算例里偏航速率只有 0.25°/s），偏航误差落进停机失稳的约 15°–60° 区间。三段各自都有原文，串成一条链的研究还没找到。\n- 滚涡、mesovortex、雨带对流、台风龙卷对风机的直接研究，已核的卡里一篇都没有。这几类与风机的尺度关系不同，不能一概而论。\n\n**第一个最小实验 E1**（批准后才做）：用 L31.2、L31.1 已有的大涡模拟塔点风向时程，套三档偏航速率，统计偏航误差进入失稳区间的时间占比。判据写在方案 §2，阈值是假设。不用 SU 和 Colab，不到 1 个节点小时。\n\n**文献检索在跑**\n- Grok 额度用尽（熔断到 23:40），三份快查自动改走 Gemini 联网快查。\n- 引文滚雪球用 13 个种子、9 组检索词，正在排队等 OpenAlex。\n- Deep Research 本月额度已用完，这次没做。\n- 已核原文卡目前约 20 张。\n\n**等 Liang Hu**\n- 是否批准方案。建议批准。\n- Deep Research 要不要加额度。建议若加，只给\"台风风向急变 × 风机偏航\"一题，占 1 次。\n\n结果回来后，我自己逐条筛滚雪球池和快查线索，矩阵升到 v1、补上文献量，再用 --report 报 L31.8。回报里会附上请上级转给 L31.1/L31.2 的需求（风眼过境的风向时程统计），以及和 L31.8c（控制与运维）在偏航上的分界，请上级确认。10-29 前交。\n\n\n\n（附件：00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:16",
+      "text": "【告知 · 来自 核心构想】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知（L31.8 上级转）：L31.8f 方案已交，路径。分工见其§7 R4，上级已认可：b 管各类风“多常见、多大”（事件发生率与对设计风况的统计贡献），f 把事件描述量（U_pk、爬升时间、超切出时长、风向变化率 vs 偏航速率、转子内切变/偏转、鼻高/轮毂高等，§2.1）的统计分布交 b 用；e 管台风流动，与 f 共用同一套描述量并对表“能否共用表征与检验链”；c 管控制策略，f 只给各类流动对控制的要求（爬升时间、风向变化率与控制器响应时间、偏航速率之比），不设计控制器。写方案时按此对齐，有异议写进回报。"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-25 19:16",
+      "text": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8e 快查A：眼墙/风眼过境风向急转、急流与负切变对风机」（Gemini 联网快查）失败：超过 20 分钟仍未完成，按超时处理。用时约 21 分钟。需要的话改一下问题后重新发起，或告诉 Liang Hu。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:16",
+      "text": "进度：快查 A 超时已收窄重发，C 已回；滚雪球池 583 篇我已筛出 33 篇风机相关，正在逐篇查本地有无全文。Now record the screening and counts in the plan.L31.8e 方案还没交，在等文献：滚雪球池已经出来，我人工筛过并派出了取件和建卡；三份联网快查只完成 1 份，另外 2 份超时，已收窄重发。\n\n**文献量**\n- **滚雪球池**：去重后 583 篇，题名里有风机/风电的 157 篇，我按特征流动人工筛出 33 篇。\n - 9 组检索词里有 5 组一篇都没命中，分别是滚涡、急流、激光雷达、mesovortex、内边界层各自加\"风机\"。我已换短一些的词另跑第二个池。\n - 命中 0 只说明这组检索词没找到，不等于没有这方面的文献。\n- **查本地**：33 篇里本地已有 13 篇，确实没有的 20 篇。\n- **已派出两单，都在排队**：\n - 文献库建卡 ：本地已有全文的 12 篇建原文卡。\n - 文献检索取件 ：16 篇。\n - 有 5 篇是 MDPI 的，按你先前\"MDPI 不取\"的指示没派。\n- **联网快查**：Grok 额度用尽，三份都自动改走 Gemini。C 已完成，报告里 13 个 DOI 查到 12 个。A 和 B 超过 20 分钟没完成，已收窄问题重发。\n- **Deep Research**：本月额度已用完，没做。\n\n**筛选的初步观察**（我的判断，没送审）\n- 池里\"台风 × 风机\"的研究，多数是\"台风风场模型 + 结构响应或可靠度\"，很少按特征流动区分入流。\n- 明确处理风向急变的只有 3 篇：Kapoor 2020、Sanchez-Gomez 2026，和一篇专门研究\"台风风向急变下风浪错向\"的论文（engstruct 2026，在取件单里）。\n- 滚涡、mesovortex、雨带对流、台风龙卷对风机影响的论文，一篇都没找到。\n\n方案 §4b 已写上这些计数和筛选记录。取件、建卡和两份快查回来后，我核过原文，把矩阵升到 v1，再用 --report 报 L31.8，10-29 前完成。\n\n快查 C 里有一篇登陆内边界层的大涡模拟（Chen 2025 GRL），属于 L31.1 的气象侧，我会写进回报请上级转给 L31.1。\n\n\n\n（附件：00_启动方案.md）"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-25 19:19",
+      "text": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8e 快查B：滚涡、mesovortex、雨带、台风雷暴与龙卷对风机」（Gemini 联网快查）失败：超过 20 分钟仍未完成，按超时处理。用时约 21 分钟。需要的话改一下问题后重新发起，或告诉 Liang Hu。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:19",
+      "text": "这次超时的是快查 B 第一次发出的那份（18:11 发出），之前已经报过。收窄后的重发版 19:2x 已经发出，正在跑，所以不用再发。重发版回来后，我跟快查 A 的重发版和取件、建卡结果一起处理。"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-25 19:20",
+      "text": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8e 快查C：台风特征流动的观测与模拟耦合风机的先例与工程表征」（Gemini 联网快查）完成，用时约 16 分钟，报告约 11692 字。\n- 报告：\n- 引文核对： DOI 12/13 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.1175/1520-0434(2003)018。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:20",
+      "text": "快查 C 我读完了，所有线索都还没核原文，只当找文献的线索用，结果已记进方案 §4b。\n\n- **\"查不到\"的那个 DOI 是被截断了**，原文是 Franklin 等 2003 的下投探空廓线论文，L31.2b 的索引里已经收了。\n- **跟本题最直接相关的一条**：Han 2019 称，用眼墙实测风谱作入流时，入流偏航角在 30° 和 120° 时塔架和叶片的耦合振动最剧烈。如果属实，30° 正好落在停机失稳的偏航区间（约 15°–60°），120° 在这个区间外。可这篇是 MDPI 期刊的，你先前定过 MDPI 不取，所以没派去取。\n- **其他线索**：\n - Wang 2026：用台风烟花的 36 个集合成员，经 WRF→TurbSim→OpenFAST 做分阶段入流重建。也是 MDPI，报告自己注明只读到摘要。\n - He 2020：山竹台风的风廓线实测，属 Elsevier，可以取。\n - Hirth 2012、Chen & Rozoff 2025：登陆内边界层的气象侧研究，会写进回报请上级转给 L31.1。\n\n**等 Liang Hu**：Han 2019 和 Wang 2026 这两篇 MDPI 开放获取论文能不能破例去取？我建议允许，只取这两篇。已写进方案 §7 第 2 条。\n\n快查 A、B 的重发版，以及取件和建卡两单，都还在跑。"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-25 19:25",
+      "text": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8e 快查A（重发，收窄）：台风风向急变与叶轮切变对风机偏航与荷载」（Gemini 联网快查）完成，用时约 8 分钟，报告约 12427 字。\n- 报告：\n- 引文核对： DOI 15/16 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.1029/2023jd039233)），而针对负切变对风机载荷特异性作用机制的量化分析，目前仍主要以。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:25",
+      "text": "快查 A 收窄后重发的那份回来了，内容比第一次扎实：16 个 DOI 查到 15 个。剩下那个\"查不到\"的只是报告正文把文字粘进了 DOI，其实就是 Sanchez Gomez 2023，库里已经有卡。这些都还只是线索，没核原文。\n\n**有用的新线索**\n- **Gutierrez 2017（WES）**：研究低空急流以上的负切变对风机的影响。这是目前找到的唯一一篇针对负切变的风机工程先例，但不是台风工况。\n- **Krathe 2025（WES）**：研究风向随高度偏转（veer）对大型浮式风机疲劳的影响，也不是台风工况。\n- **Liu 2025（PoF）**：台风分阶段作用对 15 MW 浮式风机的影响。\n- **Zou 2014（Wind Energy）**：停机风机的涡激振动和失速振动。\n\n前三篇本地都有全文，已派文献库建原文卡（第二批，排队中）。Zou 2014 本地没有，下一轮取件时再派。\n\n**又一篇 MDPI 论文与本题直接相关**：Yang 2025（Energies）研究\"台风眼诱发的风向错位\"对浮式风机的影响，正对着\"风眼过境时风向急变\"这一条，也就是矩阵里的 F1。\n\n**等 Liang Hu**：方案 §7 的 MDPI 例外请示，我把建议范围扩成三篇：Han 2019、Wang 2026、Yang 2025。\n\n快查 B 的重发版、第一批取件、两批建卡都还在跑。全部回来后，我把矩阵升到 v1，再报 L31.8。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:26",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8e 建原文卡：台风特征流动×风机 12 篇（本地已有全文）\n可直接使用索引进入全部 12 张卡；本批仅抽取原文，不含对 L31.8e 的判断。第 1、11 篇未匹配到 Zotero 父 key，其余 key 见索引。\n\n- 12 篇原文卡索引（含逐篇 DOI、Zotero key 和卡片链接）→ \n- 01 Beshara & Lundquist，10.1088/1742-6596/3224/2/022010，Zotero key NR → \n- 02 Deskos et al.，10.5194/wes-11-2749-2026，KQC5R47B → \n- 03 Thompson et al.，10.5194/wes-10-2639-2025，Z2GJN7FZ → \n- 04 He et al.，10.1063/5.0229795，8PEWEEXA → \n- 05 Wang et al.，10.1063/5.0214019，AAXRTPFB → \n- 06 Ke et al.，10.3390/app8101982，MAI6RTVD → \n- 07 Amirinia & Jung，10.1016/j.engstruct.2017.02.023，89U4I5IT → \n- 08 Hashemi et al.，10.1016/j.renene.2021.05.042，G9IGFEH7 → \n- 09 Powell & Cocke，10.1073/pnas.1206189109，BPHEEFFB → \n- 10 Li et al.，10.1016/j.jweia.2012.04.005，P4PKNR4U → \n- 11 Wang et al.，10.1016/j.renene.2023.05.052，Zotero key NR → \n- 12 Kapoor et al. 指定字段补卡，10.5194/wes-5-89-2020，AGKN5VE4 → \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n（附件：L31_8e_Batch1_Index_20261025.md）\n\n（附件：NR_L31_8e_01_fulltext_20261025.md）\n\n（附件：KQC5R47B_L31_8e_02_fulltext_20261025.md）\n\n（附件：Z2GJN7FZ_L31_8e_03_fulltext_20261025.md）\n\n（附件：8PEWEEXA_L31_8e_04_fulltext_20261025.md）\n\n（附件：AAXRTPFB_L31_8e_05_fulltext_20261025.md）\n\n（附件：MAI6RTVD_L31_8e_06_fulltext_20261025.md）\n\n（附件：89U4I5IT_L31_8e_07_fulltext_20261025.md）\n\n（附件：G9IGFEH7_L31_8e_08_fulltext_20261025.md）\n\n（附件：BPHEEFFB_L31_8e_09_fulltext_20261025.md）\n\n（附件：P4PKNR4U_L31_8e_10_fulltext_20261025.md）\n\n（附件：NR_L31_8e_11_fulltext_20261025.md）\n\n（附件：AGKN5VE4_L31_8e_12_fulltext_20261025.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:26",
+      "text": "第一批 12 张原文卡交回了，我抽查了两处原文，都对得上：Kapoor 2020 的 PDF 第 10 页，Fran 2026 的 PDF 第 9 页。\n\n**最有用的新发现：偏航错位已经落在失稳偏航区间里**\n- Kapoor 2020 根据眼墙大涡模拟里的风向变化，推算出风机的偏航错位：半径 10、12、15、20 km 处分别是 28.4°、27.1°、19.9°、20.6°（PDF pp.9–10｜期刊 pp.97–98）。\n- 这几个角度都落在停机失稳的偏航区间里（约 15°–60°，来自 Meng、Loubeyres 等）。\n- 但作者用的是固定错位角，没有模拟随时间变化的偏航过程：他们用的风场生成工具 TurbSim 只能给固定的平均风向。\n- 所以\"眼墙风向变化让风机进入失稳窗口\"这条链，现在有了量级上的支持，但还没有人真正算过。这正是 E1 要补的。\n\n**叶轮范围内的风向偏转**\n- Fran 登陆的大涡模拟里，30–270 m 叶轮高度范围最常见的偏转率是 0.027°/m，按 240 m 叶轮算约 6.5°。\n- 切变指数超过 IEC 参考值的时间：3 秒平均为 33.3%，10 分钟平均为 13.6%（PDF pp.8–9）。\n- 这篇没有算风机荷载。\n\n**其余 10 篇**\n- 多数是\"台风风场模型 + 结构响应\"或风险框架，没有按特征流动区分入流。\n- Deskos 2026 综述明确把缺少轮毂和叶轮高度的高频观测、湍流谱和空间相干数据列为短板（PDF p.6｜期刊 p.2754）。\n\n矩阵已据此更新：F1（风眼过境风向急转）、F3（叶轮平面切变与偏转）两行加入了上述原文依据，§4b 的建卡数也已更新。\n\n还在等的有：取件 16 篇、第二批建卡 3 篇、快查 B 重发版。全部回来后，我把矩阵升到 v1，报 L31.8。"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-25 19:27",
+      "text": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8e 快查B（重发，收窄）：滚涡、mesovortex、雨带对流、台风龙卷与风机」（Gemini 联网快查）完成，用时约 8 分钟，报告约 8915 字。\n- 报告：\n- 引文核对： DOI 8/8 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:27",
+      "text": "快查 B 收窄后重发的那份回来了，8 个 DOI 全部查到。这些仍只是线索，原文还没核。\n\n**主要结论：这一块基本是文献空白**\n- 报告自己的核查结论是，没找到台风伴随龙卷直接袭击风机或风电场、并做了荷载、破坏或 SCADA 分析的公开论文或事故调查。这和滚雪球池的结果一致。\n- 所以滚涡、mesovortex、雨带对流、台风龙卷对风机的影响，矩阵里先记为\"文献空白\"，只限本轮检索的范围。\n\n**可用的线索**\n- **Worsnop 2017（BLM）**：用大涡模拟给出飓风边界层的谱和相干，库里已有卡。它和 Worsnop 2017 GRL 是同一团队、同一套模拟，不能当独立验证。\n- **Li 2024（JWEIA）**：台风中—微尺度耦合的风电场模型，考虑了涡结构。Zotero 里有条目但没有 PDF，下一轮取件时补附件。\n- **两篇非台风的类比文献**，本地都有全文，打算和 L31.8f（非台风特征流动）共用：\n - Kwon 2012：阵风锋对风机塔的作用，可以类比 F7（雨带对流）\n - Aslam 2026：2024 年 Greenfield 龙卷造成的风机破坏调查，可以类比 F8（台风龙卷）。\n\n方案 §4b 已补上这次的核对记录。三份快查到这里都已完成，还在等的只剩取件 16 篇和第二批建卡 3 篇。等它们回来，我把矩阵升到 v1，报 L31.8。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:31",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8e 建原文卡第二批：风向急变/veer/负切变×风机 3 篇（本地已有）\nL31.8e Batch 2 的 3 篇原文卡及索引已完成，索引链接已核对。Liu 的 26–35 倍是特定工况的最大叶根面内弯矩，不是疲劳比；Krathe 报告的是高度方向 veer 梯度及 DEL 对照；Gutierrez 的 ξ 表示急流峰位相对扫掠盘的位置，不是负切变梯度。\n\n- Liu 2025 原文卡，DOI，Zotero 附件 `HNQPGNQV` → \n- Krathe 2025 原文卡，DOI，Zotero 附件 `C7TTNCM8` → \n- Gutierrez 2017 原文卡，DOI，Zotero 附件 `MFCSZVDH` → \n- Batch 2 索引 → \n\n\n\n\n\n\n（附件：HNQPGNQV_L31_8e_13_fulltext_20261025.md）\n\n（附件：C7TTNCM8_L31_8e_14_fulltext_20261025.md）\n\n（附件：MFCSZVDH_L31_8e_15_fulltext_20261025.md）\n\n（附件：L31_8e_Batch2_Index_20261025.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:31",
+      "text": "第二批 3 张原文卡交回了。我抽查了 Krathe 2025 表 4 和 Liu 2025 表 IV 两处原文，都对得上。\n\n**新增的原文依据（都只限原文的工况）**\n- **叶轮范围内风向偏转对疲劳的影响**（Krathe 2025，非台风，运行工况）\n - 偏转梯度 ±0.08–0.23 °/m 的工况下，不考虑偏转会低估塔顶前后弯矩的疲劳等效载荷：22 MW 低估 50%，15 MW 低估 25%（最低风速、最大偏转工况，PDF p.8｜期刊 p.2910）。\n - Fran 登陆模拟给出的叶轮高度偏转 0.027 °/m，落在这个范围的低端。\n - 台风停机工况下偏转对疲劳的影响，还没查到研究。\n- **低空急流以上的负切变**（Gutierrez 2017，夜间急流，非台风）\n - 急流峰相对叶轮的位置，会改变 1.5 MW 风机的响应。作者明确说负切变区对疲劳的净效应还不清楚。\n - 这篇只能作类比，不能推成\"负切变降低疲劳\"。\n- **台风分阶段作用**（Liu 2025，IEA 15 MW 浮式）\n - 台风各阶段按平稳工况分段计算，偏航误差只取到 ±10°，远小于失稳区间。\n - 作者自己承认没考虑各阶段连续演变时的瞬态效应。\n - 这也再次说明，\"风向连续急变 + 偏航跟踪\"这一块还没人做。\n\n方案的矩阵（F3、F4、F9 三行）和文献计数都已更新。现在只差取件那一单（16 篇）。回来后我建卡、核对，把矩阵升到 v1，然后报 L31.8。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:56",
+      "text": "【委托结果 · 文献检索智能体】L31.8e 取全文：台风特征流动×风机 16 篇（本地已查、确无）\n交办清单实际包含 17 个 DOI，不是题头所写的 16 篇。已取得 14 篇：指定目录内的 PDF 均已核对可打开，Zotero 云端父条目和附件已回查。另 3 篇未取得；未使用 Mac。逐篇结果如下：\n\nAdvancements on multi-fidelity random Fourier neural networks: application to hurricane modeling for offshore wind energy — 10.2514/6.2025-0651 — Zotero MUHKKMVJ — \n\nOn structural loads and responses of monopile offshore wind turbines under typhoons: Numerical case study of Super Typhoon Chan-hom — 10.1016/j.cscm.2025.e05031 — Zotero 8ECFTEND — \n\nTyphoon‐Induced Effects on Wind Power Generation of a Coastal Wind Farm Based on Wind Observations — 10.1002/ese3.70347 — Zotero KFZ664DQ — \n\nAssessing the impact of wind-wave misalignment on floating offshore wind turbine responses under rapid typhoon wind shifts — 10.1016/j.engstruct.2026.122882 — Zotero 65GPC74B — \n\nThe vibration mechanism of a parked wind turbine in a sheared inflow field — 10.1016/j.energy.2026.141145 — Zotero RCDECBJ8 — \n\nStructural vibration characteristics of offshore wind turbines under tropical cyclones — 10.1016/j.awe.2025.100084 — Zotero CV8RUVKZ — \n\nDynamic response of large-scale offshore wind turbine considering spatiotemporal typhoon impact — 10.1016/j.marstruc.2025.103967 — Zotero BUQCFHU9 — \n\nStudy on load distribution characteristics and wind-resistant performance of standstill wind turbines considering the effect of wind veer — 10.1016/j.renene.2025.123726 — Zotero KXCRG2DW — \n\nBuffeting response analysis of offshore wind turbines subjected to hurricanes — 10.1016/j.oceaneng.2017.06.005 — Zotero QF4BECW9 — \n\nHow can a wind turbine survive in tropical cyclone? — 10.1016/j.renene.2014.02.014 — Zotero DHVZP7S2 — \n\nEffect of the integral length scales of turbulent inflows on wind turbine loads — 10.1016/j.renene.2023.119218 — Zotero QP4D4CFU — \n\nEffects of aeroelasticity and wind direction on the aerodynamic characteristics and structural responses of blades for horizontal-axis wind turbines under typhoons — 10.1016/j.jweia.2025.106125 — Zotero 2UN9I887（仅为原条目补附件）— \n\nGaussian vs non-Gaussian turbulence: impact on wind turbine loads — 10.1002/we.1963 — Zotero ETQ5ZHFH — \n\nHurricane Wind Power Spectra, Cospectra, and Integral Length Scales — 10.1007/s10546-008-9316-8 — Zotero VF6KMX8Q — \n\nMesoscale-informed turbulence reconstruction for offshore wind turbines under typhoon conditions — 10.1088/1742-6596/3224/2/022030 — Zotero key 无 — 未获取：IOP 台式机通道此前因另一篇的验证码熔断；本篇未请求。遵照委托未换 Mac 或其他通道。\n\nSimulation of Hurricane Loading for Proposed Offshore Windfarms off the US Northeast Coast — 10.1088/1742-6596/1452/1/012026 — Zotero key 无 — 未获取：同一 IOP 台式机熔断；本篇未请求，未换通道。\n\nOn the Use of Coupled Wind, Wave, and Current Fields in the Simulation of Loads on Bottom-Supported Offshore Wind Turbines during Hurricanes: March 2012 - September 2015 — 10.2172/1266702 — Zotero key 无 — 未获取：本地查过、确无；尝试的 OSTI 官方 PDF 链接返回 404，NREL 官方报告链接及其研究库域名在本机均无法解析，未取得 PDF。\n\n完整逐篇结果 → \n逐篇取件账本（17 个 DOI 均有记录）→ \n\n\n\n\n（附件：l31_8e_fulltext_result_20261025.txt）\n\n（附件：l31_8e_fetch_ledger.jsonl）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:56",
+      "text": "L31.8e 启动方案已经报给上级 L31.8，方案文件也会自动登记到你的「待批」。这一轮只查了文献、读了原文、写了方案，没有计算，也没有派计算任务。\n\n**取件结果**：这一单其实是 17 篇，取到 14 篇，全文都已入库，已派文献库建原文卡（第三批，在排队）。没取到 3 篇：两篇 IOP 的，台式机的 IOP 通道当时已暂停，没有发出请求；一篇 OSTI 报告，链接打不开。\n\n**我亲自读了 4 篇新论文的摘要，矩阵据此升到 v1**\n- **风向急变**：一篇用 Rammasun 台风风场研究浮式风机的论文，根据规范和实测风向急变定出风浪错向角，30° 最常见，60° 最不利。60° 时，塔顶前后位移极值约为 0° 时的 5.2 倍，叶片摆振位移极值从 1.45 m 涨到 38.97 m（Engineering Structures 2026，PDF p.1 摘要）。\n- **叶轮范围内的风向偏转**：DTU 10 MW 风机停机时，偏转 30° 的侧向推力约为不偏转时的 6 倍，扭矩约 8 倍（Renewable Energy 2025，PDF p.1 摘要；理想化偏转，CFD 计算）。\n- **固定偏航角下的振动**：两篇研究，停机风机偏航 45° 时叶尖涡脱落引起叶片共振；台风下风向 90° 时，下游叶片推力增 109%。\n\n**核心判断**（我的判断，没送审）\n- 最强的一条链是\"眼墙或风眼过境时风向急变 → 偏航跟不上 → 停机失稳\"。三段各自都有原文支持，Kapoor 2020 推算的偏航错位也落在失稳区间里。\n- 但现有研究用的都是固定角度，还没有人用随时间变化的风向时程去驱动偏航跟踪。这正是第一个最小实验 E1 要做的；E1 等你批准后才做，不用超算机时。\n- 滚涡、mesovortex、雨带对流、台风龙卷对风机的影响，在本轮检索范围内是文献空白。\n\n**文献量**：滚雪球去重后 583 篇，我人工采用 33 篇。联网快查 3 份；Grok 不可用，改走 Gemini。Deep Research 额度已用完，没做。原文卡已建 15 张，另有 14 篇在建卡；方案的矩阵共引用原文约 30 篇。\n\n**等 Liang Hu**\n1. 是否批准方案。建议批准。\n2. 三篇 MDPI 开放获取论文是否破例去取：Han 2019、Wang 2026、Yang 2025。建议允许，三篇都和\"风向急变 × 风机\"直接相关。\n3. Deep Research 是否加额度。建议若加，只给\"台风风向急变 × 风机偏航\"一题。\n\n**请上级转达的**\n- 两条登陆内边界层的气象线索转给 L31.1。\n- 问 L31.2 有没有风眼过境时的风向时程。E1 需要它，现有的 CM1 算例不含风眼过境。\n- 和 L31.8c 的分工：偏航跟踪的需求归本子项目，控制策略本身归 L31.8c，请上级确认。\n\n\n\n（附件：00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:59",
+      "text": "【告知 · 来自 核心构想】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n上级（L31.8，10-25）：①分界确认——偏航跟踪“需求”（风向变化率、所需偏航速率、错位分布）归 L31.8e，控制策略本身归 L31.8c；非台风类比文献与 L31.8f 共用、按你标的办。②已直接告知 L31.1（Chen & Rozoff 2025、Hirth 2012）；已向 L31.2 问风眼过境风向时程，对方会 --note 回到本。③MDPI 三篇例外和 Deep Research 加额度两件已列给 Liang Hu。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:59",
+      "text": "【委托结果 · 文献检索智能体】回访回报：「核心构想 → 文献检索智能体」L31.8e 取全文：台风特征流动×风机 16 篇（本地已查、确无）\n清单共 17 篇，已核实 14 篇、未取得 3 篇。每篇的题名、DOI、Zotero 父项及附件 key、本地 PDF 绝对路径，或未获取原因，已逐行写入以下交付文件：\n\n- 完整逐篇结果 → \n- 17 个 DOI 的核验账本 → \n- 原始取件账本 → \n\n\n\n\n（附件：l31_8e_fulltext_result_20261025_v2.txt）\n\n（附件：l31_8e_fetch_ledger_verified_20261025.jsonl）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:59",
+      "text": "这份是文献检索智能体对同一批取件的回访回报，结果和上一份一样：17 篇里取到 14 篇，3 篇没取到。我这边不用再动：这 14 篇已经交文献库建原文卡，L31.8e 的方案也已经报给上级了。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 20:07",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8e 建原文卡第三批：新取到的 14 篇\n可直接使用第三批索引查阅全部 14 张卡；清单中另有 3 篇未取得全文，不在本批范围内。以下路径均位于\n- 第三批索引 → \n- Davis 等，DOI，Zotero `MUHKKMVJ`／`Q7FBH9V2` → \n- Zhang 等，DOI，Zotero `8ECFTEND`／`A28XNGSK` → \n- Jia 等，DOI，Zotero `KFZ664DQ`／`URCQI23V` → \n- Lv 等，DOI，Zotero `65GPC74B`／`2TE2FMTP` → \n- Han 等，DOI，Zotero `RCDECBJ8`／`2W4NC9N9` → \n- Song 等，DOI，Zotero `CV8RUVKZ`／`I7MFXVWT` → \n- Wang 等，DOI，Zotero `BUQCFHU9`／`PT6UCIZE` → \n- Wu 等，DOI，Zotero `KXCRG2DW`／`49RMZ89V` → \n- Amirinia 与 Jung，DOI，Zotero `QF4BECW9`／`ZEBTF2SX` → \n- Han 等，DOI，Zotero `DHVZP7S2`／`R592XDKG` → \n- Stanislawski 等，DOI，Zotero `QP4D4CFU`／`NXEKS2JC` → \n- Peng 等，DOI，Zotero `2UN9I887`／`TG5GQB2M` → \n- Berg 等，DOI，Zotero `ETQ5ZHFH`／`PKXNIET3` → \n- Yu 等，DOI，Zotero `VF6KMX8Q`／`U668XXEB` → \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n（附件：L31_8e_Batch3_Index_20261025.md）\n\n（附件：Q7FBH9V2_L31_8e_01_fulltext_20261025.md）\n\n（附件：A28XNGSK_L31_8e_02_fulltext_20261025.md）\n\n（附件：URCQI23V_L31_8e_03_fulltext_20261025.md）\n\n（附件：2TE2FMTP_L31_8e_04_fulltext_20261025.md）\n\n（附件：2W4NC9N9_L31_8e_05_fulltext_20261025.md）\n\n（附件：I7MFXVWT_L31_8e_06_fulltext_20261025.md）\n\n（附件：PT6UCIZE_L31_8e_07_fulltext_20261025.md）\n\n（附件：49RMZ89V_L31_8e_08_fulltext_20261025.md）\n\n（附件：ZEBTF2SX_L31_8e_09_fulltext_20261025.md）\n\n（附件：R592XDKG_L31_8e_10_fulltext_20261025.md）\n\n（附件：NXEKS2JC_L31_8e_11_fulltext_20261025.md）\n\n（附件：TG5GQB2M_L31_8e_12_fulltext_20261025.md）\n\n（附件：PKXNIET3_L31_8e_13_fulltext_20261025.md）\n\n（附件：U668XXEB_L31_8e_14_fulltext_20261025.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 20:07",
+      "text": "第三批 14 张原文卡交回了。我抽查了 Lv 2026、Wu 2025 两张，和我先前读过的原文对得上。\n\n卡片里多出两点，已写进方案矩阵：\n- **实测风向急变的量级**：Lv 2026 引述外部实测，Rammasun 台风 70 m 高度处，相邻两个 10 分钟平均风向最大相差 77°；Nesat 台风为 53°。这是该文转引的二手数字，后面要追到原始出处。\n- **Lv 2026 没有模拟偏航跟随**：算例里偏航是锁定的。所以\"风向时程 × 偏航跟踪\"仍然没有先例，E1 的定位不变。\n\n至此 L31.8e 发出的取件和建卡委托都已交回，原文卡共 29 张。方案已于 10-25 报上级，之后补的卡片页码只改了方案文件，不另行上报。现在等你批方案，再定两件事：三篇 MDPI 论文能不能破例去取，Deep Research 要不要加额度。\n\n\n\n（附件：00_启动方案.md）"
+    }
+  ],
+  "files": {
+    "self": "62165c82.json",
+    "claims": null,
+    "pdf": null
+  }
+}

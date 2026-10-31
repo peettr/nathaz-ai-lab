@@ -1,0 +1,47 @@
+{
+  "id": "fa36b1ac",
+  "slug": "fa36b1ac",
+  "number": "R23.2",
+  "title": {
+    "zh": "R23.2 天气预报驱动的风工程应用 总控",
+    "en": "R23.2 天气预报驱动的风工程应用 总控"
+  },
+  "group": "wx",
+  "parent": "728a9982",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "fa36b1ac.json",
+    "claims": null,
+    "pdf": null
+  }
+}

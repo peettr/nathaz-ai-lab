@@ -1,0 +1,47 @@
+{
+  "id": "277cbee7",
+  "slug": "277cbee7",
+  "number": "L29.6d",
+  "title": {
+    "zh": "L29.6d 动力与CFD代理模型 总控",
+    "en": "L29.6d 动力与CFD代理模型 总控"
+  },
+  "group": "better",
+  "parent": "63be4b89",
+  "depth": 2,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "277cbee7.json",
+    "claims": null,
+    "pdf": null
+  }
+}

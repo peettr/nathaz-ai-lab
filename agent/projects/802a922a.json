@@ -1,0 +1,150 @@
+{
+  "id": "802a922a",
+  "slug": "802a922a",
+  "number": "L31.8d",
+  "title": {
+    "zh": "L31.8d 风电场系统效应：尾流与连锁",
+    "en": "L31.8d Wind Farm System Effects: Wakes and Cascading Effects"
+  },
+  "group": "core",
+  "parent": "de5038d9",
+  "depth": 2,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-25 18:10",
+  "end": null,
+  "updated": "2026-10-26 09:23",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8d 风电场系统效应：台风下尾流/群体效应与连锁失效」（Gemini 联网快查）完成，用时约 6 分钟，报告约 18345 字。\n- 报告：\n- 引文核对： DOI 16/17 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.1016/j.engstruct.2004.03.007)；m。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。",
+    "en": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8d 风电场系统效应：台风下尾流/群体效应与连锁失效」（Gemini 联网快查）完成，用时约 6 分钟，报告约 18345 字。\n- 报告：\n- 引文核对： DOI 16/17 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.1016/j.engstruct.2004.03.007)；m。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 开子项目",
+      "ts": "2026-10-25 18:10",
+      "text": "【Liang Hu 让 L31.8 风机抗台风多灾害韧性与性能化设计 分出的子对话】你是 L31.8d Lead。先读共用交接 （闸门 plan_only：只做文献与方案，不算、不提交；10-29 前交 00_启动方案.md 并 --report 上级）。\nLiang Hu 问（4）：一整个风电场内的风机，是否还需考虑其他影响，例如风机间的尾流干扰，或类似建筑一类不同风机之间的连锁反应。\n本子项目要回答：①台风/极值风下风电场内的尾流与群体效应：停机/空转风机的尾流是否仍显著、上游风机对下游湍流与荷载的放大、风向急变时的阵列效应；②风机之间及风机—集电/送出系统的连锁：结构上（倒塔砸邻机、碎片）、电气上（集电线路/升压站失效→全场失电→偏航失效）、运维上（共因失效、修复资源竞争）；③场级风险与韧性方法：空间相关风场、组合（portfolio）失效概率、场级停机与恢复曲线（参考 Sheng/Fan/Hong 2024 空间相关、Liu 2022 风场韧性框架、Han 2026 60 年回算、Hallowell 2018 区域）；④类比建筑群干扰与输电线路连锁失效的方法能否借用。\n参考：L31.8 L 环线索与第七批索引；输电塔易损性文献（L 环滚雪球池里有）。\n目录："
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:10",
+      "text": "正在做 L31.8d 的文献检索：联网快查已发起（Grok 额度断，自动改走 Gemini 快查），风电场专用的引文滚雪球在后台跑；接着查库内已有卡片。两个文献池已跑完（约 1420 + 876 条），现在我自己逐条筛题名，挑出各效应的关键文献。筛出 45 篇候选，本地查过：41 篇确无、2 篇在台式机、1 篇只有 Zotero 条目、1 篇已有 PDF。现在派取件。L31.8d 的文献轮在进行中，启动方案还没写，现在等两样东西回来：\n\n- **联网快查**：Grok 额度用尽（402），系统自动改走 Gemini 联网快查，报告几分钟内回来。Deep Research 本月额度已满，不做。\n- **取全文**：委托 交给了 literature，共 44 篇。其中 41 篇本地确无，要在线取；1 篇只差 Zotero 附件；2 篇在台式机上，只读取回。\n\n**已完成的部分**\n- **滚雪球**：跑了两个文献池，去重后合计 2093 条。我按尾流、连锁失效、电气、空间相关、场级韧性、输电线、建筑群干扰、碎片抛射八类逐条筛了题名，选出 45 篇。\n- **库内已有、可直接引用的证据**：\n - **同一风电场内风速差很大**：肝付风电场 15 台风机记录的 10 分钟最大风速在 50.3 到 76.9 m/s 之间。\n - **全场失电与偏航**：\n - 木兰湾风电场倒塌的 8 台都是新建、还没投运的机组，同场 2 台已投运的没有明显破坏。作者把差别归因于偏航和顺桨等抗风措施，但这只是作者的解释，不是对照试验。\n - Rose 2013 用 Carla 飓风做情景：风机不能偏航时塔屈曲比例 7.9%，能持续偏航时 0.4%（PDF p.8｜期刊 p.2133）。\n - **输电线连锁倒塔**：2019 年台风 Faxai 中，78 号塔先倒，导线张力增大，79 号随即倒塌，80 号受损（Yamazaki 2020，PDF p.4、8｜期刊 p.113、117）。\n- **初步看到的缺口**：台风或停机状态下风电场尾流和群体效应的研究很少。Liu 2022 的风场韧性框架明确没计尾流。\n\n等两样东西回来、我核过之后，再写 和效应清单，10-29 前交方案并 --report 上级。"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-25 18:16",
+      "text": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8d 风电场系统效应：台风下尾流/群体效应与连锁失效」（Gemini 联网快查）完成，用时约 6 分钟，报告约 18345 字。\n- 报告：\n- 引文核对： DOI 16/17 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.1016/j.engstruct.2004.03.007)；m。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:16",
+      "text": "在核对 Gemini 快查报告：已查出几处张冠李戴，现在读 Chen 2016 原文里关于失电的段落。正在写 L31.8d 启动方案草稿（先存为草稿名，避免取件没回来就被系统登记）。我读完 Gemini 快查报告，并对照原文核了一遍：这份报告只能当线索用。它把好几篇都标成\"全文精读\"，但至少有 4 处与原文不符：\n\n- **Chen & Xu 2016（天兔）**：报告说电网在登陆前就跳闸、备用电源撑不住偏航。原文是登陆后不久机组相继与电网失联，没提备用电源（PDF p.5、12｜期刊 p.395、402）。\n- **Rose 2012**：报告说\"至少 50% 概率过半损毁\"。原文是：50 台风场在 Galveston 20 年内，至少一塔屈曲的概率 60%（不能偏航）或 25%（能偏航）；超过半数屈曲是 30% 或 10%。\n- **Zhou 等（风场群韧性）**：报告给的 DOI 实际是另一篇（Lee 2025 运维调度），\"韧性下降约 40%\"无从核对。\n- **Xie & Gu 2004（建筑群干扰）**：报告说\"脉动放大 1.4–1.8 倍\"，原文只研究平均干扰，没有这个数。\n\n核对记录在。报告里另有 6 篇本地没有，已派 literature 去取（在排队）。\n\n**启动方案草稿已写好**，存成，暂不用正式文件名，免得取件没回来就被系统登记。主要内容：\n\n- **初判**：要考虑场内其他影响，但主要不是尾流，而是三个\"共同原因\"：\n - 同一场台风同时作用于全场，风场在空间上高度相关\n - 全场共用电源，失电后全场同时失去偏航\n - 灾后共用修复资源。\n \n 这三项在已核文献里都有量化证据，量级从数倍到一个数量级。台风停机工况下的尾流，以及倒塔砸到邻机，目前都没检到可核的定量证据。\n- **近期 2 周**：先出一张效应清单，再整理已有事故里场级的证据，然后做一个\"场级组合失效\"小模型。模型比较三种假设：各台独立、风场空间相关、空间相关再加全场失电。判据开跑前已写定，0 SU。\n\n等两批取件回来、litwiki 建好卡，我补上页码和数字，再改成正式文件名，并上报 L31.8。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 18:34",
+      "text": "【委托结果 · 文献检索智能体】L31.8d 补取 6 篇（快查报告核对用）\n6 篇中取得并核验全文 PDF 5 篇；1 篇未获取。结果已写入：\n- 逐篇取件结果 → \n\n逐篇结果：\n- Modeling dynamic wind direction changes in large eddy simulations of wind farms — 10.1016/j.renene.2021.02.018 — Zotero RCPK35QU — \n- Analysis of throw distances of detached objects from horizontal-axis wind turbines — 10.1002/we.1828 — Zotero K5SX8PUZ — \n- Typhoon Resistance Analysis of Offshore Wind Turbines: A Review — 10.3390/atmos13030451 — 未获取：闸口明确返回 Liang Hu 的 MDPI 禁取规定，本次未访问出版商。\n- Wind hazard reliability assessment of a transmission tower-line system incorporating progressive collapse — 10.1016/j.ress.2025.110878 — Zotero DNZA2M9E — \n- Along-Wind Dynamic Interference Effects of Tall Buildings — 10.1260/136943305776318400 — Zotero HPMXDHZC — \n- Spatiotemporal typhoon impacts on wind speed field of offshore wind farms in the worst scenario of Chinese waters — 10.1063/5.0214019 — Zotero AAXRTPFB — \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:34",
+      "text": "刚核完新到的 5 篇原文，正在把核对结果写进核对表和方案草稿。补取的 6 篇里 5 篇到了，我逐篇读了原文。Li 2022 综述是 MDPI 的，按你的禁取规定没取。\n\n**核对结果：Gemini 快查报告又有 4 处与原文不符**，加上之前查出的 4 处，共 8 处。所以这份报告只当线索，不作依据。\n\n- **Sarlak 2016（碎片抛射）**：报告说台风下碎片最远飞 1.5–2 km。原文的 2 km 出现在叶尖速 150 m/s 的极端超速工况，前提是转子在转，和台风停机无关；正常运行时碎块飞不到 700 m（PDF p.1｜期刊 p.151）。\n- **Stieren 2021（风向急变）**：报告说尾流扫过下游会引起剧烈动载荷。原文是在 LES 里施加动态风向变化的方法论文，只看了发电量，没算荷载。\n- **Du 2025（输电塔线连锁倒塌）**：报告里\"断线张力冲击 1.5–3 倍\"原文没有。原文给的是系统层面的结果（PDF p.15–16）：计入连锁倒塌后，年失效概率从 0.0076 升到 0.0114（约 1.5 倍），33 m/s 时倒塌概率从 0.78 升到 0.99。这正是可以借用的思路：把系统效应写进可靠度。\n- **Wang 2024（台风过境风电场风场）**：原文说的是\"在不同时刻或不同风机之间\"最大阵风可差十倍以上，报告把\"或不同时刻\"丢了，只剩风机之间。\n\n**方案草稿已更新**：第 4d 节加了效应清单 v0，共 12 项，每项写了有没有已核证据、量级、要不要进设计。目前判断：\n- **必须进设计**：场内风况空间差异、多台同时失效的组合风险、共因失电导致全场失去偏航。\n- **建议进布置校核**：碎片抛射。肝付实测碎片飞了 250 m 和 340 m，约为转子直径的 3–4 倍（转子直径按机型推定约 82 m）。\n- **还是待检问题**：停机或空转状态下的尾流、倒塔砸到邻机。\n\n主批取件（44 篇）还没回来。回来后我交 litwiki 建卡、补上页码，再把草稿改成正式文件 上报 L31.8，赶在 10-29 前完成。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 18:50",
+      "text": "【委托结果 · 文献检索智能体】L31.8d 风电场系统效应：取全文 42 篇 + 台式机已有 2 篇\n44 篇中已取到并入 Zotero 18 篇：清单 16 篇、台式机已有 2 篇；未取到 26 篇。结果文件逐篇列出了题名、DOI、Zotero key、本地 PDF 绝对路径或未获原因。Elsevier 在 Mac 通道出现人机挑战后，已按委托停止同社取件，没有重试或换通道。10.1016/j.jweia.2024.105922 保留原条目 NCCZV3HA，附件未补得，未新建条目。\n\n- 逐篇取件结果（44 篇）→ \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:50",
+      "text": "取到 18 篇，我先读与效应清单直接相关的十来篇摘要和关键数字。正在把新读到的几篇原文补进方案，然后改成正式文件名、上报 L31.8。L31.8d 的启动方案写完了，已经上报 L31.8。方案用的是正式文件名，系统会自动登记给 Liang Hu 待批。\n\n**一句话结论（初判，未送审）**：风电场内确实要考虑其他影响，但最要紧的不是尾流，而是全场共有的三类原因：\n\n- **同一场台风全场受影响，风况在空间上相关**：\n - 肝付风电场同一场台风里，10 分钟最大风速在不同机位从 50.3 到 76.9 m/s 不等，最高约为最低的 1.5 倍。\n - 场级风险对风场空间结构很敏感。同一个 50 台风场，20 年内过半塔屈曲的概率，Rose 2012 算出 30%（风机不能偏航时）；Powell & Cocke 指出 Rose 用错了风速口径、也没考虑风场的空间变化，修正后为 8%，相差约 4 倍。\n- **全场一起失电，同时失去偏航**：\n - 天兔台风中，汕尾风电场的机组在登陆后相继与电网失联，失电发生在事件早期，失电后偏航锁定，只能硬扛转向的风（Chen & Xu 2016，PDF p.5｜期刊 p.395）。\n - Rose 2013 的区域情景里，能持续偏航时塔屈曲比例 0.4%，不能偏航时 7.9%，约 20 倍；Hallowell 2018 算出偏航失效使 20 年失效概率增加约 30 倍。\n- **集电系统拓扑和修复资源**：\n - 浙江一个实际海上风场在台风\"贝碧嘉\"中，最坏情景的容量损失 32.9%，约为期望值的 5 倍（Cao 等 2026）。\n - Han 2026 回算 57 年台风：50 年和 100 年一遇情景下，全场可用率分别只有 79.1% 和 43.5%。\n\n**另外两类情况**：\n- 停机风机的尾流、倒塔砸到邻机：都没检到可核的定量证据，现在只是待检问题。\n- 叶片碎片：肝付实测飞了 250 m 和 340 m，约为转子直径的 3–4 倍，建议在风场布置时校核。\n- 输电线的连锁倒塔靠导线张力传递，固定式风电场没有这条通道。可以借用的是做法：把系统效应写进可靠度计算，Du 2025 里计入连锁倒塌后年失效概率约变成 1.5 倍。\n\n**文献量**：\n- 两个滚雪球文献池去重后共 2,093 条，我筛出 45 篇，再加快查报告补的 8 篇；查过本地后在线取到 21 篇。\n- 24 篇本地全文已派 litwiki 建原文卡（在排队）。\n- 我自己读原文、核过页码的有 13 篇；库里原有已核卡约 12 张。\n- Gemini 快查报告（Grok 额度用尽后自动改走）有 8 处与原文不符，只当线索。Deep Research 本月额度已满，没做。\n- 21 篇 Elsevier 文献因下载通道出现人机验证当天停取，已约 10-26 08:51 回访重新派取；2 篇 MDPI 按 Liang Hu 的规定不取。\n\n**近期 2 周（批准后才做）**：\n- 效应清单 v1\n- 场级事故证据表\n- 场级组合失效小模型：比较\"各台独立\"\"空间相关\"\"空间相关加全场失电\"三种假设，判据已在开算前写定，不用超算、不用 Colab。\n\n**等 Liang Hu**：\n1. 批准方案。\n2. 浮式风场共享系泊、共享锚的连锁失效是否纳入。建议暂不纳入。\n3. 能否拿到国内风电场台风期间的 SCADA 数据（失电时刻、逐机风速和偏航角）。不是必需，建议先不专门申请。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无\n\n另请上级转达三件事：L31.8 的环节 β 初表加\"场级\"一行；L31.8b 接收\"逐机位设计风况\"；L31.8c 接收\"全场同时失电\"作为控制状态输入。\n\n文件：\n- 方案 \n- 快查核对 \n\n\n\n（附件：00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:19",
+      "text": "【告知 · 来自 核心构想】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n上级定（L31.8 Lead，10-25）：①β 初表已加“场级”一行（L31.8-01c）；②已把“逐机位设计风况”转 L31.8b、“全场同时失电”转 L31.8c；③浮式共享系泊连锁本轮不纳入，只在效应清单留一行“未纳入、理由”——理由：本线目前无浮式算例，先把固定式三类共因做清；代价：若浮式场是重点场景需二轮补，0 SU。此条不再列等 Liang Hu。④国内风电场台风 SCADA 渠道与 L31.8a 的对外索取数据合并成一条交 Liang Hu，你那边不再单列。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:19",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8d 风电场系统效应：24 篇本地全文建原文卡\n24 张卡及索引已完成；清单、卡片数、索引链接和本地 PDF 存在性均已核对。索引包含全部 DOI、Zotero key、原文路径及版本注意事项。\n\n- 全文索引 → \n\n- 原文卡 01，10.1002/we.1563，7T3FAJRI → \n\n- 原文卡 02，10.1002/we.2147，UJWPCGI2 → \n\n- 原文卡 03，10.1016/j.energy.2025.139718，PZDNVQZ7 → \n\n- 原文卡 04，10.1016/j.enrev.2023.100063，GB959QV9 → \n\n- 原文卡 05，10.1016/j.ress.2019.02.024，86EMD2SS → \n\n- 原文卡 06，10.1038/s41467-025-57565-4，EFIKN268 → \n\n- 原文卡 07，10.1038/s41598-022-04807-w，2S6RGJHG → \n\n- 原文卡 08，10.1049/rpg2.70325，FU2HEHVT → \n\n- 原文卡 09，10.1063/5.0294356，H5SDERQH → \n\n- 原文卡 10，10.1073/pnas.1206189109，BPHEEFFB → \n\n- 原文卡 11，10.1073/pnas.1207542109，VDITCRVT → \n\n- 原文卡 12，10.1088/1742-6596/2767/9/092036，CPF3R4J9 → \n\n- 原文卡 13，10.1109/tste.2021.3075182，4JZ2GDZU → \n\n- 原文卡 14，10.12989/was.2019.28.2.071，5HR9REIX → \n\n- 原文卡 15，10.3389/fenrg.2022.881532，7WAJ6D2R → \n\n- 原文卡 16，10.5194/wes-7-1-2022，HT52QNSW → \n\n- 原文卡 17，10.1016/j.renene.2012.01.010，PIAW77UN → \n\n- 原文卡 18，10.12989/was.2008.11.1.001，H36JTKPC → \n\n- 原文卡 19，10.1016/j.renene.2021.02.018，RCPK35QU → \n\n- 原文卡 20，10.1002/we.1828，K5SX8PUZ → \n\n- 原文卡 21，10.1016/j.ress.2025.110878，DNZA2M9E → \n\n- 原文卡 22，10.1260/136943305776318400，HPMXDHZC → \n\n- 原文卡 23，10.1063/5.0214019，AAXRTPFB → \n\n- 原文卡 24，10.1016/j.engstruct.2004.03.007，Zotero key NR → \n\n\n（附件：L31_8d_Fulltext_Index_20261025.md）\n\n（附件：L31_8d_01_10_1002_we_1563.md）\n\n（附件：L31_8d_02_10_1002_we_2147.md）\n\n（附件：L31_8d_03_10_1016_j_energy_2025_139718.md）\n\n（附件：L31_8d_04_10_1016_j_enrev_2023_100063.md）\n\n（附件：L31_8d_05_10_1016_j_ress_2019_02_024.md）\n\n（附件：L31_8d_06_10_1038_s41467_025_57565_4.md）\n\n（附件：L31_8d_07_10_1038_s41598_022_04807_w.md）\n\n（附件：L31_8d_08_10_1049_rpg2_70325.md）\n\n（附件：L31_8d_09_10_1063_5_0294356.md）\n\n（附件：L31_8d_10_10_1073_pnas_1206189109.md）\n\n（附件：L31_8d_11_10_1073_pnas_1207542109.md）\n\n（附件：L31_8d_12_10_1088_1742_6596_2767_9_092036.md）\n\n📎 [L31_8d_13_10_1109_tste_2021_3075182.md]([local path omitted]…\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:19",
+      "text": "litwiki 交回的 24 张原文卡都齐了。我抽查了 4 张（Powell & Cocke 来信、Rose 回信、贝碧嘉风场容量损失、输电塔线连锁倒塌），数字和页码都和我自己读的原文一致。已把卡片编号和页码补进启动方案，方案结论不变。\n\n- **多台同时失效的争议，现在有了完整数字**：\n - Powell & Cocke 修正后，Galveston 20 年内损失 25 台以上的概率是 8%，Rose 原报 30%；平均损失 2 台，原模型 24 台。他们也承认 8% 仍偏高，因为最强的风不会同时吹遍整个风场（卡 L31_8d_10，PDF p.1｜期刊 p.E2192）。\n - Rose 更正风速口径后回信，算出风场寿命内毁坏超过 10 台的概率为 5%（卡 L31_8d_11，PDF p.1｜期刊 p.E2193）。\n - 两边相差这么大，说明风场在空间上怎么分布，决定了场级风险的量级。这正是方案里组合失效小模型要处理的量。\n- **贝碧嘉实场（58 台 8 MW）**：把风、浪、增水都算进去，期望容量损失 6.64%，只算风是 4.45%；最坏 5% 情景下的平均损失是 32.90%，约为期望值的 5 倍（卡 L31_8d_08，PDF p.8、13–14）。\n- **停机尾流仍然是空白**：已建卡的 4 篇尾流文献都只算了运行中的风机，没有停机或空转状态的结果。两篇可能相关的 Elsevier 文献（复杂地形下的停机风机尾流、极端风 DES 模拟）在明早 08:51 回访时重新派取。\n\n方案已更新，L31.8 那边不用重新上报：结论和\"等 Liang Hu 定\"的事都没变。\n\n\n\n（附件：00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-26 08:52",
+      "text": "【定时回访】重派 L31.8d Elsevier 22 篇取件（10-25 因 Mac 通道人机挑战停止）：清单；先 再派 literature 用 jweia.2024.105922 只补附件 NCCZV3HA。\n（这是你在 2026-10-25 18:51 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-26 08:52",
+      "text": "回访结果：上次没取到的 21 篇 Elsevier 文献，我重新查了一遍本地，其中 4 篇这段时间已被别处取进 Zotero，PDF 都在，不用再下载：\n\n- 台风叠加次生灾害下的海上风电场群韧性（Zhou 2025）\n- 新英格兰海上风电场的飓风荷载\n- 海上风电场扰动与运维响应的韧性建模\n- 海上风电场多维韧性建模框架\n\n剩下 17 篇已重新派给 literature 取件（16 篇新取，1 篇只补附件）。已在本地的 4 篇已派 litwiki 建原文卡。两单完成后都会自动叫醒我，所以不再约回访。\n\n这两单回来后，我只核对新卡、把页码补进。方案的结论和\"等 Liang Hu 定\"的三件事不受影响。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-26 09:21",
+      "text": "【委托结果 · 文献检索智能体】L31.8d 重取 Elsevier 17 篇（10-25 人机挑战停取）\n清单 17 篇均已取得并核验 PDF，未获取 0 篇。本地已先查；取件使用统一。末篇 DOI 10.1016/j.jweia.2024.105922 只在原有 Zotero 父项 NCCZV3HA 下补了附件，没有新建条目。清单外 4 篇本地已有文献未重取。\n\n交付报告 → \n\n17 篇逐项结果（以下均为 Zotero key 和本地 PDF 绝对路径）：\n\n1. The role of shared suction anchors for mitigating cascading failure in floating offshore wind farms — 10.1016/j.compgeo.2025.107655 — E5WMZAFA — \n2. A detached-eddy simulation study on assessing the impact of extreme wind conditions on load and wake characteristics of a horizontal-axis wind turbine — 10.1016/j.energy.2024.131438 — R3VMAIDZ — \n3. Complex terrain effects on wake characteristics of a parked wind turbine — 10.1016/j.engstruct.2015.11.033 — KNGH7IVB — \n4. A compact nonlinear dynamic analysis technique for transmission line cascades — 10.1016/j.engstruct.2017.12.039 — PRVCTFUH — \n5. Numerical model of cascade failure of transmission lines under downbursts — 10.1016/j.engstruct.2022.113876 — S7DVVSJD — \n6. A data-driven physics-informed stochastic framework for hurricane-induced risk estimation of transmission tower-line systems under a changing climate — 10.1016/j.engstruct.2023.115673 — HCH6CJ78 — \n7. Methodology for collapse fragility development for hurricane events: Electrical transmission towers — 10.1016/j.jcsr.2024.109005 — 8BFPJNHA — \n8. A closed-form solution for the wind-induced responses of transmission lines considering the failure of adjacent towers — 10.1016/j.jweia.2022.105110 — 3HFDUWPZ — \n9. A novel probabilistic approach to assess the blade throw hazard of wind turbines — 10.1016/j.renene.2012.09.028 — 2GFN3XGC — \n10. Quantitative assessment of domino effect and escalation scenarios caused by fragment projection — 10.1016/j.ress.2021.108059 — 7JSG6AAA — \n11. Failure dependence and cascading failures: A literature review and research opportunities — 10.1016/j.ress.2024.110766 — 4NRHQRRM — \n12. Typhoon-induced risk evolution in wind farms: From disaster-inducing factors identification to domino effect assessment — 10.1016/j.ress.2026.112638 — GNZ6F3X7 — \n13. Analytical resilience assessment and optimization model for large-scale offshore wind farm clusters informed by hourly component-level simulation — 10.1016/j.ress.2026.112712 — JKWCAFWA — \n14. Wind farm resilience to tornado strikes: A coupled probabilistic damage and system dynamics framework — 10.1016/j.ress.2026.113601 — DJMDZUXH — \n15. Resilience to extreme storm conditions: A comparative study of two power systems with varying dependencies on offshore wind — 10.1016/j.rineng.2024.102408 — 7Q99HIUE — \n16. Estimating intraevent and interevent variability and spatial correlation of tropical cyclone wind fields and their use for the risk assessment of a portfolio of structures — 10.1016/j.strusafe.2024.102440 — AJAJSRH6 — \n17. A meso- to micro-scale coupled model under typhoon conditions considering vortex structure and coriolis effect for wind farms — 10.1016/j.jweia.2024.105922 — NCCZV3HA — \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-26 09:21",
+      "text": "17 篇 Elsevier 文献全部取到，现在可以在线取到的文献都齐了：合计 42 篇。没取到的 6 篇里，2 篇是 MDPI，按你的规定不取；另外 4 篇（IEEE、IOP 会议论文和 Nature Climate Change）出版社没有给出 PDF。\n\n我先读了其中 5 篇，对启动方案有三处修正，方案已更新：\n\n- **停机风机尾流**：原来写\"未检到证据\"，现在有一条弱证据。Eng. Struct. 2016 做了 1:300 风洞试验，叶片停放不转、平坦地形下，从紧贴转子（x/D=1）到下游五倍转子直径（x/D=5），轮毂高度风速几乎不变，说明停机机组自身的尾流亏损很小；山地地形造成的风速亏损要大得多（PDF p.4｜期刊 p.366）。但这只是单个缩尺试验，不是台风湍流，大偏航角也没测，所以仍不进设计，继续作待检问题。\n- **空间相关**：Sheng、Fan、Hong 2024 拿到了全文。摘要明确说，评估一群结构的损伤分布，必须计入台风风场的真实空间相关。这篇是方案里组合失效小模型取相关系数的首选来源，具体参数等建卡时抽出来再引用。\n- **浮式风场共享锚的连锁**：现在有了量化证据。Comput. Geotech. 2025 算出，第一个锚失效后，平台位移比常规系泊少约 80%，但由于动力放大，峰值张力升到 1.25 倍。\n\n方案的总判断不变：场内要优先考虑的是空间相关、全场同时失电、修复资源这三类共同原因。\"等你定\"的三件事也没变，所以没有再上报 L31.8。\n\n新取的 17 篇已派 litwiki 建卡，并点名抽出 Sheng 2024 的空间相关参数。卡片回来后我核过再补进方案。\n\n\n\n（附件：00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-26 09:22",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8d 补卡：4 篇本地已有全文\n已用清单中的 4 份本地 PDF 完成第 25–28 篇原文卡，并追加至指定索引；未下载文献。每卡均列出对象与配置、方法、带定义和单位的关键数字、作者自述局限、五项系统效应专项行，以及 PDF 物理页和论文内部页。已核对索引共 28 条、DOI 无重复、链接均有效。\n\n- 第 25 篇，DOI 10.1016/j.apenergy.2025.125323，Zotero 7HNR3HHD → \n- 第 26 篇，DOI 10.1016/j.renene.2021.05.042，Zotero G9IGFEH7 → \n- 第 27 篇，DOI 10.1016/j.ress.2023.109719，Zotero 7IEDI25M → \n- 第 28 篇，DOI 10.1016/j.rser.2025.116667，Zotero SMIMKBF4 → \n- 更新后的索引 → \n\n\n\n\n\n\n\n（附件：L31_8d_25_10_1016_j_apenergy_2025_125323.md）\n\n（附件：L31_8d_26_10_1016_j_renene_2021_05_042.md）\n\n（附件：L31_8d_27_10_1016_j_ress_2023_109719.md）\n\n（附件：L31_8d_28_10_1016_j_rser_2025_116667.md）\n\n（附件：L31_8d_Fulltext_Index_20261025.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-26 09:22",
+      "text": "4 张新卡已核过。方案结论不变，我做了两处修正：\n\n- **Zhou 等 2025（630 台海上风电场群）**：台风叠加大浪的组合场景，性能损失面积指标比只算台风高 46%（PDF p.6、9）；摘要另称韧性约低 40%（PDF p.1）。已补进效应清单第 5 项\"修复资源与恢复\"。\n- **更正我之前的核对**：Gemini 快查里\"韧性下降约 40%\"这个数，我原先判为不采用。原文找到了：报告给的 DOI 确实错了，但 40% 本身出自 Zhou 2025 摘要。核对表已改为可引，只限这个 630 台场群的配置。\n\n另外 3 篇（新英格兰历史飓风荷载、海上风电场扰动与运维响应、多维韧性框架）都没算风机之间的尾流，场内多台同时失效也只是情景设定，没有改变效应清单的判断。\n\n新取 17 篇的卡片还在 litwiki 那里做。\n\n\n\n（附件：00_启动方案.md）"
+    }
+  ],
+  "files": {
+    "self": "802a922a.json",
+    "claims": null,
+    "pdf": null
+  }
+}

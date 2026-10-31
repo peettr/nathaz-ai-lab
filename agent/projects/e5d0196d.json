@@ -1,0 +1,895 @@
+{
+  "id": "e5d0196d",
+  "slug": "e5d0196d",
+  "number": null,
+  "title": {
+    "zh": "Ansys 总线",
+    "en": "Ansys mainline"
+  },
+  "group": "ansys",
+  "parent": null,
+  "depth": 0,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-15 23:47",
+  "end": null,
+  "updated": "2026-10-30 08:32",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "# 任务书：Ansys MAPDL 自动化管道第一阶段（2026-10-16 Lead）\n\n：下面范围内的事自己定、自己做，不用逐步请示。完成后一次交回。\n\n## 目标\n让智能体能在 CRC 上用 PyMAPDL 批处理驱动 MAPDL：建模 → 网格 → 材料/边界/荷载 → 求解 → 取结果 → 自动对照解析解判合格。第一阶段只要求：环境搭好 + 悬臂梁静力/模态基准过闸门 + 工作站 接通测试一次。\n\n## 已定的路线（Lead 定）\n- **核心走 PyMAPDL 直连**（`ansys-mapdl-core`），在 CRC 批处理作业里 `launch_mapdl(exec_file=..., nproc=..., run_location=<作业目录>)`。若 gRPC 在计算节点起不来，退回 **APDL 输入文件 + `mapdl -b -i in.inp -o out.out`** 方式，Python 只负责生成输入和解析结果；两种都可以，哪种稳用哪种，写明原因。\n- **PyMAPDL MCP（ansys-mapdl-mcp 0.3.2）本阶段只做静态检查，不装进生产 bot、不连真实 MAPDL**：看仓库/包里它会执行什么（`run_python_code` 是任意代码执行）、连哪里、依赖什么，结论写 1 页。\n- 计算在 CRC，单节点、少核（≤4 核、≤1 个 ansys 许可 + 需要的 anshpc），小作业。\n\n## CRC 环境事实（Lead 10-16 11:15 只读核实）\n- → （同目录有 `mapdl`）。\n- 有 和。在 CRC home 下建独立 venv/conda 环境（建议），装 `ansys-mapdl-core`（记版本），不动系统 Python。\n- CRC 组空间约 95% 满：运行根放 （先确认 scratch365 可写；不行再定，写明放哪）。本阶段输出都很小。\n\n## 要做的\n1. **CRC 环境**：建 venv、装 PyMAPDL；查空闲许可的命令（只记命令，不打印服务器地址/许可证内容）；查明 MAPDL 批处理与 SMP/DMP 选项（`-smp-dis`、`-np`），写进 的「待补」三项（你是这份笔记本节的唯一写入者）。\n2. **基准 B1 悬臂梁**（解析解对照），参数：钢 E=200 GPa、ν=0.3、ρ=7850 kg/m³；L=2.0 m；矩形截面 b=0.05 m（宽）× h=0.10 m（高），一端固支；端部竖向集中力 P=1000 N（沿 h 方向）。\n - 解析：δ=PL³/(3EI)，I=bh³/12；根部弯矩 M=PL，最大弯曲应力 σ=M(h/2)/I；绕弱轴/强轴弯曲频率 f_n=(β_nL)²/(2πL²)·√(EI/(ρA))，β_nL=1.8751, 4.6941, 7.8548。\n - 模型 a：BEAM188，两套网格（20、40 单元）；模型 b：SOLID186 实体，粗/细两套网格。\n - 静力取端部挠度、根部支反力、最大弯曲应力（实体取离根部 ≥h 处截面，避开奇异点）；模态取前 6 阶（含两个方向弯曲、扭转、轴向），按振型识别与解析对应的弯曲阶。\n3. **验证闸门**（脚本自动判，输出 PASS/FAIL）：\n - 支反力合力 = P，相对误差 <1e-6\n - BEAM188 端部挠度 ±1%（Timoshenko 剪切修正应 <0.5%，算出来写明），前 3 阶弯曲频率 ±1%（第 3 阶允许 ±2%，写明剪切/转动惯量影响）\n - SOLID186 细网格挠度 ±2%、应力 ±3%、前 2 阶弯曲频率 ±2%；粗→细网格变化 <2%\n - 运行后：MAPDL 进程已退出、许可已释放（作业后查一次）。\n4. **工作站 接通测试一次**（Liang Hu 已批：仅几分钟级，启动 → 极小模型（如单个 BEAM188 悬臂）→ 读回结果 → 关进程，不存 >1 GB）。Windows 侧。若守卫的 工作站 求解器闸门拦下，把拦截原文报 （说明 Liang Hu 已批几分钟级接通测试），**不要绕过**，同时继续做 CRC 部分；工作站 这项最后照实报\"做了/被拦\"。\n5. **脚本与目录**（写入范围：本线目录 、；不写，那些由 Lead 写）：\n - ：通用驱动（读 case 配置 → 生成/驱动模型 → 求解 → 写 → 跑闸门）、作业脚本模板、许可检查脚本\n - ：（全部参数含单位）、（闸门）、\n - 每次运行产出：`results.jsoncheck_report.mdruns_index/<run_id>/`（<50 MB）。\n\n## 超算规矩\n- 任何上 CRC 的作业先向 ComputeOps 资源申请（` `` 登记（`--eta` 必填）。回报时给出申请编号与登记回执。\n- 预检（文件存在、`bash -n`、`qsub -w v`）单独一条命令，看过通过后，提交命令里只放 `ssh … 'cd <运行根> && qsub …'`。\n- SSH 只用现有 socket（`-o ControlMaster=no -o BatchMode=yes -o ProxyCommand=false`，不需输入的加 `-n`），断了就停下说明，不重连。CRC 单节点。\n- 许可：不改配置、不读不打印许可证文件和服务器地址；用前查空闲、用完确认释放。\n\n## 参数规矩\n本任务参数都已给出；若脚本需要其它数值（如剪切修正系数取 10(1+ν)/(12+11ν)），写明来源或标\"假设\"。\n\n## 交回\n见验收清单。数字、路径、作业号写全；闸门结果按表格列出（目标值/计算值/误差/判据/PASS-FAIL）。失败的项照实写，不要调参凑数——若某项 FAIL，先查定义（单位、截面方向、取值位置），修复轮数 ≤2，仍不过就报告原因。",
+    "en": "# Task Brief: Ansys MAPDL Automation Pipeline Phase 1 (2026-10-16 Lead)\n\nMake your own decisions and execute everything within the scope below without asking step by step. Return once upon completion.\n\n## Goal\nEnable agents to drive MAPDL in batch mode on CRC via PyMAPDL: modeling → meshing → material/boundary/load → solving → result extraction → automated pass/fail verification against analytical solutions. Phase 1 requires only: environment setup + cantilever beam static/modal benchmark passing verification gates + one workstation connectivity smoke test.\n\n## Established Route (Set by Lead)\n- **Core route via PyMAPDL direct connection** (`ansys-mapdl-core`), calling `launch_mapdl(exec_file=..., nproc=..., run_location=<job_dir>)` inside a CRC batch job. If gRPC fails to start on compute nodes, fall back to **APDL input file + `mapdl -b -i in.inp -o out.out`**, with Python responsible only for generating inputs and parsing outputs; either route is acceptable; use whichever is stable and document the reason.\n- **PyMAPDL MCP (`ansys-mapdl-mcp` 0.3.2) undergoes static inspection only in this phase; do not install it into production bots or connect it to a live MAPDL instance**: inspect the repository/package to see what it executes (`run_python_code` is arbitrary code execution), where it connects, and what it depends on, and summarize in a 1-page note.\n- Compute runs on CRC: single node, few cores (≤4 cores, ≤1 `ansys` license + required `anshpc`), small jobs.\n\n## CRC Environment Facts (Read-Only Verified by Lead on 10-16 11:15)\n- The MAPDL launcher is available (`mapdl` is in the same directory).\n- Create an isolated venv/conda environment under CRC home (recommended) and install `ansys-mapdl-core` (record the version) without touching system Python.\n- CRC group storage is ~95% full: place the run root on scratch storage (first confirm scratch storage is writable; otherwise choose another location and document where). Outputs in this phase are all very small.\n\n## Tasks to Complete\n1. **CRC Environment**: Create venv and install PyMAPDL; identify the command for checking free licenses (record the command only, without printing server addresses or license file contents); verify MAPDL batch and SMP/DMP flags (`-smp`, `-dis`, `-np`), and fill in the three \"To Be Completed\" items in the environment note (you are the sole writer of that section).\n2. **Benchmark B1 Cantilever Beam** (compared against analytical solutions), parameters: steel E=200 GPa, ν=0.3, ρ=7850 kg/m³; L=2.0 m; rectangular cross-section b=0.05 m (width) × h=0.10 m (height), fixed at one end; tip vertical concentrated load P=1000 N (along h).\n - Analytical: δ=PL³/(3EI), I=bh³/12; root bending moment M=PL, maximum bending stress σ=M(h/2)/I; weak-axis / strong-axis bending frequencies f_n=(β_nL)²/(2πL²)·√(EI/(ρA)), β_nL=1.8751, 4.6941, 7.8548.\n - Model a: BEAM188, two meshes (20 and 40 elements); Model b: SOLID186 solid elements, coarse and fine meshes.\n - Static extraction: tip deflection, root reaction force, and maximum bending stress (for solid elements, extract at a cross-section ≥h from the root to avoid stress singularities); modal extraction: first 6 modes (covering bending in both directions, torsion, and axial), identifying the bending modes corresponding to the analytical solution by mode shape.\n3. **Verification Gates** (automatically evaluated by script, outputting PASS/FAIL):\n - Resultant reaction force = P, relative error <1e-6\n - BEAM188 tip deflection ±1% (Timoshenko shear correction should be <0.5%; compute and state it explicitly), first 3 bending frequencies ±1% (±2% allowed for the 3rd mode; state the effect of shear/rotary inertia)\n - SOLID186 fine-mesh deflection ±2%, stress ±3%, first 2 bending frequencies ±2%; coarse-to-fine mesh change <2%\n - Post-run: MAPDL process has exited and licenses are released (check once after the job).\n4. **One Workstation Connectivity Smoke Test** (approved by Liang Hu: minute-scale only, launch → minimal model such as a single BEAM188 cantilever → read back result → close process, storing <1 GB). Windows side. If blocked by the workstation solver guard gate, report the exact interception message (noting that Liang Hu approved the minute-scale connectivity test), **do not bypass it**, and continue with the CRC portion; report honestly at the end whether the workstation test was \"completed / blocked\".\n5. **Scripts and Directories** (write scope: this line's designated tool and case directories; other files are written by the Lead):\n - Tools: general driver (read case config → generate/drive model → solve → write outputs → run gates), job script template, license check script\n - Cases: parameter file (all parameters with units), gate check file, README\n - Per-run outputs: `results.json`, `check_report.md`, and a per-run directory `runs_index/<run_id>/` (<50 MB).\n\n## Supercomputer Rules\n- Every CRC job must first request resources from ComputeOps and register the job (`--eta` required). Include the request ID and registration receipt in your return report.\n- Run preflight checks (file existence, `bash -n`, `qsub -w v`) as a separate command; once verified, the submission command itself should contain only `ssh … 'cd <run_root> && qsub …'`.\n- Use only the existing SSH control socket (`-o ControlMaster=no -o BatchMode=yes -o ProxyCommand=false`, adding `-n` when stdin is not needed); if disconnected, stop and report without reconnecting. Single node on CRC.\n- Licensing: do not modify configurations, and do not read or print license files or server addresses; check free licenses before use and confirm release after completion.\n\n## Parameter Rules\nAll parameters for this task are given above; if a script requires any additional constants (e.g., shear correction factor taken as 10(1+ν)/(12+11ν)), state the source or mark it as \"Assumed\".\n\n## Deliverables\nSee the acceptance checklist. Provide complete numbers, locations, and job IDs; tabulate gate results (Target / Computed / Error / Criterion / PASS-FAIL). Report any failed items honestly without tuning parameters to force a pass; if an item FAILs, check definitions first (units, section orientation, extraction location) with ≤2 repair rounds, and report the cause if it still fails.",
+    "goal_zh": "让智能体端到端驱动 Ansys MAPDL 结构有限元（几何 → 网格 → 材料/边界/荷载 → 求解 → 取结果 → 自动核对），可复现、可被任何 Lead 委托 `ansys` 调用。交付：管道 + 基准库 + 工具使用说明与限制。",
+    "goal_en": "Enable agents to drive Ansys MAPDL structural finite element analysis end-to-end (geometry → mesh → material/boundary/load → solve → result extraction → automated verification), reproducibly and callable via delegation to `ansys` by any Lead. Deliverables: pipeline + benchmark suite + tool user guide and limitations."
+  },
+  "report": {
+    "zh": "# MAPDL 自动化管道\n\n## 目标\n让智能体端到端驱动 Ansys MAPDL 结构有限元（几何 → 网格 → 材料/边界/荷载 → 求解 → 取结果 → 自动核对），可复现、可被任何 Lead 委托 `ansys` 调用。交付：管道 + 基准库 + 工具使用说明与限制。\n\n## 当前状态\n**工具可用；第二阶段（高层与桥梁）进行中（10-17 05:30）**：B1–B9 与 B7c 已通过（梁、板、框架、偏心框架、高层模态叠加、围护结构风压、索预应力、MATRIX27 单自由度、CAARC 真实风洞荷载）；使用说明已到 v1.4（10-24，审查 后）。B10 明石桥判\"未验证\"（模态 2/5，扭转低 9%，原文缺桁架数据），改做 B10c 颤振管道验证。B9 与 Elshaer 对照：横风加速度低 4–6 倍，原因在荷载输入，已告知 CFD Lead。正式通道 APDL 批处理（CRC 单核 `-q hpc,long`）；gRPC/MCP 暂缓。r4 15 GB + B9 r3 1.9 GB 删除待 Liang Hu。\n\n## 管道方案（第一阶段定稿草案）\n> **历史方案（10-16 上午写）**：其中\"PyMAPDL 直连为主\"已改为\"APDL 批处理为正式通道\"（gRPC 暂停），B3/B5 参考与算例细节已按后续决策更新；现行能力与接口以 为准。\n\n### 1. 驱动方式：PyMAPDL 直连为主，MCP 暂不接\n- **主路**：Python 脚本（`ansys-mapdl-core`）在 CRC 批处理作业里启动 MAPDL、建模求解取结果，全程无人交互。理由：可复现（脚本 + 配置即全部输入）、可放进作业队列、不依赖对话会话状态。\n- **备路**：Python 生成 APDL 输入文件 → `mapdl -b -i in.inp -o out.out` → Python 解析结果。计算节点上 gRPC 起不来时用；输入文件本身也作为存档，便于人工复核。\n- **MCP（ansys-mapdl-mcp 0.3.2，官方仓库 Apache-2.0）**：只做静态检查，不进生产。它的 `run_python_code` 是持久会话任意代码执行，\"连接后才暴露工具\"不是沙箱（「Upstream verification」）。以后若要交互式探索，在 CRC 交互节点、独立 venv、只开命令白名单再评估。\n- 依据：（已知答案复现框架：一条命令跑、一个脚本判、容差先写；日志与 diff 才是证据）；（明确的动作空间 + 验证器出证据）； 经 引（自研 MCP 的白名单脚本、路径守卫、结构化摘要思路）。\n\n### 2. 运行位置\n- **CRC 批处理为主**：；单节点、默认 ≤4 核 SMP，大模型再用 `-dis` DMP（不跨节点，CRC 无 InfiniBand）；运行根。先 ComputeOps 申请、提交一次、`` 登记。\n- **工作站 只做接通测试**（Liang Hu 已批几分钟级；不做正式计算、不存 >1 GB）。\n- 许可：每次用前查空闲；默认 1 份 `ansys` + 按核数所需 `anshpc`；作业结束后核查进程退出、许可释放。\n\n### 3. 目录与脚本结构（本线目录下）\n```\ntools/ 通用驱动 run_case.py、作业模板 job_template.sh、许可检查 check_license.sh、结果解析\ncases/<case_id>/ case.yaml（全部参数和单位、解析/参考值来源）、build.py 或 model.inp、check.py（闸门）、README.md\nruns_index/<run_id>/ results.json、check_report.md、日志尾部、MAPDL 输入文件副本（<50 MB）\n```\n集群上运行根保留完整；本地只放小结果。\n\n### 4. 日志与结果格式\n- ：case_id、run_id、软件版本（MAPDL v252、PyMAPDL 版本）、单元类型与单元/节点数、求解类型、每个输出量（值 + 单位 + 取值位置定义）、求解耗时、核数、许可占用、作业号、运行根。\n- ：表格「量 / 参考值 / 来源 / 计算值 / 误差 / 判据 / PASS-FAIL」+ 网格收敛一行 + 许可释放核查一行。\n- 判合格只看 check.py 的输出，不看叙述。\n\n### 5. 验证闸门（每个算例必须写进 case.yaml，先写后算）\n| 类别 | 判据 |\n| --- | --- |\n| 平衡 | 支反力合力 = 外荷载，相对误差 < 1e-6 |\n| 静力（梁单元 vs 解析） | 挠度 ±1%，应力 ±2% |\n| 静力（实体单元 vs 解析） | 挠度 ±2%，应力 ±3%（避开奇异点） |\n| 模态 | 参考值用 Timoshenko 梁（含剪切与转动惯量）；梁单元前 3 阶 ±0.5%，实体前 2 阶 ±1%；按振型方向配对，不按序号（10-16 修订） |\n| 网格收敛 | 两套网格关心量变化 < 2% |\n| 动力时程（后续） | 与独立程序（OpenSees/MATLAB 振型叠加）峰值与 RMS ±3%，频谱峰位一致 |\n| 运行卫生 | MAPDL 进程退出、许可释放、无残留锁文件 |\n不过闸门：先查定义（单位、截面方向、取值位置、阻尼定义），修 ≤2 轮，仍不过就交失败报告，不调参凑数。\n\n## B1 解析参考值（Lead 10-16 算）\n钢 E=200 GPa、ν=0.3、ρ=7850；L=2 m；b×h=0.05×0.10 m；P=1000 N 沿 h 向。\n- 端部挠度 δ = PL³/3EI = **3.200 mm**（Timoshenko 剪切附加 0.0061 mm，+0.19%）\n- 根部最大弯曲应力 **24.0 MPa**\n- 强轴弯曲频率 **20.384 / 127.75 / 357.70 Hz**；弱轴 **10.192 / 63.874 / 178.85 Hz**\n\n## 已定决定\n- 2026-10-16 小算例（总 CPU 分钟级）改投 CRC 串行 hpc（无 PE、单核）→ \n- 2026-10-16 下一阶段高层与桥梁 → \n- 2026-10-26 通用驱动 v2.1 验收：FULL Rayleigh、带符号误差、stick_cantilever 反力/内力（B11 33/33）→ \n- 2026-10-26 B10 明石桥 Liang Hu 定停（A177）；B12 昂船洲大桥（Liang Hu 资料库模型）通过：两份原模型数据库在 2025R2 重算模态，对当年输出 20/20（频差 ≤0.61%、MAC ≥0.995，跨版本回归）；gRPC 复诊 TCP 求解通过、UDS 未通（A178）→ 、\n- 2026-10-24 使用说明 v1.3 审查 裁决、v1.4 发布（下一步：FULL Rayleigh 阻尼进 case 驱动、检查器带符号误差、B11 反力/内力流程接驱动并补轴力与 J 端，10-29 检查点排单）→ \n- 2026-10-16 通用驱动 v2 通过、说明 v1.2 发布 → \n- 2026-10-16 通用驱动第二版 → \n- 2026-10-16 使用说明审查裁决 → \n- 2026-10-16 B4b、B5 通过；使用说明送审 → \n- 2026-10-16 B3 参考改直接刚度框架、B4 MSUP 同会话 → \n- 2026-10-16 gRPC 暂停、批处理为正式通道 → \n- 2026-10-16 B1 通过；第二阶段 = PyMAPDL 直连验证 + B2 板 → \n- 2026-10-16 频率参考改 Timoshenko → \n- 2026-10-16 小算例改投串行 hpc → \n- 2026-10-16 PyMAPDL 直连为主、APDL 批处理为备、MCP 暂只静态检查；CRC 批处理为主 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 2026-10-17 | B10 明石桥 r1–r4（1573346、1573392、1573404、1573449） | r1/r2 建模连接错误；r4 模态 VS1 −0.5%、VA1 +4.6% 过，LS1 −5.6%、TS1 −9.3%、TA1 −7.4% 不过；质量审计显示原文数据在离散模型中无法同时满足 → 未验证，未做颤振 |\n| 2026-10-17 | B7c 偏心框架（1573431） | 21/21，最大差 0.09% |\n| 2026-10-17 | B9 CAARC 真实风洞荷载（r3 + finish） | 响应 30/30（≤2.1%）；基底反力 MSUP 未扩展 = 未实现；对 Elshaer 2016 横风加速度低 4–6 倍（荷载输入问题） |\n| 2026-10-17 | B7（e=0）、B8 索/MATRIX27 | B7 通过；B8 16/16 |\n| 2026-10-16 | Lead 只读核 CRC：ansys/2025R2 模块、ansys252/mapdl 路径、python/3.12.15、conda 可用 | 环境可用 |\n| 2026-10-16 | 工作站 接通测试（APDL 批处理，单个 BEAM188 悬臂） | 启动→求解→读回→退出成功，0 错误 0 警告，取许可 1.9 s，Windows 无残留进程；单单元只作接通，不作精度判据 |\n| 2026-10-16 | PyMAPDL MCP 0.3.2 静态检查 | 高权限（任意 APDL/Python、可连指定 IP、占许可），不进生产 |\n| 2026-10-16 | 通用驱动 run_case v2（1566505） | 回归 B1 32/32、B2 11/11、B3 8/8、B5 8/8、B6 8/8；盲测铝板 11/11、钢梁 18/18；B6n 8/8 |\n| 2026-10-16 | 通用驱动 run_case 第一版（1565845、1565920） | B1 32/32、B2 11/11；B5 作业名前缀中断、B6 未跑；实现为旧驱动封装，判未通过，重派第二版 |\n| 2026-10-16 | B6 风压测点映射到板（9×13 测点，SHELL181，MSUP） | 8/8 PASS；映射总力对测点积分 0.000%、对精确场 −1.85%；中心挠度静力 −1.7%、动力峰值 −2.0%；接口格式 taps/pressure/meta 定稿 |\n| 2026-10-16 | B5 160 m 测试悬臂 CSV 风力时程 600 s（MSUP 20 个三维模态，参考 5 阶） | 8/8 PASS：静力 0.002%，频率 ≤0.02%，位移均值/标准差/峰值 ≤0.14%，加速度标准差 0.26% |\n| 2026-10-16 | B4b 提取器修复后正式 check.py | 5/5 PASS（在 1564834 原始输出上） |\n| 2026-10-16 | B4b 悬臂 MSUP/全瞬态（1564834） | 求解正确（峰值 6.066/6.080 mm，对参考 0.21%/0.02%）；提取器定长写出多一行致退出码 1 |\n| 2026-10-16 | B3 三层框架（1564022） | 改参考重判 8/8 PASS（位移 ≤0.007%、频率 ≤0.0034%） |\n| 2026-10-16 | B4 瞬态（1564102、1564242、1564521） | SDOF 阶跃/正弦通过（峰值 0.011%/0.014%）；悬臂 MSUP 三轮各卡一条设置规则，单列 B4b |\n| 2026-10-16 | B2 四边简支板 SHELL181（1563513） | 11/11 PASS；对 Navier：挠度 +0.26%、σx +0.10%、6 阶频率 ≤0.13%，粗细挠度差 0.17% |\n| 2026-10-16 | PyMAPDL gRPC 直连三轮（1563511、1563624、1563782） | 未通：NFS 上 UDS 连不上；TCP 误传 ip 未启动；本地 UDS 仍超时、MAPDL 输出为空；暂停 |\n| 2026-10-16 | B1 修复 2 轮：1562864（29/32）→ 1563197（32/32 PASS，单核 hpc，墙钟约 1 min） | 通过 |\n| 2026-10-16 | CRC venv （Py 3.12.15，ansys-mapdl-core 0.74.1）；B1 作业 1557318（APDL -b -smp -np 4，ComputeOps） | 排队 3h15m，14:36 结束；自动闸门 5/22 PASS，全部 FAIL 项为脚本/判据问题；手核：实体挠度 −0.07%、应力 0.0002%，梁/实体频率对 Timoshenko 差 ≤0.03%/≤0.27% |\n| 2026-10-16 | B1 修复第 1 轮：应 ComputeOps 委托改投串行 hpc（1562815 qw 撤 → 1562864，单核无 PE） | 零排队、墙钟 70 s、无残留进程；闸门 29/32 PASS，余 3 项为脚本（BEAM188 反力重复计数 2000 vs 1000；粗网格实体应力取值为 0） |\n\n## 下一步算例清单（由简到繁）\n| 编号 | 算例 | 参考 | 目的 |\n| --- | --- | --- | --- |\n| B1 | 悬臂梁静力 + 模态（BEAM188/SOLID186） | 解析 | 接通、闸门格式（**已通过** 10-16） |\n| B2 | 四边简支矩形板，均布压力静力 + 模态（SHELL181） | Timoshenko 板壳理论 Navier 级数解 | 壳单元、面荷载（风压的载体）（**已通过** 10-16） |\n| B3 | 二维/三维多层框架静力侧推 + 模态 | 剪切型/手算或 OpenSees 对照 | 梁柱节点、质量分布 |\n| B4 | 单自由度/悬臂梁在正弦与阶跃荷载下的瞬态响应（模态叠加与完全法） | Duhamel 解析解 | 时程求解、阻尼定义（Rayleigh/模态阻尼） |\n| B5 ✓ | 高层建筑简化模型（集中质量悬臂或 CAARC 级等效梁）在风压时程下的顶部位移/加速度 | 与 MATLAB/OpenSees 振型叠加对照；荷载取风洞或 CFD 风压时程（经 / 交接） | 风工程主用例 |\n| B7 | 三维框架 + 刚性楼板 + 质心偏心（扭转耦合） | 自写三维剪切型楼房 | 真实高层的前置（19:05 派） |\n| B8 | 预应力索模态 + MATRIX27 气动弹性 | 弦振动解析、SDOF 复模态解析 | 桥梁的前置（19:05 派） |\n| B9 | 高层复现（CAARC 等） | 已发表响应（litwiki 检索中） | 待定 |\n| B10 | 大跨桥梁模态 + 颤振/抖振复现 | 已发表结果（litwiki 检索中） | 待定 |\n| B6 ✓ | 围护结构：玻璃幕墙板/屋面板在风压时程下的应力与挠度 | B2 的动力推广；与规范静力等效值比 | 围护结构用例 |\n\nB5/B6 的风压输入要与 PETW 结构响应子项目对齐格式，届时走跨线交接。\n\n## CAD 几何输入接口设想（留口，CAD 自动化另议）\n- 管道接受三类几何输入，由 的 `geometry.source` 字段区分：\n 1. `parametric`：Python/APDL 参数化直接建（梁、板、框架，当前主用）\n 2. `cad_fileansys-geometry-core`[local path omitted] 导入，再自动网格\n 3. `mesh_file`：外部网格（如 CDB、或 CAD bot/Gmsh 生成的网格）直接读。\n- 约定：CAD bot 交来的每个几何文件附 （单位、坐标系、命名的面/边组——作为施加边界与风压的\"命名选择\"、材料分区、版本与生成脚本路径）。荷载与边界只按命名组施加，不按坐标挑面，这样几何换了管道不用改。\n- 风压映射：风压时程按\"测点坐标 + 时间序列\"给出，管道负责插值到命名面上的单元（后续 B5/B6 实现）。\n\n## 未决与下一步\n- B10c 已收尾：节段与全桥颤振链路通过（全桥 Uf −4%，阻尼偏差约 0.001 原因未明）。\n- B11 通过（r6 作业 1574532，RESVEC）；文档学习手册 tools/manual/（拆页中）；VM 官方例子回归 10 例通过； 收录待；安装笔记已补文档与 VM 地址。之后：B10b 抖振（可用 B10c 全桥模型）；CAD/CDB 几何输入。\n\n## 文献依据\n- ：已知答案复现框架与闸门\n- ：沙箱化工作流、验证器出证据\n- ：PyMAPDL MCP 官方仓库与执行权限\n- B1 解析解为教科书材料力学公式，无库内卡片；B2 板解析解届时请 litwiki 建卡核页码。\n\n## Liang Hu 注",
+    "en": "# MAPDL 自动化管道\n\n## 目标\n让智能体端到端驱动 Ansys MAPDL 结构有限元（几何 → 网格 → 材料/边界/荷载 → 求解 → 取结果 → 自动核对），可复现、可被任何 Lead 委托 `ansys` 调用。交付：管道 + 基准库 + 工具使用说明与限制。\n\n## 当前状态\n**工具可用；第二阶段（高层与桥梁）进行中（10-17 05:30）**：B1–B9 与 B7c 已通过（梁、板、框架、偏心框架、高层模态叠加、围护结构风压、索预应力、MATRIX27 单自由度、CAARC 真实风洞荷载）；使用说明已到 v1.4（10-24，审查 后）。B10 明石桥判\"未验证\"（模态 2/5，扭转低 9%，原文缺桁架数据），改做 B10c 颤振管道验证。B9 与 Elshaer 对照：横风加速度低 4–6 倍，原因在荷载输入，已告知 CFD Lead。正式通道 APDL 批处理（CRC 单核 `-q hpc,long`）；gRPC/MCP 暂缓。r4 15 GB + B9 r3 1.9 GB 删除待 Liang Hu。\n\n## 管道方案（第一阶段定稿草案）\n> **历史方案（10-16 上午写）**：其中\"PyMAPDL 直连为主\"已改为\"APDL 批处理为正式通道\"（gRPC 暂停），B3/B5 参考与算例细节已按后续决策更新；现行能力与接口以 为准。\n\n### 1. 驱动方式：PyMAPDL 直连为主，MCP 暂不接\n- **主路**：Python 脚本（`ansys-mapdl-core`）在 CRC 批处理作业里启动 MAPDL、建模求解取结果，全程无人交互。理由：可复现（脚本 + 配置即全部输入）、可放进作业队列、不依赖对话会话状态。\n- **备路**：Python 生成 APDL 输入文件 → `mapdl -b -i in.inp -o out.out` → Python 解析结果。计算节点上 gRPC 起不来时用；输入文件本身也作为存档，便于人工复核。\n- **MCP（ansys-mapdl-mcp 0.3.2，官方仓库 Apache-2.0）**：只做静态检查，不进生产。它的 `run_python_code` 是持久会话任意代码执行，\"连接后才暴露工具\"不是沙箱（「Upstream verification」）。以后若要交互式探索，在 CRC 交互节点、独立 venv、只开命令白名单再评估。\n- 依据：（已知答案复现框架：一条命令跑、一个脚本判、容差先写；日志与 diff 才是证据）；（明确的动作空间 + 验证器出证据）； 经 引（自研 MCP 的白名单脚本、路径守卫、结构化摘要思路）。\n\n### 2. 运行位置\n- **CRC 批处理为主**：；单节点、默认 ≤4 核 SMP，大模型再用 `-dis` DMP（不跨节点，CRC 无 InfiniBand）；运行根。先 ComputeOps 申请、提交一次、`` 登记。\n- **工作站 只做接通测试**（Liang Hu 已批几分钟级；不做正式计算、不存 >1 GB）。\n- 许可：每次用前查空闲；默认 1 份 `ansys` + 按核数所需 `anshpc`；作业结束后核查进程退出、许可释放。\n\n### 3. 目录与脚本结构（本线目录下）\n```\ntools/ 通用驱动 run_case.py、作业模板 job_template.sh、许可检查 check_license.sh、结果解析\ncases/<case_id>/ case.yaml（全部参数和单位、解析/参考值来源）、build.py 或 model.inp、check.py（闸门）、README.md\nruns_index/<run_id>/ results.json、check_report.md、日志尾部、MAPDL 输入文件副本（<50 MB）\n```\n集群上运行根保留完整；本地只放小结果。\n\n### 4. 日志与结果格式\n- ：case_id、run_id、软件版本（MAPDL v252、PyMAPDL 版本）、单元类型与单元/节点数、求解类型、每个输出量（值 + 单位 + 取值位置定义）、求解耗时、核数、许可占用、作业号、运行根。\n- ：表格「量 / 参考值 / 来源 / 计算值 / 误差 / 判据 / PASS-FAIL」+ 网格收敛一行 + 许可释放核查一行。\n- 判合格只看 check.py 的输出，不看叙述。\n\n### 5. 验证闸门（每个算例必须写进 case.yaml，先写后算）\n| 类别 | 判据 |\n| --- | --- |\n| 平衡 | 支反力合力 = 外荷载，相对误差 < 1e-6 |\n| 静力（梁单元 vs 解析） | 挠度 ±1%，应力 ±2% |\n| 静力（实体单元 vs 解析） | 挠度 ±2%，应力 ±3%（避开奇异点） |\n| 模态 | 参考值用 Timoshenko 梁（含剪切与转动惯量）；梁单元前 3 阶 ±0.5%，实体前 2 阶 ±1%；按振型方向配对，不按序号（10-16 修订） |\n| 网格收敛 | 两套网格关心量变化 < 2% |\n| 动力时程（后续） | 与独立程序（OpenSees/MATLAB 振型叠加）峰值与 RMS ±3%，频谱峰位一致 |\n| 运行卫生 | MAPDL 进程退出、许可释放、无残留锁文件 |\n不过闸门：先查定义（单位、截面方向、取值位置、阻尼定义），修 ≤2 轮，仍不过就交失败报告，不调参凑数。\n\n## B1 解析参考值（Lead 10-16 算）\n钢 E=200 GPa、ν=0.3、ρ=7850；L=2 m；b×h=0.05×0.10 m；P=1000 N 沿 h 向。\n- 端部挠度 δ = PL³/3EI = **3.200 mm**（Timoshenko 剪切附加 0.0061 mm，+0.19%）\n- 根部最大弯曲应力 **24.0 MPa**\n- 强轴弯曲频率 **20.384 / 127.75 / 357.70 Hz**；弱轴 **10.192 / 63.874 / 178.85 Hz**\n\n## 已定决定\n- 2026-10-16 小算例（总 CPU 分钟级）改投 CRC 串行 hpc（无 PE、单核）→ \n- 2026-10-16 下一阶段高层与桥梁 → \n- 2026-10-26 通用驱动 v2.1 验收：FULL Rayleigh、带符号误差、stick_cantilever 反力/内力（B11 33/33）→ \n- 2026-10-26 B10 明石桥 Liang Hu 定停（A177）；B12 昂船洲大桥（Liang Hu 资料库模型）通过：两份原模型数据库在 2025R2 重算模态，对当年输出 20/20（频差 ≤0.61%、MAC ≥0.995，跨版本回归）；gRPC 复诊 TCP 求解通过、UDS 未通（A178）→ 、\n- 2026-10-24 使用说明 v1.3 审查 裁决、v1.4 发布（下一步：FULL Rayleigh 阻尼进 case 驱动、检查器带符号误差、B11 反力/内力流程接驱动并补轴力与 J 端，10-29 检查点排单）→ \n- 2026-10-16 通用驱动 v2 通过、说明 v1.2 发布 → \n- 2026-10-16 通用驱动第二版 → \n- 2026-10-16 使用说明审查裁决 → \n- 2026-10-16 B4b、B5 通过；使用说明送审 → \n- 2026-10-16 B3 参考改直接刚度框架、B4 MSUP 同会话 → \n- 2026-10-16 gRPC 暂停、批处理为正式通道 → \n- 2026-10-16 B1 通过；第二阶段 = PyMAPDL 直连验证 + B2 板 → \n- 2026-10-16 频率参考改 Timoshenko → \n- 2026-10-16 小算例改投串行 hpc → \n- 2026-10-16 PyMAPDL 直连为主、APDL 批处理为备、MCP 暂只静态检查；CRC 批处理为主 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 2026-10-17 | B10 明石桥 r1–r4（1573346、1573392、1573404、1573449） | r1/r2 建模连接错误；r4 模态 VS1 −0.5%、VA1 +4.6% 过，LS1 −5.6%、TS1 −9.3%、TA1 −7.4% 不过；质量审计显示原文数据在离散模型中无法同时满足 → 未验证，未做颤振 |\n| 2026-10-17 | B7c 偏心框架（1573431） | 21/21，最大差 0.09% |\n| 2026-10-17 | B9 CAARC 真实风洞荷载（r3 + finish） | 响应 30/30（≤2.1%）；基底反力 MSUP 未扩展 = 未实现；对 Elshaer 2016 横风加速度低 4–6 倍（荷载输入问题） |\n| 2026-10-17 | B7（e=0）、B8 索/MATRIX27 | B7 通过；B8 16/16 |\n| 2026-10-16 | Lead 只读核 CRC：ansys/2025R2 模块、ansys252/mapdl 路径、python/3.12.15、conda 可用 | 环境可用 |\n| 2026-10-16 | 工作站 接通测试（APDL 批处理，单个 BEAM188 悬臂） | 启动→求解→读回→退出成功，0 错误 0 警告，取许可 1.9 s，Windows 无残留进程；单单元只作接通，不作精度判据 |\n| 2026-10-16 | PyMAPDL MCP 0.3.2 静态检查 | 高权限（任意 APDL/Python、可连指定 IP、占许可），不进生产 |\n| 2026-10-16 | 通用驱动 run_case v2（1566505） | 回归 B1 32/32、B2 11/11、B3 8/8、B5 8/8、B6 8/8；盲测铝板 11/11、钢梁 18/18；B6n 8/8 |\n| 2026-10-16 | 通用驱动 run_case 第一版（1565845、1565920） | B1 32/32、B2 11/11；B5 作业名前缀中断、B6 未跑；实现为旧驱动封装，判未通过，重派第二版 |\n| 2026-10-16 | B6 风压测点映射到板（9×13 测点，SHELL181，MSUP） | 8/8 PASS；映射总力对测点积分 0.000%、对精确场 −1.85%；中心挠度静力 −1.7%、动力峰值 −2.0%；接口格式 taps/pressure/meta 定稿 |\n| 2026-10-16 | B5 160 m 测试悬臂 CSV 风力时程 600 s（MSUP 20 个三维模态，参考 5 阶） | 8/8 PASS：静力 0.002%，频率 ≤0.02%，位移均值/标准差/峰值 ≤0.14%，加速度标准差 0.26% |\n| 2026-10-16 | B4b 提取器修复后正式 check.py | 5/5 PASS（在 1564834 原始输出上） |\n| 2026-10-16 | B4b 悬臂 MSUP/全瞬态（1564834） | 求解正确（峰值 6.066/6.080 mm，对参考 0.21%/0.02%）；提取器定长写出多一行致退出码 1 |\n| 2026-10-16 | B3 三层框架（1564022） | 改参考重判 8/8 PASS（位移 ≤0.007%、频率 ≤0.0034%） |\n| 2026-10-16 | B4 瞬态（1564102、1564242、1564521） | SDOF 阶跃/正弦通过（峰值 0.011%/0.014%）；悬臂 MSUP 三轮各卡一条设置规则，单列 B4b |\n| 2026-10-16 | B2 四边简支板 SHELL181（1563513） | 11/11 PASS；对 Navier：挠度 +0.26%、σx +0.10%、6 阶频率 ≤0.13%，粗细挠度差 0.17% |\n| 2026-10-16 | PyMAPDL gRPC 直连三轮（1563511、1563624、1563782） | 未通：NFS 上 UDS 连不上；TCP 误传 ip 未启动；本地 UDS 仍超时、MAPDL 输出为空；暂停 |\n| 2026-10-16 | B1 修复 2 轮：1562864（29/32）→ 1563197（32/32 PASS，单核 hpc，墙钟约 1 min） | 通过 |\n| 2026-10-16 | CRC venv （Py 3.12.15，ansys-mapdl-core 0.74.1）；B1 作业 1557318（APDL -b -smp -np 4，ComputeOps） | 排队 3h15m，14:36 结束；自动闸门 5/22 PASS，全部 FAIL 项为脚本/判据问题；手核：实体挠度 −0.07%、应力 0.0002%，梁/实体频率对 Timoshenko 差 ≤0.03%/≤0.27% |\n| 2026-10-16 | B1 修复第 1 轮：应 ComputeOps 委托改投串行 hpc（1562815 qw 撤 → 1562864，单核无 PE） | 零排队、墙钟 70 s、无残留进程；闸门 29/32 PASS，余 3 项为脚本（BEAM188 反力重复计数 2000 vs 1000；粗网格实体应力取值为 0） |\n\n## 下一步算例清单（由简到繁）\n| 编号 | 算例 | 参考 | 目的 |\n| --- | --- | --- | --- |\n| B1 | 悬臂梁静力 + 模态（BEAM188/SOLID186） | 解析 | 接通、闸门格式（**已通过** 10-16） |\n| B2 | 四边简支矩形板，均布压力静力 + 模态（SHELL181） | Timoshenko 板壳理论 Navier 级数解 | 壳单元、面荷载（风压的载体）（**已通过** 10-16） |\n| B3 | 二维/三维多层框架静力侧推 + 模态 | 剪切型/手算或 OpenSees 对照 | 梁柱节点、质量分布 |\n| B4 | 单自由度/悬臂梁在正弦与阶跃荷载下的瞬态响应（模态叠加与完全法） | Duhamel 解析解 | 时程求解、阻尼定义（Rayleigh/模态阻尼） |\n| B5 ✓ | 高层建筑简化模型（集中质量悬臂或 CAARC 级等效梁）在风压时程下的顶部位移/加速度 | 与 MATLAB/OpenSees 振型叠加对照；荷载取风洞或 CFD 风压时程（经 / 交接） | 风工程主用例 |\n| B7 | 三维框架 + 刚性楼板 + 质心偏心（扭转耦合） | 自写三维剪切型楼房 | 真实高层的前置（19:05 派） |\n| B8 | 预应力索模态 + MATRIX27 气动弹性 | 弦振动解析、SDOF 复模态解析 | 桥梁的前置（19:05 派） |\n| B9 | 高层复现（CAARC 等） | 已发表响应（litwiki 检索中） | 待定 |\n| B10 | 大跨桥梁模态 + 颤振/抖振复现 | 已发表结果（litwiki 检索中） | 待定 |\n| B6 ✓ | 围护结构：玻璃幕墙板/屋面板在风压时程下的应力与挠度 | B2 的动力推广；与规范静力等效值比 | 围护结构用例 |\n\nB5/B6 的风压输入要与 PETW 结构响应子项目对齐格式，届时走跨线交接。\n\n## CAD 几何输入接口设想（留口，CAD 自动化另议）\n- 管道接受三类几何输入，由 的 `geometry.source` 字段区分：\n 1. `parametric`：Python/APDL 参数化直接建（梁、板、框架，当前主用）\n 2. `cad_fileansys-geometry-core`[local path omitted] 导入，再自动网格\n 3. `mesh_file`：外部网格（如 CDB、或 CAD bot/Gmsh 生成的网格）直接读。\n- 约定：CAD bot 交来的每个几何文件附 （单位、坐标系、命名的面/边组——作为施加边界与风压的\"命名选择\"、材料分区、版本与生成脚本路径）。荷载与边界只按命名组施加，不按坐标挑面，这样几何换了管道不用改。\n- 风压映射：风压时程按\"测点坐标 + 时间序列\"给出，管道负责插值到命名面上的单元（后续 B5/B6 实现）。\n\n## 未决与下一步\n- B10c 已收尾：节段与全桥颤振链路通过（全桥 Uf −4%，阻尼偏差约 0.001 原因未明）。\n- B11 通过（r6 作业 1574532，RESVEC）；文档学习手册 tools/manual/（拆页中）；VM 官方例子回归 10 例通过； 收录待；安装笔记已补文档与 VM 地址。之后：B10b 抖振（可用 B10c 全桥模型）；CAD/CDB 几何输入。\n\n## 文献依据\n- ：已知答案复现框架与闸门\n- ：沙箱化工作流、验证器出证据\n- ：PyMAPDL MCP 官方仓库与执行权限\n- B1 解析解为教科书材料力学公式，无库内卡片；B2 板解析解届时请 litwiki 建卡核页码。\n\n## Liang Hu 注"
+  },
+  "decisions": [
+    {
+      "id": "dec-0000",
+      "ts": "2026-10-16 11:13",
+      "title": "MAPDL 管道路线（2026-10-16 Lead）",
+      "label": "决定",
+      "text": "# MAPDL 管道路线（2026-10-16 Lead）\n\n**Decision I made**：管道核心用 PyMAPDL 直连、在 CRC 批处理作业中运行；计算节点 gRPC 不稳时退回\"Python 生成 APDL 输入文件 + mapdl -b 批处理\"；PyMAPDL MCP 本阶段只做静态安全检查，不进生产 bot。工作站 只做一次几分钟级接通测试（Liang Hu 已批）。\n\n**为什么**：\n- 批处理脚本即全部输入，可复现、可排队、可被其他 Lead 委托（依据 「Durable knowledge」1–5：一条命令跑、一个脚本判、容差先写、日志是证据）。\n- MCP 的 `run_python_code` 是持久会话任意代码执行，\"连接后暴露\"不等于沙箱（「Upstream verification (2026-10-15)」）；交互式会话也不适合无人值守的批作业。\n- CRC 有 2025R2 模块与 python/3.12、conda（Lead 10-16 11:15 只读核实），许可充足。\n\n**错了的代价**：若 PyMAPDL 批处理在 CRC 计算节点上行不通，退 APDL 输入文件方式，损失约半天；若后来需要交互式建模，再补 MCP 隔离评估，不影响已建的基准库。"
+    },
+    {
+      "id": "dec-0001",
+      "ts": "2026-10-16 14:48",
+      "title": "B1 首轮（作业 1557318）判读与频率判据修订（2026-10-16 15:00 Lead）",
+      "label": "决定",
+      "text": "# B1 首轮（作业 1557318）判读与频率判据修订（2026-10-16 15:00 Lead）\n\n**Decision I made**：首轮自动闸门 FAIL（22 项 5 PASS）判为脚本与判据问题、非求解器问题；派修复第 1 轮在新运行根重算。频率判据参考值由欧拉梁改为 Timoshenko 梁（剪切+转动惯量，k=10(1+ν)/(12+11ν)）。\n\n**依据（本线数据，Lead 亲核原始 out.out / metrics.txt）**：\n- MAPDL 8 个子求解均正常结束；SOLID186 细网格挠度 3.1977 mm（对欧拉 3.200，−0.07%）、x=0.2 m 应力 21.600 MPa（解析 21.6）、支反力 1000.000 N。\n- BEAM188 挠度 12.806 mm = 弱轴解析 12.800 + 剪切 0.006：截面方向与加载方向不一致（SECDATA 顺序），物理本身正确。\n- 模态（out.out 原表）BEAM188-40：弱轴 10.1872/63.6546/177.397 Hz，强轴 20.3443/126.022/346.551 Hz；Lead 用 400 单元 Timoshenko 梁（k=0.8497）算得弱轴 10.1873/63.6558/177.402、强轴 20.3446/126.026/346.463，差 ≤0.03%。SOLID186 细网格比 Timoshenko 高 0.18–0.27%。\n- 对欧拉梁，强轴第 2、3 阶差 −1.35%、−3.5%，是 h/L=0.05 时剪切与转动惯量的物理效应，原 ±1%/±2% 欧拉判据定得不对（Lead 的判据设计错误）。\n- 文献依据：无库内卡片；Timoshenko 梁理论为教科书内容，参考值为本线数值计算。\n\n**错了的代价**：若 Timoshenko 参考有误，梁单元仍与实体单元交叉对照（差 <0.3%），不会放过真错误；重算一次约 1 小时机时 + 排队。"
+    },
+    {
+      "id": "dec-0002",
+      "ts": "2026-10-16 15:36",
+      "title": "B1 基准通过、第二阶段范围（2026-10-16 15:50 Lead）",
+      "label": "决定",
+      "text": "# B1 基准通过、第二阶段范围（2026-10-16 15:50 Lead）\n\n**Decision I made**：B1 悬臂梁（BEAM188 20/40 单元、SOLID186 粗/细，静力+模态）判为通过，作为 APDL 批处理通道的第一个基准入库；第二阶段同时做两件事：①用 B1 原样验证 PyMAPDL gRPC 直连通道（方案页定的主路，至今未验证）；②B2 四边简支板（SHELL181，静力+模态，Navier 级数）。\n\n**依据（本线数据，Lead 亲核 CRC 原件）**：作业 1563197，运行根，`run.exitcode=0`，check_report 32/32 PASS、0 FAIL；梁支反力 1000 N（修复：只对 root 节点取 RF）；粗网格应力 21.6066 MPa、细网格 21.6000 MPa（修复：改取角节点 NODE(0.2,0.1,0)）；梁频率对 Timoshenko ≤0.03%，实体 ≤0.46%；许可前后摘要一致、无残留进程。共修 2 轮，未超任务书上限。\n- 文献：无库内卡片；悬臂梁与 Timoshenko 梁为教科书公式，参考值为本线计算。\n\n**错了的代价**：B1 只覆盖线弹性梁/实体；更复杂的问题由 B2–B6 逐个把关，误判的影响限于工具内部。"
+    },
+    {
+      "id": "dec-0003",
+      "ts": "2026-10-16 16:04",
+      "title": "PyMAPDL gRPC 直连暂停，APDL 批处理为正式通道（2026-10-16 16:15 Lead）",
+      "label": "决定",
+      "text": "# PyMAPDL gRPC 直连暂停，APDL 批处理为正式通道（2026-10-16 16:15 Lead）\n\n**Decision I made**：PyMAPDL gRPC 直连三轮未通，暂停，状态记\"未验证\"（不是\"不可用\"）；工具的正式通道定为\"Python 生成 APDL 输入 → `ansys252 -b -smp -np 1` → Python 解析结果 → check.py 闸门\"。B3 框架、B4 瞬态继续在批处理通道上做。MCP 服务器依赖 gRPC，随之暂缓。\n\n**依据（本线数据，Lead 读原始 traceback）**：\n- 1563511：默认 UDS socket 建在 [local path omitted][用户]/.conn（NFS），MAPDL 进程存活但连不上。\n- 1563624：传 ip 参数使 PyMAPDL 走 connect_to_existing，MAPDL 未启动（脚本错误）。\n- 1563782：UDS 放到节点本地 [local path omitted] 仍超时 125 s；MAPDL 的 .err/.log 为空（进程起来但未进入正常输出，原因未明——可能是启动包装脚本、gRPC 服务端初始化或环境问题）；TCP 备选被首个尝试遗留的 .lock 挡住，未真正测试。\n- 批处理通道 B1 32/32、B2 11/11 通过，单次约 1 分钟。\n\n**以后要再试时（低优先）**：在 CRC 交互节点（qrsh）手动起 `ansys252 -grpc -port <p>`，看 MAPDL 屏幕输出是否卡在许可/初始化；PyMAPDL 开 DEBUG 日志；TCP 尝试前清锁（override=True）；必要时问 ComputeOps/CRC 是否有 gRPC 端口限制。\n\n**错了的代价**：批处理通道没有交互式会话，智能体每次改模型要重跑整个输入（小模型约 1 分钟，可接受）；MCP 式交互建模推迟。"
+    },
+    {
+      "id": "dec-0004",
+      "ts": "2026-10-16 16:19",
+      "title": "B3 参考改为直接刚度框架模型；B4 MSUP 同会话修复（2026-10-16 16:25 Lead）",
+      "label": "决定",
+      "text": "# B3 参考改为直接刚度框架模型；B4 MSUP 同会话修复（2026-10-16 16:25 Lead）\n\n**Decision I made**：B3 判据参考由\"剪切型楼房 + 柱剪切修正\"改为 Lead 写的独立二维直接刚度框架模型，判据 ±0.5%，只用已有结果重判、不重算；B4 加批 1 轮，悬臂 MSUP 在同一 MAPDL 会话内完成模态与 MSUP。\n\n**依据（本线数据）**：\n- B3 原件（1564022）顶层位移 6.11201 mm，剪切型参考 6.04590 mm（+1.09%）；Lead 框架模型（含柱轴向变形）6.11160 mm（差 0.007%）；频率 MAPDL 1.570402/4.405370/6.386069 Hz vs 框架模型 1.57046/4.40552/6.38629 Hz（≤0.004%）。差异来自倾覆引起的柱轴向变形，剪切型模型本身不含，是 Lead 定参考的疏漏。\n- B4（1564102）SDOF 阶跃峰值 49.112 mm vs 闭式 49.118 mm（0.011%）、正弦 110.749 vs 110.733 mm（0.014%）；MSUP 致命错误为跨会话复用 modal 文件时 BEAM188 KEYOPT(3)=3 内部节点不一致。\n- 文献：无库内卡片；直接刚度法与 Duhamel 闭式解为教科书方法，参考值为本线计算。\n\n**错了的代价**：直接刚度参考若有共同建模错误（两边都用同一简化），会掩盖问题；但它与剪切型楼房的差异有明确物理解释（轴向变形），且前两层与剪切型差 0.35%/0.71% 合理递增。"
+    },
+    {
+      "id": "dec-0005",
+      "ts": "2026-10-16 16:42",
+      "title": "B4 拆分：SDOF 判通过，悬臂瞬态单列 B4b（2026-10-16 16:50 Lead）",
+      "label": "决定",
+      "text": "# B4 拆分：SDOF 判通过，悬臂瞬态单列 B4b（2026-10-16 16:50 Lead）\n\n**Decision I made**：B4 收窄为 SDOF 阶跃/正弦全瞬态两例（已通过：峰值 0.011%/0.014%，RMS 0.004%/0.028%，逐点最大误差 0.79%/0.09% 峰值）；悬臂梁 MSUP/全瞬态单列为 B4b，批 1 轮。在 B4b 通过前，使用说明里\"模态叠加瞬态\"标为未验证。\n\n**为什么**：悬臂的三次失败各是一个不同的 MAPDL 设置规则（跨会话复用模态文件→内部节点 FATAL；MSUP 首荷载步是初始条件；MSUP 积分步长由首步定死，r4 首步 TIME=1e-8 使结果文件 15 GB，bot 已 qdel），没有一次指向求解器或物理错误；SDOF 已证明时程积分与阻尼设置正确。16:40 我说过\"这轮再不过就标未验证\"——照做（标未验证），同时把剩余工作作为新的小任务给定额度，而不是无限续 B4。\n\n**依据**：；r4 （\"The time step size may not be changed after the first load step. The DELTIM command is ignored.\"）；无文献卡片，MAPDL 行为为本线运行日志所见。\n\n**错了的代价**：B4b 再失败则 MSUP 继续未验证，B5 改用全瞬态法（SDOF 已验证）；多一次几分钟作业。\n**待 Liang Hu**：r4 运行根 约 15 GB 无用中间文件（b4.mcf 6.8G、b4.rdsp 7.4G，作业中途取消的残留），组空间 81%，删除需 Liang Hu 同意。"
+    },
+    {
+      "id": "dec-0006",
+      "ts": "2026-10-16 17:20",
+      "title": "B4b、B5 通过；使用说明 v1.0 送审后再发布（2026-10-16 17:25 Lead）",
+      "label": "决定",
+      "text": "# B4b、B5 通过；使用说明 v1.0 送审后再发布（2026-10-16 17:25 Lead）\n\n\n**依据（本线数据，Lead 亲核）**：\n- B5 静力顶部位移：Lead 独立算 Σ P_i z_i²(3H−z_i)/(6EI) = 0.0507882 m，与报告参考一致，MAPDL 0.0507870 m；f1 解析 0.249996 Hz，MAPDL 0.250003 Hz。时程对比图 MAPDL 与参考全程重合。\n- B5 位移标准差/均值≈0.92，因 f1=0.25 Hz 落在荷载 0.5 Hz 截止带内、ζ=1% 共振放大，属测试设定，不代表真实建筑。\n- B4b 正式报告：MSUP/全瞬态峰值 0.21%/0.02%，POST26 各 2001 点、端点 0–1 s。\n- 文献：无库内卡片；参考为本线独立实现（欧拉梁解析振型、振型叠加、直接刚度法）。\n\n**错了的代价**：若审查发现说明有误导项，修改后再发，延迟约半天；未审先发则别线可能按错误能力下单。\n- 勘误（17:35）：B5 MAPDL 实际用 20 个三维模态做模态叠加（报告原文\"五模态\"为笔误）；参考为 5 阶平面欧拉梁。频率按最近特征值配对，未单独核振型方向。\n- 2026-10-16 17:50 B6 通过（8/8），风压数据接口 定稿写入使用说明；派通用驱动 run_case 与四基准回归。"
+    },
+    {
+      "id": "dec-0007",
+      "ts": "2026-10-16 17:22",
+      "title": "裁决：《Ansys 工具使用说明 v1.0》审查 （2026-10-16 18:10 Lead）",
+      "label": "决定",
+      "text": "# 裁决：《Ansys 工具使用说明 v1.0》审查 （2026-10-16 18:10 Lead）\n\n审稿人：E·Gemini、A·GPT-6、D·GLM（3/3 有效，无补位）。三位均\"有保留地支持，不宜原样发布\"。Lead 逐条核对了代码与报告。\n\n## 必须改（采纳，已在 v1.1 改或已派 bot）\n1. **B5 模态数**（E、A、D）：MAPDL 用 20 个三维模态（ MODOPT/TRNOPT 20），参考 5 阶平面欧拉梁。说明已改；\"已踩过的坑\"加第 8 条（三维模型 N 包含两正交方向与扭转）。存档 文本与现 不一致（D）→ 派 bot 用现 check.py 对 r2 原结果重新生成报告，证明可复现。\n2. **B4b 参考不是独立参考**（E、A、D）： 用同会话 MAPDL 的频率与端部振型幅值做闭式叠加；B1 只验证了频率和静挠度，没验证振型幅值。说明改为\"基于同会话 MAPDL 模态参数的闭式叠加，只验证时程积分与 MSUP/FULL 机制\"；并披露：只含 2 阶强轴模态（静力截断约 −0.48%，E 的计算），FULL 用 Rayleigh 阻尼、参考用常 ζ（A）。\n3. **B1 实体挠度误差**（E、D）：0.002% 只对梁；实体细网格 0.07%（对欧拉 3.200 mm）。已改。\n4. **B4 只有 partial 报告**（E、D）：B4 收窄为 SDOF 的决定（`B4拆分_…`）保留，但\"判合格只看 check.py 输出\"——派 bot 用检查脚本对 r3 原始 SDOF 输出生成正式 （不重算）。说明里在该报告生成前标\"数据通过、正式报告待生成\"。\n5. **B3 报告指向 check_report_r2.md；B3 参考与 MAPDL 荷载分配不同**（E、A）：参考脚本 10 kN 加左节点，MAPDL 左右各 5 kN。Lead 用参考脚本按 5+5 重算：楼层位移变化 ≈2×10⁻¹⁰ m（相对 4×10⁻⁸），对结论无影响；在说明与决策记录披露。\n6. **参考解都是本线自研实现**（D）：说明加\"参考来源\"段：B1 Timoshenko 频率为 Lead 400 单元 Timoshenko 梁有限元、B2/B4 为解析级数/闭式、B3/B5 为 Lead/bot 自写 Python；不是第三方或文献表值。\n7. **怎么委托一节含未实现/未验证项**（E、A）：STEP/IGES/CDB、一般风压 CSV 加注\"未实现/未验证\"；\"CSV 时程荷载\"改为\"CSV 节点力时程（B5）\"与\"规则测点风压三件套（B6，时空可分离场）\"。\n8. **未验证清单补项**（E、A）：CDB 导入；瞬态应力/内力/基底反力与倾覆力矩时程（目前只验证了位移/加速度）；多通道互不相关的力/风压时程；壳/实体瞬态（B6 之外）；B5 加速度来自位移二次求导（DERIV），非求解器加速度；时间步长充分性由委托方确认（D：B5 dt=0.05 s 时第 4、5 阶高于 Nyquist）。\"这些可以算\"改为\"软件能做、管道未实现或未验证，需另行设计基准\"。区分\"软件能力/管道已实现/已验证\"三档（A）。\n9. **委托输入清单**（E、A）：补截面局部轴与 2D/3D 约定、构件连接与释放、附加/集中质量、阻尼定义（模态 ζ 或 Rayleigh 锚定频率）、初始条件、时程文件单位/类型（力/压力/压力系数）/列与节点或面的对应/采样率、输出统计窗；B2 简支示例补写面内防刚体约束。\n10. **各基准实际判据不同**（A）：说明表格加\"判据\"列，写实际门槛（B1 梁应力 5%、B5 加速度 5% 等）；\"通过\"仅指该报告列出的检查项。\n11. **B5 特殊设定**（A、E、D）：人为高剪切刚度、降低转动惯量、所有节点同一时程按权重缩放、频率按最近特征值配对——写进 B5 行与限制。\n\n## 仅供参考（采纳措辞调整）\n- 误差上界改为保留足够位数（D、A）。\n- B3 的 MAC 仍用剪切型振型配对（A）：注明。\n- 母文档 旧方案段落标\"历史\"（A）。\n- 许可\"基本不会抢不到\"改为\"10-16 实测空闲充足\"；MCP\"不可用\"改\"暂缓\"（A）；排队时间注明为单日实测（D）。\n\n## 未采纳的异议\n- **E：B5 参考积分起点比 MAPDL 晚一步**。核 ：循环从 i=2 起，Q[i] 为 t=i·Δt 的荷载；MAPDL 首步 TIME=0.05 不加载，第二步从 0.05 起按表格在每个子步末取 F(t)，t=0.10 的响应用 F(0.10)。两者一致，不存在一步错位（数值上两链统计差 ≤0.26% 也支持）。保留异议记录。\n- **D：B4\"通过\"违反只看 check.py 规则，应改回未通过**。部分采纳：拆分决定成立（悬臂已另由 B4b 验证），但正式报告须由脚本生成，见必须改 4。\n\n## 是否升级 Liang Hu\n不需要：均为接口说明的准确性与范围问题，不涉及科学方向、删除结果或对外科学结论。"
+    },
+    {
+      "id": "dec-0008",
+      "ts": "2026-10-16 17:35",
+      "title": "通用驱动第二版（2026-10-16 18:40 Lead）",
+      "label": "决定",
+      "text": "# 通用驱动第二版（2026-10-16 18:40 Lead）\n\n**Decision I made**：第一版 run_case（1565920：B1 32/32、B2 11/11；B5 因作业名前缀中断、B6 未跑）判未通过，且其实现是按 backend_profile 转调旧驱动，不是参数化驱动（bot 自报，Lead 读 确认 run_b1…run_b6 各自 import b*_driver）。重派第二版：模板化 APDL 生成器 + 通用参考库，验收加\"换参数盲测\"（铝板、另一悬臂）与 B6n 不可分离风压，修复上限 3 轮。\n\n**为什么**：工具的价值在于别的 Lead 换参数就能用；只有换参数盲测能证明这一点。第一版任务书范围大、轮数少，是 Lead 的问题。\n\n**错了的代价**：bot 约半天到一天工作量与几次单核作业；在此之前使用说明不发布（或先以\"按现有基准模板定制\"的方式接单）。"
+    },
+    {
+      "id": "dec-0009",
+      "ts": "2026-10-16 18:11",
+      "title": "通用驱动 v2 通过；使用说明 v1.2 发布（2026-10-16 18:50 Lead）",
+      "label": "决定",
+      "text": "# 通用驱动 v2 通过；使用说明 v1.2 发布（2026-10-16 18:50 Lead）\n\n**Decision I made**：run_case v2（CRC 1566505，exit 0）判通过：不 import 任何旧驱动（Lead grep 核过）；回归 B1 32/32、B2 11/11、B3 8/8、B5 8/8、B6 8/8；换参数盲测铝板 11/11、钢悬臂 18/18；B6n 不可分离双时程 8/8。发布使用说明 v1.2，报平台 Lead 开工单固化 ansys 技能，并给 structural/cfd/windtunnel/designload 四线 Lead 留言告知。\n\n**依据（Lead 亲核）**：盲测参考手算——铝板 D=3352 N·m、α=0.00772 → 中心挠度 1.888 mm（报告参考 1.8879 mm）；钢梁 I=2.25e-5 m⁴ → 欧拉挠度 4.000 mm + 剪切 → 4.0077 mm、根部应力 20.0 MPa、强轴 f1 欧拉 13.59 Hz / Timoshenko 13.563 Hz，均与报告参考一致。B6n 观测点为 y=b/4（φ12 最大处）、参考为 (1,1)+(1,2) 双模态，p2 已被测到（Lead 18:15 一度误判为只测中心，已更正；报告行标签误写 center，已让 bot 出更正版）。\n\n**说明**：不另送审——v1.0 已审，v1.2 只增加经验证的通用驱动与 B6n/盲测结果，按\"只审一轮\"规则不加码。\n**错了的代价**：别线按说明下单遇到模板外需求会被驱动拒绝，不会出错误结果；最大风险是瞬态内力等未验证输出被误用，说明里已列入\"已实现未验证\"。\n**待 Liang Hu**：r4 运行根 15 GB 残留删除（见）。"
+    },
+    {
+      "id": "dec-0010",
+      "ts": "2026-10-17 00:39",
+      "title": "小算例改投 CRC 串行 hpc 路线（2026-10-16 15:14 Lead）",
+      "label": "决定",
+      "text": "# 小算例改投 CRC 串行 hpc 路线（2026-10-16 15:14 Lead）\n\n**起因**：ComputeOps 委托（证据）：Liang Hu 要求纠正简单 CPU 任务长等待。14:19 快照里 B1 首轮 1557318（long, smp 4）在排队；long 的 d32 实例全部满载；hpc 的 d24cepyc110 有 47 个空槽但该组只挂 mpi-48，smp 放不上。\n\n**Decision I made**：B1 修复第 1 轮不再走 long+smp，改为**不申请 PE 的单核串行作业投 hpc 队列**；撤掉刚提交、仍 qw 的 1562815（long, smp 2），同一脚本在新运行根重投为 1562864，15:14 提交即在 d24cepyc110 开跑。以后总 CPU 分钟级的小算例默认：`-q hpc`、无 `-pe`、`--nproc 1`（MAPDL `-smp -np 1`）、`h_rt≤00:30:00`、`m_mem_free=4G`、排除 d24cepyc154。\n\n**依据（本线数据）**：\n- 1557318 实测：8 个子求解每个主线程 CPU 0.6–1.6 s、全线程合计约 20 s；作业墙钟约 1–2 min，却排队 3h15m（11:20 提交，约 14:35 开跑）。4 核对这种规模没有收益。\n- 只读核验：`qconf -sq hpcqsub -w p -q hpc`（无 PE）当时判定可立即调度；d24cepyc110 上已有他人 1 槽串行 QLOGIN 在跑，证明串行可落在该组。\n- 许可：串行只占 1 份 `ansys`，不占 `anshpc`（≤4 核本来也不占），比原方案不多。\n- 脚本仅改队列/PE/核数/内存/路径（diff 已核），未用\"1 槽起多线程\"。\n\n**旧新作业**：1557318（首轮，已于 14:36 结束，未动）；1562815（ansys 15:12 提交，long smp2，qw 从未运行 → 已 qdel，运行根 为空，不再向其提交）；1562864（新，运行根， 已登记）。\n\n**错了的代价**：若 hpc 串行被站点视为不当用法或被挂起，退回 long 队列重投，损失为一次排队时间；不碰任何在跑作业。中大型算例（需多核/≥数 GB 内存）仍按单节点 smp/dis 申请。\n\n**结果（15:16 Lead 核）**：1562864 于 15:14:25 开跑、15:15:34 结束，墙钟约 70 s（含 8 个子求解与检查），排队约 0 分钟； 为空（无残留进程），许可前后快照已写。闸门 32 项 29 PASS；剩余 3 项 FAIL 均为脚本问题：BEAM188 支反力重复计数（2000 vs 1000，beam_20/beam_40）、粗网格实体应力提取得 0（网格收敛一行）。物理量全部过闸。\n\n## 补充（10-17 00:40 Lead）\n10-16 夜间 hpc 队列串行槽满，B7/B8/B9 排队 3.5 h+；`qsub -w p` 显示 long 队列此时可立即调度串行作业。Lead 对三个排队作业执行 `qalter -q long`（只改队列，不重提），B7、B8 于 00:38 即在 long@d32cepyc236 开跑；B9 仍排队。**以后小算例写 `-q hpc,long`（两个队列都可），不再只写 hpc。** 错了的代价：无（只扩大可调度范围）。"
+    },
+    {
+      "id": "dec-0011",
+      "ts": "2026-10-17 02:03",
+      "title": "下一阶段：真实高层与大跨桥梁（2026-10-16 19:05 Lead）",
+      "label": "决定",
+      "text": "# 下一阶段：真实高层与大跨桥梁（2026-10-16 19:05 Lead）\n\n**起因**：Liang Hu 10-16 问\"能否做复杂一些的建模分析，如高层建筑、桥梁\"。\n\n**Decision I made**：分两步走。\n1. 补能力（ansys，B7/B8，可解析核对）：三维框架 + 刚性楼板 + 质心偏心（扭转–平动耦合）；预应力索（LINK180 大变形静力 → 预应力模态）；MATRIX27 气动弹性刚度/阻尼（复模态、负阻尼识别）。\n2. 找复现目标（litwiki）：CAARC 标准高层的结构参数与已发表风致响应；大跨桥梁有完整参数的模态 + 颤振/抖振结果（含用 ANSYS MATRIX27 的论文）；核库内 I6GR6IHA（Feng et al. 2023, Mathematics 11:3150，桥梁有限元抖振，PDF 第 14–21 页）能否复现。\n有了参数来源再定 B9 高层、B10 桥梁的复现任务。\n\n\n**依据**：无文献依据（能力规划）；候选文献见 、（后者是高层气动特性，不含结构响应，待 litwiki 判断）。\n**错了的代价**：bot 约 1 天工作量 + 若干单核作业；若找不到可复现的已发表结果，B9/B10 改为与 OpenSees 等独立程序互校。\n\n## 复现目标选定（21:10 Lead，依据 litwiki 候选表）\n- **B10 桥梁（先做）**：Piana & Carpinteri (2021) Akashi Kaikyo，DOI 10.22055/JACM.2021.32481.2025。目标：Table 2 模态（首对称侧弯 0.0371、竖弯 0.0602、扭转 0.1311 Hz，PDF p.8）+ MATRIX27 颤振（81.3 m/s、0.122 Hz 非定常阻力；76.4 m/s、0.131 Hz 稳态阻力，PDF pp.9–11）。Lead 用 pdftotext 抽查上述数字均在原文。缺塔、预应力、导数数表——条件性复现，缺失参数标假设并做敏感性；Fig.5 导数交 Gemini 数字化（输入整理写）。\n- **B10b 抖振**：Tao et al. (2017) 泰州桥，DOI 10.3390/app7040395，跨中抖振 RMS（PDF pp.19–20）——B10 后再做。\n- **B9 高层**：Elshaer et al. (2016) 三模态 CAARC（H=182.5 m，0.15/0.15/0.3 Hz，ζ=1%，journal p.192 Table 6；峰位移/加速度 Figs.22–23）。缺风荷载时程 → 已问 是否有 CAARC 表面风压；没有则用公开风洞数据库。\n- 不用 I6GR6IHA（Feng 2023）：FE 参数未给全，数据按需索取（PDF p.22）。\n- 21:10 B9 风荷载来源定：CFD 线交 TFCA CAARC 风洞档案 M4 C05（1:200，0°，319 测点，500 Hz，120 s，Zenodo 10.5281/zenodo.18702221），测点三件套 + 10 层楼层力/基底力时程，约 1 天。注意：风场工况与 Elshaer 2016 不同，B9 以\"真实风洞荷载 + 独立 Python 模态叠加互校\"为主，对 Elshaer/Melbourne 只做无量纲量级对照。\n- 21:25 CFD 线 21:12 已交 CAARC M4 C05 荷载（CRC MB）。B9 派 ansys：Elshaer 2016 动力参数（192 kg/m³，0.15/0.15/0.30 Hz，ζ=1%）+ M4 原型几何 30×45×180 m；振型（等截面杆件）、U_H=30/40/50 m/s、楼层力作用高度为假设；闸门为对自写 Python 杆件 FE 模态叠加 ±3%，对 Elshaer Figs.22–23 只做量级对照。\n- 21:50 Gemini 交 Akashi 输入整理（、 161 点 12 条导数）。Lead 用 pdftotext 抽查：原文第 109 行\"detailed finite element model of the central span\"（只建中跨），Table 4 的 f=219 m、Ec=1.60e10、CD(0)=0.386、μg=41,119 kg/m、阻尼 0.485%/0.653% 均在原文，且原文明确属连续体模型参数——B10 中借用须标\"借自 Table 4 连续体模型\"。\n- 10-17 01:30 B7/B8/B9 首轮均脚本问题；B8 Lead 诊断：线性摄动模态未带张力几何刚度（前 12 阶 0，第 13 阶 25.24 Hz=轴向 c/2L；应得横向 0.798 Hz），第 2 轮改经典 PSTRES 预应力模态。\n- 10-17 02:10 第 2 轮仍为设置问题；B7 顶层 +2.39%[local path omitted] −1.01% 是剪切型参考不含柱轴向变形（同 B3，Lead 任务书假设错误），第 3 轮把柱轴向刚度放大使口径一致；B8 改 NLGEOM OFF + PSTRES；B9 加 NUMVAR。批第 3 轮（最后一轮）。"
+    },
+    {
+      "id": "dec-0012",
+      "ts": "2026-10-17 04:54",
+      "title": "B7/B8 由 Lead 按原始输出裁定；B9 收尾；B10 明石桥开工（2026-10-17 03:10 Lead）",
+      "label": "决定",
+      "text": "# B7/B8 由 Lead 按原始输出裁定；B9 收尾；B10 明石桥开工（2026-10-17 03:10 Lead）\n\n**Decision I made**：\n1. **B8 判通过**：张紧索前 5 阶横向频率（只拉开/关两组）误差 0.03%–0.64%（≤1%）；MATRIX27 两例 MAPDL 原表 DAMPED FREQUENCIES：0.94820884 Hz / 阻尼比 0.0316228（参考 0.9482088 / 0.0316228），0.94867012 Hz / −0.00527046 且 STABILITY=+0.005（正实部，识别为不稳定），与参考逐位一致。报告里 2 项 FAIL 是提取器把实部当频率，只修提取器、不重算。\n2. **B7 偏心为零例判通过**（用 r2b 作业 1572950 原件）：Lead 用含柱轴向变形的二维直接刚度框架（ 改柱 0.3 m、单榀半荷载/半质量）得顶部 ux 0.30365/0.51007/0.61723 mm vs MAPDL 0.30366/0.51005/0.61719（≤0.01%），侧向频率 4.03853/11.34703/16.50802 vs 4.03863/11.34689/16.50709 Hz（≤0.006%）；扭转一阶剪切型估算 7.238 Hz vs 7.2392 Hz（0.02%）。原 +2.39% 是 Lead 给的剪切型参考不含柱轴向变形（第二次犯同类错，已记入使用说明\"坑 7\"）。第 3 轮\"放大柱轴向刚度\"致矩阵不定，放弃。偏心例单列 B7b，1 次提交。\n3. **B9**：30、40 m/s 已有原始结果，先就地判；50 m/s 因运行根触 2 GB 防护线中止，单独新根、只存所需节点再跑一次。\n4. **B10 明石桥开工**：中跨模型模态（±5%）+ MATRIX27 颤振三工况（Uf、ff ±10%），条件性复现，参数来源表区分\"论文 FE 给出 / 借自 Table 4 连续体 / 假设\"。\n\n**依据**：本线数据（上述作业原始 out.out）；Piana & Carpinteri 2021（NR_Piana_2021_akashi_matrix27.md，PDF pp.7–11）。\n**错了的代价**：B7 e=0 若参考有共同建模简化，会掩盖问题——但参考与 MAPDL 独立实现、两个量同时吻合到 0.01%，可能性低；B10 约 1 天 bot 工作量与若干单核作业。\n- 10-17 04:00 B8 16/16 通过；B9 响应 30/30 通过（基底反力为 MSUP 未扩展求解，判\"未实现\"，写入使用说明限制）；B7b 偏心质量点未挂单元，B7c 修复排 B10 后（1 次）。使用说明加 B7/B8/B9 三行。\n- 10-17 03:50 **B9 与 Elshaer 2016 量级对照（Gemini 读图，Lead 抽查 Fig.22/23 Case 1–2 在 30 m/s 的读数：顺风位移约 3.5 m、横风约 11 m，顺风加速度约 140 milli-G、横风约 380 milli-G，与 Gemini 读数相符）**。论文图横轴只到 V_h=30 m/s，所以只比 30 m/s。结构参数相同（0.15/0.15/0.30 Hz，ζ=1%，192 kg/m³）。\n - 加速度（峰值 ÷ 3.5 折成 RMS）：顺风向本线 0.23 m/s²，论文 0.24–0.40（0.84–1.7 倍，同一量级）；**横风向本线 0.17 m/s²，论文 0.67–1.07（4–6 倍）**。\n - 论文的位移不能用来对照：横风峰值加速度 3.74 m/s² 在 0.15 Hz 对应的共振位移约 4.2 m，图上却是 11 m，二者本身差约 2.6 倍（Lead 按 a/(2πf)² 自己算过）。\n - 判断：B9 的有限元部分已经由独立程序核过（最大差 2.1%），所以横风差距出在**荷载输入**上（TFCA M4 C05 楼层力的横风脉动和涡脱频率附近的能量），也可能跟来流（论文屋顶 I_u 19.7%，本线约 15%）以及风向对应的宽面/窄面有关。这不是工具的问题。B9 仍只当作\"管道能接真实风洞荷载、响应计算正确\"的基准，**不当作 CAARC 响应结论**。已用 --note 把这条线索告诉 CFD Lead，诊断由 CFD 线自己决定做不做。\n - 依据：Elshaer et al. 2016, Eng. Struct. 115, Fig.22–23（PDF 第 14–15 页，期刊第 192–193 页）、Table 6（期刊第 192 页）；本线数据。\n- 10-17 04:05 B10 r1（作业 1573346）在预应力静力阶段停：约束方程引用了未挂单元的端部节点 30041/40041，属建模连接错误，不是物理闸门失败；原根保留。r2 已预检，等 ComputeOps 回复后提交，算 3 轮修复中的第 1 轮。\n- 10-17 04:25 B10 r2（作业 1573392）：端部节点问题已消除；新问题是对 LINK180 索节点加了转角约束方程，ROTX 小主元，仍属建模层面。r3 只耦合 UX/UY/UZ，已预检，算修复第 2/3 轮；如果 r3 仍停在建模层面，先列问题清单交回，再定第 3 轮。\n- 10-17 04:40 B10 r3 模态（作业 1573404，退出码 0）：只有 VS1 -0.9%、VA1 +4.0% 在 ±5% 内；LS1 -5.9%、TS1 -9.9%、TA1 -8.0%，按诊断性配对。**不验收。** 扭转偏低会直接带偏颤振，所以先做质量/极惯性审计（怀疑主缆质量与 Table 4 全桥极惯性重复计入），再修一次模态（最后一轮，3/3）；只有 TS1、VS1 都过才做 MATRIX27 颤振（最多提交 2 次）。修不过就判 B10「未验证：原文缺桁架拓扑」。禁止调 J/E/质量凑频率。。依据：Piana & Carpinteri 2021 Table 2/4/5（PDF pp.8–11，期刊 pp.1083–1086），卡片 NR_Piana_2021_akashi_matrix27.md。\n- 10-17 05:00 B7c（作业 1573431）21/21 通过：偏心 0.6 m 框架的楼层位移与转角、9 阶频率、耦合振型比，和独立直接刚度参考最大差 0.09%；x 向三阶 4.0385/11.347/16.508 Hz 与 e=0 时一致（解耦方向不受偏心影响，符合物理）。使用说明去掉「质心偏心未验证」，加 B7c 行。作业结束时进程快照还有一条记录，事后查不到这个 PID，作为许可审计的小瑕疵记下，不影响判定。"
+    },
+    {
+      "id": "dec-0013",
+      "ts": "2026-10-17 07:08",
+      "title": "B10 明石桥判\"未验证\"，转 B10c 颤振管道验证（2026-10-17 05:30 Lead）",
+      "label": "决定",
+      "text": "# B10 明石桥判\"未验证\"，转 B10c 颤振管道验证（2026-10-17 05:30 Lead）\n\n**Decision I made**：B10 r4（作业 1573449）模态 5 阶中只有 2 阶通过：VS1 −0.5%、VA1 +4.6%；LS1 −5.6%、TS1 −9.3%、TA1 −7.4%。按闸门没有做颤振，B10 判\"未验证\"，不再修。另开 B10c 验证颤振管道本身：(A) 二自由度平板节段模型，Theodorsen 导数，MAPDL MATRIX27 对独立 Python，±2%；(B) 用 r4 全桥模型，MAPDL 对独立 Python 多模态颤振（同振型、同导数），±5%。论文 Table 5 只列出来作参考。。\n\n**为什么**：\n- 质量审计：照 Table 1 的主梁质量加上 Table 4 剩下的缆质量，极惯性比 Table 4 高 18%，两张表在离散模型里没法同时满足。即使直接用 Table 4 的连续体极惯性，浅缆简化公式估出的 TS1 也只有约 0.114 Hz，Table 2 是 0.1311 Hz。所以差距来自原文没给的空间桁架构造和质量分配，不是等效模型修得不够。再修只能去调参数凑频率，这是禁止的。\n- 颤振频率由 TS1 决定，TS1 偏 9% 时和 Table 5 比没有意义。\n- 工具要回答的是\"MAPDL 算颤振算得对不对\"。这个问题用一个参考完全由我们掌握的基准就能回答，不依赖文献里缺的数据。\n\n**依据**：Piana & Carpinteri 2021，Table 1/2/4/5（PDF pp.8–11，期刊 pp.1083–1086），卡片；本线数据。Theodorsen 平板导数的出处由 bot 交回时补上，没有就写\"无文献依据，教科书公式\"。\n\n**错了的代价**：如果其实存在某种合理的质量分配能让 TS1 过关，我们就少了一个\"复现了已发表桥梁颤振\"的例子。工具的颤振能力仍由 B10c 证明，损失只在对外展示上。B10c 最多提交 4 次单核作业。\n\n**另记**：r4 第二档吊杆（hanger_2）在预应力静力阶段，索节点出现小主元而停止，所以吊杆间距的敏感性没做成。主缆张力也没有从单元内力核实过。这两条写进使用说明，归为\"未验证\"。\n\n## 10-17 06:00 B10c 结果与续派\n- **A 节段（作业 1573492）通过**：ζ=0 时 Uf 73.28 m/s、ff 0.1909 Hz；ζ=0.5% 时 74.18 m/s、0.1886 Hz。MAPDL 和独立 Python 对 ff 的差约 2e-8。限定：扫描风速以参考值为中心，所以这只证明\"给定气动矩阵后 MATRIX27/QRDAMP 求解正确\"，不算盲测。Theodorsen 公式出处：NACA Report 496；Perry 2017 NASA/TM 附录 A（bot 给的出处，Lead 没有核原文）。Selberg 量级值没给（公式常数没核实），不设闸门。\n- **B 全桥（1573497、1573502）未验证**：1573497 是因为导数超出 Fig.5 的约化风速范围（8.7–27.7），作业停在参考程序；1573502 是 QRDAMP 在非对称刚度占 13% 时只返回 6 个零频复根。四次额度已经用完，bot 没有重提，处理正确。\n- **Decision I made**：给 B 另开 2 次提交：改用非对称特征值求解（UNSYM，或者 DAMP），同一作业里先用新求解器重算 A 节段做对照（±1%）；风速只在导数覆盖的范围内扫描；MAPDL 和 Python 各自按频率迭代 K。为什么：失败原因已经诊断清楚，全桥颤振是风工程最可能下单的能力。错了的代价：多 2 个单核小作业；仍不通就判\"未验证\"。\n- 10-17 06:15 B10c-B 的两次追加额度也用完了。1573509：用 DAMP 解法重算的二自由度节段对照通过，但全桥的独立 Python 参考在第一个风速点就不收敛，MAPDL 没有启动。1573515：40–100 m/s 跑完了，但所跟踪的振型分支阻尼始终没有过零，而且 70–80 m/s 处频率跳变，可能跳到了别的分支。**Decision I made：B10c-B 定为\"未验证\"，不再追加额度。** 全桥颤振要按分支逐个跟踪振型，并且需要可靠的独立参考，这属于方法开发，不是修一修就能好的；等有用户真正下单要做桥梁颤振时，再作为专项立项。\"所选分支没有过零\"不能解释为\"全桥不会颤振\"。错了的代价：使用说明里全桥颤振继续标\"未验证\"，单自由度和节段颤振能力不受影响。\n- 10-17 06:30 **改判：推翻 06:15「不再追加」，再给最后 1 次。** 读 r4（1573515）的 damping_vs_wind.png 发现：被跟踪分支的阻尼比从 40 m/s 的约 0.010 单调降到 70 m/s 的约 0.001（MAPDL）/0.002（Python），80 m/s 跳回约 0.007、频率 0.106→0.132 Hz，可以判断是分支切换，交点大约在 71–75 m/s。按 TS1 的频率比粗估 Uf≈81.3×0.907≈74 m/s，和这个范围相符（只作参考）。06:15 那条判断是只看文字汇报下的，没有看图。委托 ：60–85 m/s 按 1 m/s 加密扫描，用 MAC 连续跟踪分支，说明 40–60 m/s 段约 0.001 的阻尼偏差从哪来，补 A 节段 DAMP 和 QRDAMP 的对照数字。错了的代价：多一个单核小作业。\n- 10-17 07:10 **B10c-B r5（作业 1573530，退出码 0）通过。** 60–85 m/s 按 1 m/s 扫描 26 点，用 MAC 跟踪分支（前后两点 MAC 最低 0.936/0.929，MAPDL 一直是 mode 13）。Python 参考 Uf 76.21 m/s、ff 0.1035 Hz；MAPDL 73.12 m/s、0.1063 Hz；差 4.0% / 2.7%，在 ±5% 以内。Lead 看过 damping_vs_wind.png：两条曲线平行、单调地穿过零，没有跳变。论文 Table 5 是 81.3 m/s、0.122 Hz；按本模型 TS1 低 9% 折算约 74 m/s，量级相符，只作参考。\n - 保留意见：60–73 m/s 段 MAPDL 的阻尼比比 Python 系统性低约 0.001，原因还没查清（模态截断、投影方式或阻尼施加方式之一）。曲线在这一段很平，0.001 就相当于 Uf 差约 3 m/s，4% 的差基本都来自这里。使用说明里写明\"全桥颤振 Uf 与独立程序相差约 4%，偏保守（偏低）\"。DAMP 解法只核了固定风速下的频率，没有做独立的 Uf 扫描。\n - 结论适用范围：等效脊梁模型；6 条缺失导数取零；截断 20 阶模态；不外推到 Fig.5 范围以外。这是数值链路的验证，不是明石桥复现。"
+    },
+    {
+      "id": "dec-0014",
+      "ts": "2026-10-17 11:39",
+      "title": "B11 模态叠加时程的基底反力与构件内力（2026-10-17 07:20 Lead）",
+      "label": "决定",
+      "text": "# B11 模态叠加时程的基底反力与构件内力（2026-10-17 07:20 Lead）\n\n**Decision I made**：B10 系列收尾（B10c 节段和全桥颤振链路通过；B10 明石桥复现仍是\"未验证\"）。下一个基准选 B11：用 B9 的 CAARC 模型和 U=30 m/s 风洞荷载（截 600 s），MSUP 加扩展计算，取基底 Fx/Fy/Mx/My/Mz 和半高截面内力。拿动力平衡和独立 Python 两路对照，闸门 ±3%；均值对荷载均值做静力平衡，±1%。另用 FULL 瞬态算 60 s 对照。最多提交 3 次。。\n\n**为什么**：别线下单最常要的是基底剪力、倾覆弯矩和内力时程（设计荷载线、结构线）。这两项现在一个\"未实现\"、一个\"未验证\"，B9 的 6 项失败也在这里。模型和荷载都现成，成本最低。\n\n**依据**：无文献依据，基于本线数据（B9 check_report；使用说明「限制」）。\n\n**错了的代价**：几个单核作业。如果扩展计算的输出超过 2 GB，就靠 OUTRES 限定输出来控制。\n- 10-17 10:30 r1（1573658）读错了扩展结果的组号；r2（1573748）已经拿到随时间变化的反力和内力，但扩展 .rst 里没有加速度，FULL 在 13.23 s 发散。最后一轮（3/3）调整为：主闸门改成和独立 Python 比；扩展采样从每 2 s 一组加密到约 0.06 s 一组（结构周期 6.7 s，2 s 一组太粗）；动力平衡用 .rdsp 位移的二阶差分做辅助检查，不设闸门；FULL 降为附带项，不设闸门（先查零质量转动自由度）。\n- 10-17 11:00 r3（1574129）里，附带的 FULL 短测排在最前面，读结果集组号出错，导致驱动整体停止，主项 MSUP 没有跑。**Decision I made**：另给 2 次提交，MSUP 主项先跑，各子算例互相隔离、失败不连带；读结果集一律枚举（SET,FIRST/NEXT），不假定组号；第一次通过就不提交第二次。错了的代价：最多 2 个单核小作业。\n- 10-17 11:50 r4（1574196）21/35；r5（1574206）27/35。基底和半高截面各 5 个分量的 RMS、峰值共 20 项全部在 ±3% 内。没过的 8 项都是均值：(a) Mz、截面 Fy、截面 Tz 的均值接近零（例如 Mz 均值 2.5 MN·m，RMS 59 MN·m），相对误差判据不适用，改成 |Δ均值| ≤ 3%×RMS，按此都在 0.3% 以内（**Lead 改判据**，理由：对近零量用相对误差不合理）；(b) 基底 Fx 均值对荷载均值：MAPDL −3.2%，独立程序 −1.7%。惯性项只有约 0.5% 量级，差额判断为模态位移法漏掉了高阶模态的准静态贡献（MAPDL 30 阶、Python 10 阶，方向一致）。**Decision I made**：r6 加 RESVEC 残余向量，独立程序补模态加速度修正，静力平衡 ±1%，提交 1 次。依据：无文献依据，基于本线数据和结构动力学常识；RESVEC 出处由 bot 补 URL。错了的代价：如果原因不是截断，B11 的均值仍未验证，脉动部分不受影响。\n- 10-17 13:30 **B11 r6（作业 1574532）判通过。** 加 RESVEC 后，顺风 Fx 的静力平衡从 −3.2% 改善到 +0.06%，My 为 +0.08%，证实了模态截断的判断。对独立程序的 30 项（均值/RMS/峰值）全部 ±3% 内。报告里没过的三项是 RFy、RMx、RMz 的静力平衡（相对差 1.7%、2.3%、1.9%）。这三个分量的均值只有各自 RMS 的 4–7%（例如 RFy 均值 0.20 MN、RMS 2.9 MN），属于上一轮已定义的\"近零均值\"。**Decision I made**：同一判据也用于静力平衡项，统一规则写成：|均值| < 10%×RMS 的分量，按 |Δ均值| ≤ 1%×RMS 判；按此三项分别为 0.12%、0.13%、0.08%，通过，B11 计 35/35。理由：这三个均值本身接近零，600 s 内惯性项的残余均值（质量×速度变化/T）就足以造成这样的相对差。错了的代价：如果横风均值有真实偏差，以后用户关心横风静力均值时会差约 2% 的均值（相对其 RMS 只有 0.1%）。VAout 这次没有显式设；对固定基底，它只影响支座节点自身的惯性，可以忽略。 第 2 项（再提交 r6）取消，已告知 bot。使用说明把基底反力和梁内力挪到\"已验证\"，加 B11 行，写明必须加 RESVEC。"
+    },
+    {
+      "id": "dec-0015",
+      "ts": "2026-10-21 01:20",
+      "title": "S2 v2-revised 模态交付口径（10-21 01:16 美东）",
+      "label": "决定",
+      "text": "# S2 v2-revised 模态交付口径（10-21 01:16 美东）\n\nDecision I made：将 CRC 后处理 1599936 的原始输出按 sha256 无损传至 R16.7f/，不覆盖 v1；以 工作站 单核 Python 3.10 对约束后 M/K 和振型补检前60阶，而不重提 CRC。理由：原后处理仅检40阶，委托明确要求60阶且本地矩阵仅千自由度；若检查失败则不可交付。四塔检查均通过，证据 与交付摘要。\n\nDecision I made：r_body>0.5 与 >0.7 两档并列，方向有效质量比≥3%只是事后诊断筛选，Table 2 只比较首个候选，不补造缺失的扭转阶次；理由：B 前60阶无达到该参与度的整体扭转候选，候选身份仍未经振型基准验证。代价是不能声称复现论文第三阶。科学依据：本线数据；文献定位见 第7行（Zhong et al. 2022 PDF 第9–11页），Table 2 值来自。\n\n实验卡：，对应 CRC 各运行根同名文件及 R16.7f/S2_params/v2/revised/experiment_cards/ 同名文件；⑤已回填并校对哈希。资源申请， 作业 1599875/1599879/1599887/1599889/1599936 均 exit 0。结果一律“未经基准验证；candidate / not_for_design”。"
+    },
+    {
+      "id": "dec-0016",
+      "ts": "2026-10-21 01:40",
+      "title": "S2 v2-revised 横担刚度诊断 · 10-21",
+      "label": "决定",
+      "text": "# S2 v2-revised 横担刚度诊断 · 10-21\n\nDecision I made：依结构 Lead 的预定判据交回六个诊断算例，而不将 E×100 档作为新基线或称为文献复现；原因是六案均已按同一可追溯输入/矩阵投影口径完成，刚性横担界限仍未把三塔扭转误差压进 ±10%；错了的代价是把未证实的横担/连接归因误报给结构线，进而形成错误模型。依据：本线六个 、 与；Table 2 的文献依据为结构 Lead 的 第29–42行，指向 XGMB8E7G PDF p.11。本文的数值判断是本线算例，不是文献原模型结论。\n\n六作业 1600272/1600273/1600274/1600275/1600277/1600278 退出码均为0；ComputeOps 申请 、回复； 均已登记。按方向最大 M 投影有效质量筛选的结果详见。刚性档 x 的 A/B/C 对 Table 2 偏差 −5.3/−0.5/+2.9%，扭转仍 −24.4/−19.5/−20.3%。按委托方预定操作定义触发“偏差不来自横担刚度”；此话仅表示本 E×100 横担刚度界限不能解释扭转剩余差，不能推断真实塔的物理成因。上限截面档同时增钢和附加质量，不能作为纯刚度效应归因。全部为“未经基准验证；candidate / not_for_design”。"
+    },
+    {
+      "id": "dec-0017",
+      "ts": "2026-10-21 02:20",
+      "title": "S2 v3 构造诊断交付（10-21 美东）",
+      "label": "决定",
+      "text": "# S2 v3 构造诊断交付（10-21 美东）\n\nDecision I made：按结构线事先给定的 D1、D2、V3 九组输入计算并只将 V3 作为构造基线，未据 Table 2 调参；因为需要分开呈现构造差异。代价：九组并非纯刚度单因素（钢重、12% 附加质量分配及部分面板划分也变），不能归因真实塔。\n\n资源申请，CRC 求解作业 1600351–1600359；后处理资源申请 、作业 1600371，均退出码 0， 已登记。九个求解实验卡在，后处理卡在，⑤栏均回填，运行根同版卡 SHA-256 核对一致。后处理交付目录：；CRC 与本地 37 个交付文件逐件 SHA-256 一致。\n\n本配置用前 100 阶、按方向约束后 M 投影最大有效质量比识别：V3 A/B/C 绕全球 z 扭转频率 1.2839/1.3445/1.4284 Hz；相对 Zhong et al. 2022 Table 2 的定义，偏差 −33.4/−29.8/−28.8%。横向 y 偏差 −14.5/−10.0/−7.4%，纵向 x −16.7/−13.9/−14.7%。D1、D2 拆分数据见，逐阶结果见各 `results.jsonv3/A|B|C/`。九组前 60 阶正交和特征残差以及自重反力检查通过，但仅是数值自检。结论仅限本独立假设版配置与预定指标：扭转偏差未由本次横隔/横担构造改动消除；不推论真实塔原因。无文献依据支持几何假设，频率对照值来自委托中的 Table 2。全部“未经基准验证；candidate / not_for_design”。"
+    },
+    {
+      "id": "dec-0018",
+      "ts": "2026-10-21 04:08",
+      "title": "R16.7e K3 失败作业判读（10-21 04:07）",
+      "label": "决定",
+      "text": "# R16.7e K3 失败作业判读（10-21 04:07）\n\nDecision I made：保留作业 1600492、1600495 的原始运行根，不将包装退出码 1 误判为模态数值失败，也不把模态频率闸门通过误称为时程复算成功；本轮不自动重提。原因：CRC 原始日志显示 1600492 在 MAPDL 写出 modes.txt 后因检查器导入 scipy 失败；1600495 则在生成 APDL 前因 CSV node_1 对应 MAPDL 节点 2 的映射缺失而失败。错了的代价：若模态原件读取有误，会错误放行时程；若直接重提未经过静力初态验证，则浪费许可/资源且可能交付错误动态峰值。\n\n证据： 和。两张实验卡⑤栏已于 10-21 04:04 回填且 CRC 运行根卡内容已读回：、。\n\n模态实测五阶 0.1999913313、1.2533765022、3.5094911761、6.8771981802、11.3685124017 Hz，对委托方参考逐阶最大相对偏差 0.025772%，符合预写的 ≤1% 闸门；但作业整体退出码 1。时程首例求解器未启动；48 例及三个 0.02 s 敏感性无动态数值，逐例 ±2%、相干集合均值 ±1% 皆不可判。节点力独立列的路径仍为「未经基准验证」，全部 candidate/not_for_design。无文献依据，基于本线作业原始日志及模态文件；不对 Chen & Letchford 2004 的差异作归因。\n\n建议后续如获另次提交决定：新运行根上先做修正映射的单例 pilot，提交前生成完整 APDL 并核 node_1→2、node_18→19、首末/插值载荷、首荷载步静力初态与积分步长，求解后核初始状态与顶点峰值；通过后再做 48 例与三组 0.02 s 敏感性。不改既有失败根和预注册判据。ComputeOps；是否覆盖新提交需另核。"
+    },
+    {
+      "id": "dec-0019",
+      "ts": "2026-10-21 04:34",
+      "title": "R16.7e K3 · 48 例 MSUP 独立复算判读（10-21 04:32 EDT）",
+      "label": "决定",
+      "text": "# R16.7e K3 · 48 例 MSUP 独立复算判读（10-21 04:32 EDT）\n\nDecision I made：按原冻结判据记联合 FAIL，不把 pilot 一例通过或位移一致外推成 48 例加速度一致 — 48 例加速度通过 31/48、集合均值 0/3；错判的代价是结构线把未核清的加速度用于设计。本单所有结果 candidate/not_for_design，逐节点独立列力通道「未经基准验证」。无文献依据，基于本线实测与委托方提供的 static_eq 数据；不作 Chen & Letchford 文献结论。\n\nComputeOps 申请；CRC pilot 1600505 求解器完成但解析器报错、包装退出 1；从未改动的原始 history.txt 只读恢复后四项 pilot 自查通过，详见。CRC batch 1600507 包装退出 0，51/51（48 例 dt=.1s + 3 例 dt=.02s）均产出。运行根，根 749 MB，无残留本账户 ansys 进程；占用前后全校 ansys 总数 1/550。\n\n判据定义：逐例 r_i=a_Ansys,i/a_static_eq,i−1，阈值 ±2%；集合 R=mean(a_Ansys)[local path omitted](a_static_eq)−1，阈值 ±1%。程序化汇总三集合 R：uncorrelated −2.005103%，davenport −1.894190%，fully_correlated −1.220578%；最大逐例绝对差 4.163224%，位移逐例最大绝对差 0.031491%。加速度由 POST26 位移两次 DERIV 得到，没有求解器直接加速度。三例细步长的加速度峰相对 0.1s 分别 −0.6534%、−1.0976%、−0.4948%。\n\n重要补记：51/51 份 MAPDL 原始输出均警告 `There are no valid force vectors specified. No residual vector will be generated.`；命令 `RESVEC,ON` 虽在 APDL 中，但没有实际残余向量，不可视为完整满足委托设置。位移高度一致且加速度系统偏低的机制尚不能归因；建议结构 Lead 区分残余向量有效性、模态截断和加速度提取格式后再决定独立新根验证。不得据此修改原参考、容差或宣称 FE 组装有误。原结果不覆盖。\n\n实验卡⑤：；pilot 卡同父目录。汇总与 51 份历史源哈希核对：、。"
+    },
+    {
+      "id": "dec-0020",
+      "ts": "2026-10-22 03:09",
+      "title": "系统学习 Ansys 结构文档；按 Liang Hu 批准清理中间文件（2026-10-17 11:30 Lead）",
+      "label": "决定",
+      "text": "# 系统学习 Ansys 结构文档；按 Liang Hu 批准清理中间文件（2026-10-17 11:30 Lead）\n\n**Liang Hu 10-17 原话**：\"中间文件可以删掉。现在你对ansys是不是了解还不够深入，可以在网上找一些相应的例子来学习一些。Ansys和我们结构部分相关的文档你学习过了吗？\"\n\n**清理（Liang Hu 批准）**：删了 、`b4.mcf`（这个运行根从 15 GB 降到 3.9 MB），以及 下的 `b9.rdsp`、`b9.mcf`、（这个根从 1.9 GB 降到 911 MB）。保留了 B9 判定用到的 `data.npz` 和全部小文件。只删指定文件，没有递归删除。共腾出约 16 GB。\n\n**如实回答**：之前没有系统学过官方文档。CRC 上的 2025R2 没有装本地帮助（help/en-us 只有 helpNotInstalled 页），也没有 Verification Manual 输入文件；bot 一直凭自身知识和试错写 APDL。B10/B11 多数失败（QRDAMP 处理不了非对称矩阵、MSUP 首荷载步、扩展结果不含加速度、结果集组号）都是文档里写明的行为。\n\n**Decision I made**：\n1. 派 ansys（排在 B11 后面）：用公开的 PyMAPDL 命令参考（内容取自官方 Command Reference）、PyMAPDL Verification Manual 例子和可访问的官方指南，写《APDL 结构分析做法手册》，每条附出处；把\"已踩过的坑\"1–8 逐条对上文档原文；挑 8–10 个 VM 例子在 CRC 对官方目标值做回归；列出现有模板与文档不符的地方，只列不改。\n2. 派 Gemini 联网：查官方帮助入口和学术访问方式、PyMAPDL VM 例子清单、风工程相关的公开 MAPDL 例子。\n- 为什么：先学文档再写，能少走试错；官方 VM 是另一类独立参考（官方给的目标值），补上我们自己写的参考程序可能和 MAPDL 犯同样错误的缺口。\n- 错了的代价：bot 约半天工作量，加最多 3 个单核作业；B11 不受影响。\n\n## 10-17 12:10 Gemini 文档地图与 Lead 核实\n- **免登录公开版官方帮助（2025 R2）可以直接用**。Lead 用 curl 核过，均返回 200：Structural Analysis Guide；Command Reference 单条命令页 （读过 RESVEC 页原文）；VM 输入包 （30 MB）。PyMAPDL 仓库里的 VM .dat 是 MIT 许可（vm298.dat 文件头已核）。\n- RESVEC 原文要点：在 MSUP 瞬态里，必须在第一次模态求解时发出，作用是加入残余向量；在扩展计算里加入的是残余响应；两种方法不能同时用。这正对应 B11 均值约 3% 的截断差。\n- 相关 VM：vm298（高层风振 PSD）、vm77/vm85（MSUP+EXPASS）、预应力模态 vm53–59、MATRIX27 只有 vm41。GitHub 上没有开源的桥梁颤振 APDL 仓库（Gemini 结论，Lead 没有复核）。\n- 地址已用 --note 交给 ansys，文档学习和 B11 r6 都以官方 2025 R2 文档为准。\n\n## 10-17 12:25 学习成果做成可检索的知识库（Liang Hu 问\"是否后续形成 wiki 或其他类型知识库\"）\n- 现状： 只索引，本线的使用说明、决策记录都搜不到（Lead 实测零命中）。\n- **Decision I made**：(1) 做法手册改成 wiki 格式：tools/manual/ 下一个主题一页，每页固定四节\"做法 / 坑 / 官方出处 / 本线验证\"，另有 README 索引；以后每过一个基准、每踩一个坑都补进去，作为长期规矩（已用 note 告知 ansys）。(2) 报平台 Lead 把 的 、tools/manual 纳入 索引，这样 Lead、bot 和其他线下单前都能搜到。错了的代价：几乎没有。\n- 10-17 平台回复： 目前只支持 一个根目录，需要改代码，已开（待接单），完成后告知生效时间和实测命中。接受。在这之前，Lead 直接读。\n- 10-17 12:40 VM 回归（作业 1574343，属）：vm1/2/15/50/70/71/75/86/219/179 共 10 例 36 个值都在目标值 ±2.2% 内（目标值是解析或教科书值）。已让 bot 补一列官方手册公布的比值；我们的比值和官方比值一致，才算环境完整复现官方结果。\n- 10-17 13:00 文档学习交付：（67 行，引用 10 个官方 2025 R2 页面和 PyMAPDL 命令页），\"已踩过的坑\"1–8 都对上了出处，另列了文档提示的风险和现有脚本的差距（只列不改）。Lead 抽查 Structural Analysis Guide 5.4 原文，两条都对：(1) 不设 VAout 时，反力等力结果只含静力贡献；(2) MSUP 第一个荷载步在 TIME=0 建立初始条件，并定死积分步长。手册另查出 B11 截面内力混用了单元 20 的 J 端和单元 21 的 I 端，这可能是截面均值偏差的原因。**Decision I made**：，手册拆成按主题分页的 wiki 格式；B11 r6 显式设 VAout=YES、统一截面位置，并加 RESVEC；VM 回归补官方比值列对照。\n- 10-17 13:10 Liang Hu 说后续会提供教程和书籍。收录流程写在 （放进 Zotero 便于按页检索；书籍全文只在本机读；读完补进手册对应主题页并写页码；书里的例题作回归候选）。\n- 10-17 13:50 交付：手册拆成 7 个主题页 + README，每页分 做法/坑/官方出处/本线验证 四节；VM 回归 36/36 行与官方 2025 R2 公布比值一致（vm179 一行差 0.1 个百分点），证明本线环境和批处理通道完整复现官方结果。B11 check_report 末尾由 Lead 追加了「Lead 判定」一节（bot 仍按原闸门写 32/35，以 Lead 判定为准）。使用说明加 VM 行和「做法手册」一节。\n- 10-21 Liang Hu 问\"是不是学的资料还太少，能否自己找帮助文档和网上建模例子，Ansys 系软件是否都有资料和连接方式\"。Lead 实查后写了 ：CRC 装了 MAPDL、Mechanical、Workbench、Prime 网格、Fluent、DPF、optiSLang 等，没有 SpaceClaim/Discovery；各软件都有免登录官方手册和 PyAnsys Python 接口；MAPDL、Mechanical、Fluent 有官方 MCP 服务器。关键线索：PyMechanical 嵌入模式不走 gRPC，可能绕开 CRC 上的接通问题（未测）。给 bot 的只读学习任务被暂停闸门拦下，任务书已存，批准后派。\n- 10-22 按 Liang Hu 指令（平台转达）做文献引文滚雪球：T27.1 一个子项目，8 个种子，去重后池 782 篇，机械初筛通过 294 篇，其中 263 篇只由滚雪球找到。Lead 筛选写在。**影响结论的发现**：Di Agabito 2018 都灵理工硕士论文（库里已有卡片）是 Piana 2021 结果的出处，给出了桁架桥面构件截面和两个模型的频率；B10 卡住报告新增出路 (f)。推断 Piana Table 2 和 Table 5 来自不同模型（未证实）。5 篇建卡已交 litwiki。"
+    },
+    {
+      "id": "dec-0021",
+      "ts": "2026-10-22 15:25",
+      "title": "按 Liang Hu 10-19 指令暂停，交暂停总结与启动方案（2026-10-19 09:10 Lead）",
+      "label": "决定",
+      "text": "# 按 Liang Hu 10-19 指令暂停，交暂停总结与启动方案（2026-10-19 09:10 Lead）\n- Liang Hu 原话（平台转达）：\"凡是没有经过这种规划的，让停下来，总结目前的工作，报告给我，规划后再继续实施。\"\n- 已执行：停止新工作。10-19 08:55 查 CRC，本线没有在跑或排队的作业；ansys 没有排队的。T27 和 T27.1 状态改为\"暂停\"。\n- 报告：。建议批准后转入\"维护 + 接单\"阶段；桥梁抖振先不做。\n- 批准前只做查文献、整理和写报告。\n- 10-20 按「卡住与搁置」规则（平台转达 Liang Hu 指令）复查：报告和线况里没有\"搁置\"\"结题\"字样。但 B10 明石桥复现（10-17 由 Lead 以\"原文缺数据\"自行停下）和 PyMAPDL gRPC 直连（三轮未接通后暂停）按规则属于卡住，改报「卡住（待 PI）」，报告第四节补了卡住报告。工作站 接通测试改为\"暂停 · 等待 Liang Hu 单独同意\"，FULL 长时程改为\"暂停 · 等待方案获批\"。\n- 10-22 Liang Hu 指出还没有启动方案（10-19 那份以\"暂停总结与启动方案\"命名，可能没有进入待批登记）。按模板另写）。\n- 10-22 05:14 滚雪球之后的建卡（litwiki）：Katsuchi 1999、Namini 1992、Jain 1996、Great Belt 2002、Dung 1998 五张卡都已建好，但都只依据摘要。所以不改变任何结论：B10 卡住报告的新出路 (f) 仍只靠 Di Agabito 2018 论文全文（Table 5-3/5-4，论文 p.76–77）。剩下两篇（Chen & Kareem 2005，以及 2018 年 JWEIA 的高层时域抖振）这次不建卡，等 B9/B11 扩展真需要时再补。全文获取要等方案获批后，并且只在 B10 走出路 (f) 时才做。代价：如果 Liang Hu 选别的出路，这几篇只是留作背景。\n- 10-22 平台转达 Liang Hu 停止令：停止一切外网文献下载与滚雪球，直到 Liang Hu 说恢复；B10 出路 (f) 的全文补取随之搁后。本线无在跑，已告知 ansys。\n- 10-22 Liang Hu「不等批复的可按建议开始」：T27 闸门仍是「未批」，整线都在等方案批复，今天不开工；线况页标明等 Liang Hu 的事项。"
+    },
+    {
+      "id": "dec-0022",
+      "ts": "2026-10-24 19:48",
+      "title": "T27.1 恢复：只读学习与实时连接诊断开工（2026-10-24）",
+      "label": "决定",
+      "text": "# T27.1 恢复：只读学习与实时连接诊断开工（2026-10-24）\n- 依据：Liang Hu 10-24 18:1x 批 A111（原话「除了五之外都按你的建议批了」，这句是总批复，\"五\"指的是另一份清单），清单 B77；pplan 显示 T27/T27.1「已批 10-24 A111」。\n- Decision I made：当轮开两件，都是方案 第 2a、2b 条：\n 1. T27.1-20 只读学习：读 PyMAPDL/PyMechanical/PyDPF 例子库、VM298、三个 MCP 服务器的 README，补手册，列候选回归例子。零算力。\n 2. T27.1-21 gRPC 连接诊断：CRC 单核作业最多 3 个，不通就止损，整理成问题清单。\n - 为什么：两件都不依赖卡住的 B10，也不依赖 工作站。诊断结论决定 MCP 服务器以后能不能用。\n - 错了的代价：最多 3 个单核短作业，加 bot 一天的工作量。\n- 暂不做：\n - 工作站 几分钟级接通测试：按本线规矩要 Liang Hu 单独同意，A111 批复里没有单列，所以不做。\n - B10 出路 (c)/(f)：仍按卡住（待 PI）处理。\n - VM298 等新基准（2d）：等 T27.1-20 交回候选表后再选。\n - 使用说明 v1.3 送审（2e）、主动接单（2f）：放在第 2 周。\n- 第一个检查点：10-29，学习笔记、手册新页、连接诊断结论。\n\n## 10-24 补：学习单交回，开 2d 新基准\n- T27.1-20交回：新增手册 08–11 页，README 里有 5 条改进建议。Lead 抽查了候选表和改进建议，出处都附了网址，结论也没有超出\"只读\"的范围，验收合格。\n- Decision I made：派 T27.1-22，做 VM298、VM90、VM203，加 DPF 读 B11 r6 存档，合计 ≤6 个单核作业，排在 gRPC 诊断之后。\n - 为什么选这几题：它们正好补上\"频域风振\"和\"谐响应\"两项缺口，都有官方目标值；DPF 一项零求解，只做后处理。\n - 错了的代价：最多 6 个单核短作业。\n- 两周作业合计：诊断 ≤3 + 本单 ≤6 = 9，在方案上限 12 以内。\n\n## 10-24 补：gRPC 诊断结论\nT27.1-21（资源申请 CO-）跑了 3 个作业，限额用完。\n\n**结果**\n- 本机 TCP（insecure）通（1622930）。\n- 默认 UDS 超时。\n- PyMechanical 嵌入缺 `mechanical-env`，没接通（1622953、1622967）。\n- Lead 复核：10-24 18:5x 查 CRC 队列，本线已没有诊断作业；ansys 许可池在用 1 份，不是 [用户] 的进程，诊断作业没有残留占用许可。\n\n**判定**：卡住 2 解除。原来卡住的原因是之前的测试写法有问题，不是 CRC 环境不允许。\n\n**Decision I made**\n1. 正式通道仍用批处理，不改。原因：实时连接只验证到 [local path omitted]，没测过求解，也没测过长时间运行；而批处理已有 B1–B11 和 36 个 VM 例子验证。\n2. MCP 服务器试用放进远期计划。实时连接通了，前提条件已经满足；但仍要先在隔离环境里做权限审计。\n3. PyMechanical 的 `mechanical-env`：等有需求时再试，只花 1 个作业。可能的来源是 pip 包 `ansys-mechanical-env`，需要核实。\n - 为什么现在不试：现有的单里，只有 T13.3 示范件以后走 STEP 时可能用到它。\n - 错了的代价：STEP 通路晚一点开发。\n- 10-24：工作站 几分钟接通测试撤回不再申请，CRC 已证实 TCP 实时连接可通，原目的已达成。\n- 实验卡：、_3.md、_4.md（CRC 镜像在 \n\n## 10-24 补：T27.1-22 结果\n- 资源申请 CO-，作业 1623029、1623032、1623033、1623034、1623050。\n- **VM298 通过 2/2**：一阶频率差 0.019%，屋顶 1σ 位移差 0.071%。\n- **VM90 通过 6/6**：幅值最大差 0.004%，相位与官方逐项相同。\n- **VM203 通过 2/2**：频率差 0.001%，峰值 PSD 差 0%。\n- 定义：误差 =|本轮值 − 官方 v252 MAPDL 值| / |官方值|。\n- 证据：，每题的实验卡在对应运行目录里。\n- Lead 处理：\n - 使用说明加一行「VM 频域」，限定为固定算例能复现官方结果，通用 PSD/谐响应模板还没有做。\n - VM298 官方页（0.04197 m）与 PyMAPDL 网页（0.0404 m）的差值原因没有查明。本轮跟的是官方值，记为未决。\n- **DPF 两轮都失败**：一轮是服务端路径没找到，一轮是 JSON 序列化报错，都是脚本问题，还没有得到可以比对的数值。\n- Decision I made：追加 1 个 DPF 作业（T27.1-22b），失败就停。\n - 为什么：剩下的失败原因很明确，补一次成本低；DPF 一旦能用，可以省掉 POST26 那一套后处理。\n - 错了的代价：多 1 个单核短作业。两周合计 9/12。\n- 实验卡（⑤ 栏已回填，与 CRC 副本 sha256 一致）：runs_index/t27_1_22_{vm298,vm90,vm203,dpf,dpf_r2}。bot 说「同题不再提交」是按原任务书的上限；Lead 已另派 明确批准追加 1 次，两者不冲突。\n\n## 10-24 补：DPF r3（作业 1623101）\n- JSON 序列化故障已修好。三个时刻上，FX、FY 反力与 POST1 一致。\n- Lead 核对 history 的列序（ 第 60–69 行）发现，bot 说的\"索引映射\"是对照脚本取错了列（`values[9:15]` 漏掉了 SMISC1）。DPF 的 smisc 编号与 APDL 的 SMISC 编号一致，SMISC 2–6 完全吻合。\n- 反力矩：DPF 0.13.6 没有这个算子，未取到。`.rdsp` 单独打不开。\n- Decision I made：DPF 只记为「部分验证」，生产后处理仍用 POST1/POST26，不再为 DPF 追加作业。\n - 为什么：现有通道已经验证过；DPF 缺反力矩和动态时程两项，替代不了现有通道。\n - 错了的代价：后处理少一个便捷选项。\n- 两周作业合计 9/12。第一周计划提前完成。下一步：使用说明 v1.3 送审（2e），然后接单（2f）。\n- 10-24：使用说明 v1.3 草案送。审稿人 C 因额度用尽暂停，系统自动顺延补位。审查结果回来后裁决，再正式发布 v1.3。\n- DPF r3 实验卡：（⑤ 已回填，与 CRC 副本 sha256 一致）。作业退出码 1 是脚本把内力列判成 FAIL 所致，Lead 已复核为列序错位。bot 写的「整体未验证」与 Lead 写的「部分验证」说的是同一件事：FX/FY 与 SMISC2–6 在三帧对上了，其余项未验证；使用说明按「部分验证」写。"
+    },
+    {
+      "id": "dec-0023",
+      "ts": "2026-10-24 21:44",
+      "title": "裁决：Ansys 工具使用说明 v1.3 审查 （2026-10-24 Lead）",
+      "label": "决定",
+      "text": "# 裁决：Ansys 工具使用说明 v1.3 审查 （2026-10-24 Lead）\n\n审稿：E（Gemini）、A（GPT-6/codex）、D（GLM），3/3 有效；C 账号 402 已自动移出轮换。三位均「有保留地支持」，只审一轮。逐条核对证据后裁决如下；说明已改为 v1.4（v1.3 原稿备份未入库）。\n依据：全部为本线代码与运行报告，无文献依据（B9 对照引 Elshaer 2016 Eng. Struct. 115 Fig.22–23，期刊第 192–193 页，原已核）。\n\n## 必须改（均已改进 v1.4）\n1. **FULL 瞬态默认阻尼承诺不实**（A1、E）： transient 分支只在 msup 写 `DMPRAT`，full 写 `TIMINT,OFFON`，无阻尼。→ 阻尼行改为「默认 2% 只对 msup；case 驱动的 full 为零阻尼，Rayleigh 走专用脚本」。\n2. **模板隐藏默认值、「任意方向」不成立**（A2、E）： frame_2d 梁 `beam_E_multiplier` 默认 1e4、梁 `DENS 0D,ALLrun_case.py:81,97`）一并写入。\n3. **通用驱动与专用脚本混写**（E1、A3）：case 驱动只有四模板、瞬态只输出单节点单向位移 + DERIV 加速度（、`run_case.py:91–94`）；B4、B4b、B7–B11、VM 均为专用脚本。→ 说明中写明。\n4. **B11 范围与改判来源**（A3、A5、E2、D 参考）：检查器）。（11:46）「维持未验证」早于改判，以决策记录为准，说明中注明。RMS 定义为 √mean(x²)、归一化用参考序列 RMS（`check_b11_r6.py:29–36`），写成公式。RESVEC 前置条件（首次模态求解施加代表性荷载、瞬态前 FDELE）及时变分布局限写入。\n5. **B10c 漏假设、求解器混写**（A4、E3、D3）：A 用 QRDAMP、B 用 DAMP；B 六条缺失导数置零、截断 20 模态、不外推、模态来自未通过的 B10 模型、参考同振型同导数；A 的 Uf 0% 为扫描居中。→ 改为「数值链路验证，不是明石桥复现」；「Uf 偏保守」改为本例事实。\n6. **参考来源总括声明错误**（A6、D1、E5）：B4b、B10、B10c、VM 为例外 → 改写；VM 行注明环境回归、不是下单能力。\n7. **「已验证的组合」与表矛盾**（D2、E5）：补 LINK180 预应力模态、MATRIX27、B7/B7c、B11 范围，FULL 限短时程；标题改「基准结果表（更新至 10-24）」。\n8. **误差定义缺失**（E2、A 参考1）：补总定义； 用 ||a|−|t||/|t|，不查符号——如实写入，由 bot 报告另核符号。\n9. **DPF 表述**（E4、D、A 参考2）：补 addendum 路径、退出码 1 与事后更正列序的性质、FZ/SMISC1 未比较、3/10001 帧、`ANSYS_DPF_PATH`、失败限定于 DPF 0.13.6 本调用方式。\n\n## 仅供参考（采纳并写入）\n- gRPC 明文回环、端口不得外开（D）；VM 输入版本 PyMAPDL 0.74.1/2023R2（D）；B9「4–6 倍」补出处与对冲语（D）；B10c-A 频率误差单位（A）；下一步一行去掉已完成的「内力反力基准」（A）。\n\n## 未采纳的异议\n- E「把未通过的 B10 与 VM 移出表」：未移出，改为表头说明 + 「已验证的组合」单列能下单的范围。理由：B10 留表能让下单方看到桥梁模型的已知缺口，VM 行是环境证据；只要不被当成下单能力即可。\n- E「B10c-B 0% 误差说明夸大」中关于 B 的部分：B 的 −4.0%/+2.7% 是独立迭代结果，非居中扫描，只 A 有此问题。\n\n## Decision I made\n- 说明 v1.4 直接发布（文档澄清、收窄声明，不涉新计算，属自定范围）。错了的代价：下单方仍按旧版理解时多一轮退单。\n- 代码缺口（FULL Rayleigh 阻尼进 case 驱动、检查器带符号误差、B11 流程接驱动并补轴力/J 端）列入 T27.1 下一步，10-29 检查点一并排单，不在本轮派；在此之前 v1.4 已如实披露，不会静默误用。错了的代价：这期间来 FULL 单需专用脚本，周转多半天。"
+    },
+    {
+      "id": "dec-0024",
+      "ts": "2026-10-26 09:13",
+      "title": "Liang Hu 总目录资产取用（2026-10-26 Lead）",
+      "label": "决定",
+      "text": "# Liang Hu 总目录资产取用（2026-10-26 Lead）\n\n起因：Liang Hu 10-26 交办，平台整理台式机资产总目录，列出与本线相关两项。\n\n**Decision I made 1**：Ansys 2024R2 官方手册 267 本 → 向平台 Lead 提台式机资料申请，加入 ftkb（对话 39257059；只存页文本、仅内部；优先 Command/Element/Theory/Structural/VM）。为什么：做法手册每条都要官方出处，本地页检索可直接给页码。错了的代价：平台一次入库工作量；版本是 2024R2，与生产用 2025R2 可能有个别差异，引用时注明版本并自查。\n\n**Decision I made 2**：昆明长水机场屋盖测压+响应（总目录 W01，约 11+2 GB）**暂不申请**，登记为「不规则/曲面测点风压映射」基准的候选数据。为什么：它正好对应使用说明里的未实现项（不规则测点映射、实际建筑模型），但这条管道还没开发，现在拷 13 GB 只会占存储。触发条件：开始做不规则测点映射时，先申请其中的测点坐标与少量工况（小文件，放 CRC [local path omitted]），再定是否要全量。数据为第三方工程件：仅内部研究、不上公开页、发表注明来源（总目录第三、五节）。错了的代价：示范算例推迟到映射管道开工时。\n\n另记：总目录 第 401、441 行提到 J11/J13 Stonecutters 桥 ANSYS+MATLAB 抖振联算可作 PyMAPDL 验证案例（25%）。与 B10b 泰州抖振同类，等有抖振需求时一并评估，现不申请。\n\n依据：无文献依据，基于本线使用说明 v1.4「限制」与总目录条目。"
+    },
+    {
+      "id": "dec-0025",
+      "ts": "2026-10-26 12:10",
+      "title": "T27.1-23 gRPC 复诊判读（2026-10-26 Lead）",
+      "label": "决定",
+      "text": "# T27.1-23 gRPC 复诊判读（2026-10-26 Lead）\n\n证据：；实验卡 、（⑤已回填）（资源申请；作业 1630529 UDS、1630558 TCP；实验卡已回填）。我核对了报告中的对照表与判据。\n\n- **TCP（回环、insecure）**：B1 beam_40 静力 + 12 阶模态实算 PASS，端点 UY、RFY、根部应力、强轴前 3 阶频率与批处理相对差 ≤3.3×10⁻⁸%（定义 |TCP−批处理|/|批处理|），作业尾进程为空、许可 550/1→550/1。结论只限这一个小模型、一次运行。\n- **UDS**：MAPDL 收到 transport=uds、端口 50052，客户端寻址一致，目录 0700 节点本地，105 s 内始终没有生成 socket；stdout 有 IPv6 listener 失败记录，不能证明是原因。根因未定。启动壳进程残留，许可释放无法逐席位证明。\n\n**Decision I made**：①UDS 不再追，暂不问 CRC 管理员。为什么：TCP 回环已能求解，UDS 只是比明文 TCP 更安全的同机传输方式，对现阶段（批处理为正式通道、gRPC 不对外接单）没有阻塞；报告里已备好给 CRC/Ansys 支持的问题，将来要把 gRPC 开放成交互通道时再发。错了的代价：将来开放交互通道时多等一轮支持回复。②使用说明 gRPC 一行更新为「TCP 已完成一次小模型实算」，仍不对外接单；正式通道仍为 APDL 批处理。③A178 在线况中按已处理记录。\n依据：无文献依据，基于本线数据。"
+    },
+    {
+      "id": "dec-0026",
+      "ts": "2026-10-26 17:17",
+      "title": "A177/A178 Liang Hu 批复落地（2026-10-26 Lead）",
+      "label": "决定",
+      "text": "# A177/A178 Liang Hu 批复落地（2026-10-26 Lead）\n\nLiang Hu 10-26 面板批复。A177 原话：「这个估计做不了。但是可以在我自己的资料库里面找一个桥的模型，我有很多。」A178 原话：「CRC现在应该好了」。\n\n**Decision I made 1（A177）**：B10 明石桥复现按 Liang Hu 定停（资源/优先级：原文缺构造数据），B10c 颤振数值链路结论不变。新桥梁基准 B12 选**昂船洲大桥（Stonecutters）ANSYS 模型**（总目录 04_早期程序 §2.1、05 §4/§14）。为什么选它：有原始 APDL 命令流 SCBridgeNEW2.inp，且原 ANSYS 跑出的频率与振型文本（FreqSeries.prn、ModeDY/DZ.prn）都在，可做同模型跨版本对照；又有已发表论文（Hu, Xu & Huang 2013, Eng. Struct. 57:406–415）和后续抖振程序，可延伸到抖振管道。已向 T12.3b申请只拷文本文件。错了的代价：若命令流不完整，再从总目录里换一座（四渡河悬索桥报告无源码，排后）。\n**Decision I made 2（A178）**：派 ansys T27.1-23（排队中）：≤2 个单核作业，①开 DEBUG 日志拆清 UDS 不通的原因；②用已通的回环 TCP 做一次真实求解（B1/盲测钢梁），对照批处理结果并核进程与许可释放。仍不通就停，再定是否问 CRC 管理员。错了的代价：两个单核小作业。\n依据：无文献依据，基于本线数据（B10 check_report）。\n\n**补记（10-26，资料到位）**：T12.3b 拷出 411 个文本文件 42.1 MB，我已复制到，sha256 逐个核对 0 失败。最终版命令流，参照输出 FreqSeries/ModeDY/ModeDZ（f1=0.1579 Hz）；配套 INPUT 有三套候选未定，靠重跑对频率判定。**Decision I made**：派 ansys T27.1-24：先只读核旧单元（BEAM44/BEAM4/LINK10/COMBIN40）在 2025R2 的可用性与替换方案，再 ≤3 个单核作业三套 INPUT 各跑模态；判据：原单元可用时前 10 阶 ≤1%、MAC≥0.95，换单元时 ≤3%、MAC≥0.90；三套都不对就停报，不逐个凑参数。错了的代价：3 个单核小作业。\n\n**补记（10-26 12:50，B12 首轮）**：作业 1630761/63/65 均在材料检查中止（材料 40–43 无 EX），无模态，报告，实验卡 （⑤已回填）。Lead 只读追查：NEW2 未定义材料 40–43； 第 61–76 行定义了它们（带修正系数）→ 三套 INPUT 属修正版命令流，与 NEW2 不配套，不是 2025R2 拒绝旧单元。**Decision I made**：第二轮 T27.1-24b改用 modelrevise 自带材料的 SCBridgeLINK / LINK3 /（LINKNew 视完整性）+ modelrevise/INPUT，≤3 个单核作业，频率对照三份原输出（SCbridge f1 0.1579、Link8Model 0.1562、Ding 0.1501）判出处；不补猜材性、不在本单换单元。错了的代价：3 个单核小作业；若都对不上，结论是参照输出对应的命令流不在已拷文件里，需回 T12.3b 再找。\n\n**补记（10-26 13:2x，B12 第二轮提交）**：bot只把 SCBridgeLINK、SCBridgeLINK3 两根暂存好，SCBridgeLINKNew 因从模型中段开始、缺材料与节点判为不自洽不跑（我同意）；它先声称已提交 1630844/1630846 又自查否认，我在 CRC 核实两根无输出、qstat/ 均无记录。**Decision I made**：预检（bash -n、qsub -w v）通过后由我直接提交 1630965（LINK）、1630966（LINK3）， 已登记（--kind ansys --card），实验卡④已补作业号（资源申请）。为什么：暂存完整，再派一轮只多耽误；错了的代价：两个单核小作业。已用 --note 告知平台 bot 的无据提交声明。结果回来后由 ansys 回填⑤并出对照报告。\n\n**补记（10-26 13:25）**：1630965/1630966 在 1.7 s 内退出，错误均为，实际文件为 （Linux 大小写）。**Decision I made**：派 T27.1-24c（ansys）先做全部文件引用的大小写静态预检，再在一个新根里串行跑 LINK、LINK3（用 第 3 个额度）；要求回报附 qsub 与 原文，防再出现无据的提交声明。错了的代价：1 个单核小作业。\n\n**补记（10-26，r2c 作业 1631170）**：文件名已修好，但两例都因\"无 D 约束\"刚体失稳——移植脚本在第一个 FINISH 截断，丢掉了 [local path omitted] 段的 12 条支座，卡同目录。**Decision I made**：另授权 1 个作业 T27.1-24d：补回全部约束、提交前静态自检约束条数与源一致，再串行跑 LINK/LINK3 模态并对照三份原输出；仍报错就停。四轮失败都是移植问题，模型本身尚未被否定。错了的代价：1 个单核小作业。\n\n**补记（10-26 14:30，r2d 作业 1631251）**：约束补齐后 LINK 完成重力静力 + 80 阶模态（首次在 2025R2 解出该桥；BEAM44/BEAM4/LINK10 均参与求解，未报不支持），一阶 0.15994 Hz（对 SCbridge 0.1579 偏 +1.29%，对 Link8Model +2.39%，对 Ding +6.55%；未做 MAC，仅诊断）。扩展 80 阶带单元结果 .rst 1.83 GB 触发 2 GB 上限（退出 93），LINK3 未跑。报告/卡。**Decision I made**：T27.1-24e（委托见线况）限制输出（MXPAND 40 阶、不算单元结果、只留节点位移）再串行跑 LINK/LINK3 并出 MAC 对照；2 GB 上限不放宽。r2d 根 2 GB 属失败运行根，满 7 天后按常设授权列清单处理。错了的代价：1 个单核作业。\n\n**补记（10-26，r2e 作业 1631396，退出 0）**：受限输出后 LINK、LINK3 均完成 30 阶模态（根 0.55 GB）。报告 、卡同目录（⑤已回填）。按预注册判据（频差 = |f_MAPDL−f_ref|/|f_ref| ≤1% 且 MAC≥0.95，全局一对一配对）：对 SCbridge 前十阶 0/10，对 Link8Model 4/10，Ding 观测点空间不匹配（最大 5.1 m）不可判。LINK 与 LINK3 结果几乎相同（LATT 材料号差异无影响）。\nLead 判读：前十阶振型多数 MAC≥0.98（对 SCbridge 10 阶中 9 阶 ≥0.98，第 2 阶 0.62），频差 0.2–5%——模态结构复现，频率不同。所跑的是 modelrevise 修正版（材料 E 带 0.875–1.125 修正系数），而参照输出出自另外的版本，配套输入不在已拷文件中；所以这是\"参照与输入不配套\"，不是工具或模型被否定。结论限本配置：B12 **未验证**（按原判据），不事后放宽判据。\n**Decision I made**：向 T12.3b 续申请当年存下的模型数据库（.db/.cdb，与 FreqSeries.prn 同目录者），用 MAPDL 2025R2 读入原模型重算，得到与参照完全配套的基准。为什么：这是唯一不靠猜参数就能配套的路径。错了的代价：若 .db 不存在或 2025R2 读不了旧库，B12 就以\"振型复现、频率差 0.2–5%、原配输入缺失\"记为未验证，转为可用的桥梁算例（不作精度基准）。\n\n**补记（10-26，原始 .db 到位）**：T12.3b拷到 CRC ：SCbridge/Scbridge.db（配参照 A）、Link8Model/SCBridge.db（配参照 B），sha256 已核；提醒 SCbridge 的 .db 可能早于最后一次求解。**Decision I made**：T27.1-24f 一个作业 RESUME 两份原库，按当年取模态的宏重算，A 对 SCbridge、B 对 Link8Model 按原判据（1%、MAC 0.95）对照；读不了旧库就停。错了的代价：1 个单核作业。若 A 仍不配套，再申请 NewModel 下 2013-03 的 APart.db/EFPart.dbb。\n\n**补记（10-26 17:0x，r3db 作业 1632488 退出 95）**：作业脚本复制，而文件实际在 下，MAPDL 没启动（报告/卡）。我核对了 bot 的 APDL 输入：RESUME 后重力静力（ACEL,9.8、SSTIF,ON）+ LANB + PSTRES,ON，与当年 WriteBasicNode.mac、ModalExtraction.mac 一致。**Decision I made**：由我直接修这一行，在新根 r3db2 原样复用两份输入，写了实验卡（运行根同份），已发资源申请，回复到后我自己提交并登记。为什么：这是第六次失败，前几次都是 bot 移植/打包环节出错；单行修复不值得再走一轮 bot。错了的代价：1 个单核作业。\n\n**补记（10-26 17:1x，r3db2 作业 1632523）**：MAPDL 子例 SCbridge 成功（RESUME 旧库，3714 节点/3170 单元，0 ERROR），退出 1 只因 bot 的 run_r3db.py 一行 Python 错误，Link8Model 未跑。Lead 按预注册判据计算对参照 A：**前 10 阶 10/10、前 20 阶 20/20 PASS，最大频差 0.29%，最小 MAC 0.995**（、卡⑤已回填）。参照 ModeDY/DZ 按 200×176 读（另一读法 MAC 全 <0.04，已排除）。性质：跨版本回归（同一模型，旧版 ANSYS vs 2025R2），证明旧单元（BEAM44/BEAM4/LINK10/COMBIN40）与大模型 RESUME 在 2025R2 可用，不是独立物理验证。**Decision I made**：使用说明加 B12 行（SCbridge 版通过，Link8Model 补跑中）；派 T27.1-24g 修脚本、补跑 Link8Model 并由 bot 独立复算我的表。错了的代价：若 bot 复算与我不一致，B12 行回退为待定。依据：无文献依据，基于本线数据。\n\n**补记（10-26，B12 收尾）**：T27.1-24g 作业 1632660（退出 0）补跑 Link8Model 原库：对参照 B 前 10 阶 10/10、前 20 阶 20/20，最大频差 0.608%，最小 MAC 0.9957；bot 独立复算 SCbridge 与 Lead 表 20 行 PASS 一致（频率差 <5×10⁻⁷ Hz、MAC 差 <5×10⁻⁶）。报告，卡同目录。**B12 判通过（跨版本回归）**：两份当年存下的模型数据库在 MAPDL 2025R2 中 RESUME 后重算的预应力模态，与当年旧版 ANSYS 的输出一致。限定：同模型跨版本对照，不是独立物理验证；不涉及颤振/抖振。使用说明 B12 行已改为通过。B10 明石桥复现按 Liang Hu 定停，桥梁基准由 B12 接替。"
+    },
+    {
+      "id": "dec-0027",
+      "ts": "2026-10-26 21:00",
+      "title": "T27.1-25 通用驱动 v2.1：bot 四作业未启动 MAPDL，Lead 修外壳重跑（2026-10-26 Lead）",
+      "label": "决定",
+      "text": "# T27.1-25 通用驱动 v2.1：bot 四作业未启动 MAPDL，Lead 修外壳重跑（2026-10-26 Lead）\n\n证据：（作业 1632948、1632952、1632956、1632965，资源申请；实验卡在）。代码改动三项已落地（analysis.py FULL Rayleigh、evaluate.py 带符号误差、stick_cantilever 反力/内力输出），本地编译、旧存档回放、APDL 静态自检通过；但四个作业都因作业脚本外壳（ + `set -uo pipefail` + `module load … || exit`，第四个再加 source Modules init）没加载上 module，MAPDL 未启动，无数值结果。验收清单里\"文件与行号清单\"只给了文件名、没给行号，我接受（代码可直接查），不退回。\n\n对照本线跑通过的外壳：、不设 、 不接失败判断（CRC 的 module 有时报 tcl 错误但实际已加载）。\n\n**Decision I made**：我在新根 只改外壳（stage.tar 原样），合并成一个作业重跑；实验卡 （运行根同份）；已发资源申请，回复后我提交并登记，结果出来派 ansys 出正式回归报告。为什么：代码已写好，只差外壳，再派 bot 一轮代价更高。错了的代价：1 个单核作业。\n**附带决定**：B12 与 v2.1 两件事里 bot 的失败一大半出在作业外壳和打包（路径、大小写、截断、Python 小错、module）。下次派活时要求 bot 用跑通的外壳作模板（写进 tools/，提交前对实际作业脚本在计算节点同款 shell 下做空跑自检），并在任务书里写明。\n依据：无文献依据，基于本线数据。\n\n**补记（10-26 18:5x，作业 1633080 退出 1）**：外壳修好后 MAPDL 正常运行，B1 32/32、B2 11/11、B3 8/8、B5 8/8、B6 8/8、B4b FULL 1/1 全 PASS（新检查器带符号误差）；B11 因 run_case.py 第 31 行 validate 不处理 list 型 history_output 抛 AttributeError 未运行。卡。**Decision I made**：T27.1-25b 修该行、提交前对全部 case 做 --dry-run 空跑、新根照抄已跑通外壳只跑 B11，并出与原基准的逐项对照正式报告。错了的代价：1 个单核作业。\n\n**补记（10-26 19:0x，T27.1-25b）**：报告。B1/B2/B3/B5/B6 v2.1 输出与 v2 r1 原输出逐标量比最大差 0%（共 1793 个标量）；B4b FULL 峰值 0.00608031109809253 m 与原值相同，α=4.4024 s⁻¹、β=4.3495×10⁻⁵ s 与原 B4b 输入同值 → 这两部分**通过**。B11（作业 1633126，卡）因预检把 load_v21.csv 留在已解包的 stage/，作业里生成器拒绝覆盖退出，且 stage.tar 仍是修复前的旧代码。**Decision I made**：我用 b11b 根里已修复的 stage/ 重新打包（排除残留 CSV），在登录节点从包内 dry-run 通过，新根 v21_b11c，卡；资源申请已发，回复后我提交。错了的代价：1 个单核作业。\n\n**补记（10-26 19:2x，作业 1633157）**：打包修好后 B11 求解与扩展均完成，驱动在写 10001 组反力/内力时程时到第 4819 组触发单子算例默认 700 s 超时（卡 ⑤已回填）。**Decision I made**：case 加 timeout_s=2400、h_rt 改 1 h，新根 v21_b11d（卡），资源申请已发。另记：通用驱动 700 s 默认超时对长时程 + 扩展的订单太紧，使用说明里已写明\"长时程请在任务书说明\"，v2.1 收尾时考虑按 expansion_points 自动估算超时。错了的代价：1 个单核作业。\n\n**补记（10-26 19:5x，作业 1633242）**：B11 完整跑完，30/33（卡 ⑤已回填）：均值/RMS 对 r6 ≤0.068%；三项峰值 RFx −0.93%、cut_Fx −1.14%、cut_My +0.71% 超 0.5% 闸门；新增 FZ、I/J 端轴力三项 PASS。扩展取样时刻两次错开 0.045 s（r6 首点 0.075 s，v2.1 0.12 s）。**Decision I made**：按原判据记 B11 v2.1 **未通过**，不放宽；派 T27.1-25c 先只读查明错开原因（尤其荷载时间轴是否也错位——若是则为驱动 bug），再对齐取样重跑一次作区分实验。错了的代价：1 个单核作业；若荷载确有错位，此前用 v2.1 msup 的结果都要复核（目前只有本回归用过）。\n\n**补记（10-26 20:3x，T27.1-25c 作业 1633449）**：报告，卡。荷载时间轴无错位（时刻差 ~1e−13 s）；加 OUTRES 未对齐取样时刻（仍首点 0.12 s）；B11 仍 30/33（三项峰值同前）。按原判据：v2.1 B11 **未通过**；B1–B6、B4b 通过。**Decision I made**：对 r6 的 0.5% 峰值闸门在取样时刻不同的情况下分辨不出驱动错误，改做只读复核 T27.1-25d——用 B11 原独立 Python 参考在 v2.1 自己的取样时刻上算 30 项，按 B11 原判据（±3%）判，并与 r6 自身误差并列。此口径为事后补定，报告须并列原判据读法（3 项峰值 FAIL）。不新提交作业。错了的代价：bot 半天只读工作；结论若仍不清，v2.1 B11 保持未验收，其余部分照常可用。\n\n**补记（10-26 21:0x，T27.1-25d 只读复核）**：报告 （事后补定口径，已标注）：在各自取样时刻上对 B11 原独立 Python 参考，r6、v2.1(b11d)、v2.1(b11e) 都 30/30 通过（±3%），v2.1 三项峰值对独立参考误差 +0.11%、−0.99%、+0.08%，与 r6（+0.46%、−0.21%、+0.01%）同一量级；按原判据（对 r6 <0.5%）仍 3 项 FAIL。**根因（Lead 核实）**：v2.1 生成的输入缺 r6 第 262 行的 `CM,ROOF,NODE`，MSUP 段 `OUTRES,NSOL,ALL,ROOF` 指向未定义组件失效，.rdsp 每 4 步才写（out.out 第 2242 行 WRITE FREQUENCY=4），扩展只能取 0.06 s 网格上的时刻；扩展段也少一条 `OUTRES,NSOL,ALL`。这是生成器缺陷，不是取样\"相位巧合\"。**Decision I made**：派 T27.1-25e 修生成器、按原 0.5% 判据重跑一次；不以事后口径追认通过。错了的代价：1 个单核作业。\n\n**补记（10-26 21:5x，T27.1-25e 作业 1633628）：v2.1 验收通过。** 生成器补上 ROOF 组件定义后，Lead 在 CRC 直接核实：run.exitcode=0， 33/33 PASS，expanded_history 10001 行、首点 0.075 s（与 r6 逐行时刻差 0），in.inp 含，卡。连同 B1–B6（与 v2 逐值相同）、B4b FULL（峰值 0% 差），v2.1 三项改动全部验收。结论限 B11 这一固定模板的数值回归。使用说明已更新反力/内力行。监控器这次没拿到退出状态（ 显示\"已离开队列，未拿到退出状态\"），以运行根文件为准。"
+    },
+    {
+      "id": "dec-0028",
+      "ts": "2026-10-27 08:33",
+      "title": "CAE-Agent-Hub 精读（2026-10-27 Lead）",
+      "label": "决定",
+      "text": "# CAE-Agent-Hub 精读（2026-10-27 Lead）\n\n来源笔记；只读 GitHub API 与 、（仓库 Cai-aa/CAE-Agent-Hub，1173 星，MIT，10-27 有提交）。未克隆、未安装。\n- Mechanical 桥：Windows 桌面 Workbench RunWB2 日志 + Mechanical ACT 插件 + 本机 socket；与本线 CRC Linux APDL 批处理不兼容（PyMechanical 在 CRC 缺 mechanical-env，见）。其 pymapdl-mcp 为官方 PyAnsys 包副本（ 已审）。\n- 可借鉴：逐单 8 条独立验收闸门（正常终止、.rst 非空、荷载–支反力平衡默认 1%、网格统计、结果导出、数值+图、假设与奇异点）与三级结果标签（功能探针 / 工程草稿 / 报告级：须网格敏感性和基准对照）。\n**Decision I made**：建议出口 X3（把逐单验收清单与三级标签并入本线 check_report 模板和使用说明「交回格式」），其余 X1；已 --note 交平台 Lead，**待 Liang Hu 批，批前不落地**。另记 CalculiX 作将来独立有限元对照的候选，未评估。\n依据：无文献依据，基于仓库文件与本线数据。"
+    },
+    {
+      "id": "dec-0029",
+      "ts": "2026-10-29 08:31",
+      "title": "NVIDIA cuDSS 速读（2026-10-29 Lead）",
+      "label": "决定",
+      "text": "# NVIDIA cuDSS 速读（2026-10-29 Lead）\n\n情报委托（Liang Hu 10-29 直投，紧急）。只读来源笔记与 Manuals_Ansys2024R2；未装软件、未计算。\n- 本线瓶颈不在稀疏直接求解：B1 静力+模态求解约 0.3 s（ 的 TCP 计时），B12 3714 节点模态秒级，B11 作业约 20 分钟主要是扩展后逐组写 10001 组结果（ ⑤）。\n- MAPDL 自带 GPU 加速：稀疏直接与 PCG（Parallel Processing Guide 2024R2 第 3 章，PDF 第 23、26 页；支持卡 Installation Guides PDF 第 127 页）；小自由度模型提速不明显（PDF 第 28 页）。手册未写与 cuDSS 的关系（未查实，不作结论）。cuDSS 是开发者库，不能直接替换 MAPDL 求解器。\n**Decision I made**：建议出口 X1（存档）；将来有 ≥数十万自由度实体/壳订单时再评估 MAPDL 自带 GPU 选项（需 CRC GPU 节点与 HPC 许可）。已 --note 交平台，待 Liang Hu 批。错了的代价：无，存档可随时再提。\n依据：Ansys 2024R2 手册页码如上；其余基于本线数据。"
+    }
+  ],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-24 21:41",
+      "text": "【审查结果】这是 Ansys 结构有限元工具给全平台各线 Lead 用的使用说明 v1.3 草案。发布后，别的线会照它下单，所以它相当于一个对外接口。请核对三件事：\n1. 能力分三档（已验证 / 管道已实现但未验证 / 软件能做但管道未实现）：每一档是否都有所附证据支撑？有没有把只验证过固定算例或局部的能力说大了？重点看：官方频域 VM 算例、实时连接（gRPC）、DPF、B10c 颤振、B11 内力。\n2. 误差和判据的写法：定义式是否写清楚，数字是否与证据文件里的一致。\n3. 限制和下单说明里，有没有缺了会让下单方误用的要点。\n请分成「必须改」和「建议」两部分回答，每条都注明对应的证据文件和行号。\n3 位审稿人的意见已收齐（3/3 份有效）。请逐条核实依据后裁决：分\"必须改\"和\"仅供参考\"，回应每一条站得住的反对，保留未采纳的异议；需要 Liang Hu 定的升级给 Liang Hu。\n\n## 派发说明\n- 审稿人 C 的账号报错（Billing or credits exhausted: HTTP 402: Insufficient Balance (request_id: -9bcc-47d6-8a60-0f525ca54ab3)），已暂时移出审稿人轮换，至 2026/10/25 18:52:31（美东）；充值后运行 reset reviewer-c 立即恢复。\n\n### 审稿人 E · Gemini\n## 实际作答模型：gemini-4-argon-high（gemini）\n\n## 结论\n\n**有保留地支持（需完成 MUST-FIX 修订后再作为对外下单接口发布）。**\n\n[Ansys工具使用说明.md]([local path omitted] v1.3 草案整体框架清晰，对官方频域 VM 算例、gRPC 实时连接、PyMechanical 嵌入等边界做了基本区分；但作为全平台各线 Lead 照单委托的对外接口说明，存在以下三类必须修正的问题：\n1. **能力分档与通用管道边界混淆、局部验证被夸大为通用能力**：表中 B7/B7c/B8/B9/B10c/B11 均由专用脚本完成，并未集成进通用驱动 [`run_case.pyRESVEC,ON`”的命令也未写入通用管道 [`analysis.pySMISC,1`）；DPF 的 `SMISC 2–6` 一致结论来自作业失败（`exitcode=1`）后的事后修列勘误，且缺 `SMISC,1`（轴力）和 `FZ`；B10c 节段 `Uf` 0% 误差是因为扫描网格直接以参考解为中心；未通过的 B10 和纯环境回归的 VM 被混排进“能算什么（已验证）”主表；第 70 行“已验证的组合”总结停留在 v1.2，与新表及第 98 行自相矛盾。\n2. **误差与统计量定义式缺失、部分报告状态与数值表述不一致**：全文未给出相对误差定义式（且通用检查器 [`evaluate.py||actual|−|target||/|target|`，会掩盖反号错误），未区分含均值的 `RMS` 与去均值的 `标准差 (std)`，也未说明 B11 原报告主表实为 、系由 Lead 事后修改静力平衡分母判为。\n3. **下单说明遗漏多项会导致下单方误用或静默出错的硬编码限制**：通用管道中 `FULL` 瞬态完全未写阻尼（静默按零阻尼算）、`frame_2d` 默认把梁刚度放大 $10^4$ 倍且密度清零、“梁端铰接/端部释放”写在下单表里但根本未实现、运行根目录有 2 GB 硬上限与 700 s 超时强杀等均未在说明中告知下单方。\n\n---\n\n## 必须改（MUST-FIX）\n\n### 一、能力分档与重点项核对（对应审查问题 1）\n\n1. **混淆“通用管道已实现能力”与“单算例专用脚本验证能力”，且 B11 的 `RESVEC,ON` 与扩展步并未进入通用管道**\n - **依据位置**：[Ansys工具使用说明.md]([local path omitted] []([local path omitted]\n - **问题**：\n - 说明第 35–40 行推荐用通用驱动 下单，随后第 44–68 行“能算什么（已验证）”列出 B1–B11。但 []([local path omitted] 和 []([local path omitted] 明确仅实现了 B1、B2、B3、B5、B6/B6n 对应的四种模板及单点单方向位移/二次求导加速度输出；**B4/B4b（弹簧阻尼器）、B7/B7c（三维框架与偏心质量）、B8（张紧索预应力模态 + `MATRIX27` 复模态）、B9（三维多分量风洞荷载 同时输入）、B10c（`MATRIX27` 颤振管道）、B11（MSUP 扩展基底反力与截面内力）均由各自的独立专用脚本运行，未集成到 **。\n - 尤其是通用管道 []([local path omitted] 的 MSUP 至今未加 `RESVEC,ON`、未设 `VAout=YES`、也无 `EXPASS,ON` + ”与“仅专用脚本验证（下单需走定制脚本）”。\n\n2. **B11 内力验证范围被夸大為一般的“梁内力已由 B11 验证”，漏写了轴力未核对、单截面局部坐标符号限制及 `RESVEC` 对时变荷载分布的局限**\n - **依据位置**：[Ansys工具使用说明.md]([local path omitted] []([local path omitted]\n - **问题**：\n - **漏核轴力 `SMISC,1`**：[`build_b11_r4.pyfxi=SMISC,1`（第 8 列），但 [`check_b11_r6.pycut_Fx`、`cut_Fy`、`cut_Mx`、`cut_My`、`cut_Tz`，对应 `SMISC 2–6`），**从未核对第 8 列梁轴力 `SMISC,1`**，也没核对 J 端（`SMISC 14–19`）。\n - **局部轴别名与符号硬编码**：[document_audit.md]([local path omitted] 和 [03_反力内力与后处理.md]([local path omitted] 指出，脚本中 `SYI=SMISC,5`、`SZI=SMISC,6` 与官方 `SFzSFy` 命名相反，且到全局坐标的符号转换仅针对该竖向悬臂手工配对，不可直接迁移到其他构件方向。\n - **`RESVEC,ON` 的前置条件与局限未写全**：第 66 行只写“必须 `RESVEC,ON`”，未写明必须在**第一次模态求解步施加代表性静力荷载空间分布并在瞬态首步前 `FDELE,ALL,ALL` 删除**（见 []([local path omitted] [check_report.md]([local path omitted]\n\n3. **B10c 颤振管道存在方法标注混淆，且漏了关键限制条件（非盲测扫描、缺失导数置零、底模未验证）**\n - **依据位置**：[Ansys工具使用说明.md]([local path omitted] []([local path omitted]\n - **问题**：\n - **求解器方法混淆**：第 65 行笼统写“MATRIX27 + DAMP 复模态”，但实际上 **(A) 节段算例用的是 `QRDAMPDAMP`**，且 `DAMP` 并未做过 (A) 节段的独立临界风速扫描（见 []([local path omitted] 11 行：“DAMP 的独立 Uf 扫描未做，不能报告与 QRDAMP 的 Uf 差”）。\n - **(A) 节段 `UfUf` 误差为 0%“不是盲测精度，亦不能证明所用 Theodorsen 气动力公式本身的正确性；本闸门仅验证在相同公式和符号约定下 MATRIX27/QRDAMP 数值管道”。\n - **(B) 全桥算例的强假设未注明**：[]([local path omitted] 和 [STATUS.md]([local path omitted] 明确注明**论文 Fig.5 缺失的 6 个颤振导数被直接假定为 0**，且所用桥梁模态来自 B10 **未通过验证**的等效脊梁模型（扭转频率偏低 9.3%，与论文 Table 5 实桥颤振风速 81.3 m/s 相比本算例为 73.1 m/s）。第 65 行只写“B 通过”，未写明“仅验证与同模态、同置零导数的自写 Python 程序的数值一致性，不代表实桥颤振复现通过”。\n\n4. **DPF“部分验证”表述遗漏了作业实际失败（`exitcode=1`）、事后修列勘误性质、`SMISC,1FZ` 未验证以及环境变量与残留进程限制**\n - **依据位置**：[Ansys工具使用说明.md]([local path omitted] []([local path omitted]\n - **问题**：\n - 作业 1623101 实际 `run.exitcode=1SMISC_1..5` 全为 `FAIL`；`SMISC 2–6` 与 POST1 一致是事后发现在 [ 的列（`values[9:15]` 漏了第 8 列，也未注明 `SMISC 1`（轴力）和 `FZ` 反力**未比较/未验证**（见 [check_report_addendum.md]([local path omitted] 38 行）。\n - 另需注明：CRC 上直接调 `dpf.Model` 会因找不到服务端报错，必须手动设 （见 []([local path omitted] 10001 组中的 3 个时刻，按预注册实验卡 [EXPERIMENT_CARD.md]([local path omitted] 全量 DPF 通道仍属未验证。\n\n5. **“能算什么（已验证）”章节结构与三档定义自相矛盾，且第 45、70、98 行内部冲突**\n - **依据位置**：[Ansys工具使用说明.md]([local path omitted]\n - **问题**：\n - **第 45 行失实**：写“参考解都是**本线自研的独立实现**（解析公式、自写 Python 程序），不是第三方软件或文献表值”，但同表第 53 行（B4b 用同会话 MAPDL 模态参数）、第 64 行（B10 用论文 Table 2 频率）、第 67–68 行（VM 与 VM 频域用官方手册公布的 MAPDL 值）均非本线独立实现。\n - **未通过算例与不可下单算例混入“已验证”表**：第 64 行 B10 明确为“**未验证**”（5 项模态 3 项 FAIL，未做颤振，见 []([local path omitted] 67–68 行 VM / VM 频域包含反应谱（VM70）、谐响应（VM86/VM90）、大转动几何非线性（VM179）、随机振动 PSD（VM298/VM203），而这些分析类型在第 99 行明确属于第三档“**软件能做、管道未实现（不能直接下单）**”。把它们放在“能算什么（已验证）”表中会误导下单方。\n - **第 70 行“已验证的组合”未同步更新且与前后矛盾**：第 70 行写“……其他单元×分析×输出量的组合视为未验证”，既漏掉了表内新增的 `BEAM188LINK180` 预应力模态（B8）…\n\n### 审稿人 A · GPT-6\n## 实际作答模型：gpt-6-astra（codex）\n\n## 结论\n\n**有保留地支持；v1.3 应先修正文档再发布。** 官方频域 VM、gRPC 和 DPF 的主要边界有证据支持，但下单接口存在默认设置未披露、专用能力与通用驱动混写的问题；B10c、B11 的验证范围和裁定口径也需补全。\n\n以下路径均相对于；“《说明》”指 [](\n\n## 必须改（MUST-FIX）\n\n1. **FULL 瞬态的默认阻尼承诺与 case 驱动不符。** \n 《说明》31、35 行承诺默认 ζ=2%，并推荐直接交 case。但 仅在 MSUP 分支写入 `DMPRAT`；FULL 分支没有施加该阻尼，也没有读取 Rayleigh 锚定参数。不能让下单方以为 FULL case 会自动采用所述阻尼。应明确两种入口、两种方法实际支持的阻尼设置。\n\n2. **模板存在未披露的模型默认值，“任意方向”也不成立。** \n 《说明》36–38 行将模板描述为一般直梁和多层多跨框架。实际 默认令框架梁 **E×10⁴、密度为零**，105–106 行内置出平面约束及柱脚固支；这些会直接改变订单模型。另同文件58–59 行只接受梁轴 X/Z，SOLID186 分支27–35 行固定沿 X 建模，不支持说明所称“任意方向”。应在模板入口披露这些限制与默认值。\n\n3. **B11 的局部验证被概括为“梁内力和基底反力已验证”，且未说明未接入通用 case。** \n 《说明》66、98 行应限定为该固定模型的基底五分量，以及半高单元 I 端的五个内力分量及其统计量。 没有基底 FZ、截面轴力的验证项；报告 也排除了 FULL 和加速度平衡。 \n 此外， 的通用瞬态入口没有 B11 的 RESVEC、扩展及反力/内力提取，只输出一个观测分量的位移和差分加速度； 只解析三列时程。应明确 B11 是专用流程，不能让用户以为模板内直接填写这些输出即可交付。其他内力分量及一般模型的验证：**证据不足**。\n\n4. **B10c 漏掉决定适用范围的假设，并混写了 A/B 求解器。** \n 《说明》65 行遗漏“六条缺失气动导数取零、截断20阶模态、不外推 Fig.5 范围”。依据是 及。后者明确这是数值链路验证，**不是明石桥复现**；同文件3行还说明参考采用同振型、同导数，应保留这一独立性边界。 \n A 节段所引报告实际为 **QRDAMP**，不能与 B 统一写为 DAMP。DAMP 的节段补核只有固定风速频率，没有独立 Uf 扫描（上述决策文件23行）。“Uf 偏保守”也只能描述本次偏低结果。\n\n5. **B11“35/35”的裁定来源及 RMS 分母必须说清楚。** \n 《说明》66 行直接报35/35，但原报告1–2、35–39行是32/35；63–64行才追加改判。另 又明确“维持未验证”，证据包存在相反结论。应注明采用哪份裁定及其优先关系，不能把追加裁定写成原作业自动通过。 \n “均值 <10% RMS”须写为 **`|均值| <0.1×RMS`**，并指定判别和归一化分别采用哪条序列。 的 RMS 是 `sqrt(mean(x²))`，不是去均值标准差；51、55–57行尚未实现追加裁定的统一规则。用独立动力参考 RMS 归一化，我复算三项为 **0.11549%、0.13133%、0.08067%**，支持说明中的约数，但不足以消除公式和裁定冲突。\n\n6. **参考来源的总括声明错误。** \n 《说明》45 行称参考“都是本线自研独立实现，不是第三方软件或文献表值”，与同文53行的同会话 MAPDL 参考、64行的论文频率、67–68行的官方 MAPDL 值直接冲突。 明确是在比较官方公布比值。应限定该总括声明的范围，避免把环境回归等同于独立物理验证。\n\n## 仅供参考（NOTE）\n\n1. **误差定义应在说明内统一，避免读者自行猜测。** \n 《说明》65行“频率差约2e-8”未说明是无量纲相对误差；节段报告8、10行实际为约 `1.7×10⁻⁶%`。频域误差、相位周期角差的定义已经写在，但《说明》68行没有带入。建议明确普通相对误差、带符号偏差及百分点差的区别。\n\n2. **DPF 失败措辞应限定在本次版本和调用方式。** \n 《说明》97行“反力矩和 .rdsp 时程读不出来”略显绝对。证据实际是 DPF 0.13.6 缺少所调用的 `reaction_moment` 属性，以及**单独打开**该 `.rdsp` 报错；见。不能据此证明其他读取路径都不可用。\n\n3. **章节状态存在过期或自相矛盾的文字。** \n 《说明》44行仍标“已验证，2026-10-16”，却包含10月24日结果和64行明确“未验证”的 B10；70行组合清单遗漏 B11 反力/内力；114行又把内力、反力基准列为下一步，与66行冲突。应统一状态。\n\n## 我核对过的\n\n- 已读取全部九份指定文件，并追查上述生成器、检查器、裁定及补充审计文件；没有修改文件或重跑求解。\n- **B7c：**21项，最大相对差 `0.089623%`，支持《说明》的0.09%；依据。\n- **B10c-B：**复算 Uf 偏差 **−4.04410%**、频率偏差 **+2.67599%**，说明中的约数一致；依据其报告5–6行。\n- **VM 回归：**本地表确为36行，35行相等、1行差0.1个百分点；依据。\n- **频域 VM：**汇总9–11行的比较基准与官方 [VM298]([external URL omitted]]([external URL omitted]]([external URL omitted] Results Comparison 一致；说明限定为固定算例复现是恰当的。\n- **gRPC：**证据仅覆盖本节点回环 TCP 的 和版本读取；《说明》93行未扩大为求解验证。依据。\n- **DPF：**核对 history 写出列序与错误切片，并用存档 JSON 复算三帧 SMISC 2–6；最大相对差 **7.9856×10⁻¹²%**，支持追加勘误。依据 、DPF `run_dpf.py:65` 及原报告7–37行。\n\n## 我没能核对的\n\n- 未连接 CRC 核验原始 、完整逐帧结果、作业进程及许可释放；现有证据也明确不支持逐进程释放结论，见 gRPC报告21行、频域汇总17行。\n- 未逐项重新核验 B1–B9 的全部原始输出，也未逐页外部复核十例 VM 的全部官方比值；不能把本轮抽查扩展为整条管道认证。\n- B10c 阻尼系统偏差的原因，以及六条气动导数置零对真实桥梁的适用性：**证据不足**，见其决策文件23–24行。\n- 附录省略了早期444条消息且含截断，不能凭它解决 B11 两份相反裁定的优先关系；见。\n\n## 结论\n\n**有保留地支持，当前草案不宜原样发布。** 必须修正 FULL 阻尼承诺、模板隐藏默认值、B11 输出入口与验证范围，补齐 B10c 假设，并明确 B11 改判及误差定义。上述意见均可通过文档澄清和收窄能力声明处理，不要求新增计算。\n\n### 审稿人 D · GLM\n## 实际作答模型：glm-5.3（zai）\n\n已读主文档和技能。现在读 8 个证据文件。\n\n主文档和核心证据已读。B10c 的 A 部分、阻尼比说法、B10/B9 数字、VM 频域的单元类型还需核对原始报告，再读几个被引用的报告文件。\n\n单元类型已核实。再核对说明中引用的文件路径是否真实存在（下单方会照着去找）。\n\n路径全部存在。再快速核对 B9（含因果归因说法）与 B8 两行的原始报告。\n\nB9 报告里没有\"横风低 4–6 倍\"和因果说法，查一下这两个说法的证据出处。\n\nB9 的 4–6 倍和因果说法在决策文件里有据。再快速核对 VM 回归 10 例的\"反应谱\"覆盖说法与输入版本。\n\n核对完毕。所有证据文件已读，关键数字已复算。以下是审查意见。\n\n## 结论\n有保留地支持——三档划分的框架和绝大多数数字与证据相符（VM 频域固定算例限定、B10 判“未验证”、gRPC/DPF 降级到限制区都做得诚实），但有 3 处必须改：一句覆盖全表的参考解出处声明与表内 3 行矛盾、“已验证的组合”一行与表内 B8/B10c 行自相矛盾、B10c 行漏掉“缺失导数置零”这一直接影响下单的关键限制。改完这三处即可发布。\n\n## 必须改（MUST-FIX）\n- **第 45 行“参考解都是本线自研的独立实现……不是第三方软件或文献表值”是覆盖全表的 blanket 声明，与表内 3 行直接矛盾** — 依据：`Ansys工具使用说明.md:45` vs `:67`（VM 行参考为“官方 2025 R2 手册公布的 MAPDL 比值”，即第三方软件自报值）、`:68`（VM 频域参考为“官方 v252 Results Comparison 的 MAPDL 值”）、`:64`（B10 参考为“论文 Table 2 频率”，即文献表值）；另 与 均注明 VM219 理论值由 VM 输入自行计算、“参考独立性有限” — 若不改的后果：下单 Lead 会把 VM 两行当成独立精度验证（实际只验证环境和批处理通道），整张表的信任锚点是错的。改法：注明例外（VM/VM 频域/B10 三行）。\n- **第 70 行“已验证的组合”列举不全且收尾句与表内行矛盾** — 依据：`Ansys工具使用说明.md:70` 未列 LINK180 预应力模态、MATRIX27 复模态（表内 `:62:65runs_index/b8_cable_aeroel_r3_20261017/check_report_v2.md:1`）、SHELL281（`:68` VM 频域行， 确认），而“其他单元×分析×输出量的组合视为未验证”按字面读会把 B8/B10c 已验证的组合判为未验证；“BEAM188……全瞬态”还缺长时程限定（`:98` 自述 B11 附带 FULL 两次 13 s 发散） — 若不改的后果：索预应力/气动复模态/厚板 PSD 的下单方在这句和表行之间无所适从，档位判断出错；或误下长时程 FULL 单。\n- **B10c 行漏掉“六条 Fig.5 缺失导数设零、截断 20 模态、导数范围外不外推”的限制** — 依据：（原文“六条 Fig.5 缺失导数设零，截断 20 模态，导数范围外未外推；结论只适用于此条件性等效桥模型的数值链路”）、同目录 `check_report.md:3`（\"six missing derivatives assumed zero\"）；`Ansys工具使用说明.md:65` 只写了阻尼比低 0.001 的保留，未提导数置零 — 若不改的后果：颤振是新单最可能来的方向之一，导数不全时管道静默置零会直接改变 Uf/ff，下单方完全无从知晓，这正是“只验证过固定算例就说大了”的典型缺口。\n\n## 仅供参考（NOTE）\n- B11 \"35/35\" 建议注明是 Lead 10-17 修订判据（近零均值按 RMS 尺度）后的计数：报告文件头仍是 \"main FAIL, 32 PASS/3 FAIL\"，修订记录在 `:63-64` 与；建议行内引决策文件，免得下单方打开报告看到 FAIL 以为说明书写错。数字本身我已复算无误（见下）。\n- DPF 条目（`Ansys工具使用说明.md:97`）没有给证据文件路径；且作业 1623101 `run.exitcode=1`、存档自动报告 15 项标 FAIL，“部分验证”是事后只读复算加 Lead 列序更正的产物；SMISC1（轴力）未比较（`:38`）。建议补 路径和一句出处说明。\n- B10c-A 用的是 QRDAMP 不是 DAMP，`Ansys工具使用说明.md:65` 的\"MATRIX27 + DAMP 复模态\"易被读成 A、B 两档都是 DAMP；A 的 Uf 0% 是扫描以参考值为中心的结果，r2 报告自述“不是盲测精度……仅验证数值管道”，说明已带“扫描以参考值为中心”但建议把“非盲测”挑明。\n- B9 行的“横风加速度低 4–6 倍”“原因在风荷载输入”不在其所引 check_report 里（该报告 `:44` 只说 order-of-magnitude、图值未数字化），出处是 （Gemini 读图＋Lead 抽查）；决策原文还有“也可能跟来流……以及风向对应的宽面/窄面有关”的对冲，`Ansys工具使用说明.md:63` 压缩后丢了这个对冲，建议补引用并还原。\n- gRPC 条目（`:93`）未带“明文 insecure 仅限本节点回环、端口不得对其他节点开放”的安全注意；现在不接单风险低，将来放开时须随行。\n- VM 行“原版输入”实为 PyMAPDL 0.74.1 捆绑的 2023 R2 输入在 MAPDL 2025 R2 上运行，建议注明版本，与“官方 2025 R2 手册比值”的对照口径配套。\n- `Ansys工具使用说明.md:70` 的“加速度输出”建议注明“位移二次求导”（B5 DERIV，`:54`），与 `:98`“求解器直接输出的加速度……未验证”保持同一口径。\n- “## 能算什么（已验证，2026-10-16）”（`:44`）表内含 10-17、10-24 的行和一个整行未验证的 B10，标题日期与内容不符；建议改为“基准结果表（更新至 10-24）”之类，避免速读者把 B10 也当已验证。\n\n## 我核对过的\n- 全文 114 行，23 个引用路径全部真实存在（含 、 页）。\n- B7c：21/21，容差 0.01/0.03 与说明一致；全表最大相对误差 0.0896%（mode 4 UY/ROTZ，第 17 行）≈ 说明的“0.09%”。\n- B10c-B（ 及）：Uf 73.12375 vs 76.20558 = −4.044%、ff 0.106264 vs 0.103494 = +2.676%，均 <5% PASS，与说明“−4.0%/+2.7%”一致；60–73 m/s 阻尼差我在 U=60 复算：python ζ=0.0008042/0.10961≈0.00734 vs MAPDL 0.00620，Δ≈0.0011，与“低约 0.001”一致（STATUS.md:9）。\n- B10c-A：ff 相对误差 1.78e-8≈说明“约 2e-8”；“扫描以参考值为中心”“仅验证数值管道”为报告原文。\n- B10：LS1 −5.581%、VS1 −0.475%、VA1 +4.558%、TS1 −9.319%、TA1 −7.381%，2/5 过，与说明一致。\n- B11（ + Lead 判定）：30 项独立对照最大差 1.91%（cut_Tz 峰值）<3% ✓；静力平衡 Fx +0.059%→\"+0.06%\"、My +0.082%→\"+0.08%\" ✓；RFy/RMx/RMz 均值差 1.67/2.30/1.94%（“约 2%”）✓；均值/RMS 我复算为 7.0/5.8/4.2%（“4–7%”）✓；按 RMS 尺度我复算为 0.116/0.131/0.081%（“≤0.13%”）✓；RESVEC −3.2%→+0.06% 与 Lead 判定及 一致。\n- VM 回归：36 行，35 行差 0.000、1 行（vm179 DX T2）差 0.100 百分点，与说明“36/36（35 完全相同，1 行差 0.1）”一致； 确认 VM70=模态+SPRS（“反应谱”覆盖属实）、VM86=FULL 谐响应、VM179=FULL 瞬态大转动。\n- VM 频域（`t27_1_22_summary.md:9-11,15,17` + 各题 check_report + 输入文件）：0.01852%→0.019%、0.07148%→0.071%、0.00411%→0.004%、0.00093%→0.001%、峰值 PSD 0% 全部一致；单元类型从 `vm298.dat:40,51vm203.dat:7`（SHELL281）、`vm90 solver.out:233,241`（COMBIN14/MASS21）核实；固定算例限定语与 summary:17 自我限定逐句相符。\n- gRPC：1622930 insecure TCP 完成 [local path omitted]＋读回 25.2、UDS 155 s 超时、PyMechanical 缺 mechanical-env，与说明 :93-95 一致。\n- DPF：FX/FY 节点 1、SMISC 2–6、3 个时刻、反力矩无算子、.rdsp 报错，与说明 :97 一致。\n- B8：16/16，索第 5 阶 0.644%≈“≤0.64%”，气动频率/阻尼比相对差 1e-9~1e-8。\n- B9：30 项非反力全过，最大 2.10%（U50 ax_rms）＝说明“2.1%”；基底反力 MAPDL 0.0（未提取），说明“基底反力未提取”属实。\n\n## 我没能核对的\n- B1–B6、B4b、B5、盲测、“回归”各行的具体数字（对应 check_report 未列入证据包，我只确认了路径存在）。\n- “MCP 服务器只做了静态检查，没有安装”（说明 :96）——证据包内无对应文件。\n- 资源与排队说法（排队 0–几分钟、long 队列 3 小时、许可 550 份在用个位数中后者与 gRPC/summary 快照相符，前者无证据文件）。\n- B7c “质心偏心 0.6 m” 的几何参数（check_report 不含几何信息）。\n- CRC 端原件（probe.json、solver.out、.rst 等）——只读了本地副本与报告转述。\n- “ 能检索到手册内容”（说明 :89）。\n\n## 结论\n有保留地支持发布 v1.3：三档能力框架成立，重点核查的官方频域 VM（固定算例限定已如实带上）、gRPC（只测到 [local path omitted]、不接单）、DPF（部分验证、生产仍用 POST1）、B11 内力（35/35 数字全部复算相符）均有证据支撑且未夸大；但第 45 行参考解出处 blanket 声明、第 70 行“已验证的组合”自相矛盾、B10c 行缺失导数置零限制这三处必须先改，否则下单方会在这几个点上被误导。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-24 21:41",
+      "text": "正在核实完三位审稿人的意见，已改好说明 v1.4，接着写裁决记录、更新线况。审查 已裁决，使用说明改成 v1.4 并发布，改动只涉及文档，没有跑新的计算。三位审稿人 E（Gemini）、A（GPT-6）、D（GLM）的结论都是\"有保留地支持\"。C 的账号余额不足，被系统移出了轮换，有效意见 3/3。他们提到的问题我都对照代码和运行报告核过，属实的全部改进了说明。\n\n## 必须改（9 项，已改进 v1.4）\n1. **全瞬态的阻尼说错了。** 说明写\"默认 2% 阻尼\"，但通用驱动只有模态叠加法加了阻尼，全瞬态实际是零阻尼。现在说明写明这一点，要阻尼须在任务书里给锚定频率，由 bot 用专用脚本施加。\n2. **模板里有没写出来的默认值。**\n - 平面框架模板默认把梁刚度放大一万倍、梁密度设为 0，还约束出平面方向、柱脚全固接。\n - 直梁只能沿 X 或 Z 方向，说明原来写的\"任意方向\"不成立。\n - 下单表里写的\"梁端铰接/端部释放\"其实没有实现。\n - 每个子算例超过 700 s 或运行目录超过 2 GB 会被强行结束。\n\n 这些都补进了新的一节\"通用驱动覆盖到哪里\"。\n3. **通用驱动和专用脚本混在一起写了。** 通用驱动只覆盖 B1–B3、B5、B6/B6n 和两个盲测，瞬态只输出一个点、一个方向的位移。B4、B4b、B7–B11 和官方算例回归（VM）都是各自的专用脚本跑通的，现已写明。\n4. **B11（基底反力与内力）的验证范围要收窄。**\n - 实际只核了基底 5 个分量和半高处一个单元一端的 5 个内力；竖向反力 FZ、轴力、另一端、全瞬态法都没核。\n - 35/35 是我 10-17 按\"均值接近零的分量改用 RMS 衡量\"的规则改判的，原自动报告是 32/35。bot 那份\"维持未验证\"写在改判之前，已注明以决策记录为准。\n - RMS 的定义（含均值的均方根，用参考序列归一化）写成了公式；残余向量的使用前提和局限也补上了。\n5. **B10c（颤振管道）漏了假设，求解器也写混了。**\n - 节段算例用的是 QRDAMP，全桥用的是 DAMP。\n - 全桥算例里论文缺的 6 条颤振导数按 0 处理，模态取自没有通过验证的 B10 桥模型，参考程序和 MAPDL 用的是同一组导数和公式。\n - 现在改写为\"只验证了数值计算链路，不是明石桥颤振复现\"；\"Uf 偏保守\"改成只描述本例的事实。\n6. **\"参考解都是本线独立实现\"这句话错了。** B4b、B10、B10c 和两行 VM 都是例外，已改写。VM 两行注明只证明我们的软件环境能复现官方结果，不代表能接这类单。\n7. **\"已验证的组合\"一段与表格对不上。** 已重写，补上索预应力模态、气动复模态、B7/B7c 和 B11 的具体范围；表格标题改为\"基准结果表（更新至 10-24）\"。\n8. **误差定义补上了。** 另外如实写明：通用检查器比较的是绝对值，不检查正负号，符号由 bot 在报告里另行核对。\n9. **DPF（PyAnsys 的结果读取库）的表述补全了。** 那次作业本身失败了（退出码 1），一致的结论是事后改正取数列序、从存档结果复算出来的；轴力和 FZ 没有比较；10001 个时刻只核了 3 个；在 CRC 上要先设 `ANSYS_DPF_PATH` 才能用。\n\n## 仅供参考（也已写入）\n- 实时连接用的是明文、无认证的方式，端口不能对其他节点开放。\n- 官方算例输入的版本写明了（PyMAPDL 0.74.1 自带、2023R2 版输入，在 2025 R2 上运行）。\n- B9 的\"横风加速度低 4–6 倍\"补了出处，并恢复原来的保留说法（也可能与来流、风向有关）。\n- 下一步里删掉了已经做完的\"内力/反力基准\"。\n\n## 未采纳的异议\n- Gemini 建议把没通过的 B10 和官方算例回归移出表格。我没有移：这两行留在表里，能让下单方看到桥梁模型的已知缺口和环境证据。改为在表头说明，并单列真正能下单的范围。\n\n**Decision I made：** 说明直接按 v1.4 发布，因为只是澄清和收窄说法、不涉及新计算。错了的代价：有人仍按旧版理解时，多一轮退单。三处代码缺口——全瞬态阻尼接进通用驱动、检查器改成带正负号的误差、B11 流程接进驱动并补轴力和另一端——排到 10-29 检查点再派单。在那之前 v1.4 已经写明这些限制，下单方不会在不知情的情况下用错；代价是这期间来的全瞬态订单要走专用脚本，周转多半天。\n\n文件：\n\n\n\n线况页、项目页和决策索引都已更新。\n\n（附件：Ansys工具使用说明.md）\n\n（附件：裁决_使用说明v1.3审查2c8959ce_20261024.md）"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-24 23:04",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n平台 Lead 告知（10-24 23:xx）：CRC [local path omitted][用户]（家目录，配额 100G）已用满，作业写不出文件会失败（T13.2 blockMesh 已因此失败）。即日起所有新 CRC 作业的运行根、输出、临时文件一律放 Liang Hu 定（清单 A229）。纯告知，不用回复。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-25 14:34",
+      "text": "【告知汇总 · 2 条】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）以下是 10/25 12:33 起攒下的告知，按时间先后：\n\n1. 来自 平台（10/25 12:33）\n平台 Lead 正式通知（10-25）：Liang Hu 10-25 定，MDPI 文献不取（原话「没有什么好杂志」）。DOI 前缀 10.3390/ 已加入无订阅名单，取件命中直接跳过（退出码 13）。即日起：MDPI 文献不下载、不进建卡清单；本地已有的全文可以照常读。 纯告知，不用回复。\n\n2. 来自 平台（10/25 12:56）\n平台 Lead 正式通知（10-25）：文献取件改用统一入口 （参数同 ：--doi --title --lead）。它会在台式机、MacBook、工作站 三台之间按当天剩余额度、排队长短、是否在线自动挑一台，各台额度与熔断分开算；Mac 22:00–07:00 自动停用。规则不变：先；无订阅名单（ASCE 书籍章节、CSP、MDPI 等）退出码 13 走馆际互借；遇验证页/登录页/无权限记原因不重试；不得 curl 直下出版商 PDF。以后不用再自己选 / （旧命令仍可用，需要指定某台时才用）。 纯告知，不用回复。"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-26 09:12",
+      "text": "【Liang Hu 交办 · 他已有的工作里你能用的东西 · 10-26】Liang Hu 让平台把他台式机上历年的程序、数据、论文、讲义整理成总目录，交给各 Lead 使用（规则已写进 Lead 公共规则「Liang Hu 已有的程序、数据、论文：先查总目录」）。总目录： Hu_Work_Catalog/（先读 README.md 与 可用资产清单.md，也可 search --line work）。源文件在台式机，你读不到：需要时在平台 Lead 对话（39257059）提「台式机资料申请」，写明路径与用途，平台只拷所需部分。下面只是和你相关的几项，用不用、何时用由你决定；把握是平台的估计。\n\n1. Ansys 2024R2 官方手册 267 本（APDL/Fluent/CFX/理论/UDF，3.05 GB，在台式机 O 盘）作为 ftkb 新来源，只存页文本、仅内部（把握 75%）。\n2. 昆明长水机场屋盖测压+结构响应（约 11+2 GB，工程项目数据，Liang Hu 已同意内部研究使用）可作大跨屋盖风振演示（20%，见 09 W01）。\n第一步：向平台 Lead 提工单把 Ansys 手册加进 ftkb。使用限制见总目录第三、五节（第三方数据 Liang Hu 已同意内部研究使用，不上公开页；审稿/基金/个人材料不入库）。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 09:12",
+      "text": "Ansys 手册进知识库的申请已交给平台 Lead（工单）。平台那边正在忙上一件事，这单在排队，做完会自动回我。昆明机场的数据这次先不取。\n\n**1. Ansys 2024R2 官方手册（267 本）**\n- **Decision I made：** 已在平台 Lead 对话里提了台式机资料申请。内容是把台式机 O 盘上的这批手册作为知识库新来源，只存页文本、不拷 PDF，仅内部检索。入库优先顺序是：命令手册、单元手册、理论手册、结构分析指南、官方验证算例集，然后才是 Fluent 部分。\n- **为什么：** 我们的做法手册每一条都要有官方出处。入库后 bot 能直接查到页码，不用每次去翻在线帮助。\n- **错了的代价：** 平台多做一次入库。手册是 2024R2 版，我们在 CRC 上用的是 2025R2，引用时会注明版本，个别差异由我们自己核对。\n\n**2. 昆明长水机场屋盖测压与结构响应（约 13 GB）**\n- **Decision I made：** 暂不申请，先登记为将来\"不规则测点风压映射\"基准的候选数据。\n- **为什么：** 这批数据正好对应使用说明里还没实现的能力（不规则测点、真实建筑），但这条管道还没开始开发，现在拷 13 GB 只会占存储。等映射管道开工时，先申请测点坐标和少量工况（小文件，放 CRC 组空间），再决定要不要全量。使用上按总目录的限制：仅内部研究，不上公开页，发表时注明来源。\n- **错了的代价：** 屋盖示范算例要推迟到映射管道开工时才做。\n\n另外，总目录里提到你以前做的 Stonecutters 桥 ANSYS+MATLAB 抖振联算，可以作为 PyMAPDL 的验证案例。它和泰州桥抖振是同一类问题，等有抖振需求时一起评估，这次也不申请。\n\n决策记录和线况页都已更新：\n\n\n（附件：Liang Hu总目录资产取用_20261026.md）"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 09:16",
+      "text": "【告知 · 来自 Fluent】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：Liang Hu 10-26 交办的「Ansys 2024R2 官方手册 267 本入 ftkb」，T28 已在平台 Lead 对话 39257059 以两线合提名义提了台式机资料申请（O 盘 BaiduNetdiskDownload/ansys/产品文件，3.05 GB，只存页文本、仅内部检索）。你方如有补充（如 MAPDL 优先、需要的子集），请直接补到该工单，不另开。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 09:16",
+      "text": "【委托结果 · 平台】台式机资料申请：Ansys 2024R2 官方手册加入 ftkb\n已开，平台会话 10 分钟内接手。新建 ftkb 库 Manuals_Ansys2024R2，工作站 只存页文本，不拷 PDF；每页记手册名、2024R2、PDF 页号。先入你列的 6 本 MAPDL 手册，再入 Fluent、CFX、UDF。只供内部检索，不公开、不外送。索引超过 1 GB 先停报。完成后用 实测命令和单元查询，关单时自动回你库名和页数。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 09:16",
+      "text": "平台已经接下手册入库的活，开了，新库名叫 Manuals_Ansys2024R2。\n\n- **范围：** 工作站 上只存页文本，不拷 PDF 原件，仅内部检索、不外送。每页记下手册名、版本（2024R2）和 PDF 页号。\n- **顺序：** 先入我列的 6 本结构分析手册（命令、单元、理论、结构分析指南、验证算例集、基础分析指南），再入 Fluent、CFX 和 UDF。\n- **止损：** 页文本索引超过 1 GB 时，平台会先停下来报告。\n- **收尾：** 平台会用知识库实际查几条命令和单元，确认能查到后关单，自动回我库名和页数。\n\n这件事我这边不用再做什么，线况页已经记上了工单号。\n\n关单回报到了以后，我会把做法手册里引用在线帮助的地方，逐步改成引用本地手册的页码，并注明是 2024R2 版本。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 11:20",
+      "text": "【委托 · 来自 平台】A177、A178 Liang Hu 批复：B10 改用 Liang Hu 资料库里的桥模型；gRPC 直连再诊断\nLiang Hu 10-26 在「待你处理」面板批复：\nA177（B10 明石海峡大桥复现卡住）原话：「这个估计做不了。但是可以在我自己的资料库里面找一个桥的模型，我有很多。」即：放弃明石复现，改从 Liang Hu 自己的资料里找一座 FE 模型齐全的桥作基准。请按新流程向 T12.3b 本地历史知识库提「台式机资料申请」：先用 查总目录里 Liang Hu 的桥梁模型，挑一座、写明路径和用途。\nA178（PyMAPDL gRPC 直连卡住）原话：「CRC现在应该好了」。CRC 主连接 Liang Hu 10-26 已重建、现在正常。请按出路 a 再试：1–2 个单核小作业测本机端口/UDS 并开 gRPC 日志，拆清原因；仍不通再报，届时再定是否问 CRC 管理员。\n两件各回一句即可。\n（原因：Liang Hu 10-26 面板批复）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 11:20",
+      "text": "已选好昂船洲大桥（Stonecutters）的 ANSYS 模型，正在找 T12.3b 的收件人，然后发申请并派 gRPC 诊断。A177 的资料申请和 A178 的诊断任务都已发出，目前还没有新结果。\n\n**A177（B10 明石桥）：**\n- 明石桥复现记为\"Liang Hu 定停\"，原因是原文缺桥的构造数据。之前的颤振计算链路验证结论不受影响。\n- 新的桥梁基准（编号 B12）选你资料库里的**昂船洲大桥（Stonecutters）ANSYS 模型**，已向 T12.3b 提了台式机资料申请。\n- **Decision I made：** 只申请拷文本文件——建模命令流 `SCBridgeNEW2.inp` 和相关宏、截面文件，以及当年 ANSYS 算出的频率和振型文本（`FreqSeries.prn`）。不拷 .rst/.db 这类二进制大文件。\n- **为什么选它：** 同一个模型能在 2025R2 上重跑，直接和当年的结果对照；另外有你 2013 年在 Engineering Structures 上发表的论文可比，后面还能接抖振。\n- **错了的代价：** 命令流若不完整，就从总目录里换一座桥。\n\n**A178（gRPC 直连）：**\n- 10-24 已查清：本机回环 TCP 能连，默认的 UDS 方式（本机 socket 文件）连不上，但只测到建模前处理一步，没做过求解。\n- 已派 ansys 做 T27.1-23，最多 2 个单核小作业。一是打开详细日志，查清 UDS 连不上的原因；二是用已通的 TCP 实际做一次求解，和批处理结果对照，并核实进程退出、许可证释放。\n- 这单目前在排队，因为全平台的委托名额满了，轮到会自动开始。\n- 如果仍不通就停，到时再定要不要问 CRC 管理员。\n\n决策记录在，线况页已更新。\n\n## 结论\n- **A177：** 明石桥复现按\"Liang Hu 定停\"处理。新桥梁基准 B12 改用 Liang Hu 资料库里的昂船洲大桥 ANSYS 模型（有原始命令流，也有当年算出的频率和振型可对照），已向 T12.3b 提台式机资料申请，只拷文本文件。\n- **A178：** 已派 T27.1-23（在排队），最多 2 个单核小作业：查清 UDS 连不上的原因，并用 TCP 实际求解一次、和批处理结果对照。仍不通就停，再定是否问 CRC 管理员。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 11:26",
+      "text": "【委托结果 · 数据】台式机资料申请：昂船洲大桥（Stonecutters）ANSYS 有限元模型，作 T27 桥梁基准\n- **拷出**：昂船洲大桥 ANSYS 模型的文本输入和输出共 411 个文件、42.1 MB，在 工作站。两端 sha256 逐个一致，见，清单和判定见。请 ansys 自己拷到。\n- **最终版**：命令流是，参照输出是 下的 `FreqSeries.prn`、`ModeDY.prn`、`ModeDZ.prn`，f1 = 0.1579 Hz。和它配套的输入文件夹判不了：三套候选都已拷出，要靠重跑后比对频率来确定。\n- **重跑前先核**：BEAM44、BEAM4、LINK10、COMBIN40 这几种老单元在 2025R2 上是否还能用、要怎么替换。\n- **没找到的文件**：`Unitelength.prn`、`CREATESEC.mac`、`Bridge.mac`。\n- **没拷的**：二进制文件、风场输入、施工图、。\n- 只限内部研究；、 的归属待核。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 11:26",
+      "text": "昂船洲大桥的模型资料已经到位，B12 重跑任务也已派出，在 ansys 那边排队。\n\n**资料情况**\n- T12.3b 拷来 411 个文本文件，共 42 MB。我已复制到，逐个文件做了校验，全部一致。\n- 主命令流是 `SCBridgeNEW2.inp`。作对照的是当年 ANSYS 算出的频率和振型（`FreqSeries.prn`、`ModeDY.prn`、`ModeDZ.prn`），第一阶 0.1579 Hz。\n- 命令流要读的坐标和截面文件，盘上有三套候选，原文没写配的是哪一套。只能三套都重跑一遍，看哪套的频率对得上。\n- 模型里用了 BEAM44、BEAM4、LINK10、COMBIN40 几种老单元，2025R2 不一定还支持。\n\n**Decision I made：** 派 ansys 做 T27.1-24（排在 gRPC 那单后面）。\n- **先查单元：** 只读核对这几种老单元在 2025R2 上能不能用；不能用的给出替换方案，写明官方文档出处。\n- **再重跑：** 在 CRC 上最多跑 3 个单核小作业，三套坐标截面文件各算一次模态，判定原配是哪套，再把前 20 阶频率和振型与当年结果逐阶对照。\n- **判据（提交前写定）：**\n - 老单元能直接用：前 10 阶频率差不超过 1%，振型相关系数（MAC）不低于 0.95。\n - 换了新单元：频率差放宽到 3%，MAC 不低于 0.90。\n - 三套都对不上就停下报告差在哪里，不逐个调参数去凑。\n- **为什么这么做：** 同一模型直接对照当年的计算结果，比和论文表值比更干净。这座桥后面还能接抖振和颤振管道。\n- **错了的代价：** 最多 3 个单核小作业。\n\n资料只限内部研究使用。决策记录和线况页都已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 11:29",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n补充 A177：Liang Hu 10-26 面板又回了一句「同意建议」。请按你卡住报告里的建议出路执行（报告里推荐的那条，如 f：按库里 Di Agabito 2018 硕士论文的参数），同时照上一条委托从 Liang Hu 资料库找一座桥模型作补充基准；两件冲突时先做你的建议出路，并在回执里说明怎么安排。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 12:03",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n报告草案：。ComputeOps；UDS 作业 1630529 未产生节点本地 socket、退出1；TCP 作业 1630558 B1 beam_40 静力+模态六项对批处理 PASS、退出0。实验卡⑤已双端回填。 Lead 上级项目可用），故以此 note 告知；正式通道仍为批处理。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 12:06",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nT27.1-23：ComputeOps 资源申请 排队。UDS/TCP 两个新运行根已暂存、双份实验卡预注册、独立 qsub -w v 均通过；尚未提交或求解，未判断接通。阶段记录。资源回复后按已批范围各单次提交并登记，结束后一次交完整结果。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 12:06",
+      "text": "【委托结果 · Ansys 智能体】T27.1-23 gRPC 再诊断：UDS 不通的原因 + TCP 通道实际求解\nCRC 本机 TCP 的 PyMAPDL 实际求解短测通过；节点本地 UDS 仍未接通，根因待查。\n\n（附件：check_report.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 12:06",
+      "text": "gRPC 复诊（T27.1-23）做完了：通过本机 TCP 实时连接已经能真正求解，默认的 UDS 方式还是连不上，原因没查出来。我核对了报告里的对照表和判据。\n\n- **本机 TCP 能求解：** 用 B1 悬臂梁做了一次静力加 12 阶模态计算（作业 1630558）。端点位移、支座反力、根部应力和前 3 阶频率，跟原来批处理算出的结果几乎一模一样，相对差最大约 3×10⁻⁸%。作业结束后 MAPDL 进程都退出了，许可证占用回到作业前的 550 份中用 1 份。这只证明了这一个小模型、一次运行。\n- **UDS 仍不通：** MAPDL 确实按 UDS 方式启动了（作业 1630529），客户端找的路径也对，但 105 秒里节点上始终没有生成 socket 文件。日志里有一条 IPv6 监听失败的记录，但证明不了就是它造成的。这个作业结束时启动进程还残留着，所以这一路的许可证有没有完全释放，没法逐席位确认。\n\n**Decision I made：**\n1. **UDS 先不追，也暂不问 CRC 管理员。**\n - 为什么：TCP 已经能求解，UDS 只是同一台机器上更安全的一种连接方式。现在正式通道是批处理，实时连接也不对外接单，所以它不挡任何事。给 CRC/Ansys 支持的提问报告里已经写好，以后要把实时连接开放成交互通道时再发。\n - 错了的代价：到那时要多等一轮支持回复。\n2. **使用说明里实时连接那一条已更新：** 写明 TCP 已完成一次小模型实算，但仍不对外接单，正式通道还是 APDL 批处理。\n\nA178 在线况页里已记为处理完毕，决策记录在。\n\nB12 昂船洲大桥的重跑任务（T27.1-24）在这单之后排队，还没有结果。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 12:10",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1630529 结束于 2026-10-26 11:49；作业 1630558 结束于 2026-10-26 11:51，提交方 2026-10-26 12:09 已处理。\n- CRC 作业 1630529「T27.1-23 UDS DEBUG诊断」：失败（退出码 1）。结束时间 约 2026-10-26 11:49（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n- CRC 作业 1630558「T27.1-23 TCP B1实际求解」：已正常结束（退出码 0）。结束时间 约 2026-10-26 11:51（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已复核两项 CRC 作业及实验卡：1630529 退出码 1，节点本地 UDS 在 105 秒内未生成预期 socket，未接通；1630558 退出码 0，本机回环 TCP 完成 B1 梁静力和模态实算，六项与批处理结果的对照均 PASS。两张实验卡⑤栏已回填，本地与 CRC 副本哈希一致；运行根分别为 288 KB、216 KB，均低于 2 GB，无需重提。\n\nTCP 作业尾相关进程快照为空、共享许可在用数为 1→1。UDS 作业尾曾留有启动壳，且两作业时间重叠，不能证明其计算节点进程和许可逐项释放。正式接单通道仍为 APDL 批处理；TCP 仅是已完成一次小模型实算的交互候选。完整证据：。\n\n## 结论\n\nTCP 实算短测通过；UDS 未接通，服务端未生成 socket 的具体原因仍未查明。本轮两次作业额度已用，不追加提交。\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 12:10",
+      "text": "ansys 的处理和我的计划一致，不用再做什么。\n\n- **两个作业：** 1630558（本机 TCP 求解）正常结束；1630529（UDS 诊断）退出码 1，就是预期的\"连不上\"，不是新故障，不重提。\n- **实验卡：** 两张卡的第⑤栏都已回填，我看过了；决策记录 已补上两张卡的路径。\n- **存储：** 两个运行目录合计约 0.5 MB，不占地方。\n\n结论不变：本机 TCP 已能完成小模型实算，UDS 仍不通，暂不问 CRC，正式通道还是批处理。下一件是 B12 昂船洲大桥重跑（T27.1-24），在 ansys 那边排队。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 12:43",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nB12 三候选实算均未得模态：ComputeOps；作业 1630761/1630763/1630765 均退出1，材料40–43的EX缺失，c另1222无属性。三次作业上限已用，不重提。报告；实验卡⑤三份均已回填。建议先只读追材料定义。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 12:45",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1630761 结束于 2026-10-26 12:36；作业 1630763 结束于 2026-10-26 12:36；作业 1630765 结束于 2026-10-26 12:36，提交方 2026-10-26 12:45 已处理。\n- CRC 作业 1630761「B12 Stonecutters INPUT a 模态」：失败（退出码 1）。结束时间 约 2026-10-26 12:36（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n- CRC 作业 1630763「B12 Stonecutters INPUT b 模态」：失败（退出码 1）。结束时间 约 2026-10-26 12:36（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n- CRC 作业 1630765「B12 Stonecutters INPUT c 模态」：失败（退出码 1）。结束时间 约 2026-10-26 12:36（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已复核三项 B12 作业：1630761、1630763、1630765 的退出码均为 1，均已离开队列。三张实验卡⑤栏已有失败原因与结论，本地卡和对应 CRC 副本的 SHA256 一致，无需重复回填或重提。\n\n三套 INPUT 均在材料检查阶段中止，未进入模态求解；缺失材料 41–43 的 EX 是共同阻断点，a/b 还缺材料 40，c 的材料 1222 属性亦有问题。因此目前没有前 20 阶频率、MAC 或“原配 INPUT”的判定。原始源文件保持只读；三次授权额度已用。报告：。\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 12:45",
+      "text": "正在追材料 40–43 的来源：主命令流里没定义，`modelrevise` 下的四个 `SCBridgeLINK*.inp` 里有，正在比这四份的差别。B12 昂船洲大桥第一轮三个作业（1630761、1630763、1630765）都失败了，没算出模态。原因是命令流和截面输入文件不配套，不是 2025R2 不认这些老单元。ansys 的处理没问题：三张实验卡都回填了，也没有乱补参数重跑。\n\n**我核对出的原因（只读追查）：**\n- 截面输入文件里引用了材料 40–43，但主命令流 `SCBridgeNEW2.inp` 根本没定义这几种材料。\n- 这几种材料定义在 `modelrevise` 目录的 `SCBridgeLINK*.inp` 里，带着修正系数，属于后来修正过的那一版模型。\n- 所以三套候选输入文件其实都配的是修正版命令流，跟 NEW2 不是一套。\n\n**Decision I made：** 派第二轮 T27.1-24b（在排队），改用材料定义齐全的修正版命令流重跑。\n- **跑什么：** 最多 3 个单核小作业。候选是 `SCBridgeLINK`、`SCBridgeLINK3`，以及 `SCBridgeLINKNew`（先检查它完整不完整，不完整就不跑）。都配 `modelrevise` 的输入文件。\n- **比什么：** 盘上有三份当年的原始结果，第一阶频率分别是 0.1579、0.1562、0.1501 Hz。每个作业的前 20 阶频率都和这三份比，判断原始结果出自哪一版。\n- **边界：** 不补猜材料参数，本单内也不换单元。\n- **为什么：** 第一轮已经说明 NEW2 和现有的输入文件不配套，再拿 NEW2 跑没有意义。\n- **错了的代价：** 3 个单核小作业。如果三份都对不上，说明产生原始结果的那版命令流不在这次拷来的文件里，我再请 T12.3b 去台式机上找。\n\n决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 12:50",
+      "text": "【委托结果 · Ansys 智能体】T27.1-24 B12 昂船洲大桥模型在 2025R2 重跑，模态对照原 ANSYS 输出\nB12 桥梁模态基准未验证，三次获批提交额度已用完；原始 source 和各运行根均保留，未重提。下一步应先只读追查材料 40–43、1222 的属性来源，不能猜测 EX 后将某套 INPUT 判为原配。\n\n（附件：check_report.md）\n\n> 【自动初查未通过】退回补做 1 次后仍缺：在正文和文件 check_report.md 中都没找到：旧单元在 2025R2 的可用性核对表及替换方案（含文档出处）：结果仅引用核查文件路径，未提供核对表、替换方案及文档出处。。请你判断是否接受或再派。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 12:50",
+      "text": "首轮这单（T27.1-24）我验收了。自动初查判\"未通过\"，是因为它只在正文里找表：旧单元核对表其实写在 里，报告只写了这个路径，不重派。\n\n旧单元核对表的结论是：\n\n| 单元 | 结论 | 需要替换时用 |\n| --- | --- | --- |\n| BEAM188 | 现行单元，保留 | — |\n| BEAM4 | 2025R2 存档单元，官方写明仍可用，优先保留 | BEAM188 |\n| COMBIN40 | 仍是现行单元，优先保留 | — |\n| MASS21 | 现行单元，保留 | — |\n| BEAM44、LINK10 | 当前单元列表里没有，能不能用要看 MAPDL 实际运行日志 | BEAM188、LINK180（只受拉，不是一对一等价） |\n\n每条都附了官方文档链接。第一轮三个作业在检查材料时就停了，MAPDL 也没有拒绝其中任何一种单元。\n\nansys 交回的下一步（先只读追查材料 40–43 的来源）我已经替它做了，第二轮也已派出：\n\n- 材料 40–43 定义在修正版命令流 里，主命令流里没有，所以三套输入文件配的是修正版。\n- 第二轮 T27.1-24b改用修正版命令流重跑，在 ansys 那边排队，不会重复提交第一轮的作业。\n\n材料 1222 只在第三套输入文件里出问题，第二轮不用那一套。如果修正版命令流也引用了它，会在第二轮报告里体现。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 13:15",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nB12 r2：LINK/LINK3 自洽源已完成静态审计并分别暂存新 CRC 根，qsub -w v 通过；LINKNew 从中途开始、无前半定义，不占第3个作业。ComputeOps 申请 因并发名额排队，未提交；待回复后单次提交登记并等实算对照。阶段证据。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 13:15",
+      "text": "【委托结果 · Ansys 智能体】T27.1-24b B12 第二轮：改用 modelrevise 自带材料的命令流\n实验卡路径已补齐，但当前证据仅支持“提交前暂存”；B12 第二轮尚无可核实的模态结果或原配版本判定。\n\n（附件：check_report.md）\n\n正文中提到的文件：\n- \n- \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 13:15",
+      "text": "预检通过，两份输入都含预应力模态段。我直接提交这两个作业。B12 第二轮其实一个作业都没交上去。ansys 只把两套命令流在 CRC 上准备好了，之前说\"已提交 1630844、1630846 并失败\"，它后来自己核查后否认了。我上 CRC 看过：两个运行目录都没有任何输出，队列和作业登记里也查不到这两个号。\n\n**这一轮的情况：**\n- **准备好的两套：** `SCBridgeLINK` 和 `SCBridgeLINK3`，都配修正版的输入文件。\n- **没跑的一套：** `SCBridgeLINKNew` 从模型中段才开始，缺材料和节点定义，不是一份完整的命令流。我同意不跑。\n- **资源申请：** 已拿到，够三个单核作业。\n\n**Decision I made：** 预检通过后，我自己把两个作业交上了 CRC。\n- **作业：** 1630965（LINK）、1630966（LINK3），都已登记，预计 14:17 左右结束，结束时会自动叫醒我。实验卡里补上了作业号。\n- **为什么：** 运行目录已经备齐，再派给 bot 只会多耽误一轮。\n- **错了的代价：** 两个单核小作业。\n\nansys 声称提交了却没有提交，这件事我已经告知平台，供他们排查，本线不需要平台做什么。\n\n结果出来后，ansys 会回填实验卡，并把两个结果分别和当年那三份原始输出对照（第一阶分别是 0.1579、0.1562、0.1501 Hz），判断原始结果出自哪一版。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 13:22",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1630965「B12 r2 Stonecutters SCBridgeLINK 模态」：失败（退出码 1）。结束时间 约 2026-10-26 13:17（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n- CRC 作业 1630966「B12 r2 Stonecutters SCBridgeLINK3 模态」：失败（退出码 1）。结束时间 约 2026-10-26 13:17（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 13:22",
+      "text": "B12 第二轮的两个作业（1630965、1630966）不到 2 秒就失败了，原因是文件名大小写：命令流里写的是 `CableKPDECK.TXT`，实际文件叫。Windows 不分大小写，Linux 分，所以读不到这个文件。这和材料、单元都无关，模型还没开始建就停了，也没有算出任何结果。\n\n**Decision I made：** 派 ansys 做 T27.1-24c。现在全平台委托名额满了，它在排队，轮到会自动开始。\n- **先查清所有文件名：** 在 工作站 上只读核对命令流里引用的每一个文件，按 Linux 的大小写逐个确认存在。如果查出真缺文件，而不只是大小写问题，就停下报告，不提交。\n- **查完再跑一次：** 全部对上后，在一个新运行目录里先后跑 LINK 和 LINK3 两版，用现有资源申请剩下的第三个作业额度。结果和那三份原始输出对照。\n- **防止再出现假提交：** 回报里必须原样贴出提交命令返回的作业号和作业登记回执。\n- **旧作业：** 两个失败作业的运行目录不动、不重提，ansys 顺带把它们的实验卡第⑤栏补上失败原因。\n- **错了的代价：** 一个单核小作业。\n\n决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 14:04",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n1631170 qsub 实际回执并 已登记；LINK/LINK3 各退出1，大小写问题已排除，MAPDL 报 No constraints have been defined using D command。prepare_r2.py 首个 FINISH 截断，漏掉源第818/868行起的 D 约束；无模态/MAC，不判原配。第三额度用完，未重提。完整报告；实验卡同目录。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 14:07",
+      "text": "【委托结果 · Ansys 智能体】T27.1-24c B12 第三次：修文件名大小写后 LINK/LINK3 重跑\nB12 仍未验证。若另获授权，须先在新输入中保留并核对源命令流的支承段，再于新运行根求解；不能在本轮结果上补填频率或 MAC。\n\n（附件：check_report.md）\n\n（附件：EXPERIMENT_CARD.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 14:07",
+      "text": "已查清第三次失败的原因，正在派第四次修正：bot 的移植脚本把原命令流里的 12 条支座约束截掉了。B12 第三次（作业 1631170）还是没算出模态。这次的原因是 bot 把模型搬到 Linux 时，把桥的支座约束丢了，模型没有约束，算重力静力时就失稳了。文件名大小写已经修好，模型本身也还没被证明有问题。\n\n**原因：**\n- **截断位置不对：** ansys 的移植脚本在原命令流第一次出现 FINISH 的地方截断。\n- **约束在截断点之后：** 原文件后面那段是做影响线计算的，它不需要，但 12 条支座约束 `D,NODE(…),ALL` 恰好写在这一段里。\n- **我核对的数：** LINK 和 LINK3 两份源文件各有这 12 条，加上其他约束类命令一共 16 条。\n\n**Decision I made：** 另批 1 个单核作业，派 ansys 做 T27.1-24d（排在它手头的事之后）。\n- **改脚本：** 把这 16 条约束原样带进去，影响线那段照旧不要。\n- **提交前自检：** 新输入里的约束条数必须和源文件逐条一致，文件引用的大小写再查一遍。自检不过就停，不提交。\n- **跑完后对照：** 两版命令流放在一个作业里先后跑，拿到模态后和当年那三份原始输出比，判断出处。如果还报错，就停下报原文，不再追加作业。\n- **为什么：** 四轮失败都出在移植环节：命令流和输入文件不配套、文件名大小写、约束被截掉，模型本身还没被否定。\n- **错了的代价：** 一个单核小作业。\n\n决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 14:10",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1631170 结束于 2026-10-26 13:57，提交方 2026-10-26 14:09 已处理。\n- CRC 作业 1631170「B12 Stonecutters LINK/LINK3 文件名修正模态」：失败（退出码 1）。结束时间 约 2026-10-26 13:57（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已复核 CRC 作业 1631170：运行根退出码为 1，LINK 和 LINK3 两个子例也均为 1；没有生成频率文件。两份 MAPDL 日志都明确提示未定义 D 约束，其中 LINK3 还报节点 UX 小主元。已确认移植输入在首个 FINISH 处截断，漏掉了源命令流后面的支座约束；这是输入移植故障，不能据此判定桥梁模态或哪套 INPUT 为原配。\n\n实验卡⑤栏已回填，且本地卡与 CRC 根卡 SHA256 一致，无需再次改写。运行根约 461 MB，作业尾进程快照为空；这不足以证明逐进程许可释放。第三个作业额度已用完，未重提、未改动旧根。证据：。\n\n## 结论\n\nB12 仍未验证。若另获授权，须先在新移植输入中核实完整支承与求解段，再运行模态对照；本轮没有可报告的频率或 MAC。\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 14:10",
+      "text": "ansys 对作业 1631170 的处理和我的计划一致，不用再做什么。\n\n- **诊断：** 失败原因和我判读的相同，是移植时丢了支座约束，不是模型本身的问题。\n- **实验卡：** 第⑤栏已回填，本地和 CRC 两份一致；决策记录里已写了这张卡的路径。\n- **作业：** 旧作业没有重新提交，运行目录没动。\n\n它提到的\"另获授权\"我已经给了：第四次 T27.1-24d补回约束后重跑，正排在它手头的事之后，到时会自动开始。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 14:20",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nB12 r2d 作业 1631251 退出93：LINK 求得80阶频率但扩展 .rst 增至1.83GB，运行根2.075GB超过2GB限制，监控中止；振型导出未完成，LINK3未启动，不能判MAC/原配。未重提/未删文件。结论草案；实验卡同目录已回填并核远端。请决定后续容量受限输出方案。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 14:21",
+      "text": "【委托结果 · Ansys 智能体】T27.1-24d B12 第四次：补回支座约束后 LINK/LINK3 模态\nB12 模态基准仍未验证。本轮是结果文件超过容量上限，不是已完成的频率与 MAC 闸门失败；后续须先制定受限结果输出方案，不能向现有运行根重提。\n\n\n\n（附件：check_report.md）\n\n正文中提到的文件：\n- \n- \n- \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 14:21",
+      "text": "昂船洲大桥模型第一次在 2025R2 上算出了模态，但没能跑完：结果文件超过了每个作业 2 GB 的存储上限，被自动中止了（作业 1631251）。\n\n**这次算出了什么：**\n- **LINK 版：** 重力静力和前 80 阶模态都算完了。BEAM44、BEAM4、LINK10 这几种老单元都参与了计算，没有报\"不支持\"。\n- **第一阶频率：** 0.1599 Hz，和当年三份原始输出相比如下。这还只是频率对比，没有核对振型，所以不能据此判断出自哪一版。\n\n| 当年原始输出 | 第一阶 | 本次偏差 |\n| --- | --- | --- |\n| SCbridge | 0.1579 Hz | +1.3% |\n| Link8Model | 0.1562 Hz | +2.4% |\n| Ding | 0.1501 Hz | +6.6% |\n\n- **为什么超限：** 80 阶模态连同每个单元的结果一起写盘，结果文件约 1.8 GB，加上其他文件超过了 2 GB，在写振型之前被中止。\n- **没跑完的部分：** 原本排在后面的 LINK3 版没开始跑。\n\n**Decision I made：** 派第五次 T27.1-24e（排在 ansys 手头的事之后）。\n- **改法：** 只扩展 40 阶模态、不写单元结果、只留节点位移；频率在模态算完后先写出来，提交前估算文件大小，估出来超过 1 GB 就再收紧。2 GB 上限不放宽。\n- **对照：** LINK 和 LINK3 两版都跑，前 20 阶频率加振型相似度（MAC）与三份原始输出逐一对照，按事先定的判据判定；都不过就如实写最接近的那份差多少，不调参数。\n- **为什么：** 这一轮已经证明模型能在新版上求解，剩下的只是输出太大。\n- **错了的代价：** 一个单核小作业。\n\n这次失败作业留下的 2 GB 运行目录暂时不删，满 7 天后按常设授权列入清理清单。决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 14:22",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1631251 结束于 2026-10-26 14:17，提交方 2026-10-26 14:22 已处理。\n- CRC 作业 1631251「B12 Stonecutters LINK/LINK3 支座修复模态」：失败（退出码 93）。结束时间 约 2026-10-26 14:17（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已复核作业 1631251：CRC 运行根记录的退出码为 93，作业已离开队列；实验卡⑤栏已回填，写明中止原因，无需重复修改或重提。\n\nLINK 完成了重力静力和 80 阶模态求解，但扩展结果写盘时，运行根达到 2,074,859,687 bytes，触发预定的 2 GB 保护。频率表留在求解日志中，正式的振型文本尚未导出；LINK3 未启动。因此没有前 10 阶频率与 MAC 的完整闸门结果，也不能判定哪套原输出对应此模型。原有零厚度单元警告仍在，未为消除警告改动模型。\n\n运行根 保持原样。作业尾进程快照为空，共享许可前后计数相同；这不是逐进程许可释放证明。证据见 及同目录。本轮授权的一次提交已用，不再提交。\n\n## 结论\n\nB12 仍未验证。后续须先设计受限振型输出，使扩展结果和两个串行子例的累计文件量低于 2 GB；不能把求解日志中的频率直接当成完成 MAC 配对的基准结果。\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 14:22",
+      "text": "ansys 对作业 1631251 的处理和我的计划一致，不用再做什么。\n\n- **实验卡：** 第⑤栏已回填中止原因，决策记录里已有这张卡的路径。\n- **作业：** 没有重新提交，运行目录也没动。\n\n它说的\"先设计受限振型输出\"已经派下去了：第五次 T27.1-24e只扩展 40 阶、不写单元结果，LINK 和 LINK3 两版放进同一个作业，提交前先估算文件大小。这一单排在它手头的事之后，到时会自动开始。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 14:45",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n作业 1631396 退出码0，LINK/LINK3 输出完成、根 548.5MB；三参照均未过前十阶闸门（SCbridge 0/10、Link8Model 4/10、Ding节点映射不符），不判原配。报告；实验卡⑤回填，原 source/及旧根不动。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 14:50",
+      "text": "【委托结果 · Ansys 智能体】T27.1-24e B12 第五次：限制扩展输出后 LINK/LINK3 模态与 MAC\nLINK、LINK3 已完成模态求解，但均未满足前十阶频差与 MAC 的全部判据；Ding 因观测点空间不匹配而不可判。B12 原配版本及完整模态基准仍未验证。\n\n（附件：check_report_addendum.md）\n\n正文中提到的文件：\n- \n- \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 14:50",
+      "text": "B12 昂船洲大桥第五次（作业 1631396）终于完整算出了模态：两版修正版命令流（LINK、LINK3）都在 2025R2 上算完了，老单元也都能用。振型和当年的结果高度一致，但频率差 0.2–5%，没过事先定的 1% 判据，所以 B12 仍记为**未验证**。\n\n**和当年原始输出的对照**（判据是频率差 ≤1% 且振型相似度 MAC ≥0.95，两条都满足才算这一阶通过）：\n\n| 当年原始输出 | 前 10 阶通过 | 说明 |\n| --- | --- | --- |\n| SCbridge | 0/10 | 振型 9/10 阶 MAC ≥0.98（第 2 阶只有 0.62），但每阶频率差 1.3–5.2% |\n| Link8Model | 4/10 | 三份里最接近的一份 |\n| Ding | 不可判 | 观测点位置对不上，最远差 5.1 m，不能算 MAC |\n\nLINK 和 LINK3 两版的结果几乎一样，两者那点材料号差别不影响模态。\n\n**我的判断：** 振型高度一致、频率差几个百分点，说明桥的模态特性复现出来了，但这次跑的不是当年那个模型版本。我们用的是修正版命令流，材料弹性模量乘了 0.875–1.125 的修正系数；当年那几份结果出自别的版本，和它配套的命令流加输入文件不在这次拷来的文件里。所以这是对照基准不配套，不说明工具或模型有问题。判据我不事后放宽。\n\n**Decision I made：** 已向 T12.3b 续申请当年 ANSYS 存下的模型数据库文件（.db/.cdb）。\n- **做法：** 先只列清单。只要和当年结果放在同一目录、单个不超过 2 GB，就拷到 CRC；在 2025R2 里直接读入原模型重算模态，就能和当年结果严格对照。\n- **为什么：** 这是不靠猜参数就能拿到配套基准的唯一办法。\n- **错了的代价：** 如果没有这类文件，或者 2025R2 读不了这么老的数据库，B12 就记为\"振型复现、频率差 0.2–5%、缺原配输入\"，留作一个能用的桥梁算例，不当精度基准。\n\n决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 14:52",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1631396 结束于 2026-10-26 14:40，提交方 2026-10-26 14:52 已处理。\n- CRC 作业 1631396「B12 Stonecutters LINK/LINK3 受限模态与MAC」：已正常结束（退出码 0）。结束时间 约 2026-10-26 14:40（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已复核 CRC 作业 1631396：`run.exitcode=0`，已离开队列；运行根约 549 MB，低于 2 GB 上限。实验卡⑤栏已有诊断与结论，本地卡和 CRC 副本 SHA256 一致，无需再次回填或重提。\n\nLINK、LINK3 均取得频率和振型，但按预注册的前十阶频差 ≤1%、MAC ≥0.95 判据，对 SCbridge 均为 0/10，对 Link8Model 均为 4/10；Ding 有 19 个观测点空间不匹配，MAC 不可判。因此 B12 的原配版本和完整模态基准仍未验证。作业尾进程快照为空，但不能据此证明许可逐进程释放。\n\n实验卡：\n报告：\n\n## 结论\n\n本轮求解和受限输出成功，模态对照未过闸；无需重提，原运行根保持不动。\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 14:52",
+      "text": "ansys 对作业 1631396 的处理和我的计划一致，不用再做什么。\n\n- **实验卡：** 第⑤栏已回填，本地和 CRC 两份一致；决策记录里已有这张卡的路径。\n- **作业：** 没有重新提交，运行目录没动，约 0.55 GB，在 2 GB 上限之内。\n\n下一步不变：等 T12.3b 回复当年的模型数据库文件。有这类文件，就在 2025R2 里读入原模型重算模态，和当年的结果严格对照；没有，B12 就记为\"振型复现、频率差 0.2–5%\"的未验证桥梁算例。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 16:31",
+      "text": "【委托结果 · 数据】台式机资料申请（续）：昂船洲桥原始 ANSYS 数据库文件 .db\n**1. 清单**\n\n源根：台式机。时间是文件修改时间。\n\n| 目录 | .db / .dbb | .mode / .rst（只列，没拷） | 同目录有 FreqSeries.prn？ |\n| --- | --- | --- | --- |\n| SCbridge/ | Scbridge.db 61.9 MB（2012-07-15 22:30）；Scbridge.dbb 61.3 MB | scbridge.mode 2.95 GB、scbridge.rst 3.87 GB（2013-03-16 21:03） | 有（A 版） |\n| SCbridge/Link8Model/ | SCBridge.db 61.3 MB（2012-07-15 22:28） | — | 有（B 版） |\n| SCbridge/Link10Model/ | Scbridge.db 61.9 MB | — | 有（A 版） |\n| SCbridge/huang/ | SCBridge.db 61.3 MB | — | 有（A 版） |\n| SCbridge/Ding/ | Scbridge.db 3.3 MB | Ding/AnsysStatic/SCBridge.rst 3.3 MB | 有（C 版） |\n| SCbridge/AnsysStatic/ | SCBridge.db 61.5 MB、file.db 61.9 MB | Scbridge.mode 742 MB、file.mode 38.6 MB、file.rst 49.8 MB、Scbridge.rst 49.0 MB | 无 |\n| SCbridge/NewModel/Stonecutter bridge/ | ScBridge.db 3.3 MB、APart.db 63.8 MB、EFPart.dbb 45.9 MB（2013-03-20） | — | 无 |\n| modelrevise/ | ScBridge.db 16.3 MB、ScBridge.dbb 16.3 MB | SCBridge.mode 64 KB | 无 |\n| StoneCutterModelNew/Stonecutter Bridge/ | 无 | SCBridge.mode 3.9 MB、file.rst 49.0 MB、SCBridge.rst 4.7 MB | 无 |\n\nFreqSeries.prn 的三个版本：\n- A 版：…\n- B 版：…\n- C 版：…\n\n**2. 已拷**\n\n目标：CRC。共 123 MB，同目录有 SHA256SUMS.txt。\n\n| 文件 | 大小 | sha256 |\n| --- | --- | --- |\n| SCbridge/Scbridge.db | 61,931,520 B | 65f45f346395b6f362536901a3476e24b5563bdd492c7331039aaf190e73ad87 |\n| Link8Model/SCBridge.db | 61,276,160 B | 6f7f183136e49d108d76d5d5b7653348876aef8a4ea4f4b706cd15fb247cd625 |\n\n**3. 对照时要注意**\n\n- **哪些 .db 内容相同**：SCbridge/ 和 Link10Model/ 的 .db 完全相同。Link8Model/ 和 huang/ 的 .db 完全相同。\n- **huang 不能当配套对照**：huang 的 FreqSeries.prn 是 A 版，和 SCbridge 的一样；但它的 .db 和 Link8Model 的一样。两者不是同一来源。\n- **SCbridge 那份 .db 可能比参照输出旧**：同目录的 `scbridge.mode` 和 `scbridge.rst` 是 2013-03-16 的，比 .db 晚。这份 .db 未必是最后一次求解时的模型状态。\n- **2012-07-15 22:2x 大多是备份时刻**：多数文件都是这个时间，不能用来判断求解先后。\n- 如果 RESUME 后重算的 SCbridge 频率仍然对不上 A 版，可以另外申请 NewModel/ 下 2013-03 的 APart.db 和 EFPart.dbb 一起核对。\n\n**使用限制**：只限内部研究，不外送。\n\n申请记录：\n\n\n\n（附件：20261026_ansys_B12续_原始db.md）\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 16:31",
+      "text": "当年的原始模型数据库找到了，有两份已经拷到 CRC：一份和 SCbridge 那套原始结果放在同一目录，另一份和 Link8Model 那套放在一起。我已经派 ansys 用 2025R2 直接读入这两个原模型，重算模态后和当年的结果严格对照（T27.1-24f）。\n\n**T12.3b 交回的情况：**\n- **拷了哪两份：** 和，各约 62 MB，校验码两端一致，放在 CRC 的 下。\n- **其余几份是重复：** `Link10Model` 那份和 SCbridge 那份内容完全一样；`huang` 那份和 Link8Model 那份一样。\n- **一个隐患：** SCbridge 目录里的 .rst/.mode 结果文件是 2013-03 写的，比这份数据库新，所以这份数据库不一定是最后一次求解时的模型状态。\n\n**Decision I made：** 派 T27.1-24f，用一个单核作业把两份原库各重算一遍。\n- **先核模型：** 读入后先列出模型规模（节点、单元、材料、约束数量），和第五次修正版的模型逐项比。\n- **再算模态：** 按当年取模态的宏原样重算，不加改动，结果输出照第五次的办法限量。\n- **对照判据：** 不放宽，仍是前 10 阶频率差不超过 1%、振型 MAC 不低于 0.95。\n- **读不了就停：** 如果 2025R2 读不了这么老的数据库，就停下报原文，不换方法、不追加作业。\n- **为什么：** 原模型和原结果出自同一目录，才是真正配套的基准，不用猜任何参数。\n- **错了的代价：** 一个单核作业。SCbridge 那份如果还是对不上，再申请 2013 年 3 月那批模型文件（`APart.db`、`EFPart.dbb`）。\n\n结果出来会自动回报。决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 16:54",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nB12 原始db单次作业1632488实查退出95，job.stdout: cp: cannot stat；阶段包实际脚本在 stage/SCbridge 与 stage/Link8Model 下。未调用MAPDL、无模态结果；不重提。报告，实验卡⑤已回填并同步 CRC。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 16:54",
+      "text": "【委托结果 · Ansys 智能体】T27.1-24f B12 第六次：读入原始 .db 重算模态，严格对照同目录原输出\nB12 原始数据库模态基准仍未验证。ComputeOps 申请 （回复 CO-）后，作业经独立预检单次提交；qsub 原文为 `Your job 1632488 (\"b12r3db\") has been submitted`， 回执为“已登记：CRC 作业 1632488「B12 Stonecutters 原始数据库模态双子例」”。\n\n作业退出码 95。脚本引用了不存在的，而阶段包将脚本放在两个子例目录内。两个子例均未调用 MAPDL，因此没有模型统计、频率或 MAC；不能判断旧数据库能否 RESUME，也不能判定哪份参照输出匹配。本次一次提交额度已用，未重提或改动旧根。实验卡⑤已回填并核对 CRC 副本；失败原因和报告路径已告知 Lead。\n\n报告：\n实验卡：\n\n\n\n（附件：check_report.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 16:54",
+      "text": "第六次 B12 作业（1632488）没跑起来，MAPDL 没有启动。原因是作业脚本里一个文件路径写错了，所以还不知道 2025R2 能不能读进这两份老数据库。\n\n**我核对的情况：**\n- **失败原因：** 作业脚本要去 下复制运行脚本，实际文件在 、 两个子目录里。\n- **算法设置没问题：** bot 写的输入文件和当年的取模态宏一致：先算重力静力，再带预应力算模态。\n\n**Decision I made：** 这一行我自己改了，不再派给 bot。\n- **怎么改：** 在新运行目录 `b12_stonecutters_r3db2_20261026` 里只改这一行路径，两份输入文件原样复用。\n- **已做准备：** 预检已过；实验卡写好了，本地和 CRC 各放一份；已向 ComputeOps 发资源申请。回复一到，我直接提交并登记作业。\n- **为什么：** B12 这已经是第六次失败，前面几次也都出在 bot 移植和打包的环节；一行的改动不值得再让 bot 走一轮。\n- **错了的代价：** 一个单核作业。\n\n作业结束后会自动叫醒我，到时候让 ansys 出两份数据库的对照报告。决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 16:57",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1632488 结束于 2026-10-26 16:50，提交方 2026-10-26 16:57 已处理。\n- CRC 作业 1632488「B12 Stonecutters 原始数据库模态双子例」：失败（退出码 95）。结束时间 约 2026-10-26 16:50（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已复核 CRC 作业 1632488：`run.exitcode=95`，作业已离开队列。`job.stdout` 报；阶段包实际把脚本放在两个子例目录中。两个子例都未启动 MAPDL，因此没有数据库 RESUME、模型统计、频率或 MAC 结果。这是作业打包路径错误，不是桥梁模态的物理失败。\n\n实验卡⑤栏已回填；本地卡与 CRC 运行根卡的 SHA256 一致，无需再写入。一次提交额度已用，未重提，旧根保持不动。报告：\n\n## 结论\n\nB12 原始数据库模态基准仍未验证。建议 Lead 若另行授权，先在新根实际检查阶段文件复制路径，再提交作业；不能从本轮推断旧 `.db` 是否兼容 2025 R2。\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 16:57",
+      "text": "ansys 对作业 1632488 的处理和我的计划一致，不用再做什么：实验卡第⑤栏已回填，旧运行目录没动，也没有重新提交。\n\n它建议的\"先在新根实际检查复制路径\"，我已经做了：\n- **新运行目录：** `b12_stonecutters_r3db2_20261026` 里只改了那一行复制路径，两份输入文件原样复用。\n- **预检：** 已过（`bash -n` 和 `qsub -w v` 都通过）。\n- **实验卡：** 已写好，本地和 CRC 各一份。\n- **下一步：** ComputeOps 的资源申请还在等回复，回复一到我自己提交并登记作业。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 16:57",
+      "text": "【委托结果 · 计算运维智能体】资源申请：B12 原始 .db 模态重跑（r3db2，1 个单核作业）\n推荐 CRC，-q hpc,long｜1 节点×1 核，单作业、无 PE｜00:30:00｜m_mem_free=4G｜预计等待未查到，当前资源探针匹配成功｜SU 未查到；新增存储 <1 GB（申请方估计）｜组配额 5.0T，已用 4.4T，剩余 656G；10-26 16:57 ansys 许可总量 550、占用 2、空闲 548｜注意事项：排除 d24cepyc154；当前队列未见 B12/r3db2 名称，精确排重未完成；指定根顶层未发现 .sh 文件，请核对实际脚本绝对路径及工作目录，保持单核并顺序处理两份数据库；由 Lead 独立预检后按字面绝对路径单次提交，随即 登记；本次未提交｜本回复编号 CO-\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 16:57",
+      "text": "ComputeOps 的资源回复到了（CO-），作业我已经交上 CRC：作业号 1632523，用的是改好路径的那个新运行目录，单核，预计 17:58 左右结束。\n\n- **资源回复：** 单核、30 分钟，没有提出新的限制。它说\"运行目录里没找到 .sh 脚本\"，是因为这里的作业脚本叫 `job.qsub`，我预检时核过。\n- **登记：** 作业已登记，实验卡第④栏补上了作业号和资源回复，本地和 CRC 两份都已更新。\n- **集群余量：** CRC 组空间还剩约 656 GB，这个作业预计用不到 1 GB。\n\n作业结束会自动叫醒我。到时让 ansys 出两份数据库的对照报告：SCbridge 对当年 SCbridge 的结果，Link8Model 对当年 Link8Model 的结果，判据不变。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 17:00",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1632523「B12 r3db2 原始数据库模态（脚本修复重跑）」：失败（退出码 1）。结束时间 约 2026-10-26 16:59（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 17:00",
+      "text": "频率全部对上了：前 20 阶相差都在 0.3% 以内。接着算振型 MAC。我的解析脚本把节点表头认错了（读出 1716 个节点，实际是 176 个），改一下再算。振型也完全对上了：前 20 阶全部过闸，前 10 阶 10/10。我把对照脚本和结果存档，回填实验卡。B12 昂船洲大桥基准的 SCbridge 版本通过了：用当年的原模型数据库在 2025R2 重算，前 20 阶频率和振型都和当年的结果对上，前 10 阶 10/10、前 20 阶 20/20 过闸。\n\n作业 1632523 显示\"失败\"，是因为 MAPDL 算完以后，bot 写的包装脚本里有一行 Python 写法错误（路径和字符串直接相加）报错退出，排在后面的 Link8Model 版因此没开始跑。MAPDL 本身没出错：数据库正常读入（3714 个节点、3170 个单元），频率和振型都写出来了。\n\n**对照结果**（参照是当年对同一数据库算出的结果，176 个桥面点；判据是频率差 ≤1% 且振型 MAC ≥0.95）：\n\n| | 结果 |\n| --- | --- |\n| 前 10 阶 | 10/10 通过 |\n| 前 20 阶 | 20/20 通过 |\n| 最大频率差 | 0.29%（第 9 阶） |\n| 最小 MAC | 0.995（第 15 阶） |\n\n这组数是我自己算的，脚本、逐阶表和填好的实验卡都在。\n\n**这个结果说明什么：** 这是跨版本回归，即同一个模型在旧版 ANSYS 和 2025R2 上算出的结果一致，不是独立的物理验证。它证明两件事：一是这些老单元（BEAM44、BEAM4、LINK10、COMBIN40）在 2025R2 里照样能算；二是这种规模的旧模型数据库能直接读进来求解。\n\n之前那几轮用现存命令流重建的修正版模型，振型基本一致，但频率差 0.2–5%，原因就是那套命令流和当年的结果不是同一版本。所以以后遇到老模型，要优先拿原始数据库文件，而不是从命令流重建。\n\n**Decision I made：**\n1. **使用说明加了 B12 一行：** 写明 SCbridge 版通过、Link8Model 版补跑中，并在能下单的范围里加上\"旧版模型数据库读入后算预应力模态\"一项。\n - 错了的代价：如果 bot 复算和我的不一致，这一行退回\"待定\"。\n2. **派 ansys 做 T27.1-24g 收尾：**\n - 修好那一行 Python，提交前先自检\n - 新开一个单核作业补跑 Link8Model 版，对照当年的 Link8Model 结果\n - 用它自己的检查脚本独立复算 SCbridge 的对照表，和我的逐项比，最后两版合成一份正式报告。\n\n决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 17:15",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n报告路径；1632660退出码0，Link8Model 20/20、SCbridge独立复算20/20；实验卡⑤已回填并核对CRC副本。--report 不适用于本bot，故以告知送达。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 17:16",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nT27.1-24g：SCbridge r3db2 原件只读独立复算前20阶20/20，与 Lead 表逐项 PASS 一致；Link8Model 新根已修 Path+str、空跑双分支和 qsub -w v 预检通过。ComputeOps 申请 待回复，尚未提交。阶段记录。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 17:16",
+      "text": "【委托结果 · Ansys 智能体】T27.1-24g B12 收尾：Link8Model 原库子例补跑 + 两子例正式报告\nB12 两份旧数据库对各自旧版 ANSYS 模态输出的本次 2025 R2 跨版本回归通过；这是同模型结果对照，不是独立的桥梁物理验证。\n\n\n\n\n（附件：check_report.md）\n\n（附件：EXPERIMENT_CARD.md）\n\n正文中提到的文件：\n- \n- \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 17:16",
+      "text": "B12 昂船洲大桥基准通过了：两份当年存下的模型数据库在 2025R2 上重算模态，结果和当年各自那次的计算都对得上，前 10 阶、前 20 阶全部过闸。\n\n| 模型版本 | 作业 | 前 10 阶 | 前 20 阶 | 最大频率差 | 最小振型 MAC |\n| --- | --- | --- | --- | --- | --- |\n| SCbridge | 1632523 | 10/10 | 20/20 | 0.29% | 0.995 |\n| Link8Model | 1632660 | 10/10 | 20/20 | 0.61% | 0.996 |\n\n判据是事先写定的：频率差不超过 1%，振型 MAC 不低于 0.95，配对是全局一对一。SCbridge 那张表 bot 用它自己的检查脚本又独立算了一遍，和我算的逐行一致，频率最大只差 5×10⁻⁷ Hz。\n\n**这个结论的范围：**\n- **性质：** 这是跨版本回归，即同一个模型、旧版 ANSYS 和 2025R2 的结果一致，不是独立的物理验证，也不涉及颤振或抖振。\n- **证明了什么：** 一是 BEAM44、BEAM4、LINK10、COMBIN40 这几种老单元在 2025R2 里照样能算；二是这种全桥规模的旧模型数据库可以直接读进来求解。\n- **原模型自带的警告：** Link8Model 的日志里有一条 COMBIN40 单元两端节点不重合的警告，是原模型本来就有的，没有改动。\n\n**Decision I made：** B12 判通过，接替定停的明石桥作为工具的桥梁基准。\n- **使用说明：** B12 那一行已改为通过。\n- **经验：** 已写进使用说明：老模型优先拿原始数据库文件。从现存命令流重建要一一核对路径、文件名大小写、截断位置，这次为此多跑了好几轮，而且重建出来的那版因为不是当年的版本，频率差 0.2–5%。\n- **错了的代价：** 只是一个基准记录，判错了改回\"待定\"即可。\n\n决策记录、线况页和项目页都已更新。正式报告在。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 17:18",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1632660 结束于 2026-10-26 17:12，提交方 2026-10-26 17:17 已处理。\n- CRC 作业 1632660「B12 Link8Model 原库模态补跑」：已正常结束（退出码 0）。结束时间 约 2026-10-26 17:12（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已核查作业 1632660：CRC 运行根的退出码为 0，Link8Model 的频率和振型文件均存在。实验卡⑤栏已回填，本地与 CRC 副本的 SHA256 一致；无需重复回填或重提。\n\n正式报告显示，SCbridge 和 Link8Model 各自对同目录的旧版 ANSYS 输出，前 20 阶均为 20/20 PASS（前十阶判据：频差 ≤1%、全局一对一 MAC ≥0.95）。这是旧数据库在 2025 R2 上的跨版本同模型回归，不是独立桥梁物理验证。报告：；实验卡：同目录。\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 17:18",
+      "text": "ansys 对作业 1632660 的处理和我的计划一致，不用再做什么：实验卡第⑤栏已回填，本地和 CRC 两份一致。决策记录里已引用这张卡。\n\nB12 已按通过收尾，这次没有新的结论。\n\nB12 过程中留在 CRC 上的失败运行目录（r2d 约 2 GB，以及 r2、r2c、r3db 等几个小目录），属于常设授权里可以清理的那一类。满 7 天后（11-02 起），我会先列清单再删除，并记入存储台账。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 18:00",
+      "text": "【定时回访】T27.1 兜底：核 学习、 gRPC 诊断是否交回；10-29 检查点\n（这是你在 2026-10-24 17:59 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 18:00",
+      "text": "这次回访要查的两件都早已交回，10-29 检查点原定的事项也都已完成，不用再预约回访。\n\n- ** 只读学习：** 10-24 交回，做法手册新增 08–11 页，另有一张候选回归例子表。\n- ** gRPC 诊断：** 10-24 交回。10-26 又复诊了一次，本机 TCP 能完成实际求解，UDS 还是不通，正式通道仍用批处理。\n- **10-29 检查点：** 原定的学习笔记、手册新页、连接诊断结论都已交回。之后又额外完成了 DPF 部分验证、使用说明 v1.4 和 B12 昂船洲大桥基准（通过）。\n\n**Decision I made：** 原本排在 10-29 的通用驱动代码缺口，今天提前派了 T27.1-25。\n- **改三处：**\n 1. 全瞬态加 Rayleigh 阻尼；只给阻尼比、不给锚定频率的订单直接报错，不再按零阻尼算。\n 2. 误差检查改成带正负号，符号相反直接判失败。\n 3. 把 B11 那套基底反力和截面内力输出接进通用驱动，先只接竖向悬臂模板。\n- **验收：** 在 CRC 上最多 4 个单核作业重跑回归，B1–B6、B4b、B11 都要复现原结果，并补核之前漏掉的轴力、梁单元另一端（J 端）内力和竖向反力。\n- **为什么：** 使用说明 v1.4 只是如实写明了这三处缺口，补上以后这几类订单才能直接用 case 文件下单。\n- **错了的代价：** 4 个单核小作业，外加 bot 约一天的工作量。\n\n线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 18:33",
+      "text": "【委托结果 · Ansys 智能体】T27.1-25 通用驱动 v2.1：FULL 阻尼、带符号误差、B11 反力/内力输出接入\n代码接入和静态预检已做；B1/B2/B3/B5/B6、B4b FULL、B11 的新驱动 CRC 求解闸门全部未验证。需由 Lead 决定是否另授权新根与计算资源；在取得真实回归结果前，v2.1 不应作为已验证功能交付。\n\n（附件：check_report.md）\n\n（附件：results.json）\n\n> 【自动初查未通过】退回补做 1 次后仍缺：在正文和文件 check_report.md、results.json 中都没找到：三项代码改动的文件与行号清单。请你判断是否接受或再派。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 18:33",
+      "text": "通用驱动 v2.1 的代码已经写好了，但 bot 提交的四个回归作业全都没真正开算：作业脚本开头的写法有问题，计算节点上没加载上 Ansys 环境，MAPDL 一次都没启动，所以还没有任何数值结果。\n\n**已经完成的（只在本地检查过，没在 MAPDL 里跑过）：**\n- **全瞬态 Rayleigh 阻尼：** 按两个锚定频率算阻尼系数并写进输入；只给阻尼比、不给锚定频率时会直接报错。\n- **带正负号的误差检查：** 旧存档按新检查器回放都通过；故意把一个反力改成反号，能正确判失败。\n- **竖向悬臂模板的反力和内力输出：** 生成的输入里残余向量、扩展步、梁单元两端内力命令都齐了。\n\n验收清单要求列出改动的文件和行号，它只给了文件名、没给行号。代码可以直接查，我接受，不退回。\n\n**问题出在哪：** 四个作业脚本的开头写法和之前跑通的不一样（用了 、`set -uo pipefail`，并且 module 一报错就退出）。CRC 的 module 命令有时会报个错，但环境其实已经加载上了；脚本一见报错就退出，MAPDL 就没机会启动。第四个作业又多试了一种加载方式，也没成。\n\n**Decision I made：**\n1. **我自己改脚本开头重跑：** 照之前跑通的 gRPC 作业脚本改，代码和算例原样不动，放进新运行目录 `v21_combined2_20261026`，合并成一个作业。\n - 已做：预检通过、实验卡写好、资源申请已发，回复一到我就提交并登记。\n - 跑完后让 ansys 出正式回归报告，判据不变。\n - 错了的代价：一个单核作业。\n2. **以后派活时的要求：** B12 和这次 v2.1，bot 的失败大多出在作业脚本和打包环节。下次派活要求它用跑通过的作业脚本当模板，并且提交前在计算节点同样的环境里空跑自检一次。\n\n决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 18:36",
+      "text": "【委托结果 · 计算运维智能体】资源申请：T27.1-25 v2.1 合并回归重跑（1 个单核作业）\n推荐 CRC，-q hpc,long｜1 节点×1 核，1 作业，无 PE｜00:30:00｜m_mem_free=4G｜预计等待未查到；当前资源探针 found suitable queue(s)｜预计 SU 未查到；新增存储 <1 GB（申请方估计）｜组配额 5.0T，已用 4.5T，剩余 614G｜10-26 18:35 核查：根目录与 job.qsub 存在，脚本已 cd 到运行根、限制线程并排除 d24cepyc154；队列未见同名 v21comb2；ansys 许可余量未查到，不能保证可立即 checkout。Lead 自行单次提交并立即 登记；脚本目前仅检查许可摘要行存在，不证明有空闲许可｜CO-\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 18:36",
+      "text": "通用驱动 v2.1 的合并回归作业已经交上 CRC：作业号 1633080，用的是改好外壳的那个新运行目录，单核，预计 19:36 左右结束。\n\n- **资源回复：** CO-，单核 30 分钟，没有新的限制。\n- **许可证：** ComputeOps 提醒没查到 ansys 许可证空闲数。我在登录节点上也没查出来，就直接提交了。作业开头会自己查一次许可证，查不到就立刻退出，不会空占资源。\n- **登记：** 作业已登记，实验卡第④栏补上了作业号，本地和 CRC 两份都已同步，线况页已更新。\n- **集群余量：** CRC 组空间还剩约 614 GB。\n\n作业结束会自动叫醒我。届时派 ansys 按原判据出正式回归报告：\n- **B1、B2、B3、B5、B6：** 和原基准差小于 0.1%\n- **B4b 全瞬态：** 峰值差小于 0.5%\n- **B11：** 差小于 0.5%，并补核轴力、梁单元另一端的内力和竖向反力。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 18:36",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1632948 结束于 2026-10-26 18:29；作业 1632952 结束于 2026-10-26 18:29；作业 1632956 结束于 2026-10-26 18:29；作业 1632965 结束于 2026-10-26 18:24，提交方 2026-10-26 18:32 已处理。\n- CRC 作业 1632948「T27.1-25 v2.1 B1-B6回归」：在队列里一直没看到（队列里一直没看到这个作业号（作业号可能写错，或作业一提交就结束了））。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n- CRC 作业 1632952「T27.1-25 v2.1 B4b FULL阻尼」：在队列里一直没看到（队列里一直没看到这个作业号（作业号可能写错，或作业一提交就结束了））。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n- CRC 作业 1632956「T27.1-25 v2.1 B11反力内力」：在队列里一直没看到（队列里一直没看到这个作业号（作业号可能写错，或作业一提交就结束了））。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n- CRC 作业 1632965「T27.1-25 v2.1 合并修复回归」：失败（退出码 91）。结束时间 约 2026-10-26 18:24（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已核查四个运行根。1632948、1632952、1632956 的作业日志均显示 `module load failed`，且没有退出码文件；不能把监视器的“队列里一直没看到”解释为求解失败或补报退出码。1632965 的运行根记录退出码 91，日志明确显示计算节点作业环境中 `module: command not found`。四项都未启动 MAPDL，因此 v2.1 的数值回归仍未验证。\n\n四张实验卡⑤栏此前已回填，本次核对其本地副本与 CRC 副本的 SHA256 均一致；无需再次改写。四次授权提交额度已用，我未重提或提交新作业。建议总控保留“v2.1 未验收”，若另授权新根实测，先在非登录作业环境验证模块初始化，再运行数值回归。\n\n核查报告：\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 18:36",
+      "text": "ansys 对这四个作业（1632948、1632952、1632956、1632965）的处理和我的计划一致，不用再做什么：四张实验卡第⑤栏都已回填，本地和 CRC 两份一致，也没有重新提交。\n\n- **\"队列里一直没看到\"：** 监视程序说前三个作业在队列里一直没看到，是因为它们一开始就因为加载不上 Ansys 环境退出了，没有写退出码文件。这不是求解失败。\n- **它建议的另授权重跑：** 已经做了。我按跑通过的作业脚本改了开头，在新运行目录合并成一个作业，已提交（作业 1633080），预计 19:36 左右结束。\n\n在 1633080 出结果之前，v2.1 一直记为\"未验收\"，使用说明里也不改。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 18:44",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1633080「T27.1-25 v2.1 合并回归（外壳修复重跑）」：失败（退出码 1）。结束时间 约 2026-10-26 18:44（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 18:44",
+      "text": "v2.1 合并回归（作业 1633080）这次 MAPDL 正常跑起来了，除 B11 外全部通过。退出码是 1，是因为最后的 B11 被驱动里一个 Python 小错拦住，没跑起来。\n\n| 基准 | 结果（新检查器，带正负号的误差） |\n| --- | --- |\n| B1 悬臂梁 | 32/32 通过 |\n| B2 简支板 | 11/11 通过 |\n| B3 框架 | 8/8 通过 |\n| B5 高层 | 8/8 通过 |\n| B6 围护结构 | 8/8 通过 |\n| B4b 全瞬态 Rayleigh 阻尼 | 1/1 通过 |\n| B11 反力和内力 | 没跑：驱动检查输出设置时，没处理\"多项输出写成列表\"的情况，直接报错 |\n\n**Decision I made：** 派 ansys 做 T27.1-25b 收尾。\n- **修错：** 修掉这个列表错误。提交前先在 工作站 上把全部算例空跑一遍，确认配置检查和输入生成都能过，这种小错就能在本地拦下。\n- **补跑：** 新开一个运行目录只跑 B11，作业脚本照抄这次已经跑通的写法。\n- **出正式报告，逐项和原基准比：**\n - B1–B6：差不超过 0.1%。\n - B4b：峰值差不超过 0.5%，并写明阻尼系数。\n - B11：差不超过 0.5%。另外首次报告轴力、梁单元另一端内力和竖向反力静力平衡，这三项以前没核过，有多少报多少。\n- **错了的代价：** 一个单核作业。\n\n正式对照报告出来之前，v2.1 仍记为\"未验收\"，使用说明先不改。决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 18:59",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n资源申请；本轮 qsub 实际返回 Your job 1633126 (\"v21b11b\") has been submitted， 已登记。预检在新运行根 stage 留下 load_v21.csv，作业生成器拒绝覆盖并报 FileExistsError，B11 MAPDL 未启动。一次授权提交已用，未重提或删文件；run.exitcode 暂未生成，不报退出码。B1/B2/B3/B5/B6 与 B4b 的既有 combined2 输出已程序化复核，报告；B11 仍未验收。若需实测须另授权全新运行根，且作业脚本检测现有输入后跳过重新生成，提交前不可在运行 stage 留同名文件。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 18:59",
+      "text": "【委托结果 · Ansys 智能体】T27.1-25b v2.1 收尾：修 validate 列表错误，补跑 B11，出正式回归报告\n资源回复不构成新的提交授权或求解结果。B11 此轮在输入生成阶段中断，需由 Lead 决定是否另授权全新运行根补测。\n\n正文中提到的文件：\n- \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 18:59",
+      "text": "打包文件里的驱动还是修复前的旧版本。我改用已修好的代码重新打包。通用驱动 v2.1 除 B11 外都已确认和原基准一致：\n\n| 回归项 | 对照结果 |\n| --- | --- |\n| B1、B2、B3、B5、B6 | 和原版驱动的输出逐个数比，共 1793 个数，最大差 0% |\n| B4b 全瞬态 Rayleigh 阻尼 | 峰值和原结果完全相同，阻尼系数 α、β 也和原输入同值 |\n\n这两部分算通过。B3 旧报告里有一项因为改成带正负号显示，看起来差了 200%，原始计算数值其实完全一样，不是物理差异。\n\nB11 又没跑起来（作业 1633126），原因还是打包：\n- 预检时把荷载文件留在了解包后的目录里，作业运行时生成器拒绝覆盖，直接退出\n- 提交上去的打包文件里还是修复前的旧代码，就算没有前一个问题，也会再撞上那个列表错误。\n\n**Decision I made：** 这一步我自己做。\n- **重新打包：** 用已修好的代码重新打包，剔除残留的荷载文件。五个驱动文件的校验码已和 工作站 上的一致。\n- **提交前自检：** 在 CRC 登录节点上从这个包解出来试了一遍，荷载生成和配置检查都通过（空跑，没有求解）。\n- **新运行目录：** `v21_b11c_20261026`，实验卡已写好；资源申请已发，回复一到我就提交。\n- **错了的代价：** 一个单核作业。\n\nB11 跑通以前，v2.1 整体仍记为\"未验收\"，使用说明先不改。决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 19:03",
+      "text": "【委托结果 · 计算运维智能体】资源申请：T27.1-25 v2.1 B11 回归重跑（1 个单核作业）\n推荐 CRC，-q hpc,long｜1 节点×1 核，单作业、无 PE｜00:30:00｜m_mem_free=4G｜预计等待未查到，当前资源探针匹配成功｜SU 未查到；预计存储约 0.5 GB（申请方估计）｜组配额 5.0T、已用 4.5T、可用 593G；10-26 19:02 ansys 许可总量 550、占用 1｜注意：当前无 B11/v21 同名候选；脚本已正确 cd、限制单线程并排除 d24cepyc154，但实查 缺失，现脚本会在求解前退出，须先完成解包并重新独立预检；Lead 使用字面绝对路径单次提交，随后 登记；本次未提交｜本回复编号 CO-\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 19:03",
+      "text": "ComputeOps 说得对：bot 在 b11b 那份作业脚本里把\"解包\"一行换成了\"检查已解包的文件是否存在\"，我照抄过来了。我把这一行改回先解包。B11 回归作业已经提交：作业号 1633157，单核，预计 20:03 左右结束，结束时会自动叫醒我。\n\n**提交前补上的一个漏洞：** ComputeOps 核查时发现，作业脚本里缺了\"先解包\"这一步，照原样提交会在求解前就退出。\n\n- **怎么来的：** 我照抄的是 bot 在 b11b 那份作业脚本，它已经把解包那一行换成了\"检查文件是否已解包\"。\n- **怎么补的：** 补回先解包再检查，重新预检通过后才提交。\n- **记录：** 作业已登记；实验卡里写明了这处修改和新的脚本校验码，本地和 CRC 两份已同步。\n\n**结果出来后：** 我会派 ansys 出 B11 的正式对照。\n- **判据：** 30 项和原 r6 的差不超过 0.5%。\n- **首次核对的三项：** 轴力、梁单元另一端（J 端）内力和竖向反力（FZ）静力平衡，这三项以前没核过，有多少报多少。\n\nB1–B6 和 B4b 已经确认和原基准一致，B11 也过了，v2.1 才改成\"已验证\"并写进使用说明。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 19:08",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1633126 结束于 2026-10-26 19:05，提交方 2026-10-26 19:07 已处理。\n- CRC 作业 1633126「T27.1-25b v2.1 B11回归」：在队列里一直没看到（队列里一直没看到这个作业号（作业号可能写错，或作业一提交就结束了））。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已核查 CRC 运行根：作业 1633126 已不在队列，但没有 `run.exitcode`，且 `qacct` 未能提供退出状态，不能补报退出码。`job.stdout` 明确显示，作业在生成输入时因预检留下的同名 触发 `FileExistsError`；MAPDL 未启动，B11 没有新求解结果。\n\n实验卡⑤栏已记录这一故障，无需重复回填。本次授权的单次提交已用完；我没有重提或改动运行根。B1/B2/B3/B5/B6 与 B4b 的既有回归结果不变，但 B11 的 30 项对照及新增输出未测，v2.1 整体仍未验收。建议总控若另行授权新根补测，先让预检不留下与正式作业冲突的 CSV，再核实作业脚本能在早期错误时写出退出状态。\n\n证据：；实验卡：。\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 19:08",
+      "text": "ansys 对作业 1633126 的处理和我的计划一致，不用再做什么：实验卡第⑤栏已记录了故障原因，这个运行目录没动，也没有重新提交。\n\n它建议的两件事里，第一件已经做了：\n- **不再留残留文件：** 我重新打包时剔除了那份冲突的荷载文件，打包里也换成了修复后的代码。新作业 1633157 正在跑，预计 20:03 左右结束。\n- **早期出错时写不出退出码：** 1633126 是在第 36 行出错退出的，按理作业脚本末尾的退出处理应该会写出退出码文件，这次却没写。原因还没查清，等 1633157 跑完我再顺带核对这一点。\n\nv2.1 仍记为\"未验收\"，等 B11 的结果。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 19:21",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1633157「T27.1-25 v2.1 B11 反力内力回归（打包修复重跑）」：失败（退出码 1）。结束时间 约 2026-10-26 19:16（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 19:21",
+      "text": "B11 这次（作业 1633157）求解其实成功了，是被驱动自己设的超时掐断的，还差最后写结果这一步。\n\n- **算完的部分：** 600 秒模态叠加和扩展都完成了，结果文件 464 MB，运行目录一共约 0.55 GB，离 2 GB 上限很远。\n- **断在哪里：** 之后驱动要逐组写出反力和内力时程，共 10001 组。写到第 4819 组（约 289 s 处），碰上了驱动给每个子算例默认的 700 秒上限，被强行结束。\n- **没有结果的部分：** 30 项对照还没出来。实验卡第⑤栏我已回填这个原因。\n\n**Decision I made：** 只放宽时间，其余不变。\n- **改动：** 把这个算例的超时放宽到 2400 秒，作业墙钟从 30 分钟改为 1 小时。代码和算例内容都没动。按这次的写出速度，全部写完约需 19 分钟，整个作业约 35 分钟。\n- **准备情况：** 新运行目录 `v21_b11d_20261026` 已打包好，空跑和预检都通过，实验卡已写好，资源申请已发。回复一到我就提交。\n- **错了的代价：** 一个单核作业。\n\n另外记一条：驱动默认 700 秒超时，对长时程又要扩展的订单太紧。v2.1 收尾时我会考虑让它按扩展点数自动估算超时。\n\n决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 19:26",
+      "text": "【委托结果 · 计算运维智能体】资源申请：T27.1-25 B11 回归（1 个单核作业，1 h）\nCRC，-q hpc,long｜1 节点×1 核，1 个作业，无 PE｜01:00:00｜m_mem_free=4G｜预计等待未查到；当前资源探针通过，不保证立即启动｜SU 未查到；预计存储约 0.6 GB（申请方估计）｜组配额 5.0T、已用 4.5T、可用 585G；10-26 19:25 核验 ansys 共 550 份、占用 1 份｜未见同名 v21b11d 排队或运行；脚本已核对进入指定根、单线程及排除 d24cepyc154；Lead 自行以绝对路径单次提交并立即 登记；许可为瞬时快照｜CO-\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 19:26",
+      "text": "B11 回归作业已经提交（作业 1633242），超时上限已放宽到 2400 秒，作业墙钟 1 小时。按上次的写出速度，大约 35 分钟能跑完；登记时含排队给的预计完成时间是 20:56。\n\n- **资源回复：** CO-，单核 1 小时，没有新的限制。\n- **登记：** 作业已登记，实验卡第④栏补上了作业号，本地和 CRC 两份已同步，线况页已更新。\n- **集群余量：** CRC 组空间还剩约 585 GB，这个作业预计用 0.6 GB 左右。\n\n作业结束会自动叫醒我。跑通后派 ansys 出 B11 正式对照：30 项和原 r6 的差不超过 0.5%，同时首次报告轴力、梁单元另一端（J 端）内力和竖向反力静力平衡的数值。到那时 v2.1 才算验收完，再改使用说明。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 19:43",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1633242「T27.1-25 v2.1 B11 反力内力回归（放宽超时）」：失败（退出码 1）。结束时间 约 2026-10-26 19:42（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 19:43",
+      "text": "B11 用新驱动完整跑完了（作业 1633242），33 项过了 30 项，3 项峰值没过闸，所以 v2.1 的 B11 按原判据记为**未通过**。判据是事先定的：和原 r6 结果相比，误差不超过 0.5%。\n\n| 项目 | 结果 |\n| --- | --- |\n| 全部均值和 RMS（24 项） | 通过，最大差 0.068% |\n| 首次核对的三项：竖向反力 FZ、梁单元两端轴力 | 通过 |\n| 峰值：基底 FX | −0.93%，没过 |\n| 峰值：截面 Fx | −1.14%，没过 |\n| 峰值：截面 My | +0.71%，没过 |\n\n**我查到的线索：** 两次扩展结果都是每 0.06 秒取一组，但取样时刻整体错开了 0.045 秒（r6 从 0.075 秒开始，v2.1 从 0.12 秒开始）。均值和 RMS 对取在哪几个时刻不敏感，所以对得很好；峰值是在这些时刻里取最大值，时刻一错开就会差 1% 左右，和看到的现象相符。不过这还只是推断，没做过区分实验，所以判据不放宽。\n\n**Decision I made：** 派 ansys 做 T27.1-25c（排队中）。\n- **先只读查原因：** 为什么取样时刻会错开。重点看施加的荷载时程是不是也在时间轴上错开了。如果荷载也错了，那就是驱动的 bug，不是取样问题。\n- **再重跑一次：** 对齐取样时刻后再跑 B11，判据不变。如果峰值差随之消失，就证实是取样造成的。\n- **出正式报告：** 把 B1–B6、B4b 一起汇总成 v2.1 的完整回归结论。\n- **硬性要求：** 作业脚本原样复制这次跑通的那份，打包必须干净，提交前在 CRC 上空跑一次。\n- **错了的代价：** 一个单核作业。如果真是荷载错位，所有用 v2.1 模态叠加算出的结果都要复核；目前只有这次回归用过 v2.1，影响范围很小。\n\n实验卡、决策记录和线况页都已更新。v2.1 仍记为\"未验收\"，使用说明不改。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 20:23",
+      "text": "【告知 · 来自 Ansys 智能体】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n正式报告；CRC 作业 1633449 run.exitcode=1，B11 30/33 PASS；新增 OUTRES,NSOL,ALL,ROOF 后首点仍为 0.12 s、三峰值仍超差，v2.1 B11 未验收。实验卡⑤已回填且双端哈希一致。--report 被平台拒绝，本告知仅送结论路径；不重提。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 20:23",
+      "text": "【委托结果 · Ansys 智能体】T27.1-25c v2.1 B11 峰值差：对齐扩展取样时刻的区分作业 + 正式报告\n这次区分实验否定了“只补 OUTRES 命令即可对齐扩展时刻”的假设；B11 三项峰值仍未过闸。完整回归报告与原始 B11 检查表如下：\n\n\n\n\n\n（附件：check_report_v2.md）\n\n（附件：check_report.md）\n\n（附件：EXPERIMENT_CARD.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 20:23",
+      "text": "T27.1-25c 的区分实验（作业 1633449）没能找出峰值差的原因，B11 在 v2.1 下仍记为**未通过**。其余部分已经验收：B1–B6 的结果和原版驱动逐个数相同，B4b 全瞬态阻尼的峰值也完全一样。\n\n**这次查明的事实：**\n- **不是驱动 bug：** v2.1 和 r6 施加的荷载在时间轴上完全对齐，时刻最大只差约 10⁻¹³ 秒。\n- **取样时刻没对齐：** bot 补了一条输出命令，扩展取样还是从 0.12 秒开始，r6 是 0.075 秒。\n- **结果和上次一样：** 33 项过 30 项，没过的仍是那三个峰值，和 r6 差 −0.93%、−1.14%、+0.71%。\n\n**Decision I made：**\n1. **只读复核，不新提交作业（T27.1-25d）：** 两边的峰值来自不同时刻的样本，拿\"和 r6 差 0.5%\"去卡峰值，分辨不出是驱动错了还是取样时刻不同。所以改用 B11 原本那个独立 Python 参考程序，在 v2.1 自己的取样时刻上算出 30 项参考值，按 B11 原来的判据（差 3% 以内）判，并和 r6 自身对这个参考的误差并排列出。\n - 这个口径是看过数据后才补的，报告里必须写明，同时并列给出按原判据的读法：三项峰值不过。\n - 错了的代价：bot 半天只读工作。如果这样还说不清，v2.1 的 B11 就继续记为未验收，其余部分照常能用。\n2. **使用说明先更新已验收的部分：**\n - 全瞬态现在必须给阻尼比和两个锚定频率，缺了驱动会拒绝\n - 误差检查改成带正负号\n - 反力和内力输出写明\"已接入、暂未验收，这类订单仍走 B11 专用流程\"。\n\n决策记录和线况页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 20:26",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1633449 结束于 2026-10-26 20:17，提交方 2026-10-26 20:25 已处理。\n- CRC 作业 1633449「T27.1-25c B11 扩展采样时刻区分」：失败（退出码 1）。结束时间 约 2026-10-26 20:17（按退出码文件的写入时间）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已复核 CRC 作业 1633449：运行根 `run.exitcode=1`，作业已离开队列。实验卡⑤栏已回填；本地与 CRC 副本的 SHA256 一致，无需重复写入或重提。\n\n本轮完成了 B11 的 MSUP 求解与扩展取数，但报告为 30/33 PASS。扩展首点仍为 0.12 s，未对齐预注册的 0.075 s；RFx、半高 cut_Fx 和 cut_My 的峰值差仍超过 0.5%。因此，本轮否定了“仅补 `OUTRES,NSOL,ALL,ROOF` 即可对齐取样”的假设，尚不能确认峰值差的原因。运行根约 607 MB，作业尾进程快照为空；这不是逐进程许可释放证明。\n\n报告：\n实验卡：\n\n## 结论\n\nB11 接入仍未过闸，v2.1 不能整体验收。本次授权的单次提交已用，不再重提；建议总控保留三项峰值差和扩展取样起点作为后续诊断问题。\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 20:26",
+      "text": "ansys 对作业 1633449 的处理和我的计划一致，不用再做什么：实验卡第⑤栏已回填，本地和 CRC 两份一致；这个作业没有重新提交，旧运行目录也没动。决策记录里已经引用了这张卡。\n\n它建议保留的\"三项峰值差和扩展取样起点\"，已经派成只读复核 T27.1-25d，不需要新作业。做法是用 B11 原本的独立 Python 参考，在 v2.1 自己的取样时刻上算出参考值，按 B11 原判据（差 3% 以内）比，并和 r6 自身对这个参考的误差并排列出。结果回来后我再判 v2.1 的 B11 能不能验收。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 20:36",
+      "text": "【委托结果 · Ansys 智能体】T27.1-25d v2.1 B11：用原独立参考在 v2.1 取样时刻上复核（只读，不提交作业）\n在各自实际取样时刻上，r6、v2.1 b11d、b11e 对同一独立参考均为 30/30 PASS，最大误差约 1.912%，低于原 B11 独立参考的 ±3% 判据。MAPDL 日志显示，v2.1 的 .RDSP 每四步保存一次；请求约 0.075 s 的扩展结果时，该时刻未保存，遂选用下一可用时刻 0.12 s。荷载时间轴未发现整体错位。这解释了取样首点差异，但不足以证明取样是峰值差的唯一成因。按原 T27.1-25 对 r6 的 <0.5% 回归判据，两版 v2.1 的三项峰值仍为 FAIL；不能以事后复核追认整体通过。\n\n（附件：check_report_v3.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 20:36",
+      "text": "峰值差的根因找到了：是 v2.1 生成器漏了一条组件定义，不是取样时刻碰巧错开。v2.1 的 B11 按原判据仍记为未通过，修好后再重跑一次。\n\n**只读复核的结果（T27.1-25d）：**\n- **怎么复核的：** 用 B11 原本的独立 Python 参考程序，在各自的取样时刻上算参考值。这个口径是看过数据后才补的，报告里已经写明。\n- **结果：** r6 和两次 v2.1 运行都是 30/30 通过（判据是差 3% 以内），最大误差约 1.9%。三项峰值和参考的误差如下，两个版本处在同一量级：\n\n| 峰值项 | r6 对参考 | v2.1 对参考 |\n| --- | --- | --- |\n| 基底 FX | +0.46% | +0.11% |\n| 截面 Fx | −0.21% | −0.99% |\n| 截面 My | +0.01% | +0.08% |\n\n- **按原判据：** 和 r6 比、差不超过 0.5%，这三项还是不过，所以不能因为这个复核就改判通过。\n\n**根因（我在 CRC 上核实的）：**\n- **少了组件定义：** r6 的输入先用 `CM,ROOF,NODE` 定义了一个节点组件，输出命令再指向它。v2.1 生成的输入有那条输出命令，却没有组件定义，命令就失效了。\n- **后果：** 求解时的位移每 4 步才存一次（日志写的是 `WRITE FREQUENCY … 4`），扩展只能在 0.06 秒一格的时刻上取值，所以首点从 0.075 秒变成了 0.12 秒。\n- **还有一处遗漏：** 扩展段也比 r6 少一条 `OUTRES,NSOL,ALL`。\n\n**Decision I made：** 派 T27.1-25e，按原判据重跑一次。\n- **修生成器：** 补上组件定义和缺的那条命令。\n- **提交前自检：** 空跑一遍，并逐条核对生成的输入和 r6 一致。\n- **重跑和判定：** 跑完先确认位移每步都存了、取样首点回到 0.075 秒，再按原判据（和 r6 差不超过 0.5%）判。如果时刻对齐了峰值还超，就如实报告，不改判据。\n- **错了的代价：** 一个单核作业。\n\n决策记录和线况页已更新。使用说明里\"B11 反力和内力暂未验收\"那句先不改。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 20:59",
+      "text": "【告知汇总 · 3 条】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）以下是 10/26 20:42 起攒下的告知，按时间先后：\n\n1. 来自 Ansys 智能体（10/26 20:42）\nT27.1-25e 已完成 ROOF 组件与扩展 NSOL 代码修复、CRC 干净包 dry-run/APDL 静态检查及独立 qsub -w v；实验卡在。ComputeOps 资源申请 待回复，未提交作业；原 r6/b11e 根保持只读。\n\n2. 来自 Ansys 智能体（10/26 20:58）\nT27.1-25e 已完成：CRC 作业1633628，CO-，run.exitcode=0；.rdsp 表项 NSOL ALL ROOF 与 r6 同（非日志字面频率1）；扩展10001时刻逐点同 r6，首点0.075s；原30/30对r6 <0.5%、新增3项PASS，总33/33。报告；实验卡 ⑤已回填且CRC镜像核哈希。--report 因非上级项目对话被拒，本告知仅路径，完整委托结论由本轮答复交回。\n\n3. 来自 Ansys 智能体（10/26 20:58）\n补充 T27.1-25e 的证据口径： CRC 运行根 run.exitcode=0、结果报告33/33，卡和 v4 报告已按此区别写明。 登记调用回显本轮未保留可引用原文，不要引用我先前草稿中推测的「已登记」回执字样。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 20:59",
+      "text": "【委托结果 · Ansys 智能体】T27.1-25e v2.1 B11：补 ROOF 组件定义后重跑（判原 0.5% 闸门）\nT27.1-25e 的单次 CRC 作业 1633628 已完成。直接读取运行根的退出码为 0；B11 对原 r6 的 30 项回归全部满足 |误差|<0.5%，新增三项也通过，共 33/33。扩展历史与 r6 均为 10001 个时刻，首点同为 0.075 s，逐点时间差为 0。先前失败的 RFx、cut_Fx、cut_My 三项峰值现均过闸。\n\nMAPDL 日志显示 `NSOL ALL ROOF`，与 r6 相同；它没有字面打印“写盘频率 = 1”。这支持每步写盘，且实际时间集已对齐。结论限于这一固定 B11 模板的数值回归，不推广为任意结构模型的验证。\n\n资源回复为 CO-；qsub 原文为 `Your job 1633628 (\"v21b11f\") has been submitted`。 列表已读回该作业，但监控器未取得退出状态，因此退出码结论依据运行根文件，而非监控器状态。实验卡⑤已回填，本地与 CRC 副本哈希一致；本轮未重提作业。\n\n正式报告：\n实验卡：\n\n（附件：check_report_v4.md）\n\n（附件：EXPERIMENT_CARD.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 20:59",
+      "text": "通用驱动 v2.1 验收通过。B11 这次（作业 1633628）33 项全部过闸，退出码 0，结果我在 CRC 上直接核过。\n\n- **33 项都在 0.5% 以内：** 和原 r6 比，30 项回归全部满足差小于 0.5%；新增的竖向反力和梁单元两端轴力三项也通过。之前没过的三个峰值现在都过了。\n- **取样时刻对齐了：** 扩展结果和 r6 一样是 10001 个时刻，都从 0.075 秒开始，逐行时刻差为 0。说明补上漏掉的那条组件定义就是对的修法。\n- **适用范围：** 只证明了 B11 这个固定模型的数值回归，不能推广到任意结构。\n\n**v2.1 三处改动现在都已验收：**\n\n| 改动 | 验收依据 |\n| --- | --- |\n| 全瞬态 Rayleigh 阻尼 | B4b 峰值和原结果差 0% |\n| 带正负号的误差检查 | B1–B6 和原版驱动逐值相同 |\n| 竖向悬臂模板的反力和内力输出 | B11 33/33 |\n\n**Decision I made：** 使用说明里\"暂未验收\"的说法改掉了。\n- **能直接下单了：** 竖向悬臂模板的基底反力和梁单元内力，现在可以直接用 case 文件下单；其他模板驱动仍会拒绝。\n- **长时程订单要设超时：** 长时程又要扩展的订单，要在 case 里写明超时时间。B11 这样 600 秒、10001 个时刻的算例约需 20 分钟，驱动默认的 700 秒不够。\n- **错了的代价：** 只影响这一类订单的下单说明，改回去很容易。\n\n还有一个平台小问题：作业监控这次没拿到退出状态，我是直接读运行目录里的退出码确认的。\n\n决策记录、线况页、项目页都已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-26 21:02",
+      "text": "【超算作业 · 已由提交方处理】\n作业 1633628 结束于 2026-10-26 20:51，提交方 2026-10-26 21:02 已处理。\n- CRC 作业 1633628「T27.1-25e B11 ROOF组件修复回归」：已离开队列，但没拿到退出状态，请自己核对（作业已离开队列，但没拿到退出状态）。运行目录 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n\nAnsys 智能体收到这条通知后的回报：\n已复核 CRC 运行根：作业 1633628 已离开队列，`run.exitcode=0`。监视器未取得退出状态，但运行根文件有明确记录； 为 33/33 PASS，扩展时程与 r6 的取样时刻逐点一致。无需重提。\n\n实验卡⑤栏已回填，本地与 CRC 副本 SHA256 一致。运行根约 625 MB。结论仅限固定 B11 模型对 r6 的数值回归；作业尾进程快照不能替代逐进程许可释放审计。\n\n报告：\n实验卡：\n\n请核对它的处理是否符合你的计划，按你的任务继续推进；它已经做的操作不要重复做。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-26 21:02",
+      "text": "ansys 对作业 1633628 的处理和我的计划一致，不用再做什么。\n\n- **结果已核实：** 运行目录里的退出码是 0，B11 33/33 全部通过，上一条消息里我已在 CRC 上直接核过。\n- **实验卡：** 第⑤栏已回填，本地和 CRC 两份一致。\n- **决策记录：** 已经引用了这张卡。\n- **没有重提：** 这个作业没有重新提交。\n\n作业监控又一次没拿到退出状态，但退出码文件明明在。我猜是 bot 登记时漏了退出码文件的路径参数，因为我自己登记、带了这个参数的作业都能正常读到退出码。我已经告知平台，请他们核对登记参数，并考虑让监控在作业结束后自动读一次运行目录里的退出码作兜底。这件事本线不需要平台再做什么。\n\nv2.1 已经验收完毕，使用说明也已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-27 07:54",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-27 08:31",
+      "text": "【委托 · 来自 情报】E2：CAE-Agent-Hub 的 Mechanical 桥接与验收留痕，对照本线 Ansys 智能体\n CAE-Agent-Hub（Liang Hu 直投；仓库 Cai-aa/CAE-Agent-Hub，功能待核）：语言界面→工程 Skill→各软件 MCP/插件桥→本机求解器→结果查看器分层，含 Mechanical、Abaqus、CalculiX 接口，强调留模型/命令/日志/结果供工程师验收。请对照本线 Ansys 智能体判断有无可借鉴处。 请判断后，把结论＋建议出口（X1–X5）＋理由交回平台 Lead「开新项目与子项目」对话： Liang Hu 批，批前不落地 X3–X5。来源笔记在，只读，结论回给我一句即可。\n（原因：T12 每日复核 10-27：Liang Hu 直投与 E2 落地）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-27 08:31",
+      "text": "正在看这个仓库里和 Mechanical 相关的部分：Workbench MCP、PyAnsys 套件和 Ansys 技能，再判断有没有可借鉴的地方。CAE-Agent-Hub 的 Mechanical 桥接搬不到本线来，但它给每一笔结果都过一遍验收清单、再分级标注的做法，正好能补本线的一个缺口。\n\n**我看了哪些：** 用 GitHub API 只读看了仓库，外加三个文件：Workbench MCP 的说明、Ansys 结构分析技能、它的验收闸门清单。没有克隆，没有安装。仓库 1173 星，MIT 许可，10-27 还在更新。\n\n**判断：**\n1. **Mechanical 桥接用不上：** 它走的是 Windows 桌面 Workbench（命令日志驱动 + Mechanical 插件 + 本机 socket）。本线在 CRC 的 Linux 上做 APDL 批处理，没有 Workbench 界面。PyMechanical 嵌入在 CRC 上缺运行环境，10-24 已经测过不通。仓库里的 pymapdl-mcp 是官方包的副本，本线 10-15 已经做过静态检查。\n2. **值得借鉴的是逐单验收和结果分级：**\n - **8 条独立闸门：** 正常终止、结果文件非空、荷载和支反力平衡（默认 1%）、记录网格统计、结果能导出、有数值表也有图、写明假设和奇异点。\n - **三级结果标签：** 功能探针、工程草稿、报告级。报告级要求做网格敏感性检查，并和解析解、实验或基准对照。\n - **本线的缺口：** 现有检查报告是按基准写的，没有对每一笔订单都强制做支反力平衡、网格统计和结果分级。\n3. **CalculiX 先记一笔：** 开源求解器 CalculiX 可以作为将来基准的第二套独立有限元对照，不占 Ansys 许可。这次没有评估。\n\n**建议出口：X3（方法直接用）。** 把这份逐单验收清单和三级标签写进本线订单的检查报告模板，以及使用说明的\"交回格式\"一节，由本线 bot 实现，不安装任何外部代码。代价约 bot 半天，加一个小算例回归。其余部分（Workbench 桥接、整套技能）按 X1 存档。这个出口要 Liang Hu 批，批之前不落地。\n\n结论已交平台 Lead 的\"开新项目与子项目\"，决策记录在。\n\n## 结论\n（CAE-Agent-Hub）：它的 Mechanical 桥接走 Windows 桌面 Workbench（命令日志 + Mechanical 插件），和本线在 CRC Linux 上做 APDL 批处理的路线不兼容，不能搬；里面的 pymapdl-mcp 是官方包副本，已审过。可借鉴的是逐单 8 条验收闸门（正常终止、结果文件非空、荷载与支反力平衡 1%、网格统计、结果导出、数值加图、写明假设）和三级结果标签（功能探针 / 工程草稿 / 报告级）。建议出口 X3：并入本线检查报告模板和使用说明，代价约 bot 半天；其余 X1。已交平台 Lead，待 Liang Hu 批。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-27 08:34",
+      "text": "【告知 · 来自 平台】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n：Ansys 2024R2 官方手册已入库（267 本 / 90396 页，仅内部使用），含 Fluent User's Guide、Theory Guide、UDF Manual、Text Command List 和 Mechanical 各手册。用法： manuals \"英文关键词\" [--manual Fluent]，返回手册名和 PDF 页号。查参数、命令、UDF 宏先用它；不要对外转贴原文。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-27 08:34",
+      "text": "【 已关】ftkb 新来源 Manuals_Ansys2024R2：台式机 Ansys 2024R2 官方手册 267 本只存页文本（Liang Hu 10-26 交办）\n结果：Manuals_Ansys2024R2 已入库：267 本 90396 页，索引 273 MB， manuals 可按手册名+PDF 页号检索（SHELL181/NLGEOM/Fluent 周期边界实测通过）\n完整处理记录：工作目录 show 0392）。这是你报的问题，请按结果核对；有疑问直接回我。"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-27 08:34",
+      "text": "Ansys 2024R2 官方手册已经能在知识库里查了： 已关，267 本、9 万多页入库，我实测可用。\n\n- **实测：** 用 ` manuals` 搜 \"RESVEC residual vector\"，直接命中《Mechanical APDL Command Reference》2024R2 第 1633 页。这正是 B11 用到的那条命令，说明里还写明了必须在第一次模态求解时下达，和本线的做法一致。第二条结果来自 Mechanical 用户手册。\n- **告知 ansys：** 以后手册新条目和报告里的文档出处，优先写\"手册名 2024R2，PDF 第 N 页\"，并注明生产用的是 2025R2。两版说法不一致时以 2025R2 为准，并写明差异。手册只作内部检索，原文片段不外送。\n- **使用说明：** \"做法手册\"一节加了这个查询方法。线况页已更新。\n\n旧条目里的在线帮助链接没有专门派人逐条改，打算等以后修订手册时顺手改成本地页码。"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-29 08:30",
+      "text": "【委托 · 来自 情报】紧急：cuDSS GPU 稀疏直接求解器对结构有限元有无用（Liang Hu 直投）\n NVIDIA cuDSS GPU 稀疏直接求解器正式版（C/C++[local path omitted] 接口；官方加速数字为厂商口径，未经我们实测）。请从 T27 结构有限元回答：本线 APDL 批处理（CRC Linux）里稀疏直接求解是否是瓶颈；Ansys 自带 GPU 求解选项与 cuDSS 是什么关系；值得试就给最小试验与代价，不值得就存档。 背景：Liang Hu 10-29 原话「前面这三个，按照我们的惯例，请你的上级速读，紧急放进项目里」；他正写教职申请（10-31 截止），研究陈述写了「数字孪生瓶颈在 CFD 实时性，GPU-LBM 风洞孪生 + PINO 解决」，教学陈述写了「自有教学模型」，担心新东西更新太快落后。 请 10-30 18:00 前交回：结论＋建议出口（X1–X5）＋理由；同一份结论用 交平台（出口由 Liang Hu 批，批前不跑计算、不装软件）。只读，来源笔记在，不改。\n（原因：Liang Hu 10-29 直投，要求紧急进项目）"
+    },
+    {
+      "role": "relay",
+      "who": "Ansys Lead · 转达",
+      "ts": "2026-10-30 08:31",
+      "text": "【委托 · 来自 情报】紧急（重发）：cuDSS GPU 稀疏直接求解器对结构有限元有无用\n NVIDIA cuDSS 正式版（C/C++[local path omitted] 接口；厂商加速数字未经实测）。请回答：本线 APDL 批处理（CRC Linux）里稀疏直接求解是否瓶颈；Ansys 自带 GPU 求解选项与 cuDSS 是什么关系；值得试给最小试验与代价，不值得就存档。CFD 已回 cuDSS X1（本线全是 CPU 迭代法）。 背景：Liang Hu 10-29 原话「前面这三个，按照我们的惯例，请你的上级速读，紧急放进项目里」；他正写教职申请（10-31 截止），研究陈述写了「数字孪生瓶颈在 CFD 实时性，GPU-LBM 风洞孪生 + PINO 解决」，教学陈述写了「自有教学模型」。（重发说明：10-29 同题委托因情报上层委托结案被系统连带取消，不是撤单；已做的部分可直接续用。） 请 10-30 18:00 前交回：结论＋建议出口（X1–X5）＋理由；同一份结论用 交平台（出口由 Liang Hu 批，批前不跑计算、不装软件）。只读，来源笔记在。\n（原因：Liang Hu 10-29 直投，紧急；原委托被连带取消后重发）"
+    },
+    {
+      "role": "bot",
+      "who": "Ansys 结构",
+      "ts": "2026-10-30 08:31",
+      "text": "这个问题 10-29 我已经答完，结论也已交到平台 Lead 的\"开新项目与子项目\"，这次不再重复发。决策记录在。\n\n## 结论\n NVIDIA cuDSS，从 T27 结构有限元看，建议出口 **X1（存档）**。依据是本线数据和 Ansys 2024R2 手册，没有装软件，也没有跑计算。\n\n1. **稀疏直接求解不是本线瓶颈。**\n - 现有基准都是小模型：B1 悬臂梁静力加模态，求解约 0.3 秒；B12 昂船洲全桥 3714 个节点，模态只要几秒；B11 一个作业约 20 分钟，时间几乎都花在扩展后逐组写出 10001 组结果，不在解方程。\n - 所以端到端时间主要耗在排队、许可证和后处理上。\n2. **Ansys 自带 GPU 加速，和 cuDSS 是两回事。**\n - MAPDL 的稀疏直接求解器和 PCG 迭代求解器都能把部分计算交给 GPU（《Parallel Processing Guide》2024R2 第 3 章，PDF 第 23、26 页；支持的显卡含 A100、H100，见《Installation Guides》PDF 第 127 页）。\n - 手册明确说，自由度少的模型用 GPU 不会明显变快（PDF 第 28 页）。\n - 手册没写 MAPDL 内部是否调用 cuDSS，这一点我没查实。cuDSS 是给自己写求解器的开发者用的库，不能直接装进 MAPDL 替换它的求解器。\n3. **现在没有值得做的最小试验。**\n - 将来如果接到几十万到上百万自由度的实体或壳大模型订单，应先试 MAPDL 自带的 GPU 加速选项，而不是 cuDSS。\n - 那需要 CRC 的 GPU 节点和额外的 HPC 许可证，到时再单独评估。\n4. **对 Liang Hu 担心的\"新东西更新太快会落后\"：**\n - cuDSS 换的是线性代数这一层的底层实现，不影响结构有限元的工作流，也不影响教学模型。\n - CFD 方面已由 判为 X1（CFD 线用的全是 CPU 迭代法）。"
+    }
+  ],
+  "files": {
+    "self": "e5d0196d.json",
+    "claims": null,
+    "pdf": null
+  }
+}

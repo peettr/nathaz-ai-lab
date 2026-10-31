@@ -1,0 +1,477 @@
+{
+  "id": "e47a2a82",
+  "slug": "e-complex-terrain-wind-warning",
+  "number": "R23.2d",
+  "title": {
+    "zh": "R23.2d 复杂地形风预警",
+    "en": "R23.2d Wind warnings over complex terrain"
+  },
+  "group": "wx",
+  "parent": "9bdbe67b",
+  "depth": 2,
+  "status": {
+    "zh": "搁置",
+    "en": "Shelved"
+  },
+  "status_class": "pause",
+  "done": true,
+  "start": "2026-10-14 15:03",
+  "end": "2026-10-24 21:42",
+  "updated": "2026-10-24 21:42",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "判断\"AI 中尺度/全球预报 → 地形微尺度降尺度 → 桥址/输电线/山区强风预警\"这条链值不值得继续。交付：已有工作与空白 + 开源代码可用性表、一句结论（值得继续/搁置）、一个判据预先写定的最小示范候选（站点、预报源、降尺度方法）。Liang Hu 10-14：须与城市风场分开做，尺度与研究群体不同。",
+    "goal_en": "Judge whether the chain \"AI mesoscale/global forecast → terrain micro-scale downscaling → strong-wind warnings for bridge sites / transmission lines / mountainous areas\" is worth continuing. Deliverables: existing work and gaps + a table of open-source code availability, a one-sentence conclusion (worth continuing / shelve), and one minimal demonstration candidate with pre-written criteria (station, forecast source, downscaling method). Liang Hu 10-14: must be done separately from urban wind; the scales and research communities differ."
+  },
+  "report": {
+    "zh": "# E 复杂地形风预警\n\n## 目标\n判断\"AI 中尺度/全球预报 → 地形微尺度降尺度 → 桥址/输电线/山区强风预警\"这条链值不值得继续。交付：已有工作与空白 + 开源代码可用性表、一句结论（值得继续/搁置）、一个判据预先写定的最小示范候选（站点、预报源、降尺度方法）。Liang Hu 10-14：须与城市风场分开做，尺度与研究群体不同。\n\n## 当前状态\n**搁置**（10-14 21:05）。示范 v2 按冻结判据四条全不过：强风合并 MAE 双线性 6.38、WindNinja 6.70 m/s（−5.1%，3/12 站）；订正后 3.25 对 3.50，无增量；全时次 3.04 对 3.09。0.25° 预报强风系统偏低（−6.4 m/s，山脊站最重，站点比模式地形高 500–830 m），单站 4 扇区 MOS 把误差减半，WindNinja 几乎不起作用。共约 0.42 CU。重启条件见 ：学习型降尺度（FuXi-CFD/DEVINE）先预注册再试；有桥址/输电线数据时改做站点订正 + 阵风；LBM 地形先验只在学习型降尺度有增量后再接；Deep Research 额度恢复后补跑。\n\n## 层级与边界\n二级节点：不开三级子项目，细分用任务；派活只到\"本节点 → bot → 工具\"，任务书不让工具 bot 再。Colab 不设单试验上限（10-14 18:3x 口径更正，原 ≤20/≤10 CU 作废），单试验预计超过 100 CU 先停下报 A 节点；用完必须 stop，同一轮只派一个执行方；超算单作业 ≤50 SU（ComputeOps 申请、 登记、预检与提交分两条命令）；观测只用公开且可再分发的数据；预报源与取数复用 A1 脚本 （AIWP GraphCast/Pangu/FourCastNet v2 含 100 m u/v、GFS），不重写；文献结论 \n\n## 已有工作与空白（Grok 4b1636 + Lead 核对 + 审查 修订；✔=Lead 亲自核过；Deep Research 未做）\n| 方法族 | 代表作 | 输入 | 输出 | 阵风/瞬态 | 不确定度 | 实测验证与强风表现 | 开源与许可 |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| AI 预报 + 订正 + 地形降尺度（台风） | ACDF，Wu 等 2026，arXiv 2603.12828 ✔摘要 | AI 全球预报（对照 Pangu） | 500 m，浙江 | 否 | — | 11 次台风留一检验，站点 MAE 比 Pangu 降 38.8%；Hagupit 标出后来失效的输电线 | 未找到代码 |\n| AI 预报 → WRF 动力降尺度 | Brewer, Fovell & Capps 2025 *WAF* 40:187–206 ✔DOI | GraphCast 0.25° | WRF 公里级 | 部分 | — | Marshall Fire 等下坡风暴，区域最大持续风/阈值评分（审稿人 A 读正文） | WRF 开源 |\n| 生成式/扩散先验 | KiloGen，Cai 等 2026，arXiv 2607.21460 ✔ | 25 km ECMWF 业务预报 | 公里级，山西 | 否 | 后验采样 | >20 m/s 风 RMSE 约降 10%，13 次强风事件全胜 0.25° ECMWF ✔ | ✔ cyjsss999/KiloGen，MIT，无权重 |\n| 深度学习降尺度（阿尔卑斯） | DEVINE：Le Toumelin 等 2023 *AIES*、2024 *NPG* 31:75–97 ✔DOI；Wind-Topo（Dujardin 2022 QJRMS） | AROME / COSMO-1 | 30–50 m | 否 | 无 | 阿尔卑斯 60 余独立站；2024 文把统计订正与地形降尺度组合 | DEVINE 代码 GitHub（2022 后未更新）；Wind-Topo 在 EnviDat（未核） |\n| 物理诊断（质量守恒） | WindNinja：Wagenbrenner 2016 ACP；Seto 等 2025 WAF ✔ | HRRR/NAM 等 | 100–500 m | 否 | 无 | Santa Ana 个例：强风时技巧下降、背风坡峡谷负偏差放大 ✔（单一地区，不推广） | ✔ firelab/windninja，公有领域 |\n| CFD/RANS 代理 | FuXi-CFD，Lin 等 2026 *Nat. Commun.* ✔ | **100 m** 风，9×9、1 km | 30 m 三维风 + TKE，27 层 | 否：稳态、中性 | 无 | 欧洲高塔（OPE 等）独立检验，**以 ERA5 驱动**，中强风改进 ✔ | ✔ 官方 Zenodo 10.5281/zenodo.18770845（作者 HF 镜像 linchensen），CC BY-NC 4.0 |\n| 中尺度→LES | Liu 2011 JWEIA；HKIA WRF–LES（QXGRWK9H）；香港桥址台风 Lo 2024（未核） | NWP | 10–100 m | 是 | 集合才有 | — | 计算量大 |\n\n**空白（审查后收窄）**：AI 全球预报直接驱动的地形降尺度已有台风（ACDF）与动力 WRF（Brewer）先例；尚未见的是**冷季/非台风复杂地形 + 快速降尺度（质量守恒或 CFD 代理）+ 检验期独立于模型训练 + 与单站统计订正对比**。阵风与工程预警判据仍缺。置信度中等（Grok + 3 位审稿人检索，非穷尽）。\n\n## 最小示范候选 v2（审查 后重新冻结，10-14 15:55；跑前不改）\n- **观测**：MeteoSwiss SwissMetNet 开放数据（Source: MeteoSwiss）。8–12 站，跨山脊/山口/谷底/高原；站表在算任何预报误差前冻结（含真实海拔与 0.25° 模式地形高度差）。\n- **时段**：2023-10-01 至 2024-03-31；10–12 月为训练期（MOS 拟合、阈值），2024-01 至 03 为检验期。\n- **预报源**：主判 FOUR_v200_GFS（有 10 m 与 100 m 风）提前 24 h；GraphCast、Pangu、GFS 与 48 h 只报不判。00/12 UTC 起报，有效时刻 00/12 UTC。\n- **观测配对**：有效时刻前后 30 分钟内 6 个 10 分钟平均风的均值；时间戳约定按 MeteoSwiss 元数据核实后写明。\n- **方法**：(0) 双线性插值到站（10 m）；(1) **WindNinja（主方法）**：每站约 10 km × 10 km 域、质量守恒求解器、以 (0) 的站点预报风矢量作域平均初始化、SRTM 30 m、网格 100 m、输出 10 m；(2) FuXi-CFD（只报不判）：官方 Zenodo 权重，输入 FOUR/GFS 的 100 m 风插到 9×9、1 km 网格，取最接近测风高度的输出层；GraphCast/Pangu 无 100 m 风，不进 (2)；(3) MOS：每站×源×提前量，4 个风向扇区的线性订正（风速），训练期拟合；(3') WindNinja+MOS：同样订正作用于 (1)。\n- **强风时次**：检验期观测 ≥ 该站**训练期**观测 P90；跨站合并，报样本数。\n- **主判据（三条全满足 = 值得继续）**：\n 1. 强风时次合并 MAE：(1) 比 (0) 降 ≥15%，且 (1) 在 ≥2/3 站上 MAE 低于 (0)\n 2. 强风时次合并 MAE：(3') < (3)（地形降尺度在统计订正之外仍有增量）\n 3. 护栏：全时次合并 MAE，(1) 不比 (0) 差。\n- **只报不判**：其他源/提前量、FuXi-CFD、按地形类别、预报超阈条件下的命中率/误报率（阈值训练期 P99）、各源训练截止日期。\n- **结论范围**：只说明所选站点、有效时刻的平均风误差，不代表阵风或工程预警有效。\n- **预算**：Colab 不设上限（预计 >100 CU 先报 A 节点），同一轮只一个执行方，用完 stop。\n\n## 参数来源表\n| 参数 | 取值 | 来源或\"假设\" | 查过哪些地方 |\n| --- | --- | --- | --- |\n| FuXi-CFD 输入 | **100 m** 水平风，9×9、1 km；地形/粗糙度 300×300（30 m） | Nat. Commun. 2026 Methods ✔、官方 HF README ✔（arXiv v1 写 10 m，以期刊版为准） | arXiv v1、第三方仓库、官方 HF |\n| FuXi-CFD 适用条件 | 稳态、中性层结 | arXiv v1 HTML ✔ | — |\n| WindNinja 配置 | 每站约 10 km 域、质量守恒、站点预报风矢量作域平均初始化、100 m 网格 | **假设**（审查 要求钉死；官方 FAQ 第 18 项区分两种初始化） | WindNinja 官方 FAQ 与求解器说明（审稿人 A 引） |\n| 强风时次阈值 | 站点训练期（10–12 月）P90 | **假设**（站间风速气候差异大，固定 m/s 阈值不可比） | 无文献依据，基于本线做法（H 节点同类分位口径） |\n| 判据 15% / 2/3 站 | — | **假设**，与 H 节点 r2 判据同量级（本线数据） | — |\n\n## 已定决定\n- 2026-10-14 示范 v2 不过，节点搁置 → \n- 2026-10-14 审查 裁决：撤回\"无完整先例\"，补 Brewer/ACDF；示范判据 v2 → \n- 2026-10-14 值得继续，先做瑞士冷季示范，判据冻结 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 2026-10-14 | 示范 v2（冻结判据，约 0.30 CU） | **不过**：强风 MAE 双线性 6.38 / WindNinja 6.70 / 双线性+MOS 3.25 / WindNinja+MOS 3.50；全时次 3.04 / 3.09；3/12 站胜；207 条强风、4295 次 WindNinja 全成功 |\n| 2026-10-14 | 示范旧版（v1 判据，约 0.12 CU） | 12 站冻结（山脊/山口/谷底/高原各 3）；WindNinja（±0.015° 约 3 km 域）强风 MAE 比插值中位只降 −2.9%（即略差），4/12 站胜，0/12 站不差于 MOS；四个 0.25° 预报源在山脊强风时次系统偏低约 13–15 m/s，MOS 把误差减半；FuXi-CFD 官方权重（Zenodo→HF，SHA256 已记）样例推理通过，未做瑞士站。v1 不作裁决，以 v2 为准 |\n| 2026-10-14 | Grok 快查 + 核原文 | 未找到\"AI 全球预报→地形降尺度→独立站强风检验\"完整先例；WindNinja 强风变差；FuXi-CFD 中性稳态、权重仅见第三方转载（不用，只用官方） |\n| 2026-10-14 | 问数字孪生风洞地形 LBM | 未做过，11 月中下旬可接，限中性、单风向、台阶地形 |\n| 2026-10-14 | 开工： 查库、Grok 快查发出、问数字孪生风洞 | 库内仅 KiloGen 与 HKIA 两张相关卡 |\n\n## 未决与下一步\n\n- 10-15 02:00 A 节点核对：Colab CPU 会话 m-s-kkb-usc1c0-gx07ji1q0lch（ideas-e-terrain-v2）已不在 `colab sessions` 列表中，无需再停；E 已搁置，不再使用 Colab。\n- 搁置中；重启条件见决策记录。冻结站表、观测、取数与 WindNinja 脚本都在，可直接复用。\n\n## 文献依据\n- Seto 等 2025, *Weather and Forecasting* 40:525–541（摘要，网页无页码）：WindNinja 强风下技巧下降。\n- Lin 等 arXiv 2505.12732v1（HTML，无页码）：FuXi-CFD 输入规格与中性稳态限制。\n- Cai 等 arXiv 2607.21460（摘要）：KiloGen 强风改进约 10%。\n- （卡片无页码；arXiv 2607.21460v1 摘要）\n- 行 170（HKIA 地形风切变 WRF–LES）\n\n## Liang Hu 注\n\n## 参考（10-25 CFD 线交来，只读）\n- Zhang/Yang/He 2026 JCP 557:114835 可微分壁面模化 LES，精读卡 的「迁移判断一：复杂地形风」一节。\n - 原文训练和测试用的是光滑壁山体与 bump/hump/ramp 分离流，对山地风比对建筑更对口；粗网格下仍能保住分离泡。\n - 局限：分离点仍有偏差；流动机制不相似时增益消失；没有粗糙地表和热分层；代码未公开。\n - R23.2d 目前暂停，随 R23.2 重构并入新方案排序。降尺度层（M5）若考虑 CFD 类物理降尺度，再找 R16.5 联系。",
+    "en": "# E 复杂地形风预警\n\n## 目标\n判断\"AI 中尺度/全球预报 → 地形微尺度降尺度 → 桥址/输电线/山区强风预警\"这条链值不值得继续。交付：已有工作与空白 + 开源代码可用性表、一句结论（值得继续/搁置）、一个判据预先写定的最小示范候选（站点、预报源、降尺度方法）。Liang Hu 10-14：须与城市风场分开做，尺度与研究群体不同。\n\n## 当前状态\n**搁置**（10-14 21:05）。示范 v2 按冻结判据四条全不过：强风合并 MAE 双线性 6.38、WindNinja 6.70 m/s（−5.1%，3/12 站）；订正后 3.25 对 3.50，无增量；全时次 3.04 对 3.09。0.25° 预报强风系统偏低（−6.4 m/s，山脊站最重，站点比模式地形高 500–830 m），单站 4 扇区 MOS 把误差减半，WindNinja 几乎不起作用。共约 0.42 CU。重启条件见 ：学习型降尺度（FuXi-CFD/DEVINE）先预注册再试；有桥址/输电线数据时改做站点订正 + 阵风；LBM 地形先验只在学习型降尺度有增量后再接；Deep Research 额度恢复后补跑。\n\n## 层级与边界\n二级节点：不开三级子项目，细分用任务；派活只到\"本节点 → bot → 工具\"，任务书不让工具 bot 再。Colab 不设单试验上限（10-14 18:3x 口径更正，原 ≤20/≤10 CU 作废），单试验预计超过 100 CU 先停下报 A 节点；用完必须 stop，同一轮只派一个执行方；超算单作业 ≤50 SU（ComputeOps 申请、 登记、预检与提交分两条命令）；观测只用公开且可再分发的数据；预报源与取数复用 A1 脚本 （AIWP GraphCast/Pangu/FourCastNet v2 含 100 m u/v、GFS），不重写；文献结论 \n\n## 已有工作与空白（Grok 4b1636 + Lead 核对 + 审查 修订；✔=Lead 亲自核过；Deep Research 未做）\n| 方法族 | 代表作 | 输入 | 输出 | 阵风/瞬态 | 不确定度 | 实测验证与强风表现 | 开源与许可 |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| AI 预报 + 订正 + 地形降尺度（台风） | ACDF，Wu 等 2026，arXiv 2603.12828 ✔摘要 | AI 全球预报（对照 Pangu） | 500 m，浙江 | 否 | — | 11 次台风留一检验，站点 MAE 比 Pangu 降 38.8%；Hagupit 标出后来失效的输电线 | 未找到代码 |\n| AI 预报 → WRF 动力降尺度 | Brewer, Fovell & Capps 2025 *WAF* 40:187–206 ✔DOI | GraphCast 0.25° | WRF 公里级 | 部分 | — | Marshall Fire 等下坡风暴，区域最大持续风/阈值评分（审稿人 A 读正文） | WRF 开源 |\n| 生成式/扩散先验 | KiloGen，Cai 等 2026，arXiv 2607.21460 ✔ | 25 km ECMWF 业务预报 | 公里级，山西 | 否 | 后验采样 | >20 m/s 风 RMSE 约降 10%，13 次强风事件全胜 0.25° ECMWF ✔ | ✔ cyjsss999/KiloGen，MIT，无权重 |\n| 深度学习降尺度（阿尔卑斯） | DEVINE：Le Toumelin 等 2023 *AIES*、2024 *NPG* 31:75–97 ✔DOI；Wind-Topo（Dujardin 2022 QJRMS） | AROME / COSMO-1 | 30–50 m | 否 | 无 | 阿尔卑斯 60 余独立站；2024 文把统计订正与地形降尺度组合 | DEVINE 代码 GitHub（2022 后未更新）；Wind-Topo 在 EnviDat（未核） |\n| 物理诊断（质量守恒） | WindNinja：Wagenbrenner 2016 ACP；Seto 等 2025 WAF ✔ | HRRR/NAM 等 | 100–500 m | 否 | 无 | Santa Ana 个例：强风时技巧下降、背风坡峡谷负偏差放大 ✔（单一地区，不推广） | ✔ firelab/windninja，公有领域 |\n| CFD/RANS 代理 | FuXi-CFD，Lin 等 2026 *Nat. Commun.* ✔ | **100 m** 风，9×9、1 km | 30 m 三维风 + TKE，27 层 | 否：稳态、中性 | 无 | 欧洲高塔（OPE 等）独立检验，**以 ERA5 驱动**，中强风改进 ✔ | ✔ 官方 Zenodo 10.5281/zenodo.18770845（作者 HF 镜像 linchensen），CC BY-NC 4.0 |\n| 中尺度→LES | Liu 2011 JWEIA；HKIA WRF–LES（QXGRWK9H）；香港桥址台风 Lo 2024（未核） | NWP | 10–100 m | 是 | 集合才有 | — | 计算量大 |\n\n**空白（审查后收窄）**：AI 全球预报直接驱动的地形降尺度已有台风（ACDF）与动力 WRF（Brewer）先例；尚未见的是**冷季/非台风复杂地形 + 快速降尺度（质量守恒或 CFD 代理）+ 检验期独立于模型训练 + 与单站统计订正对比**。阵风与工程预警判据仍缺。置信度中等（Grok + 3 位审稿人检索，非穷尽）。\n\n## 最小示范候选 v2（审查 后重新冻结，10-14 15:55；跑前不改）\n- **观测**：MeteoSwiss SwissMetNet 开放数据（Source: MeteoSwiss）。8–12 站，跨山脊/山口/谷底/高原；站表在算任何预报误差前冻结（含真实海拔与 0.25° 模式地形高度差）。\n- **时段**：2023-10-01 至 2024-03-31；10–12 月为训练期（MOS 拟合、阈值），2024-01 至 03 为检验期。\n- **预报源**：主判 FOUR_v200_GFS（有 10 m 与 100 m 风）提前 24 h；GraphCast、Pangu、GFS 与 48 h 只报不判。00/12 UTC 起报，有效时刻 00/12 UTC。\n- **观测配对**：有效时刻前后 30 分钟内 6 个 10 分钟平均风的均值；时间戳约定按 MeteoSwiss 元数据核实后写明。\n- **方法**：(0) 双线性插值到站（10 m）；(1) **WindNinja（主方法）**：每站约 10 km × 10 km 域、质量守恒求解器、以 (0) 的站点预报风矢量作域平均初始化、SRTM 30 m、网格 100 m、输出 10 m；(2) FuXi-CFD（只报不判）：官方 Zenodo 权重，输入 FOUR/GFS 的 100 m 风插到 9×9、1 km 网格，取最接近测风高度的输出层；GraphCast/Pangu 无 100 m 风，不进 (2)；(3) MOS：每站×源×提前量，4 个风向扇区的线性订正（风速），训练期拟合；(3') WindNinja+MOS：同样订正作用于 (1)。\n- **强风时次**：检验期观测 ≥ 该站**训练期**观测 P90；跨站合并，报样本数。\n- **主判据（三条全满足 = 值得继续）**：\n 1. 强风时次合并 MAE：(1) 比 (0) 降 ≥15%，且 (1) 在 ≥2/3 站上 MAE 低于 (0)\n 2. 强风时次合并 MAE：(3') < (3)（地形降尺度在统计订正之外仍有增量）\n 3. 护栏：全时次合并 MAE，(1) 不比 (0) 差。\n- **只报不判**：其他源/提前量、FuXi-CFD、按地形类别、预报超阈条件下的命中率/误报率（阈值训练期 P99）、各源训练截止日期。\n- **结论范围**：只说明所选站点、有效时刻的平均风误差，不代表阵风或工程预警有效。\n- **预算**：Colab 不设上限（预计 >100 CU 先报 A 节点），同一轮只一个执行方，用完 stop。\n\n## 参数来源表\n| 参数 | 取值 | 来源或\"假设\" | 查过哪些地方 |\n| --- | --- | --- | --- |\n| FuXi-CFD 输入 | **100 m** 水平风，9×9、1 km；地形/粗糙度 300×300（30 m） | Nat. Commun. 2026 Methods ✔、官方 HF README ✔（arXiv v1 写 10 m，以期刊版为准） | arXiv v1、第三方仓库、官方 HF |\n| FuXi-CFD 适用条件 | 稳态、中性层结 | arXiv v1 HTML ✔ | — |\n| WindNinja 配置 | 每站约 10 km 域、质量守恒、站点预报风矢量作域平均初始化、100 m 网格 | **假设**（审查 要求钉死；官方 FAQ 第 18 项区分两种初始化） | WindNinja 官方 FAQ 与求解器说明（审稿人 A 引） |\n| 强风时次阈值 | 站点训练期（10–12 月）P90 | **假设**（站间风速气候差异大，固定 m/s 阈值不可比） | 无文献依据，基于本线做法（H 节点同类分位口径） |\n| 判据 15% / 2/3 站 | — | **假设**，与 H 节点 r2 判据同量级（本线数据） | — |\n\n## 已定决定\n- 2026-10-14 示范 v2 不过，节点搁置 → \n- 2026-10-14 审查 裁决：撤回\"无完整先例\"，补 Brewer/ACDF；示范判据 v2 → \n- 2026-10-14 值得继续，先做瑞士冷季示范，判据冻结 → \n\n## 试过与结果\n| 日期 | 做了什么 | 结果一句 |\n| --- | --- | --- |\n| 2026-10-14 | 示范 v2（冻结判据，约 0.30 CU） | **不过**：强风 MAE 双线性 6.38 / WindNinja 6.70 / 双线性+MOS 3.25 / WindNinja+MOS 3.50；全时次 3.04 / 3.09；3/12 站胜；207 条强风、4295 次 WindNinja 全成功 |\n| 2026-10-14 | 示范旧版（v1 判据，约 0.12 CU） | 12 站冻结（山脊/山口/谷底/高原各 3）；WindNinja（±0.015° 约 3 km 域）强风 MAE 比插值中位只降 −2.9%（即略差），4/12 站胜，0/12 站不差于 MOS；四个 0.25° 预报源在山脊强风时次系统偏低约 13–15 m/s，MOS 把误差减半；FuXi-CFD 官方权重（Zenodo→HF，SHA256 已记）样例推理通过，未做瑞士站。v1 不作裁决，以 v2 为准 |\n| 2026-10-14 | Grok 快查 + 核原文 | 未找到\"AI 全球预报→地形降尺度→独立站强风检验\"完整先例；WindNinja 强风变差；FuXi-CFD 中性稳态、权重仅见第三方转载（不用，只用官方） |\n| 2026-10-14 | 问数字孪生风洞地形 LBM | 未做过，11 月中下旬可接，限中性、单风向、台阶地形 |\n| 2026-10-14 | 开工： 查库、Grok 快查发出、问数字孪生风洞 | 库内仅 KiloGen 与 HKIA 两张相关卡 |\n\n## 未决与下一步\n\n- 10-15 02:00 A 节点核对：Colab CPU 会话 m-s-kkb-usc1c0-gx07ji1q0lch（ideas-e-terrain-v2）已不在 `colab sessions` 列表中，无需再停；E 已搁置，不再使用 Colab。\n- 搁置中；重启条件见决策记录。冻结站表、观测、取数与 WindNinja 脚本都在，可直接复用。\n\n## 文献依据\n- Seto 等 2025, *Weather and Forecasting* 40:525–541（摘要，网页无页码）：WindNinja 强风下技巧下降。\n- Lin 等 arXiv 2505.12732v1（HTML，无页码）：FuXi-CFD 输入规格与中性稳态限制。\n- Cai 等 arXiv 2607.21460（摘要）：KiloGen 强风改进约 10%。\n- （卡片无页码；arXiv 2607.21460v1 摘要）\n- 行 170（HKIA 地形风切变 WRF–LES）\n\n## Liang Hu 注\n\n## 参考（10-25 CFD 线交来，只读）\n- Zhang/Yang/He 2026 JCP 557:114835 可微分壁面模化 LES，精读卡 的「迁移判断一：复杂地形风」一节。\n - 原文训练和测试用的是光滑壁山体与 bump/hump/ramp 分离流，对山地风比对建筑更对口；粗网格下仍能保住分离泡。\n - 局限：分离点仍有偏差；流动机制不相似时增益消失；没有粗糙地表和热分层；代码未公开。\n - R23.2d 目前暂停，随 R23.2 重构并入新方案排序。降尺度层（M5）若考虑 CFD 类物理降尺度，再找 R16.5 联系。"
+  },
+  "decisions": [
+    {
+      "id": "dec-0000",
+      "ts": "2026-10-14 15:11",
+      "title": "E 复杂地形风预警：文献现状与最小示范（2026-10-14 15:20）",
+      "label": "决定",
+      "text": "# E 复杂地形风预警：文献现状与最小示范（2026-10-14 15:20）\n\n**Decision I made**：E 节点判为\"值得继续，先做一个小示范\"；示范选瑞士 SwissMetNet 冷季（2023-10 至 2024-03），AIWP 三源 + GFS，比较双线性 / WindNinja / FuXi-CFD / 单站 MOS，判据跑前冻结；审查 （3 位）在排队，示范先派 ideas（≤10 CU，可撤回）。\n\n**依据**（核对记录）\n- 未找到\"AI 全球预报直接输入 → 地形降尺度 → 独立站强风检验\"的完整先例：KiloGen 用 ECMWF 业务预报（Cai 等 arXiv 2607.21460 摘要 ✔）；FuXi-CFD 声称兼容 AI 预报输入但 v1 只对 CFD 真值、中性稳态（arXiv 2505.12732v1 HTML ✔）。Deep Research 未做，空白判断置信度中等。\n- WindNinja 强风下技巧下降、背风坡峡谷负偏差放大（Seto 等 2025 WAF 40:525–541 摘要 ✔）——示范必须单看强风时次。\n- 公平基线：本线 TPU 与 H 节点都显示插值/简单订正是强基线（本线数据，无文献依据），故加单站 MOS 作必须战胜的对照。\n- 选瑞士而非美国 ASOS：SwissMetNet 有真正的山脊/山口站、10 分钟阵风、开放可再分发（MeteoSwiss 开放数据页 ✔）；ASOS 多在机场平地，地形代表性弱，作备选。\n- 数字孪生风洞 LBM 地形先验最早 11 月中下旬、仅中性单风向，不进第一个示范。\n\n**错了的代价**：若审查指出关键先例已做过同样检验或设计有漏洞，最多浪费约 10 CU 与半天，改设计重跑；若 MeteoSwiss 站已被 AIWP 的初始场间接同化导致偏乐观，结论只适用于\"有同化的站\"，需在美国非同化站复测。"
+    },
+    {
+      "id": "dec-0001",
+      "ts": "2026-10-14 15:44",
+      "title": "E 复杂地形风预警：审查 裁决（10-14 15:55）",
+      "label": "决定",
+      "text": "# E 复杂地形风预警：审查 裁决（10-14 15:55）\n\n审稿人：E（Gemini）、A（GPT-6）、D（GLM），3/3 有效，均\"有保留地支持\"。无补位。Deep Research 未做（额度用完）。Lead 亲自核实的证据写在每条后。\n\n## 必须改（全部采纳）\n1. **空白判断收窄，撤回\"未找到完整先例\"**（E、A、D）。核实：Brewer, Fovell & Capps (2025) *WAF* 40:187–206, DOI 10.1175/WAF-D-24-0097.1（Crossref ✔）：GraphCast → WRF 动力降尺度，Marshall Fire 等下坡风暴，按区域最大持续风与阈值评分（A 审稿人读到 §6、图 12–15，Lead 未读正文）。Wu, Wang & Wang (2026) ACDF，arXiv 2603.12828 ✔（摘要）：AI 全球预报经订正+地形感知降尺度到 500 m，浙江 11 次台风留一检验，站点风速 MAE 比 Pangu 降 38.8%，Hagupit 个例标出后来失效的输电线。**新口径**：AI 全球预报直接驱动的地形降尺度已有台风（ACDF）和动力 WRF（Brewer）先例；尚未见的是\"冷季/非台风复杂地形 + 快速降尺度（质量守恒或 CFD 代理）+ 预报期独立于训练 + 与单站统计订正对比\"。置信度中等（非穷尽检索）。\n2. **FuXi-CFD 按期刊版更正**（E、A、D）。Lead 直接抓取 Nat. Commun. 网页核实 ✔：摘要 \"consistent performance against independent wind-tower observations\"；图 5 \"Validation of FuXi-CFD against tall-tower observations over complex terrain\"（OPE 塔等，以 ERA5 驱动，基线 ERA5-SC/DC，中强风下误差改进且随风速增大）；Methods \"coarse 100 m winds (9 × 9 grid)\"；Code/Data availability：Zenodo 10.5281/zenodo.18770845（含预训练权重）。作者 HF （CC BY-NC 4.0，README 输入）✔。→ 方法 (2) 有官方权重，按根 Lead 规矩从 Zenodo 官方记录取。\n3. **代码可用性更正**：KiloGen 有官方代码 （MIT，2026-08-08 推送，无权重）✔；Wind-Topo 代码在 EnviDat（10.16904/envidat.301，A 审稿人，Lead 未核）；补 DEVINE：Le Toumelin 等 2023 *AIES* 10.1175/AIES-D-22-0034.1 ✔、2024 *NPG* 31:75–97 10.5194/npg-31-75-2024 ✔（阿尔卑斯，统计订正 + 地形降尺度组合，与本示范最近）。\n4. **输入矩阵**（E、A、D）：AIWP 里只有 FOUR_v200 有 100 m 风（A1 脚本第 27 行 ✔）。FuXi-CFD 只用 FOUR_v200 与 GFS 的 100 m 风，不把 GraphCast/Pangu 的 10 m 风外推到 100 m（避免新假设）；取 FuXi 输出最接近测风高度的层。\n5. **取数脚本**（E、A）：A1 脚本只存站点插值值、按单一年份 ✔。允许扩展：保存每站周边小窗口网格、支持起止日期；不算重写。\n6. **WindNinja 配置钉死**（E、A、D）：每站一个以站为中心的约 10 km × 10 km 域；质量守恒求解器；以该站双线性插值得到的预报风矢量（10 m）作域平均初始化；输出 10 m；网格 100 m。结果只表述为\"这一配置\"的输赢，不推广为 WindNinja 一般结论。\n7. **判据唯一化**（A、D）：主方法 = WindNinja（FuXi-CFD 只报不判，避免二选一）；主预报源 = FOUR_v200，提前量 24 h 主判、48 h 只报；\"不输 MOS\"改为可机械判定的\"WindNinja+MOS 强风 MAE < 双线性+MOS\"（看地形降尺度在统计订正之外有无增量）。详见项目页 v2。\n8. **时间配对与阈值**（A、E）：有效时刻 00/12 UTC，观测取有效时刻前后 30 分钟内 6 个 10 分钟值的平均；强风阈值改用**训练期（10–12 月）**观测的站点 P90，检验期样本跨站合并并报样本数；加\"全时次 MAE 不变差\"作护栏，并报\"预报超阈\"条件下的指标（应对只按观测分层的偏差）。\n9. **结论范围**（A）：示范只能支持所选站点、有效时刻的平均风误差结论，不等于阵风或工程预警有效。\n\n## 仅供参考\n- 同化与独立性（A、D）：对照链是 AIWP/GFS，不是 COSMO；独立性主要靠检验期晚于各模型训练截止，执行时核各源训练截止日期并写进结果。\n- MOS 分风向（D）：采纳为 4 扇区线性 MOS，否则基线偏弱。\n- 0.25° 模式地形与高山站高差（E）：结果表中报每站真实海拔与模式地形高度差，按地形类别分开看。\n- KiloGen 10% 与本判据 15% 口径不同（D）：15%、2/3 维持为\"假设\"的内部门槛。\n\n## 未采纳的异议\n- 无。E 审稿人第 6 条后半被截断，按已读部分处理。\n\n## 对正在执行的委托的处理\nideas 已在执行旧版任务书（不能撤）。已另发修订委托：若尚未出结果按 v2 执行；已完成的站表与观测取数可复用，判据与降尺度配置一律按 v2 重算。最多多花约 3–5 CU。"
+    },
+    {
+      "id": "dec-0002",
+      "ts": "2026-10-14 21:02",
+      "title": "E 复杂地形风预警：示范 v2 不过，节点搁置（10-14 21:05）",
+      "label": "决定",
+      "text": "# E 复杂地形风预警：示范 v2 不过，节点搁置（10-14 21:05）\n\n**Decision I made**：按跑前冻结的 v2 判据（审查 后），WindNinja 质量守恒降尺度四条全不过，E 节点状态改\"搁置\"。这是实验室的正常搁置（可随时重启），不是放弃\"复杂地形强风预警\"方向，未另送 6 人。\n\n**证据**（Lead 已核数字；无文献依据，基于本线数据）\n- 瑞士 SwissMetNet 12 站，FourCastNet v2 提前 24 h，2024-01 至 03 检验，训练期 P90 强风 207 条，WindNinja 4295/4295 次运行成功。\n- 强风合并 MAE：双线性 6.38、WindNinja 6.70（降幅 −5.1%，要求 ≥15%）；仅 3/12 站更好（要求 ≥8）。\n- 统计订正之后：双线性+MOS 3.25，WindNinja+MOS 3.50，无增量。全时次护栏：3.04 对 3.09，变差。\n- 主要现象：0.25° 预报在强风时次系统偏低（合并偏差 −6.4 m/s），山脊站最严重；山脊站比 GFS 0.25° 模式地形高 500–830 m，谷底站低 570–1080 m。单站 4 扇区 MOS 把强风误差约减半（6.38→3.25），WindNinja 几乎不改变（约 3 km 与 10 km 域两版结论一致）。\n- 用量约 0.42 CU（两轮，CPU 会话已 stop）。\n\n**为什么搁置**：在冷季阿尔卑斯站点上，物理质量守恒降尺度对 AI 0.25° 预报没有可用增益，单站统计订正才是主要收益来源；\"AI 预报 + 快速物理降尺度\"这条路在本试验里不值得继续投入。结论范围仅限所选站点、00/12 UTC 有效时刻的平均风，不涉及阵风或工程预警。\n\n**没测到的（重启条件）**\n1. 学习型降尺度：FuXi-CFD（官方权重 Zenodo 记录→作者 HF，100 m 输入，只能接 FOUR/GFS）或 DEVINE（阿尔卑斯 30 m，Le Toumelin 2023/2024）。若要试，须先写好 0.25°→9×9、1 km 输入协议并预注册，判据同 v2（必须在 MOS 之外有增量）。\n2. 有桥址/输电线实测或业务需求时，改做站点级统计订正 + 阵风因子的预警示范（本试验显示统计订正是主要收益）。\n3. 数字孪生风洞 LBM 地形先验（最早 11 月中下旬，仅中性单风向）只有在第 1 条显示学习型降尺度有增量后才值得接。\n4. Deep Research 额度恢复后补跑文献（本节点 Deep Research 未做）。\n\n**错了的代价**：若学习型降尺度其实有效，我们晚一段时间才发现；重启只需复用冻结站表、观测与取数脚本，新增一种方法约 1 CU 以内。"
+    }
+  ],
+  "reviews": [],
+  "results": [
+    {
+      "id": "res-0000",
+      "ts": "2026-10-14 15:08",
+      "title": "E 节点：Grok 快查（4b1636）出处核对记录（10-14 15:10 美东，Lead 亲自核）",
+      "label": "结果",
+      "text": "# E 节点：Grok 快查（4b1636）出处核对记录（10-14 15:10 美东，Lead 亲自核）\n\n报告：。Deep Research 未做（本月额度用完）。以下\"✔\"为本人打开原始页面核过；\"未核\"为 Grok 所述、未打开原文，只作线索。\n\n| # | Grok 说法 | 核对结果 | 依据 |\n| --- | --- | --- | --- |\n| 1 | KiloGen：WRF 扩散先验 + 25 km ECMWF 业务预报约束，零样本；>20 m/s 风 RMSE 降约 10%；13 次强风事件全胜 0.25° ECMWF | ✔ 摘要一致；作者为 Cai, Y. 等 9 人（知识卡 写\"H. Wang et al., verify\"，应以 arXiv 为准）；arXiv 页无代码链接 | [external URL omitted] 摘要 |\n| 2 | FuXi-CFD：输入为\"AI 预报系统典型输出\"的 10 m 水平风，输出 30 m 三维风 + TKE，CFD 精度、千倍加速；\"在欧洲独立高塔站点上稳健\" | 前半 ✔（摘要原句 \"horizontal wind input at 10 meters above ground, the typical output of AI-based forecast systems\"；输入 9×9、1 km 间距；地形/粗糙度 30 m）。**\"独立高塔验证\"在 arXiv v1 未见**：v1 只以 CFD 为真值（100 m 高度水平分量相对误差 <7%），并写明 \"trained on steady-state simulations under neutral stability conditions\"。Nat. Commun. 版有无实测验证未能打开（付费墙跳转），未核 | [external URL omitted]；[external URL omitted] |\n| 3 | FuXi-CFD 有可用权重 | ✔ 有 ONNX 权重与推理示例，但仓库 为第三方（克拉玛依市气象局开发者）转载，README 写 CC BY-NC 4.0；官方发布源未核。该转载版输入写为 100 m 风，与 arXiv v1 的 10 m 不一致，须核模型文档 | GitHub API 10-14；README |\n| 4 | WindNinja 在强风下技巧下降、背风坡峡谷负偏差放大（Seto et al. 2025） | ✔ Seto, Jones, Siuta, Wagenbrenner, Thompson, Quinn (2025) *Weather and Forecasting* 40:525–541；摘要：\"overall WN skill scores declined at higher observed wind speeds\"；背风坡峡谷站 HRRR 负偏差被放大；山脊站在 HRRR 偏低时受益 | [external URL omitted] |\n| 5 | Wagenbrenner et al. 2016 ACP：近中性强风时改进，热力上/下坡流时混合 | DOI 查到（Crossref）；内容未核 | 10.5194/acp-16-5229-2016 |\n| 6 | Wind-Topo（Dujardin 2022 QJRMS）：COSMO-1 1.1 km → 50 m，阿尔卑斯 261 站训练、60 站独立验证 | DOI 查到；内容未核 | 10.1002/qj.4265 |\n| 7 | TerraWind（GRL 2024）、TA-ViT（JGR 2026） | DOI 查到；仅摘要，未核 | — |\n| 8 | 中文海湾 WRF-LES+随机森林百米降尺度（大气科学） | **DOI 10.3878/j.issn.1006-9895.2505.24110 查不到，丢弃** | citations.md |\n| 9 | Brewer, Fovell, Capps (~2025) GraphCast + WRF 下坡风暴 | 无 DOI，未核，只作线索 | — |\n| 10 | 香港桥址两次台风观测与模拟（Lo 2024 Appl. Sci.） | DOI 查到；内容未核 | 10.3390/app14177789 |\n| 11 | MeteoSwiss 开放数据可再分发 | ✔ 10 分钟风速/阵风，约 160 站；MeteoSwiss 声明开放数据可不受限使用、再分发须注明 \"Source: MeteoSwiss\"（CC BY 4.0 由第三方文档标注，官方页写 terms of use） | [external URL omitted]；[external URL omitted] |\n| 12 | AIWP 存档年份 | ✔ 下有 2020–2026 目录 | S3 列表 10-14 |\n\nGitHub（API 10-14 15:08 查）：\n| 仓库 | 星 | 最近推送 | 许可 | 备注 |\n| --- | --- | --- | --- | --- |\n| firelab/windninja | 190 | 2026-10-14 | 美国联邦政府作品，公有领域（LICENSE 原文 \"IS IN THE PUBLIC DOMAIN\"） | 质量守恒/动量求解诊断降尺度，可 CPU 跑 |\n| NVIDIA/earth2studio | 1196 | 2026-10-14 | Apache-2.0 | AI 天气模型推理与 CorrDiff 等降尺度 |\n| ecmwf-lab/ai-models | 599 | 2026-08-06 | Apache-2.0 | AI 模型推理 |\n| tyxackr/FuXi-CFD | 2 | 2026-07-24 | 无 SPDX；README 声明 CC BY-NC 4.0 | 第三方转载权重，非官方 |\n| KiloGen | — | — | — | GitHub 搜索无结果 |\n| Wind-Topo | — | — | — | GitHub 搜索无结果 |"
+    },
+    {
+      "id": "res-0001",
+      "ts": "2026-10-14 17:11",
+      "title": "E 瑞士冷季复杂地形预警：最小示范结果",
+      "label": "结果",
+      "text": "# E 瑞士冷季复杂地形预警：最小示范结果\n\n站表在 10-14 15:46 EDT 冻结，且早于首次预报误差计算。Source: MeteoSwiss; NOAA AIWP; NOAA GFS。\n\n## 判据与口径\n\n冷季 2023-10-01—2024-03-31 全部 10 分钟有效风速求每站 P95/P99；预报 00/12 UTC 起报，24/48 h 有效时刻与观测 10 分钟结束时刻同一 UTC 时间戳（例如 00:00 是 23:50:01–00:00:00 的均风），不同提前量不混淆。强风=观测≥冷季 P95；10–12 月拟合按站×源×提前量的线性 MOS（非负截断），1–3 月检验；所有三法按四预报源共同有效的站×起报×提前量配对。WindNinja 仅在观测强风时次运行，因此不能计算它的全时次 MAE 和完整误报率。\n\n冻结主判据：WindNinja 或 FuXi-CFD 相对双线性插值的强风站点 MAE 中位降幅≥15%，在≥2/3 站胜出，同时不输于 MOS。这里把“不输于 MOS”操作化为同一配对样本上站点 MAE 中位数比较；若需不同汇总口径请保留冻结规则并报告这一歧义，不按结果挑选。\n\n## 冻结站点与观测覆盖\n\n| 站 | 类别 | 经纬度 | 海拔 m | 测风高度 m | 冷季完整率 | 官方地形描述/选择理由 |\n| --- | --- | --- | ---: | --- | ---: | --- |\n| CHA | ridge | 47.131761, 7.054367 | 1594.0 | unverified | 100.0% | MeteoSwiss exposure: crest; ridge analogue; 10-min mean wind availability >=90% |\n| NAP | ridge | 47.004667, 7.940117 | 1404.0 | unverified | 99.4% | MeteoSwiss exposure: crest; ridge analogue; 10-min mean wind availability >=90% |\n| DOL | ridge | 46.424794, 6.099453 | 1670.0 | unverified | 100.0% | MeteoSwiss exposure: crest; ridge analogue; 10-min mean wind availability >=90% |\n| BEH | pass | 46.409158, 10.019567 | 2260.0 | unverified | 98.6% | MeteoSwiss exposure: pass; pass analogue; 10-min mean wind availability >=90% |\n| CDM | pass | 46.391525, 7.098239 | 1412.0 | unverified | 100.0% | MeteoSwiss exposure: pass; pass analogue; 10-min mean wind availability >=90% |\n| GSB | pass | 45.869092, 7.170683 | 2472.0 | unverified | 100.0% | MeteoSwiss exposure: pass; pass analogue; 10-min mean wind availability >=90% |\n| BLA | valley | 46.422261, 7.825914 | 1548.0 | unverified | 100.0% | MeteoSwiss exposure: valley; valley analogue; 10-min mean wind availability >=90% |\n| GOS | valley | 46.692678, 8.595364 | 950.0 | unverified | 98.5% | MeteoSwiss exposure: valley; valley analogue; 10-min mean wind availability >=90% |\n| ROB | valley | 46.347217, 10.063031 | 1078.0 | unverified | 100.0% | MeteoSwiss exposure: valley; valley analogue; 10-min mean wind availability >=90% |\n| BUF | plateau | 46.648408, 10.2672 | 1971.0 | unverified | 100.0% | MeteoSwiss exposure: plain; plateau analogue; 10-min mean wind availability >=90% |\n| SAM | plateau | 46.526247, 9.879469 | 1709.0 | unverified | 100.0% | MeteoSwiss exposure: plain; plateau analogue; 10-min mean wind availability >=90% |\n| BRL | plateau | 46.983844, 6.610297 | 1050.0 | unverified | 100.0% | MeteoSwiss exposure: plain; plateau analogue; 10-min mean wind availability >=90% |\n\n注：高原一类是高海拔开阔平地的代理，MeteoSwiss 官方 exposure 为 plain，并未独立证实地貌学上的‘高原’；测风高度在官方站元数据未见逐站字段，均为 unverified，不擅自写 10 m。\n\n## 冻结判据检验\n\n归档预报对象 1458/1464，缺失 6 个（见 metrics.json）；强风配对 988 条，WindNinja 成功 988 条、失败 0 条。\n站点强风 MAE 相对双线性降幅中位 -2.87%；胜出 4/12 站（要求≥8）；WindNinja 与 MOS 的站点 MAE 中位分别 6.83 与 4.39 m/s（越小越好）；WindNinja 在 0/12 个单站不差于 MOS。\n\n判定：WindNinja 不过；FuXi-CFD 尚未完成瑞士站评测，整个“任一方法”主判据目前未判定，不得宣称总体不过。\n\n## 逐站、逐源、逐提前量强风指标\n\n同一行三法是相同的强风时次；每格为 MAE / 偏差（m/s），偏差=预报−观测。FuXi-CFD 只通过官方样本权重验证，未做瑞士站强风分数，故不填数字。\n\n| 站 | 类别 | 预报源 | h | n | 双线性 | MOS | WindNinja | FuXi-CFD |\n| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |\n| CHA | ridge | FOUR_v200_GFS | 24 | 4 | 18.48 / -18.48 | 8.80 / -8.80 | 17.89 / -17.89 | 未跑 |\n| CHA | ridge | FOUR_v200_GFS | 48 | 4 | 18.92 / -18.92 | 9.30 / -9.30 | 18.38 / -18.38 | 未跑 |\n| CHA | ridge | GRAP_v100_GFS | 24 | 4 | 17.75 / -17.75 | 8.30 / -8.30 | 17.17 / -17.17 | 未跑 |\n| CHA | ridge | GRAP_v100_GFS | 48 | 4 | 17.85 / -17.85 | 8.37 / -8.37 | 17.28 / -17.28 | 未跑 |\n| CHA | ridge | PANG_v100_GFS | 24 | 4 | 17.72 / -17.72 | 8.60 / -8.60 | 17.04 / -17.04 | 未跑 |\n| CHA | ridge | PANG_v100_GFS | 48 | 4 | 17.87 / -17.87 | 8.64 / -8.64 | 17.26 / -17.26 | 未跑 |\n| CHA | ridge | GFS | 24 | 4 | 17.17 / -17.17 | 9.01 / -9.01 | 16.56 / -16.56 | 未跑 |\n| CHA | ridge | GFS | 48 | 4 | 17.10 / -17.10 | 8.80 / -8.80 | 16.50 / -16.50 | 未跑 |\n| NAP | ridge | FOUR_v200_GFS | 24 | 5 | 10.36 / -10.36 | 5.40 / -5.40 | 9.79 / -9.79 | 未跑 |\n| NAP | ridge | FOUR_v200_GFS | 48 | 5 | 10.76 / -10.76 | 5.91 / -5.91 | 10.28 / -10.28 | 未跑 |\n| NAP | ridge | GRAP_v100_GFS | 24 | 5 | 9.36 / -9.36 | 4.23 / -4.23 | 8.64 / -8.64 | 未跑 |\n| NAP | ridge | GRAP_v100_GFS | 48 | 5 | 9.40 / -9.40 | 4.31 / -4.31 | 8.68 / -8.68 | 未跑 |\n| NAP | ridge | PANG_v100_GFS | 24 | 5 | 9.69 / -9.69 | 5.16 / -5.16 | 9.01 / -9.01 | 未跑 |\n| NAP | ridge | PANG_v100_GFS | 48 | 5 | 9.79 / -9.79 | 5.22 / -5.22 | 9.15 / -9.15 | 未跑 |\n| NAP | ridge | GFS | 24 | 5 | 8.01 / -8.01 | 3.96 / -3.96 | 7.01 / -7.01 | 未跑 |\n| NAP | ridge | GFS | 48 | 5 | 8.40 / -8.40 | 4.38 / -4.38 | 7.46 / -7.46 | 未跑 |\n| DOL | ridge | FOUR_v200_GFS | 24 | 10 | 15.97 / -15.97 | 7.23 / -7.22 | 15.51 / -15.51 | 未跑 |\n| DOL | ridge | FOUR_v200_GFS | 48 | 10 | 16.48 / -16.48 | 8.32 / -8.32 | 16.12 / -16.12 | 未跑 |\n| DOL | ridge | GRAP_v100_GFS | 24 | 10 | 15.81 / -15.81 | 6.65 / -6.46 | 15.35 / -15.35 | 未跑 |\n| DOL | ridge | GRAP_v100_GFS | 48 | 10 | 16.12 / -16.12 | 7.10 / -7.10 | 15.68 / -15.68 | 未跑 |\n| DOL | ridge | PANG_v100_GFS | 24 | 10 | 15.95 / -15.95 | 7.57 / -7.57 | 15.58 / -15.58 | 未跑 |\n| DOL | ridge | PANG_v100_GFS | 48 | 10 | 16.34 / -16.34 | 8.16 / -8.16 | 16.04 / -16.04 | 未跑 |\n| DOL | ridge | GFS | 24 | 10 | 14.83 / -14.83 | 6.43 / -6.43 | 14.20 / -14.20 | 未跑 |\n| DOL | ridge | GFS | 48 | 10 | 15.24 / -15.24 | 7.04 / -7.04 | 14.67 / -14.67 | 未跑 |\n| BEH | pass | FOUR_v200_GFS | 24 | 10 | 12.00 / -12.00 | 5.90 / -5.90 | 11.99 / -11.99 | 未跑 |\n| BEH | pass | FOUR_v200_GFS | 48 | 10 | 12.26 / -12.26 | 6.18 / -6.18 | 12.24 / -12.24 | 未跑 |\n| BEH | pass | GRAP_v100_GFS | 24 | 10 | 12.14 / -12.14 | 4.67 / -4.67 | 12.12 / -12.12 | 未跑 |\n| BEH | pass | GRAP_v100_GFS | 48 | 10 | 12.62 / -12.62 | 5.74 / -5.74 | 12.60 / -12.60 | 未跑 |\n| BEH | pass | PANG_v100_GFS | 24 | 10 | 11.93 / -11.93 | 5.49 / -5.49 | 11.89 / -11.89 | 未跑 |\n| BEH | pass | PANG_v100_GFS | 48 | 10 | 12.35 / -12.35 | 6.16 / -6.16 | 12.30 / -12.30 | 未跑 |\n| BEH | pass | GFS | 24 | 10 | 10.36 / -10.36 | 4.95 / -4.95 | 10.31 / -10.31 | 未跑 |\n| BEH | pass | GFS | 48 | 10 | 10.35 / -10.35 | 4.93 / -4.93 | 10.31 / -10.31 | 未跑 |\n| CDM | pass | FOUR_v200_GFS | 24 | 11 | 4.99 / -4.99 | 3.67 / -3.67 | 5.39 / -5.39 | 未跑 |\n| CDM | pass | FOUR_v200_GFS | 48 | 11 | 4.92 / -4.92 | 3.54 / -3.54 | 5.28 / -5.28 | 未跑 |\n| CDM | pass | GRAP_v100_GFS | 24 | 11 | 4.79 / -4.79 | 3.12 / -3.12 | 5.19 / -5.19 | 未跑 |\n| CDM | pass | GRAP_v100_GFS | 48 | 11 | 4.86 / -4.86 | 3.12 / -3.12 | 5.23 / -5.23 | 未跑 |\n| CDM | pass | PANG_v100_GFS | 24 | 11 | 4.14 / -4.14 | 3.26 / -3.26 | 4.77 / -4.77 | 未跑 |\n| CDM | pass | PANG_v100_GFS | 48 | 11 | 4.16 / -4.16 | 3.18 / -3.18 | 4.77 / -4.77 | 未跑 |\n| CDM | pass | GFS | 24 | 11 | 4.23 / -4.23 | 3.67 / -3.67 | 4.88 / -4.88 | 未跑 |\n| CDM | pass | GFS | 48 | 11 | 4.02 / -4.02 | 3.59 / -3.59 | 4.90 / -4.90 | 未跑 |\n| GSB | pass | FOUR_v200_GFS | 24 | 6 | 12.27 / -12.27 | 6.79 / -6.79 | 12.20 / -12.20 | 未跑 |\n| GSB | pass | FOUR_v200_GFS | 48 | 6 | 13.01 / -13.01 | 8.52 / -8.52 | 13.12 / -13.12 | 未跑 |\n| GSB | pass | GRAP_v100_GFS | 24 | 6 | 12.41 / -12.41 | 4.39 / -4.39 | 12.90 / -12.90 | 未跑 |\n| GSB | pass | GRAP_v100_GFS | 48 | 6 | 13.38 / -13.38 | 6.57 / -6.57 | 13.37 / -13.37 | 未跑 |\n| GSB | pass | PANG_v100_GFS | 24 | 6 | 11.71 / -11.71 | 4.05 / -4.05 | 11.65 / -11.65 | 未跑 |\n| GSB | pass | PANG_v100_GFS | 48 | 6 | 11.96 / -11.96 | 3.76 / -3.76 | 11.87 / -11.87 | 未跑 |\n| GSB | pass | GFS | 24 | 6 | 10.03 / -10.03 | 4.78 / -4.78 | 10.91 / -10.91 | 未跑 |\n| GSB | pass | GFS | 48 | 6 | 9.77 / -9.77 | 4.33 / -4.33 | 10.52 / -10.52 | 未跑 |\n| BLA | valley | FOUR_v200_GFS | 24 | 16 | 1.67 / -1.67 | 1.97 / -1.97 | 2.46 / -2.46 | 未跑 |\n| BLA | valley | FOUR_v200_GFS | 48 | 15 | 1.89 / -1.89 | 2.06 / -2.06 | 2.61 / -2.61 | 未跑 |\n| BLA | valley | GRAP_v100_GFS | 24 | 16 | 1.68 / -1.67 | 1.70 / -1.70 | 2.61 / -2.61 | 未跑 |\n| BLA | valley | GRAP_v100_GFS | 48 | 15 | 2.08 / -2.08 | 1.85 / -1.85 | 2.81 / -2.81 | 未跑 |\n| BLA | valley | PANG_v100_GFS | 24 | 16 | 1.24 / -1.03 | 1.83 / -1.83 | 2.55 / -2.55 | 未跑 |\n| BLA | valley | PANG_v100_GFS | 48 | 15 | 1.37 / -1.28 | 1.88 / -1.88 | 2.68 / -2.68 | 未跑 |\n| BLA | valley | GFS | 24 | 16 | 1.02 / -0.07 | 1.87 / -1.87 | 2.26 / -2.26 | 未跑 |\n| BLA | valley | GFS | 48 | 15 | 1.01 / 0.13 | 1.82 / -1.82 | 2.26 / -2.26 | 未跑 |\n| GOS | valley | FOUR_v200_GFS | 24 | 17 | 4.70 / -4.70 | 4.18 / -4.18 | 5.53 / -5.53 | 未跑 |\n| GOS | valley | FOUR_v200_GFS | 48 | 17 | 5.10 / -5.10 | 4.12 / -4.12 | 5.91 / -5.91 | 未跑 |\n| GOS | valley | GRAP_v100_GFS | 24 | 17 | 4.02 / -4.02 | 2.81 / -2.81 | 4.69 / -4.69 | 未跑 |\n| GOS | valley | GRAP_v100_GFS | 48 | 17 | 4.66 / -4.66 | 3.02 / -3.02 | 5.19 / -5.19 | 未跑 |\n| GOS | valley | PANG_v100_GFS | 24 | 17 | 3.92 / -3.92 | 2.90 / -2.90 | 4.59 / -4.59 | 未跑 |\n| GOS | valley | PANG_v100_GFS | 48 | 17 | 4.31 / -4.31 | 2.58 / -2.58 | 4.87 / -4.87 | 未跑 |\n| GOS | valley | GFS | 24 | 17 | 1.78 / -1.72 | 2.56 / -2.56 | 2.90 / -2.90 | 未跑 |\n| GOS | valley | GFS | 48 | 17 | 1.79 / -1.73 | 2.56 / -2.56 | 2.87 / -2.87 | 未跑 |\n| ROB | valley | FOUR_v200_GFS | 24 | 13 | 7.83 / -7.83 | 5.36 / -5.36 | 8.92 / -8.92 | 未跑 |\n| ROB | valley | FOUR_v200_GFS | 48 | 13 | 8.11 / -8.11 | 5.21 / -5.21 | 9.07 / -9.07 | 未跑 |\n| ROB | valley | GRAP_v100_GFS | 24 | 13 | 8.46 / -8.46 | 5.75 / -5.75 | 8.90 / -8.90 | 未跑 |\n| ROB | valley | GRAP_v100_GFS | 48 | 13 | 8.84 / -8.84 | 6.12 / -6.12 | 9.17 / -9.17 | 未跑 |\n| ROB | valley | PANG_v100_GFS | 24 | 13 | 8.09 / -8.09 | 6.21 / -6.21 | 8.86 / -8.86 | 未跑 |\n| ROB | valley | PANG_v100_GFS | 48 | 13 | 8.44 / -8.44 | 6.34 / -6.34 | 9.10 / -9.10 | 未跑 |\n| ROB | valley | GFS | 24 | 13 | 6.51 / -6.51 | 5.63 / -5.63 | 7.42 / -7.42 | 未跑 |\n| ROB | valley | GFS | 48 | 13 | 6.60 / -6.60 | 5.68 / -5.68 | 7.45 / -7.45 | 未跑 |\n| BUF | plateau | FOUR_v200_GFS | 24 | 16 | 2.32 / -2.32 | 1.98 / -1.98 | 2.65 / -2.65 | 未跑 |\n| BUF | plateau | FOUR_v200_GFS | 48 | 16 | 2.54 / -2.54 | 2.07 / -2.07 | 2.85 / -2.85 | 未跑 |\n| BUF | plateau | GRAP_v100_GFS | 24 | 16 | 2.57 / -2.51 | 1.88 / -1.68 | 2.85 / -2.85 | 未跑 |\n| BUF | plateau | GRAP_v100_GFS | 48 | 16 | 2.81 / -2.81 | 1.79 / -1.65 | 3.08 / -3.08 | 未跑 |\n| BUF | plateau | PANG_v100_GFS | 24 | 16 | 2.24 / -2.24 | 1.77 / -1.71 | 2.57 / -2.57 | 未跑 |\n| BUF | plateau | PANG_v100_GFS | 48 | 16 | 2.53 / -2.53 | 1.79 / -1.74 | 2.79 / -2.79 | 未跑 |\n| BUF | plateau | GFS | 24 | 16 | 1.65 / -1.41 | 2.29 / -2.29 | 1.91 / -1.91 | 未跑 |\n| BUF | plateau | GFS | 48 | 16 | 1.54 / -1.43 | 2.30 / -2.30 | 1.93 / -1.93 | 未跑 |\n| SAM | plateau | FOUR_v200_GFS | 24 | 8 | 4.93 / -4.93 | 3.85 / -3.85 | 5.04 / -5.04 | 未跑 |\n| SAM | plateau | FOUR_v200_GFS | 48 | 8 | 5.55 / -5.55 | 4.07 / -4.07 | 5.64 / -5.64 | 未跑 |\n| SAM | plateau | GRAP_v100_GFS | 24 | 8 | 5.04 / -5.04 | 3.97 / -3.97 | 5.09 / -5.09 | 未跑 |\n| SAM | plateau | GRAP_v100_GFS | 48 | 8 | 5.67 / -5.67 | 4.00 / -4.00 | 5.71 / -5.71 | 未跑 |\n| SAM | plateau | PANG_v100_GFS | 24 | 8 | 4.95 / -4.95 | 3.62 / -3.62 | 5.06 / -5.06 | 未跑 |\n| SAM | plateau | PANG_v100_GFS | 48 | 8 | 5.44 / -5.44 | 3.58 / -3.58 | 5.54 / -5.54 | 未跑 |\n| SAM | plateau | GFS | 24 | 8 | 3.60 / -3.60 | 4.33 / -4.33 | 3.73 / -3.73 | 未跑 |\n| SAM | plateau | GFS | 48 | 8 | 3.44 / -3.44 | 4.20 / -4.20 | 3.57 / -3.57 | 未跑 |\n| BRL | plateau | FOUR_v200_GFS | 24 | 8 | 4.06 / -4.06 | 1.96 / -1.96 | 4.17 / -4.17 | 未跑 |\n| BRL | plateau | FOUR_v200_GFS | 48 | 8 | 4.62 / -4.62 | 2.59 / -2.59 | 4.73 / -4.73 | 未跑 |\n| BRL | plateau | GRAP_v100_GFS | 24 | 8 | 2.93 / -2.93 | 1.28 / -1.25 | 3.03 / -3.03 | 未跑 |\n| BRL | plateau | GRAP_v100_GFS | 48 | 8 | 3.59 / -3.59 | 1.96 / -1.96 | 3.68 / -3.68 | 未跑 |\n| BRL | plateau | PANG_v100_GFS | 24 | 8 | 3.50 / -3.50 | 1.85 / -1.84 | 3.63 / -3.63 | 未跑 |\n| BRL | plateau | PANG_v100_GFS | 48 | 8 | 4.06 / -4.06 | 2.58 / -2.42 | 4.21 / -4.21 | 未跑 |\n| BRL | plateau | GFS | 24 | 8 | 1.60 / -1.60 | 1.06 / -0.94 | 1.74 / -1.74 | 未跑 |\n| BRL | plateau | GFS | 48 | 8 | 2.14 / -2.14 | 1.67 / -1.61 | 2.28 / -2.28 | 未跑 |\n\n## 地形类别汇总（强风 MAE / 偏差，m/s）\n\n| 类别 | 预报源 | h | 双线性 | MOS | WindNinja | FuXi-CFD |\n| --- | --- | ---: | ---: | ---: | ---: | --- |\n| ridge | FOUR_v200_GFS | 24 | 15.02 / -15.02 | 7.08 / -7.08 | 14.50 / -14.50 | 未跑 |\n| ridge | FOUR_v200_GFS | 48 | 15.49 / -15.49 | 7.89 / -7.89 | 15.06 / -15.06 | 未跑 |\n| ridge | GRAP_v100_GFS | 24 | 14.52 / -14.52 | 6.36 / -6.26 | 13.97 / -13.97 | 未跑 |\n| ridge | GRAP_v100_GFS | 48 | 14.72 / -14.72 | 6.64 / -6.64 | 14.17 / -14.17 | 未跑 |\n| ridge | PANG_v100_GFS | 24 | 14.67 / -14.67 | 7.15 / -7.15 | 14.16 / -14.16 | 未跑 |\n| ridge | PANG_v100_GFS | 48 | 14.94 / -14.94 | 7.49 / -7.49 | 14.49 / -14.49 | 未跑 |\n| ridge | GFS | 24 | 13.53 / -13.53 | 6.33 / -6.33 | 12.80 / -12.80 | 未跑 |\n| ridge | GFS | 48 | 13.83 / -13.83 | 6.71 / -6.71 | 13.16 / -13.16 | 未跑 |\n| pass | FOUR_v200_GFS | 24 | 9.20 / -9.20 | 5.19 / -5.19 | 9.35 / -9.35 | 未跑 |\n| pass | FOUR_v200_GFS | 48 | 9.44 / -9.44 | 5.62 / -5.62 | 9.60 / -9.60 | 未跑 |\n| pass | GRAP_v100_GFS | 24 | 9.21 / -9.21 | 3.97 / -3.97 | 9.47 / -9.47 | 未跑 |\n| pass | GRAP_v100_GFS | 48 | 9.63 / -9.63 | 4.86 / -4.86 | 9.76 / -9.76 | 未跑 |\n| pass | PANG_v100_GFS | 24 | 8.71 / -8.71 | 4.26 / -4.26 | 8.94 / -8.94 | 未跑 |\n| pass | PANG_v100_GFS | 48 | 8.93 / -8.93 | 4.41 / -4.41 | 9.14 / -9.14 | 未跑 |\n| pass | GFS | 24 | 7.79 / -7.79 | 4.39 / -4.39 | 8.23 / -8.23 | 未跑 |\n| pass | GFS | 48 | 7.65 / -7.65 | 4.25 / -4.25 | 8.15 / -8.15 | 未跑 |\n| valley | FOUR_v200_GFS | 24 | 4.53 / -4.53 | 3.75 / -3.75 | 5.42 / -5.42 | 未跑 |\n| valley | FOUR_v200_GFS | 48 | 4.90 / -4.90 | 3.75 / -3.75 | 5.72 / -5.72 | 未跑 |\n| valley | GRAP_v100_GFS | 24 | 4.46 / -4.46 | 3.26 / -3.26 | 5.16 / -5.16 | 未跑 |\n| valley | GRAP_v100_GFS | 48 | 5.01 / -5.01 | 3.53 / -3.53 | 5.55 / -5.55 | 未跑 |\n| valley | PANG_v100_GFS | 24 | 4.17 / -4.09 | 3.46 / -3.46 | 5.09 / -5.09 | 未跑 |\n| valley | PANG_v100_GFS | 48 | 4.53 / -4.50 | 3.43 / -3.43 | 5.36 / -5.36 | 未跑 |\n| valley | GFS | 24 | 2.86 / -2.50 | 3.19 / -3.19 | 3.96 / -3.96 | 未跑 |\n| valley | GFS | 48 | 2.92 / -2.52 | 3.21 / -3.21 | 3.99 / -3.99 | 未跑 |\n| plateau | FOUR_v200_GFS | 24 | 3.41 / -3.41 | 2.44 / -2.44 | 3.63 / -3.63 | 未跑 |\n| plateau | FOUR_v200_GFS | 48 | 3.82 / -3.82 | 2.70 / -2.70 | 4.02 / -4.02 | 未跑 |\n| plateau | GRAP_v100_GFS | 24 | 3.27 / -3.25 | 2.25 / -2.14 | 3.46 / -3.46 | 未跑 |\n| plateau | GRAP_v100_GFS | 48 | 3.72 / -3.72 | 2.38 / -2.31 | 3.89 / -3.89 | 未跑 |\n| plateau | PANG_v100_GFS | 24 | 3.23 / -3.23 | 2.25 / -2.22 | 3.46 / -3.46 | 未跑 |\n| plateau | PANG_v100_GFS | 48 | 3.64 / -3.64 | 2.43 / -2.37 | 3.83 / -3.83 | 未跑 |\n| plateau | GFS | 24 | 2.13 / -2.01 | 2.49 / -2.46 | 2.33 / -2.32 | 未跑 |\n| plateau | GFS | 48 | 2.17 / -2.11 | 2.62 / -2.60 | 2.43 / -2.43 | 未跑 |\n\n## 预警次要指标（不参与判定）\n\n双线性与 MOS 的全时次 MAE/偏差、99 分位命中率和误报率逐站×源×提前量在。WindNinja 只在已观测强风时次求解，因缺非事件时次，不能定义其完整 99 分位误报率；仅给其在观测达到 P99 的已计算样本上的条件命中率，不等于完整检验。\nWindNinja 条件命中率 0.00（P99 个数 192）；完整误报率 null；全时次 MAE null。观测阵风因子（1 s 阵风/10 min 均风，均风≥1 m/s）逐站中位见 metrics.json；没有预报阵风。\n\n## 参数来源与限制\n\n| 参数 | 取值与出处/性质 | 检索和约束 |\n| --- | --- | --- |\n| 观测与许可 | MeteoSwiss SwissMetNet 历史 2020–2029 站点 CSV，仅保留 2023-10—2024-03 10 分钟风/阵风；官方 Open Data CC-BY，重分发须 Source: MeteoSwiss | [external URL omitted] |\n| 10 分钟风与阵风 | fkl010z0 (m/s, 10 分钟标量均风)；fkl010z1 (m/s, 1 秒最大阵风) | [external URL omitted]；MeteoSwiss 时间戳规则 [external URL omitted] |\n| 测风高度 | 逐站未核实；不把一般 10 m 风桅高度当成逐站证据 | 站元数据与参数清单未列；SwissMetNet 一般站例有 10m 风桅 [external URL omitted] |\n| 四套预报 | FOUR_v200_GFS、GRAP_v100_GFS、PANG_v100_GFS 的 NOAA AIWP HDF5 小切片 + NOAA GFS 0.25° GRIB2 idx 范围请求；参考 A1 run_forecasts.py，仅改地区窗口、日期、提前量 | [external URL omitted] [external URL omitted]；未整包下载 |\n| WindNinja | USFS WindNinja [地址]（conda-forge 构建；USFS 原仓库为公有领域），质量守恒 domainAverageInitialization，SRTM 1 arc-second DEM，UTM 32N 方形 30m DEM，输出 90m 格网，10m 入出风，m/s | [external URL omitted]；[external URL omitted]；官方 CLI 选项支持 domainAverageInitialization |\n| 地形域、地表粗糙度 | 假设：站点周围±0.015° 近场域；vegetation=grass，30 m DEM，90 m 风格网；官方文献未给本瑞士站一一对应的域、粗糙度与网格，未做敏感性 | 只做可跑通的小示范，不宣称最佳设定；结果对此敏感 |\n| WindNinja 区域平均初风 | 假设：3 km 地形域内 0.25° 双线性风场的均值≈站点双线性矢量风；均匀、对称域的一阶 Taylor 展开支持近似，复杂曲率未验证 | grid direct 试算仅单站单时次，不把它当季节敏感性结论 |\n| FuXi-CFD 官方权重 | 作者 Lin 等官方 Zenodo DOI 10.5281/zenodo.18770845 → HuggingFace linchensen/FuXi-CFD-model，ONNX SHA256 …；CC BY-NC 4.0，仅内部试验；官方样本推理已成功，非瑞士预测 | [external URL omitted] [external URL omitted] |\n| FuXi-CFD 风高矛盾 | arXiv 2505.12732v1 摘要写 10 m；最终作者官方 ONNX 卡片、模型签名/归一化实际是 u_100m/v_100m 9×9，与 300×300 DEM/粗糙度；按具体权重文档判为 100 m，不用 10 m 冒充 | [external URL omitted] [external URL omitted] |\n| FuXi-CFD 缺口 | 官方权重存在但未作瑞士站全季推理：GRAP/PANG 没有原生 100m，FOUR/GFS 的 0.25° 100m 需构造模型要求的 9×9、1km 风场；作者文档未说明如何从 0.25° 得到 1km 有效输入；官方样本 CPU 一次约 55 秒，强风全量将显著增加运行预算 | 禁止使用第三方转载；不把仅跑作者样本记作方法(2)站点分数 |\n| MOS、强风阈值 | 按冻结规则：每站×每源×提前量在 10–12 月 OLS 拟合，1–3 月独立检验；P95 强风、P99 报告不判 | 「最小示范候选」；阈值不是论文给定 |\n\n## 数据来历、失败和下一步\n\n缺失预报对象：ERROR_FOUR_v200_GFS_2023101812.txt, ERROR_FOUR_v200_GFS_2024031612.txt, ERROR_FOUR_v200_GFS_2024031700.txt, ERROR_FOUR_v200_GFS_2024031712.txt, ERROR_FOUR_v200_GFS_2024031812.txt, ERROR_PANG_v100_GFS_2023101812.txt。分析用四源共同有效的时次，未以另一源替代缺失。\nWindNinja 的直接 griddedInitialization 已以单站/单时次独立试算：最初网格与 DEM 同范围时报 input grids do not completely overlap；给网格加四格边界后成功，CHA 示例与平均初风在站点均为 1.28 m/s（输出已显式 mps）；这只是一次数值敏感性，不是冷季统计。\n\n下一步：核逐站风高和地表粗糙度，补 WindNinja 全时次运行以报完整预警误报率；如果 WindNinja 不过、仍要评方法(2)，须先有四源可比的 100m→1km 输入协议、量化预算再试。当前报告绝不外推阵风预报。\n\n数据/代码：stations_frozen.csv、freeze_manifest.json、obs_*.csv、metrics.json、strong_metrics.csv、full_metrics_baselines.csv、mos_coefficients.csv、strong_mae_by_terrain.png、freeze_stations.py、run_forecasts.py、prepare_dem.py、analyze_and_windninja.py。\n\n## Colab 资源账\n\n本轮仅使用一个 CPU Colab 会话 ideas-e-terrain-（10-14 15:43—17:10 美东），已 stop；结束后 `colab --auth oauth2 sessions` 不再列出该会话，账号还有其他代理拥有的 GPU/CPU 会话，未触碰。会话停止前后账号总计费速率从 5.46 降到 5.38 CU/h，推算本会话约 0.08 CU/h × 87 分钟 ≈0.116 CU（估计约 0.12 CU，低于 10 CU）。账号余额从开始的 1458.44 降至 1445.44，合计 13.00 CU 包含同时存在的其他 GPU 会话，不能错误归于本试验；平台未提供逐会话精确账单。\n\n官方 FuXi-CFD 权重下载与样例 CPU 推理经哈希核验；证据见 （不是瑞士站推理）。单站网格初始化敏感性见。"
+    },
+    {
+      "id": "res-0002",
+      "ts": "2026-10-14 20:59",
+      "title": "E 瑞士冷季最小示范 v2",
+      "label": "结果",
+      "text": "# E 瑞士冷季最小示范 v2\n\nv2 主判：不过；只涵盖所选站点 00/12 UTC 有效时刻的平均风速误差，不是阵风预报或工程预警效能。旧版 未改动。\n\n## 预先冻结的主判据（FOUR_v200_GFS +24h）\n训练配对 2164，检验配对 2131，其中训练期 P90 强风 207 条；WindNinja 成功 4295/4295，失败 0。\n\n| 口径 | 双线性 | WindNinja | 双线性 MOS | WindNinja MOS |\n| --- | ---: | ---: | ---: | ---: |\n| 强风合并 MAE (m/s) | 6.38 | 6.70 | 3.25 | 3.50 |\n| 全时次合并 MAE (m/s) | 3.04 | 3.09 | 1.73 | 1.74 |\n| 强风合并偏差 (m/s) | -6.37 | -6.70 | -3.18 | -3.35 |\n| 训练 P99 命中率 | 0.00 | 0.00 | 0.00 | 0.04 |\n| 训练 P99 误报率 | 0.0000 | 0.0000 | 0.00047 | 0.00095 |\n\nP99 在检验期共 25 个观测事件；上述率只报不判。WindNinja+MOS 的一个非强风检验样本（GOS，输出风向第 1 扇区）在训练期没有可拟合扇区，故其全时次 MAE/误报率只用 2130/2131 条；强风 207/207 条均有四法完整配对，主判据不受此缺口影响。\n\n强风降幅 -5.05%（要求≥15%）；胜出 3/12 站（要求≥8）；WindNinja+MOS < MOS：False；全时次 WindNinja ≤ 双线性：False。四个布尔位依次为 {'strong_reduction_15pct': False, 'station_win_two_thirds': False, 'windninja_mos_increment': False, 'all_time_guardrail': False}。\n\n## 逐站主判强风：MAE/偏差 m/s\n| 站 | 地形 | n | 双线性 | WindNinja | 双线性 MOS | WindNinja MOS |\n| --- | --- | ---: | ---: | ---: | ---: | ---: |\n| BEH | pass | 18 | 10.67/-10.67 | 10.67/-10.67 | 3.85/-3.55 | 4.01/-3.98 |\n| BLA | valley | 21 | 1.19/-1.11 | 2.02/-2.02 | 1.33/-1.33 | 1.41/-1.41 |\n| BRL | plateau | 11 | 4.05/-4.05 | 4.25/-4.25 | 2.06/-2.06 | 1.95/-1.95 |\n| BUF | plateau | 25 | 2.15/-2.15 | 2.47/-2.47 | 1.74/-1.74 | 1.82/-1.82 |\n| CDM | pass | 18 | 4.00/-4.00 | 4.36/-4.36 | 2.85/-2.85 | 2.83/-2.83 |\n| CHA | ridge | 6 | 17.22/-17.22 | 16.79/-16.79 | 8.72/-8.72 | 8.52/-8.52 |\n| DOL | ridge | 10 | 15.50/-15.50 | 14.89/-14.89 | 7.43/-7.43 | 7.15/-7.15 |\n| GOS | valley | 29 | 4.08/-4.08 | 4.67/-4.67 | 2.48/-2.48 | 3.01/-3.01 |\n| GSB | pass | 25 | 10.16/-10.16 | 10.54/-10.54 | 3.45/-3.33 | 4.46/-3.34 |\n| NAP | ridge | 14 | 9.15/-9.15 | 8.56/-8.56 | 4.18/-4.18 | 4.07/-4.07 |\n| ROB | valley | 17 | 6.98/-6.98 | 8.12/-8.12 | 3.89/-3.57 | 4.80/-4.58 |\n| SAM | plateau | 13 | 4.30/-4.30 | 4.56/-4.56 | 3.78/-3.74 | 3.49/-3.47 |\n\n## 地形类别主判强风：MAE/偏差 m/s\n| 地形 | n | 双线性 | WindNinja | 双线性 MOS | WindNinja MOS |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| pass | 61 | 8.50/-8.50 | 8.76/-8.76 | 3.39/-3.26 | 3.85/-3.38 |\n| plateau | 49 | 3.15/-3.15 | 3.42/-3.42 | 2.36/-2.35 | 2.29/-2.29 |\n| ridge | 30 | 12.88/-12.88 | 12.31/-12.31 | 6.17/-6.17 | 5.98/-5.98 |\n| valley | 67 | 3.91/-3.88 | 4.72/-4.72 | 2.48/-2.40 | 2.96/-2.91 |\n\n## 其他预报源与提前量（只报双线性及其 MOS；WindNinja 与 FuXi-CFD 未跑，不进入主判）\n每站×源×提前量详见 other_sources_v2.csv（强风 MAE 与偏差，同站 P90）。不可拿旧版 WindNinja 样本换算 v2。\n\n## 地形高度（站海拔 − GFS 0.25° 表面地形，m）\nFOUR 等 AI 源没有原生静态地形可核，此表明确是 NOAA GFS 0.25° 地形代理，不假装是 FOUR 原生模式高度。\n| 站 | 真实海拔 m | GFS 双线性地形 m | 差 m |\n| --- | ---: | ---: | ---: |\n| CHA | 1594 | 761.2 | 832.8 |\n| NAP | 1404 | 904.7 | 499.3 |\n| DOL | 1670 | 883.0 | 787.0 |\n| BEH | 2260 | 2211.7 | 48.3 |\n| CDM | 1412 | 1355.1 | 56.9 |\n| GSB | 2472 | 2050.5 | 421.5 |\n| BLA | 1548 | 2115.3 | -567.3 |\n| GOS | 950 | 2026.5 | -1076.5 |\n| ROB | 1078 | 2038.2 | -960.2 |\n| BUF | 1971 | 2244.9 | -273.9 |\n| SAM | 1709 | 2381.5 | -672.5 |\n| BRL | 1050 | 939.5 | 110.5 |\n\n## 参数来源、时间与许可\n| 参数 | 值、来源或假设 |\n| --- | --- |\n| 站点 | 旧版 stations_frozen.csv 10-14 15:46 美东冻结，早于首次预报误差计算；12 站四类，完整率≥90%；逐站风速计高度未核实（不擅自填 10m）。高原为 plain 代理。 |\n| 验证时窗 | MeteoSwiss 10 分钟时间戳为 UTC 区间结束；有效时刻 t 配六条 t−20、t−10、t、t+10、t+20、t+30，覆盖 (t−30,t+30]；六条齐全才取标量均值，来源 [external URL omitted] |\n| 阈值 | 10–12 月同配对时刻六值均风 P90/P99，1–3 月检验；每站阈值与样本数在 metrics_v2.json。假设：由 v2 冻结口径指定。 |\n| WindNinja | USFS [地址]，质量守恒 domainAverageInitialization；各站 UTM32N 10 km×10 km SRTM 1 arc-second DEM，30 m 重采样；100 m 求解格、10m 输入输出；初风=站点 0.25° 双线性 U/V。grass 粗糙度是假设（未有逐站地被），来源 [external URL omitted] |\n| MOS | 每站×源×提前量×风向四扇区，训练期 OLS 风速线性订正并非负截断；WindNinja 的输出方向另分扇区并单独拟合。不以检验期拟合。少数扇区训练样本很小，请见 mos_coefficients_v2.json。 |\n| 模型训练截止 | NOAA/CIRA 归档文献 Radford 等 2025 BAMS 表1：FOUR v2-small 2015 年训练、2016–17 验证；Pangu 2017 训练、2019 验证；GraphCast Operational 2017 训练、2016–21 微调。GFS 非固定训练模型，训练截止不适用。[external URL omitted] |\n| FuXi-CFD | 只报不判：Zenodo DOI 10.5281/zenodo.18770845 官方记录说明权重实际放在外部 HF；本轮没有从 Zenodo 记录直接取得权重，因此未做瑞士站 ONNX 推理；禁止以第三方转载权重或 10m 风代 100m。作者说明 100m、9×9、1km，GraphCast/Pangu 无 100m 不进入 FuXi。 |\n| GFS 地形 | 2023-10-01 00Z f24 HGT:surface，.idx byte-range 取 0.25° GRIB2，双线性到站；来源 [external URL omitted] |\n| 数据与许可 | Source: MeteoSwiss（开放数据可再分发并须注明来源）；NOAA AIWP/GFS 开放归档；NASA/USGS SRTM；WindNinja 公有领域。只留 12 站所选期间序列及小文件，未整包下载 7–9GB AIWP。 |\n\n缺失对象 6 个：ERROR_FOUR_v200_GFS_2024031712.txt, ERROR_FOUR_v200_GFS_2024031700.txt, ERROR_FOUR_v200_GFS_2024031812.txt, ERROR_PANG_v100_GFS_2023101812.txt, ERROR_FOUR_v200_GFS_2024031612.txt, ERROR_FOUR_v200_GFS_2023101812.txt。原始拉取脚本 run_forecasts_v2.py 复用 A1；完整配对样本和 MOS 系数见同目录。图注明 Source: MeteoSwiss; NOAA AIWP; NOAA GFS。\n\n## 下一步\n核逐站传感器高度、地表覆盖，若需评 FuXi 先确定 Zenodo 直供权重及输入地形/粗糙度规格；只在另一次预设试验中扩展。"
+    },
+    {
+      "id": "res-0003",
+      "ts": "2026-10-14 21:01",
+      "title": "E 瑞士冷季最小示范 v2",
+      "label": "结果",
+      "text": "# E 瑞士冷季最小示范 v2\n\nv2 主判：不过；只涵盖所选站点 00/12 UTC 有效时刻的平均风速误差，不是阵风预报或工程预警效能。旧版 未改动。\n\n## 预先冻结的主判据（FOUR_v200_GFS +24h）\n训练配对 2164，检验配对 2131，其中训练期 P90 强风 207 条；WindNinja 成功 4295/4295，失败 0。\n\n| 口径 | 双线性 | WindNinja | 双线性 MOS | WindNinja MOS |\n| --- | ---: | ---: | ---: | ---: |\n| 强风合并 MAE (m/s) | 6.38 | 6.70 | 3.25 | 3.50 |\n| 全时次合并 MAE (m/s) | 3.04 | 3.09 | 1.73 | 1.74 |\n| 强风合并偏差 (m/s) | -6.37 | -6.70 | -3.18 | -3.35 |\n| 训练 P99 命中率 | 0.00 | 0.00 | 0.00 | 0.04 |\n| 训练 P99 误报率 | 0.0000 | 0.0000 | 0.00047 | 0.00095 |\n\nP99 在检验期共 25 个观测事件；上述率只报不判。WindNinja+MOS 的一个非强风检验样本（GOS，输出风向第 1 扇区）在训练期没有可拟合扇区，故其全时次 MAE/误报率只用 2130/2131 条；强风 207/207 条均有四法完整配对，主判据不受此缺口影响。\n\n强风降幅 -5.05%（要求≥15%）；胜出 3/12 站（要求≥8）；WindNinja+MOS < MOS：False；全时次 WindNinja ≤ 双线性：False。四个布尔位依次为 {'strong_reduction_15pct': False, 'station_win_two_thirds': False, 'windninja_mos_increment': False, 'all_time_guardrail': False}。\n\n## 逐站主判强风：MAE/偏差 m/s\n| 站 | 地形 | n | 双线性 | WindNinja | 双线性 MOS | WindNinja MOS |\n| --- | --- | ---: | ---: | ---: | ---: | ---: |\n| BEH | pass | 18 | 10.67/-10.67 | 10.67/-10.67 | 3.85/-3.55 | 4.01/-3.98 |\n| BLA | valley | 21 | 1.19/-1.11 | 2.02/-2.02 | 1.33/-1.33 | 1.41/-1.41 |\n| BRL | plateau | 11 | 4.05/-4.05 | 4.25/-4.25 | 2.06/-2.06 | 1.95/-1.95 |\n| BUF | plateau | 25 | 2.15/-2.15 | 2.47/-2.47 | 1.74/-1.74 | 1.82/-1.82 |\n| CDM | pass | 18 | 4.00/-4.00 | 4.36/-4.36 | 2.85/-2.85 | 2.83/-2.83 |\n| CHA | ridge | 6 | 17.22/-17.22 | 16.79/-16.79 | 8.72/-8.72 | 8.52/-8.52 |\n| DOL | ridge | 10 | 15.50/-15.50 | 14.89/-14.89 | 7.43/-7.43 | 7.15/-7.15 |\n| GOS | valley | 29 | 4.08/-4.08 | 4.67/-4.67 | 2.48/-2.48 | 3.01/-3.01 |\n| GSB | pass | 25 | 10.16/-10.16 | 10.54/-10.54 | 3.45/-3.33 | 4.46/-3.34 |\n| NAP | ridge | 14 | 9.15/-9.15 | 8.56/-8.56 | 4.18/-4.18 | 4.07/-4.07 |\n| ROB | valley | 17 | 6.98/-6.98 | 8.12/-8.12 | 3.89/-3.57 | 4.80/-4.58 |\n| SAM | plateau | 13 | 4.30/-4.30 | 4.56/-4.56 | 3.78/-3.74 | 3.49/-3.47 |\n\n## 地形类别主判强风：MAE/偏差 m/s\n| 地形 | n | 双线性 | WindNinja | 双线性 MOS | WindNinja MOS |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| pass | 61 | 8.50/-8.50 | 8.76/-8.76 | 3.39/-3.26 | 3.85/-3.38 |\n| plateau | 49 | 3.15/-3.15 | 3.42/-3.42 | 2.36/-2.35 | 2.29/-2.29 |\n| ridge | 30 | 12.88/-12.88 | 12.31/-12.31 | 6.17/-6.17 | 5.98/-5.98 |\n| valley | 67 | 3.91/-3.88 | 4.72/-4.72 | 2.48/-2.40 | 2.96/-2.91 |\n\n## 其他预报源与提前量（只报双线性及其 MOS；WindNinja 与 FuXi-CFD 未跑，不进入主判）\n每站×源×提前量详见 other_sources_v2.csv（强风 MAE 与偏差，同站 P90）。不可拿旧版 WindNinja 样本换算 v2。\n\n## 地形高度（站海拔 − GFS 0.25° 表面地形，m）\nFOUR 等 AI 源没有原生静态地形可核，此表明确是 NOAA GFS 0.25° 地形代理，不假装是 FOUR 原生模式高度。\n| 站 | 真实海拔 m | GFS 双线性地形 m | 差 m |\n| --- | ---: | ---: | ---: |\n| CHA | 1594 | 761.2 | 832.8 |\n| NAP | 1404 | 904.7 | 499.3 |\n| DOL | 1670 | 883.0 | 787.0 |\n| BEH | 2260 | 2211.7 | 48.3 |\n| CDM | 1412 | 1355.1 | 56.9 |\n| GSB | 2472 | 2050.5 | 421.5 |\n| BLA | 1548 | 2115.3 | -567.3 |\n| GOS | 950 | 2026.5 | -1076.5 |\n| ROB | 1078 | 2038.2 | -960.2 |\n| BUF | 1971 | 2244.9 | -273.9 |\n| SAM | 1709 | 2381.5 | -672.5 |\n| BRL | 1050 | 939.5 | 110.5 |\n\n## 参数来源、时间与许可\n| 参数 | 值、来源或假设 |\n| --- | --- |\n| 站点 | 旧版 stations_frozen.csv 10-14 15:46 美东冻结，早于首次预报误差计算；12 站四类，完整率≥90%；逐站风速计高度未核实（不擅自填 10m）。高原为 plain 代理。 |\n| 验证时窗 | MeteoSwiss 10 分钟时间戳为 UTC 区间结束；有效时刻 t 配六条 t−20、t−10、t、t+10、t+20、t+30，覆盖 (t−30,t+30]；六条齐全才取标量均值，来源 [external URL omitted] |\n| 阈值 | 10–12 月同配对时刻六值均风 P90/P99，1–3 月检验；每站阈值与样本数在 metrics_v2.json。假设：由 v2 冻结口径指定。 |\n| WindNinja | USFS [地址]，质量守恒 domainAverageInitialization；各站 UTM32N 10 km×10 km SRTM 1 arc-second DEM，30 m 重采样；100 m 求解格、10m 输入输出；初风=站点 0.25° 双线性 U/V。grass 粗糙度是假设（未有逐站地被），来源 [external URL omitted] |\n| MOS | 每站×源×提前量×风向四扇区，训练期 OLS 风速线性订正并非负截断；WindNinja 的输出方向另分扇区并单独拟合。不以检验期拟合。少数扇区训练样本很小，请见 mos_coefficients_v2.json。 |\n| 模型训练截止 | NOAA/CIRA 归档文献 Radford 等 2025 BAMS 表1：FOUR v2-small 2015 年训练、2016–17 验证；Pangu 2017 训练、2019 验证；GraphCast Operational 2017 训练、2016–21 微调。GFS 非固定训练模型，训练截止不适用。[external URL omitted] |\n| FuXi-CFD | 只报不判：Zenodo DOI 10.5281/zenodo.18770845 官方记录说明权重实际放在外部 HF；本轮没有从 Zenodo 记录直接取得权重，因此未做瑞士站 ONNX 推理；禁止以第三方转载权重或 10m 风代 100m。作者说明 100m、9×9、1km，GraphCast/Pangu 无 100m 不进入 FuXi。 |\n| GFS 地形 | 2023-10-01 00Z f24 HGT:surface，.idx byte-range 取 0.25° GRIB2，双线性到站；来源 [external URL omitted] |\n| 数据与许可 | Source: MeteoSwiss（开放数据可再分发并须注明来源）；NOAA AIWP/GFS 开放归档；NASA/USGS SRTM；WindNinja 公有领域。只留 12 站所选期间序列及小文件，未整包下载 7–9GB AIWP。 |\n\n缺失对象 6 个：ERROR_FOUR_v200_GFS_2024031712.txt, ERROR_FOUR_v200_GFS_2024031700.txt, ERROR_FOUR_v200_GFS_2024031812.txt, ERROR_PANG_v100_GFS_2023101812.txt, ERROR_FOUR_v200_GFS_2024031612.txt, ERROR_FOUR_v200_GFS_2023101812.txt。原始拉取脚本 run_forecasts_v2.py 复用 A1；完整配对样本和 MOS 系数见同目录。图注明 Source: MeteoSwiss; NOAA AIWP; NOAA GFS。\n\n## 下一步\n核逐站传感器高度、地表覆盖，若需评 FuXi 先确定 Zenodo 直供权重及输入地形/粗糙度规格；只在另一次预设试验中扩展。\n\n## Colab 资源及交付核验\n本轮单个 CPU 会话 ideas-e-terrain-v2，10-14 17:12—20:56 美东，已 stop；colab sessions 不含本会话（账号另有其他会话，不属于本轮）。停止前后账户费率差 0.08 CU/h，按 3.733 h 估算本轮约 0.30 CU；上轮约 0.12 CU，累计约 0.42 CU，均非逐会话精确账单。账户余额变动包含其他会话，不能归因本轮。根目录 metrics_v2.json 为独立按原始配对 CSV 复核的版本， 与 保留原始/初版供审计。强风四法 207/207 完整，其他源的 WindNinja/FuXi 未跑；另有非主判 MOS 空扇区 14 条，见 other_sources_v2.csv 的 strong_scored_n。"
+    }
+  ],
+  "figures": [
+    {
+      "id": "fig-0000",
+      "ts": "2026-10-14 17:09",
+      "title": "strong mae by terrain",
+      "url": "../../img/3344f7e7388f.png"
+    },
+    {
+      "id": "fig-0001",
+      "ts": "2026-10-14 20:56",
+      "title": "strong mae by terrain v2",
+      "url": "../../img/7aa5a0ae0f24.png"
+    },
+    {
+      "id": "fig-0002",
+      "ts": "2026-10-14 21:01",
+      "title": "strong mae by terrain v2",
+      "url": "../../img/e8f55071ab89.png"
+    }
+  ],
+  "code": [
+    {
+      "name": "analyze_and_windninja.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/analyze_and_windninja.py"
+    },
+    {
+      "name": "archive_obs.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/archive_obs.py"
+    },
+    {
+      "name": "archive_results.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/archive_results.py"
+    },
+    {
+      "name": "check_analysis.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/check_analysis.py"
+    },
+    {
+      "name": "check_errors.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/check_errors.py"
+    },
+    {
+      "name": "check_runtime.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/check_runtime.py"
+    },
+    {
+      "name": "compare_gridded.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/compare_gridded.py"
+    },
+    {
+      "name": "freeze_stations.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/freeze_stations.py"
+    },
+    {
+      "name": "install_windninja.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/install_windninja.py"
+    },
+    {
+      "name": "launch_analysis.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/launch_analysis.py"
+    },
+    {
+      "name": "launch_forecast.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/launch_forecast.py"
+    },
+    {
+      "name": "pilot_gridded.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/pilot_gridded.py"
+    },
+    {
+      "name": "pilot_windninja.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/pilot_windninja.py"
+    },
+    {
+      "name": "prepare_dem.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/prepare_dem.py"
+    },
+    {
+      "name": "probe_ascii.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/probe_ascii.py"
+    },
+    {
+      "name": "probe_fuxi_sample.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/probe_fuxi_sample.py"
+    },
+    {
+      "name": "probe_proj.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/probe_proj.py"
+    },
+    {
+      "name": "probe_units.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/probe_units.py"
+    },
+    {
+      "name": "probe_windninja.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/probe_windninja.py"
+    },
+    {
+      "name": "render_results.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/render_results.py"
+    },
+    {
+      "name": "run_forecasts.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/run_forecasts.py"
+    },
+    {
+      "name": "sample_pilot.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/sample_pilot.py"
+    },
+    {
+      "name": "smoke_forecast.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/smoke_forecast.py"
+    },
+    {
+      "name": "smoke_fuxi_official.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/smoke_fuxi_official.py"
+    },
+    {
+      "name": "smoke_gfs.py",
+      "group": "e_terrain",
+      "url": "../../code/e_terrain/smoke_gfs.py"
+    },
+    {
+      "name": "analyze_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/analyze_v2.py"
+    },
+    {
+      "name": "archive_forecast_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/archive_forecast_v2.py"
+    },
+    {
+      "name": "bootstrap.py",
+      "group": "v2",
+      "url": "../../code/v2/bootstrap.py"
+    },
+    {
+      "name": "check_missing_sectors.py",
+      "group": "v2",
+      "url": "../../code/v2/check_missing_sectors.py"
+    },
+    {
+      "name": "check_sectors.py",
+      "group": "v2",
+      "url": "../../code/v2/check_sectors.py"
+    },
+    {
+      "name": "finalize_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/finalize_v2.py"
+    },
+    {
+      "name": "gfs_terrain_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/gfs_terrain_v2.py"
+    },
+    {
+      "name": "launch_analysis_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/launch_analysis_v2.py"
+    },
+    {
+      "name": "launch_forecasts_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/launch_forecasts_v2.py"
+    },
+    {
+      "name": "launch_stage_b.py",
+      "group": "v2",
+      "url": "../../code/v2/launch_stage_b.py"
+    },
+    {
+      "name": "launch_stage_test.py",
+      "group": "v2",
+      "url": "../../code/v2/launch_stage_test.py"
+    },
+    {
+      "name": "launch_stage_test_b.py",
+      "group": "v2",
+      "url": "../../code/v2/launch_stage_test_b.py"
+    },
+    {
+      "name": "launch_stage_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/launch_stage_v2.py"
+    },
+    {
+      "name": "pilot_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/pilot_v2.py"
+    },
+    {
+      "name": "prepare_dem_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/prepare_dem_v2.py"
+    },
+    {
+      "name": "render_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/render_v2.py"
+    },
+    {
+      "name": "run_forecasts_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/run_forecasts_v2.py"
+    },
+    {
+      "name": "stage_test_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/stage_test_v2.py"
+    },
+    {
+      "name": "stage_test_v2b.py",
+      "group": "v2",
+      "url": "../../code/v2/stage_test_v2b.py"
+    },
+    {
+      "name": "stage_wn_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/stage_wn_v2.py"
+    },
+    {
+      "name": "stage_wn_v2b.py",
+      "group": "v2",
+      "url": "../../code/v2/stage_wn_v2b.py"
+    },
+    {
+      "name": "verify_metrics_v2.py",
+      "group": "v2",
+      "url": "../../code/v2/verify_metrics_v2.py"
+    }
+  ],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 开子项目",
+      "ts": "2026-10-14 15:03",
+      "text": "【Liang Hu 让 A 天气预报驱动的风工程应用 分出的子对话】E「复杂地形风预警」。项目页名 Complex_Terrain_Wind_Warning.md（已由 A 节点建好框架，你补全）。\n任务书原文：目标：桥址、输电线、山区的强风预警：AI 中尺度预报 → 地形微尺度降尺度。Liang Hu 10-14：须单列——与城市风场特征差别大、尺度也不同，文献上一般是两拨不同的组在做。条件：卡；FuXi-CFD（RANS 稳态，不含阵风/瞬态）；数字孪生风洞 GPU LBM 可算地形。第一步：文献现状（地形风 AI 降尺度/代理，含开源代码可用性表），再选一个有观测的地形站点做 AI 预报+降尺度 vs 实测的小示范。\n注意：(1) Deep Research 本月额度已用完（30/30，A3 10-14 遇到），先做 Grok 快查 + 你亲自核原文，再按需送审；额度恢复后补跑，回复里写明\"Deep Research 未做\"。(2) 预报源与取数复用 A1 的 AIWP/GFS 脚本，不重写；观测只用公开、可再分发的数据（A1 已遇到 Oklahoma Mesonet 不能再分发）。(3) 要数字孪生风洞算地形 LBM 的，走 （对方 Lead），先问是否已有在做。(4) 层级：你是二级节点，不开三级子项目，细分用任务；派活只到\"你 → bot → 工具\"两跳，任务书不让工具 bot 再。\n交付：项目页\"已有工作与空白 + 开源代码可用性\"表、一句结论（值得继续 / 搁置）和一个最小示范候选（站点、预报源、降尺度方法、判据预先写定）。\n【边界（从严）】单试验 Colab ≤20 CU，用完 colab stop，同一轮只派一个执行方；超算单作业 ≤50 SU，先 ComputeOps 资源申请、提交后 登记，预检与提交分两条命令；基于文献综述的结论；批量杂活走，单批 ≤100 题、审查在跑时不开、不用 --force；其他线数据只读。任务书里本线数字标\"本线数据\"。【回报】有结论时 A 节点（只写结论与下一步）。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 15:03",
+      "text": "Grok 快查已发出；现在问数字孪生风洞有没有在算地形，然后写项目页。E 节点（复杂地形风预警）已经开工，现在还没有结论，在等两件事的回复。\n\n**已做的**\n- **项目页**：建好了，挂在 A 节点下。里面有判断表框架、最小示范候选、参数来源表和边界。线况总表加了一行。\n- **知识库查过**：库里几乎没有这方面的卡片。只有两张相关：\n - KiloGen：用高分辨率 WRF 训练的扩散模型做先验，再用 ECMWF 粗预报去约束，输出公里级的地形风。卡片上写着它的代码在采集时打不开。\n - 香港机场地形风切变的 WRF–LES 卡。\n - 另外，H 节点的文献报告里提到 KiloDA（arXiv 2609.11230），说它在复杂地形里改进最大。这只是线索，我还没核原文。\n - WindNinja、FuXi-CFD 库里都没有。\n- **Grok 快查已发出**，问六件事：\n - 四类降尺度方法的代表作：机器学习/扩散、质量守恒诊断、CFD 代理、WRF–LES 嵌套\n - 有没有先例直接拿 AI 预报做输入，并在独立站点上检验强风\n - 桥梁、输电线、山区道路现有的强风预警系统\n - 公开、允许再分发的复杂地形测风数据\n - GitHub 仓库表\n - 空白在哪里。\n- **已问数字孪生风洞 Lead**：他们有没有在做地形 LBM 算例、能不能接 DEM 地形，以及有没有不希望我们碰的部分。\n\n**Deep Research 未做**：本月额度已用完。按要求先用 Grok 快查，我再亲自核原文，额度恢复后补跑。\n\n**下一步**：Grok 报告一般 1–3 分钟就到，会自动叫醒我。到了以后：\n1. 抽核关键出处，填\"已有工作与空白 + 开源代码可用性\"表\n2. 选一个有公开观测的地形站点，写定最小示范：站点、预报源（复用 A1 的 AIWP/GFS 取数脚本）、降尺度方法、判据\n3. 结论送 3 位审稿人，之后再报 A 节点。\n\n这一轮没有新的决定。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 15:05",
+      "text": "【委托结果 · 数字孪生风洞 Lead】实验室 E 复杂地形风预警：你们是否已有地形 LBM 算例\n1. **有无重复**：数字孪生风洞线没有做过、也没有在做复杂地形（山体、峡谷、Askervein/Bolund 类）的 GPU LBM 算例或验证。最接近的是 Urban Field 子项目在 OKC 的城区开发算例，地形平缓、未经实测检验。项目页。斯图加特盆地只做过可行性评估，没跑。E 节点不会和本线重复。\n2. **以后能否做\"降尺度先验\"算例**：\n - **能接受的**：DEM 地形（台阶式表示，无壁面模型，陡坡误差预计偏大，估算），以及从文件读入、随时间变化强度的入流。\n - **做不到的**：入口固定在一个方向，单次运行内风向不能变，变风向需分扇区分次跑；只有中性层结，表示不了稳定层结和热力驱动的山谷风。\n - **最早时间**：11 月中下旬（估算，等 5090 到货、现有子项目腾出算力）。\n - **怎么提**：届时贵方提出具体站点和时段，由我评估后排期。\n3. **请勿触碰**：本线 FluidX3D 修改版的设置代码、入流和前驱域的生成与文件、Silsoe 和 OKC 算例的运行目录；需要就只读引用结果，并保留\"开发结果、未经观测验证\"的标注。贵方若自用 FluidX3D，请注意许可证限制：不得商用或军用；不得用其源码训练 AI；发表修改版算出的结果须公开修改后的源码。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 15:05",
+      "text": "数字孪生风洞 Lead 回复了：他们没做过、也没在做复杂地形的 LBM 算例，所以 E 节点不会和他们重复。回复已记进项目页。\n\n**他们以后能提供什么**\n- 我们需要时，他们可以算一个地形算例，作为降尺度的\"先验\"。最早 11 月中下旬，具体等他们新显卡到货、现有子项目让出算力。到时由我们给出站点和时段，他们评估后排期。\n- 限制有三条：\n - 地形用台阶式表示，没有壁面模型，陡坡上的误差会偏大\n - 一次运行只能固定一个风向，要换风向得按扇区分开跑\n - 只能算中性层结，算不了稳定层结，也算不了热力驱动的山谷风。\n\n**不要碰的部分**：他们改过的 FluidX3D 的设置代码、入流和前驱域文件，以及 Silsoe 和 OKC 的运行目录。需要时只读引用他们的结果，并保留\"开发结果、未经观测验证\"的标注。他们还提醒：我们如果自己用 FluidX3D，要注意它的许可证限制。\n\n**Decision I made**：最小示范先不依赖 LBM，降尺度改用质量守恒诊断模型或统计/机器学习方法，可以马上开做；LBM 地形先验留作第二步，等 11 月他们有空再提。为什么：LBM 只能算中性层结、单一风向，正好缺山区强风里常见的层结效应和风向变化，而且要等一个多月。错了的代价：如果文献显示只有 CFD 类先验才有用，示范要推迟到 11 月下旬，前面做的质量守恒或统计方法结果可以当对照，不算白做。\n\nGrok 快查还没回来（发出约 2 分钟），回来后会自动叫醒我，再核原文、填表、写定示范候选。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 15:06",
+      "text": "【深度调研】「E 复杂地形强风预警：AI 预报→地形降尺度的方法、先例、开放观测与开源代码（Grok 快查）」（Grok 快速调研）完成，用时约 2 分钟，报告约 24072 字。\n- 报告：\n- 引文核对： DOI 10/11 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.3878/j.issn.1006-9895.2505.24110。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 15:06",
+      "text": "正在核对 Grok 报告里的关键出处（已核 FuXi-CFD、KiloGen、WindNinja 三处），接着写判断表和示范候选。Now the project page update with the judgment table and the pre-registered demo candidate.Now the decision record, status tables, and report to A node.E 节点的初步结论是值得继续：文献里没找到同样的完整先例，所以先做一个小示范。示范已派给 ideas，送审也已发出，两件都在排队，还没开始。**Deep Research 未做**（本月额度已用完），所以文献部分只有 Grok 快查和我亲自核的 12 处出处。\n\n**文献现状（核过原文的标 ✔）**\n- **最关键的空白**：没找到有人\"直接拿 AI 全球预报（GraphCast、Pangu、FourCastNet）做输入 → 地形降尺度 → 在独立站点上检验强风\"。最接近的两篇：\n - **KiloGen** ✔：它的输入是 ECMWF 业务预报，不是 AI 预报。风速超过 20 m/s 时误差降了约 10%，13 次强风事件都胜过 0.25° 的 ECMWF。没有找到代码。\n - **FuXi-CFD** ✔：论文写明输入是\"AI 预报系统典型输出\"的 10 m 风，输出 30 m 三维风场。但它只在中性层结、稳态 CFD 上训练，预印本第一版只拿 CFD 结果当真值，没和实测比。Grok 说它在欧洲高塔站上做过检验，我在第一版里没看到，正式发表版打不开，所以算未核。\n- **WindNinja**（质量守恒降尺度）✔：在加州 Santa Ana 大风事件上，风越大，它的技巧反而越差；在背风坡峡谷的站点，它会把预报原有的风速偏低放大（Seto 等 2025）。\n- **代码**：\n - WindNinja 是美国政府作品，属公有领域，还在活跃更新。\n - earth2studio、ai-models 都是 Apache-2.0。\n - FuXi-CFD 的权重只找到第三方转载版，许可是 CC BY-NC，只能非商用。\n - KiloGen、Wind-Topo 没找到代码。\n- **丢弃的一条**：一篇中文海湾降尺度论文的 DOI 查不到，不采用。\n\n**数字孪生风洞的回复**：他们没做过复杂地形的 LBM，不会和我们重复。最早 11 月中下旬能帮忙算，但只能算中性层结、一次只能算一个风向，所以不进第一个示范。\n\n**最小示范**（判据在开跑前已写进项目页，跑的时候不改）\n- **观测**：瑞士气象局的自动站开放数据，有 10 分钟平均风和阵风，可以公开发布，只需注明来源。选 8–12 个站，覆盖山脊、山口、谷底和高原。站表在算任何误差之前先定死。\n- **时段**：2023-10 至 2024-03 的冷季。10–12 月用来拟合单站订正，1–3 月用来检验。\n- **预报**：FourCastNet、GraphCast、Pangu 三个 AI 模型，再加 GFS 作对照，提前 24 小时和 48 小时。取数复用 A1 的脚本。\n- **比四种做法**：直接插值、WindNinja、FuXi-CFD、单站线性订正。\n- **判据**：只看强风时次（每站风速排在前 5% 的时段）。降尺度要同时做到三条才算值得继续：\n - 误差比直接插值降 15% 以上\n - 在至少 2/3 的站上胜出\n - 不输给单站订正。\n\n 加最后一条，是因为 TPU 和 H 节点的经验都说明，简单方法是很难打败的基线。\n- **预算**：Colab 不超过 10 计算单元，不上超算。\n\n**Decision I made**：示范地点选瑞士，不选美国机场站。为什么：瑞士有真正的山脊站和山口站，有阵风记录，数据也能公开发布；美国机场站大多在平地，代表不了复杂地形，所以留作备选。另外，示范在审查结果回来之前就先派出去。为什么：最多浪费约 10 计算单元，而且可以撤回。错了的代价：如果审查找到已有同样的检验，或指出设计有漏洞，就改设计重跑，晚半天。\n\n**在排队的**\n- ideas 的示范：。\n- 3 位审稿人的。\n\n两件出结果都会自动叫醒我。已上报 A 节点。\n\n文件：\n- 项目页 \n- 出处核对记录 \n- 决策记录 \n\n\n\n\n\nSources:\n- [KiloGen, arXiv 2607.21460]([external URL omitted]\n- [FuXi-CFD, arXiv 2505.12732]([external URL omitted]\n- [Seto et al. 2025, USFS Treesearch]([external URL omitted]\n- [WindNinja GitHub]([external URL omitted]\n- [FuXi-CFD 权重（第三方转载）]([external URL omitted]\n- [MeteoSwiss open data]([external URL omitted]\n- [MeteoSwiss 自动站数据文档]([external URL omitted]\n\n（附件：Complex_Terrain_Wind_Warning.md）\n\n（附件：lead_source_check_20261014.md）\n\n（附件：E_文献现状与最小示范_20261014.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 15:11",
+      "text": "【委托 · 来自 实验室 Lead】FuXi-CFD 权重只用官方来源\n告知，不用回复。你的表里写 FuXi-CFD 权重\"有第三方转载\"。实验室规矩不下载来源不明的数据/模型：示范里方法 (2) 只用作者或期刊官方渠道发布的权重（核到官方仓库/数据声明页再用）；只有第三方转载就把 (2) 标\"未跑：无官方权重\"，按冻结判据用 (1) WindNinja 判，不改判据。请转给 ideas 的任务书一句。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 15:11",
+      "text": "收到，FuXi-CFD 只用官方来源的权重，已经落实到 ideas 的任务里。\n\n- **任务书**：补了一节。只用作者或期刊官方渠道发布的权重，第三方转载仓库 tyxackr/FuXi-CFD 不下载。找不到官方权重，就把方法 (2) 标\"未跑：无官方权重\"，主判据只用 WindNinja 判，冻结的判据不改。项目页也同步改了。\n- **重派**：原委托 还没开始。如果另发一条补充，它会排在原任务后面，等 ideas 做完才送到，起不了作用。所以我撤回了原委托和那条补充，用新版任务书重派为，还在排队。线况总表、项目页和决策记录里的编号都已更新。\n\n## 结论\n已照办：FuXi-CFD 只用作者或期刊官方渠道的权重；没有官方权重，方法 (2) 就标\"未跑：无官方权重\"，按冻结判据只用 WindNinja 判，判据不变。原委托还没开始，补充消息会晚于任务送达，所以撤回后用新版任务书重派给 ideas，新，原编号 作废。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 15:42",
+      "text": "【审查结果】实验室 E 节点（复杂地形强风预警：AI 天气预报 → 地形微尺度降尺度 → 桥址/输电线/山区预警）基于 Grok 快查（Deep Research 本月额度用完未做）和 Lead 亲自核对的 12 处出处，得出：(1) \"AI 全球预报直接做输入 → 地形降尺度 → 独立站点强风检验\"未找到完整先例，最接近的是 KiloGen（ECMWF 业务预报）与 FuXi-CFD（声称兼容 AI 预报输入，arXiv v1 只对 CFD 真值）；(2) 强风尾部、阵风、与单站 MOS 公平基线比较是主要空白；(3) 结论\"值得继续，做一个小示范\"。请审：这些文献判断是否成立、有没有漏掉的关键先例（尤其 2024–2026 年 AI 预报+地形降尺度+强风检验的工作）；项目页里冻结的最小示范（瑞士 SwissMetNet 冷季、AIWP 三源 + GFS、双线性/WindNinja/FuXi-CFD/MOS、强风时次 MAE 降 ≥15% 且 2/3 站胜且不输 MOS）设计是否公平、判据是否合理、有无会让结论失真的漏洞（例如站点代表性、MeteoSwiss 站是否已被 COSMO/ICON 同化、FuXi-CFD 输入高度不一致、WindNinja 初始化方式）。每条意见请给出处；找不到就说找不到。\n3 位审稿人的意见已收齐（3/3 份有效）。请逐条核实依据后裁决：分\"必须改\"和\"仅供参考\"，回应每一条站得住的反对，保留未采纳的异议；需要 Liang Hu 定的升级给 Liang Hu。\n\n### 审稿人 E · Gemini\n## 结论\n\n**有保留地支持（支持继续推进 E 节点最小示范，但文献现状判断与最小示范方案存在 7 处事实错误/关键漏项/设计漏洞，必须在执行前修正）。**\n\n1. **文献判断审查结果**：\n - **判断 (1)（“AI 全球预报直接做输入 → 地形降尺度 → 独立站点强风检验”未找到完整先例）部分夸大、且对 FuXi-CFD 与 KiloGen 的事实认定有误**：\n - 若不限定降尺度方法为“微尺度快速诊断/AI 代理（30–500 m）”，则 **Brewer, Fovell, and Capps (2025, *Weather and Forecasting*, DOI:)** 已完整发表了“**0.25° GraphCast AI 预报直接作输入 → WRF 地形动力降尺度 → 复杂地形下坡风暴（科罗拉多 Marshall Fire 与加州 Sundowner 强风）独立地面站检验**”。Lead 将其标为“无 DOI，未核”而排除（[lead_source_check_20261014.md]([local path omitted] [Complex_Terrain_Wind_Warning.md]([local path omitted] 的“未找到完整先例”表述偏大；**但若严格限定为“AI 全球预报直接驱动微尺度非动力/快速降尺度（WindNinja / CFD 训练的 AI 代理如 FuXi-CFD、DEVINE）并在独立地面站做强风尾部检验”，则该空白依然成立**。\n - **FuXi-CFD（Lin et al., 2026, *Nature Communications*, 17:3713, DOI:）并非付费墙、并非未做实测检验、也并非无官方权重**：该文为金色开放获取（Gold OA），正文 Section `Results -> Validation10.5281/zenodo.18770845`）和 HuggingFace开源了预训练 ONNX 权重（CC BY-NC 4.0）。\n - **KiloGen（`arXiv:2607.21460`）官方代码已开源**：（MIT 协议）已公开训练、扩散后验采样与站点评估代码（仅未附预训练权重与原始数据），[Complex_Terrain_Wind_Warning.md]([local path omitted] 写“未找到代码”不实。\n - **判断 (2)（强风尾部、阵风、与单站 MOS 公平基线比较是主要空白）基本成立**，但漏掉了阿尔卑斯山复杂地形深度降尺度的代表性开源基线 **DEVINE**（Le Toumelin et al., 2023 *AIES*；2024 *NPG*，含山脊强风偏置分析与开源代码/权重）。\n2. **最小示范方案与判据审查结果**：\n - 现有冻结方案存在 **样本量严重不足（每站每预见期 95 百分位仅约 9 个检验时次）、观测条件筛选偏置（Forecaster's Dilemma）、FuXi-CFD 输入高度与变量通道不匹配（100 m vs 10 m）、WindNinja 区域平均初始化与粗网格海拔差失真、复用脚本 [run_forecasts.py]([local path omitted] 不支持跨年及网格输出、多重比较未预注册** 等会让结论失真的漏洞，必须先修正定义再执行。\n\n---\n\n## 必须改（MUST-FIX）\n\n### 1. [事实错误 / 漏核] FuXi-CFD 的 *Nature Communications* (2026) 正文已包含独立测风塔实测检验，且官方权重已正式开源\n- **依据位置**：\n - [lead_source_check_20261014.md]([local path omitted] 8–9 行：“ 付费墙跳转，未核；… 只对 CFD 真值检验，未做实测塔/站检验”）及第 26 行（“没有找到 FuXi-CFD 官方仓库，只有第三方实现 ”）。\n - [Complex_Terrain_Wind_Warning.md]([local path omitted] 27、31、40、49、60 行：“arXiv v1 只对 CFD 真值检验，未做实测检验”、“如无官方权重则跳过 (2)”）。\n - [任务书_E最小示范_瑞士冷季_20261014.md]([local path omitted] 12、26 行）。\n- **核实证据**：\n 1. 系开放获取论文（2026-03-09 发表，CC BY-NC-ND 4.0）。其正文 `Results -> Validation` 节（`#Sec6ERA5-DC` 分别降低 5.31%–13.38% 和 12.66%–15.63%）。但该节使用的是 **ERA5 再分析 100 m 风场** 作为输入，**并未用 AI 天气预报（FuXi/GraphCast/Pangu）驱动做实测站检验**。\n 2. 该论文 `Data availability` 与 `Code availability` 节给出了第一作者林晨森（Chensen Lin）发布的官方 Zenodo 归档，对应官方 HuggingFace 模型库 与数据集 （CC BY-NC 4.0 协议，含完整 `model.onnx` 与 `model.data` 权重；第三方仓库 的 第 28 行实际上就是调用 下载该官方权重）。\n- **必须修改**：更正上述文档中“FuXi-CFD 未做实测塔/站检验”与“无官方仓库/权重”的错误表述；明确其空白在于“**尚未用实时 AI 全球预报直接驱动并在高山复杂地形强风尾部及与单站 MOS 对比下检验**”，且最小示范中方法 (2) 已有作者/期刊官方渠道权重可用，不应以“无官方权重”为由跳过。\n\n### 2. [文献夸大 / 关键先例遗漏] “AI 全球预报直接做输入 → 地形降尺度 → 独立站点强风检验：未找到完整先例”表述夸大，漏掉了 Brewer et al. (2025, *WAF*)\n- **依据位置**：\n - [lead_source_check_20261014.md]([local path omitted] 15 行：“#9 Brewer, Fovell, Capps (~2025) GraphCast + WRF 下坡风暴 | 无 DOI，未核，只作线索”）。\n - [Complex_Terrain_Wind_Warning.md]([local path omitted] 31 行：“AI 全球预报（GraphCast/Pangu/FourCastNet）直接做输入 → 地形降尺度 → 独立站点强风检验：未找到完整先例”）。\n - [E_文献现状与最小示范_20261014.md]([local path omitted] 5 行）。\n- **核实证据**：\n - 该文已于 2025 年 1 月在 AMS 期刊 *Weather and Forecasting* 正式发表：**Brewer, M. J., R. G. Fovell, and S. B. Capps (2025)**, *\"Hybrid Numerical Weather Prediction: Downscaling GraphCast AI Forecasts for Downslope Windstorms\"*, *Weather and Forecasting*, 40(1), 187–206, **DOI: **。\n - 该研究直接以 **0.25° GraphCast AI 预报** 为初始/边界条件驱动 WRF 动力降尺度（\"last-mile\" downscaling），针对复杂地形极端下坡风暴（2021 年科罗拉多 Marshall Fire 强风与 2022 年加州圣巴巴拉 Sundowner 强风）进行了地面气象站（SWEX/MADIS）强风实测检验。\n- **必须修改**：在 [lead_source_check_20261014.md]([local path omitted] 与 [Complex_Terrain_Wind_Warning.md]([local path omitted] 中补入，并将“未找到完整先例”严格收窄为：“**AI 全球预报直接驱动微尺度非动力/快速降尺度（诊断模型 WindNinja 或 CFD 代理模型如 FuXi-CFD，30–500 m）→ 独立站点强风检验**尚未见完整先例（动力 WRF 降尺度已有 Brewer et al. 2025）”。\n\n### 3. [事实错误 / 关键漏项] KiloGen 官方代码已公开；漏掉阿尔卑斯山复杂地形深度学习微尺度降尺度开源基线 DEVINE（Le Toumelin et al. 2023, 2024）\n- **依据位置**：\n - [lead_source_check_20261014.md]([local path omitted] 7、27 行：“KiloGen GitHub 搜索无结果”）。\n - [Complex_Terrain_Wind_Warning.md]([local path omitted] 24–27 行：KiloGen 与 Wind-Topo 均标为“未找到代码”）。\n - [report.md]([local path omitted] 64 行提及 DEVINE 但未入库核查）。\n- **核实证据**：\n 1. **KiloGen 代码**：本机交接单 [HO-20260728-001_KiloGen_Terrain_Wind_Forecasting_Zotero_Handoff.md]([local path omitted] 第 25 行已记录，经实时核验该仓库处于 Public 状态（MIT License，含 、 等完整实现，仅无权重与训练数据）。\n 2. **DEVINE 及其后续工作**：**Le Toumelin et al. (2023)**, *Artificial Intelligence for the Earth Systems*, 2, e220034, **DOI: **（FuXi-CFD 论文参考文献 [34]）以及 **Le Toumelin, Gouttevin, Galiez, and Helbig (2024)**, *\"A two-fold deep-learning strategy to correct and downscale winds over mountains\"*, *Nonlinear Processes in Geophysics*, 31, 75–98, **DOI: **（使用 ARPS 30 m 微尺度模拟训练 CNN，将 NWP 风场降尺度至法国/瑞士阿尔卑斯山 30 m 地形，并在 61 个高山站含暴露山脊检验了强风加速与偏差），且开源了代码。\n- **必须修改**：在项目页先例表中更正 KiloGen 代码状态（有代码、无公开权重），并补入 Le Toumelin et al. (2023, 2024) 的 DEVINE 系列工作。\n\n### 4. [实验设计漏洞] FuXi-CFD 官方模型输入为 **100 m 风**（而非 10 m 风），与 AIWP 中 GraphCast/Pangu 仅有 10 m 风及地面站 10 m 观测存在高度错位\n- **依据位置**：\n - [Complex_Terrain_Wind_Warning.md]([local path omitted] 27 行：“输入 1 km 粗网格 10 m 风…输出 30 m × 27 层（5–300 m）三维风场”）、第 39–40 行。\n - [任务书_E最小示范_瑞士冷季_20261014.md]([local path omitted] 10–12 行）。\n - [run_forecasts.py]([local path omitted] 27 行：`names=['u10','v10']+(['u100','v100'] if source.startswith('FOUR') else [])`）。\n- **核实证据**：\n - 虽然 `arXiv:2505.12732v1` 早期稿写的是 10 m 风输入，但正式发表的 *Nature Communications* (2026)（`#Sec10` 方法节与 Fig. 8）以及官方发布的 ONNX 权重（ 第 43–49 行； 第 133–138 行）要求的输入张量明确为 **`u_100m, v_100m`（100 m 高度水平风，`[B, 1, 9, 9]`，1 km 分辨率）**，输出为 27 个固定高度层（`5, 10, 15, ..., 100, ..., 214.29 m`，见 第 99–100 行）。\n - 而在 NOAA AIWP 归档中（见 [run_forecasts.py]([local path omitted] `FOUR_v200_GFS`（及 `GFS`）提供，**`GRAP_v100_GFS` 和 `PANG_v100_GFS` 只有 而无 100 m 风**！若直接把 GraphCast/Pangu 的 10 m 风喂给 FuXi-CFD 的 输入通道，会导致物理高度错配与系统性低估；同时若不规定从 FuXi-CFD 27 层输出中固定抽取第 2 层（`10 m AGL`，对应 `index=1`）与 SwissMetNet 10 m 测风杆对比，评估结果将完全失真。\n- **必须修改**：在实验方案中明确：(a) FuXi-CFD 输入层如何匹配（对有 `100 m` 风的 `FOUR_v200_GFSGFS` 直接用，对仅提供 `10 m` 风的 `GRAPPANG` 需说明是否用标准幂律/粗糙度对数律外推至 100 m 或仅在有 100 m 风的源上运行）；(b) 明确从 0.25° 粗网格插值生成站点周围 $9\\times 9$（1 km 间距）输入补丁的方式，以及固定取 FuXi-CFD 输出的 **10 m AGL 层（index=1）** 与站点 10 m 观测比较。\n\n### 5. [实验设计漏洞] 复用 [run_forecasts.py]([local path omitted] 的约束自相矛盾：该脚本不支持跨年冷季，且只输出单点插值序列、不保存降尺度所需的二维网格场\n- **依据位置**：\n - [Complex_Terrain_Wind_Warning.md]([local path omitted] 39 行：“复用 切瑞士窗口；只存所选站点的小时/10 分钟序列”）。\n - [任务书_E最小示范_瑞士冷季_20261014.md]([local path omitted] 10–11 行：“只把写死的 OKC 窗口改成参数，不重写；… 用 WindNinja CLI 以‘直接读 NWP 网格’或‘以 AI 预报区域平均风初始化’方式降尺度”）。\n - [run_forecasts.py]([local path omitted] 31–38 行、第 88–95 行）。\n- **核实证据**：\n 1. [run_forecasts.py]([local path omitted] 第 88 行与第 93 行将 `--year` 写死为单一年份整数（`inits=pd.date_range(f'{a.year}-01-01',f'{a.year+1}-01-01',freq='12h',inclusive='left',tz='UTC')`），无法通过仅改经纬度窗口参数跑出跨年冷季（`2023-10-01` 至 `2024-03-31`），除非分 2023、2024 两年跑或修改起止日期参数。\n 2. [run_forecasts.py]([local path omitted] 第 35–45 行在读取 H5/Grib 后立即通过双线性权重 `w00..w11` 坍缩为站点单点标量（`fc_u, fc_v`），并未落盘任何二维/三维周边网格点。若“只存所选站点序列”，则 FuXi-CFD 所需的站点周围 $9\\times 9$（1 km）风场网格及 WindNinja 的“直接读 NWP 网格”均无输入可用。\n- **必须修改**：修订任务书第 10 行，允许导出站点周边小窗口网格（或分两段日期提取），而非仅保存双线性单点序列。\n\n### 6. [方法物理漏洞] WindNinja 初始化方式与 0.25° 模式地形平滑存在严重高程错配\n- **依据位置**：\n - [任务书_E最小示范_瑞士冷季_20261014.md]([local path omitted] 11 行：“以‘直接读 NWP 网格’或‘以 AI 预报区域平均风初始化’方式降尺度到 ~100–200 m”）。\n - [Complex_Terrain_Wind_Warning.md]([local path omitted] 40 行）。\n- **核实证据**：\n 1. **不能用整个瑞士窗口的区域平均风初始化**：3–6 个站点分散在瑞士不同高山/山口/河谷，若对整个瑞士窗口取区域平均风输入 `domainAverageInitialization`，会抹平跨阿尔卑斯山的大尺度气压梯度与焚风锋面差异。必须**按每个站点独立切局部小计算域（如以各站为中心的 $9\\text{ km}\\times 9\\text{ km}$ 或 $15\\text{ km}\\times 15\\text{ km}$ 域，与 FuXi-CFD 的 $9\\text{ km}\\times 9\\text{ km}$ 域严格对齐）**，并用该站所在位置的插值风速/风向初始化。\n 2. **粗网格模式地形（0.25°）与真实高山站（2000–3500 m）的高程差失真**：0.25° 全球模式（GFS/ERA5/AIWP）在阿尔卑斯山的平滑地形高度通常比真实山脊/山峰（如 Jungfraujoch 3580 m、Säntis 2502 m、Gütsch 2287 m）低 **500–1500 m**。粗网格的 `10 m`（或 `100 m`）风实际上位于平滑…\n\n### 审稿人 A · GPT-6\n## 结论（有保留地支持）\n\n**支持继续探索，但不支持用当前“冻结方案”直接裁决项目价值。** 文献检索漏掉了直接相关先例，FuXi-CFD 的版本信息需要更新；示范中的输入规格、时间配对和最终判胜规则尚未闭合。以下意见不涉及新增实验。\n\n## 必须改（MUST-FIX）\n\n1. **“最接近的是 KiloGen 与 FuXi-CFD”遗漏了更直接的先例。** \n 位置：[项目页第31行](\n\n - **Wu 等，ACDF，2026，arXiv:2603.12828**：明确使用 Pangu 预报、地形降尺度至500米，并报告台风站点风速检验及输电线路风险。正文§3.2、表4、§5.1显示包含站点监督与留一台风检验。因此，这是必须纳入的直接先例；但**留一台风不等于留一站点**，我未找到足以确认其空间独立站点留出的证据。摘要称涉及11次台风，正文主要独立测试表列5次，不能简单转述为“11次独立测试”。[论文记录]([external URL omitted]，§3.2、表4、§5.1]([external URL omitted]\n - **Brewer、Fovell、Capps，2025**已有正式 DOI：10.1175/WAF-D-24-0097.1。其 GraphCast→WRF 链确实检验了 Marshall Fire 下坡强风；§6、图12—15采用区域最大持续风及观测阈值评分，不能冒充逐站独立误差检验，也不能仅因采用动力降尺度就从当前宽泛定义中排除。[正式论文]([external URL omitted]\n\n **“严格满足空间独立站点条件的完整先例”仍是证据不足；“仅有两个最接近先例”的判断需要更新。**\n\n2. **FuXi-CFD 把旧预印本规格、正式版及第三方权重混在了一起，直接影响比较有效性。** \n 位置：[项目页第27行、第39—40行、第49行](\n\n arXiv v1 的10米输入、仅对CFD验证，核对正确；但2026正式版 Methods 与图8明确写**100米输入、27层至214米**，图5已有 OPE、Torfhaus、Ispra 三站实测验证，并在 Code availability 给出官方 Zenodo 出处。正式版图3图注仍残留10米字样，更说明不能只凭标题或图注决定权重输入。[正式版 Methods、图5、图8及代码声明]([external URL omitted]\n\n 被复用的[取数脚本第27行、第41行]( FOUR 提取100米风，另两源输出该高度为空。**现方案没有定义它们如何进入100米版模型，也未定义0.25°风到1公里输入网格及粗糙度的处理。** 在权重版本和这些接口明确之前，三源之间的公平比较没有成立；把10米风直接当100米风使用则是变量错配。正式版实测结果本身也不能证明已经完成真实AI预报驱动的检验。\n\n3. **WindNinja 区域平均初始化是合法模式，但不能据此把结果完全归因于地形降尺度。** \n 位置：[项目页第40行、第51行](\n\n 官方文档区分：质量守恒求解器的天气模式初始化保留网格空间信息；质量与动量求解器采用区域平均入流。当前选择的是“质量守恒＋区域平均”，与直接双线性基线之间同时改变了**空间信息与地形处理**。这不是禁止的用法，但不能把其输赢表述为 WindNinja 标准网格降尺度的普遍输赢。区域范围、平均的是风矢量还是风速、输入及输出高度、植被/粗糙度和热力选项均未冻结。[官方FAQ第18项]([external URL omitted]]([external URL omitted]\n\n4. **主判据仍允许多种互不等价的判胜方式，不是可唯一执行的冻结判据。** \n 位置：[项目页第39—42行、第53行](\n\n 尚未说明：三个AI源和两个提前量分别判还是汇总判；“方法(1)或(2)”是否要求同一个方法跨站满足全部条件；“不输MOS”按逐站、站点中位数还是总体MAE判断；缺测及失败运行是否采用共同样本。每站“线性MOS”也未定义拟合风速还是分量、是否按源和提前量分别拟合。这些选择足以改变最终结论，不能留到查看结果之后解释。\n\n **15%和2/3可以作为内部决策门槛，但其科学最优性、统计显著性或普适合理性均证据不足。** 文件已标注“假设”，这一限定必须保留。\n\n5. **预报与10分钟观测的时间配对口径缺失。** \n 位置：[项目页第37—42行](\n\n 00/12 UTC起报、固定24/48小时提前量，直接对应的有效时刻仍只有00/12 UTC。它不是全天所有10分钟时次的检验。方案没有定义使用哪个10分钟窗口，还是进行时间聚合或插值；不同提前量也会覆盖相同有效时刻，不能当成独立强风事件。官方资料明确提供10分钟参数及UTC时间信息，但文件未完成两者的配对定义。[MeteoSwiss 数据结构与元数据说明]([external URL omitted]\n\n6. **尾部MAE通过，不能直接解释为强风预警有效。** \n 位置：[项目页第13行、第41—43行、第52行](\n\n 主评分只在“观测超过P95”的时次计算，**不惩罚其余时次的强风误报**；命中、误报又不参与判定。因此该规则允许预警误报恶化而仍然通过。各站P95表示相对偏大的风，并不自动等于工程危险强风；文件没有给出对应绝对风速或设施阈值。\n\n 此外，“冷季P95”按字面包含检验期观测，P99的估计期则未定义。这可作为事后分层，但不能称为提前可用的预警阈值；也不能仅凭此认定模型训练泄漏。当前示范最多支持**所选站点、时段及有效时刻的平均风误差结论**，不能外推成桥址、输电线阵风预警结论。\n\n7. **研究空白存在过度概括。** \n 位置：[项目页第24行、第28行、第32—34行](\n\n “强风尾部是共同短板”不能由特定 Santa Ana 个例研究推广到全部方法；同页KiloGen已列出强风增益。“所有方法族输出平均风”又与同页LES的瞬态能力相冲突。“多数论文……很少与单站MOS比”没有逐篇比较清单或统计范围，**证据不足**。\n\n 漏掉的2024年 *A two-fold deep-learning strategy to correct and downscale winds over mountains* 已明确讨论统计订正与纯物理降尺度比较的不对称，并研究组合订正与地形降尺度；它不是AI全球预报先例，但与“公平基线是空白”的论证直接有关。[论文引言及§3—4]([external URL omitted]\n\n## 仅供参考（NOTE）\n\n1. **不能从“MeteoSwiss站可能被COSMO/ICON同化”直接推断本示范泄漏。** \n 位置：[项目页第31行、第37—40行](\n\n MeteoSwiss官方确认其资料同化使用地面站等观测，但当前方案输入是AIWP及GFS，没有COSMO/ICON输入链。更相关的是实际预报初始化及训练资料，以及是否使用预报有效时刻之后的信息。MOS使用同站早期观测，检验的是时间外推，并非未见站点泛化。具体站点、变量、日期是否被同化，**证据不足**。[官方资料同化说明]([external URL omitted]\n\n2. **Wind-Topo“未找到代码”已有可核实的补充。** \n 位置：[项目页第25行](\n\n 作者的 EnviDat 记录列出代码、安装说明、技术文档和示例，DOI为10.16904/envidat.301；因此GitHub搜索无结果不能作为代码不可获得的依据。[作者代码归档]([external URL omitted]\n\n3. **“只把OKC窗口改成参数”低估了现有脚本与所需输入之间的差距。** \n 位置：[项目页第39行](\n\n 当前脚本保存的是站点插值序列，没有保存FuXi-CFD需要的邻域风网格或WindNinja区域输入。仅修改窗口不足以提供这些输入。这是静态代码核对结果，没有运行脚本。\n\n## 我核对过的\n\n- 完整读取了[原始快查报告，第1—98行](\n- [核对记录第7行](\n- [核对记录第10行](\n- [核对记录第17行](\n- FuXi-CFD v1全文、正式版可检索正文段落，Brewer论文相关章节、ACDF v1全文相关章节，以及上述官方软件文档均已交叉核对。没有修改文件、运行模型或新增计算。\n\n## 我没能核对的\n\n- [项目页第37行](\n- [项目页第39—40行、第49行](\n- [核对记录第18行](\n- [项目页第31行、第34行](\n\n## 结论\n\n**有保留地支持继续探索；不支持按现有冻结文本直接判“值得继续／搁置”。** 必须先更正文献遗漏与FuXi-CFD版本信息，明确输入、时间配对和判胜口径。现有证据不足以宣称完整链条无先例，也不足以把平均风尾部MAE达标解释为工程强风预警有效。\n\n### 审稿人 D · GLM\n我已读取三份证据文件。现在独立核对关键文献（KiloGen、FuXi-CFD 两个版本、KiloDA）并自行搜索可能的遗漏先例。\n\nFuXi-CFD 的 Nat Commun 版和一篇 ACDF 论文是关键新证据。再核一轮 ACDF 原文与其它可能的遗漏先例。\n\n## 结论\n有保留地支持。三条文献判断中大方向(强风尾部短板、阵风缺口、MOS 公平基线稀缺)经我独立检索仍成立，“值得继续 + 小示范”的决策可维持；但空白判断 #1 漏掉了一个 2026 年 3 月的直接先例(ACDF),且 FuXi-CFD 的期刊版证据已推翻项目页里“实测高塔验证未核”的现状；冻结判据有三处可判定性漏洞。这些不改，“未找到完整先例”这句话本身会成为被反驳点。\n\n## 必须改（MUST-FIX）\n- **空白判断 #1 漏掉 ACDF,直接反例** — 依据：arXiv 2603.12828(2026-03-13 提交，我已打开摘要)：\"transforms coarse AI weather prediction (AIWP) into 500-m, unbiased wind fields and transmission tower/line failure probabilities for tropical cyclones… reduces station-scale wind-speed MAE by 38.8% versus Pangu-Weather… leave-one-storm-out evaluation… reproduced observed high-wind tails… flagged the line that failed\"。这就是“AI 全球预报(Pangu)→ 地形感知降尺度 → 站点强风检验 → 输电线预警”的近完整链路，而且场景恰是本节点的“输电线”。项目页 写“未找到完整先例，最接近的 KiloGen 与 FuXi-CFD”,Grok 报告(第 30–37 行)与 Lead 核对记录(全文 12 条)均未收录 — 若不改的后果：novelty 叙述错误，外部一句引用即可推翻；缓解口径存在但必须写出来(ACDF 是台风风、站点观测用作训练 supervisory labels 而非完全独立检验、不涉冷季温带地形风)，空白须收窄为“非台风/冷季复杂地形 + 站点独立于训练 + 预注册 MOS 基线”这一更窄口径。\n- **FuXi-CFD 证据已过时，项目页陈述失实** — 依据：Nat. Commun. 17:3733–3713 (2026), [external URL omitted] OA,Lead 记录“付费墙跳转未能打开”不成立)：摘要明言 \"generalizes well to real-world conditions, as demonstrated by consistent performance against independent wind-tower observations\",Fig. 5 标题即 \"Validation of FuXi-CFD against tall-tower observations over complex terrain\"。且期刊版 Methods(Fig. 8 说明)写输入为 \"coarse 100 m winds (9 × 9 grid)\",与 arXiv v1 的 10 m AGL 冲突。项目页 `Complex_Terrain_Wind_Warning.md:27`(“arXiv v1 只对 CFD 真值……实测高塔验证未核”)和参数表 `:49` 须更新 — 若不改的后果：方法表与“最接近先例”论证建立在不完整信息上；10 m vs 100 m 的输入规格分歧现在有两处独立来源(第三方仓库 + 期刊正文)，示范中 (2) 分支的可用性判断必须重做。\n- **冻结判据的可判定性漏洞(三处，均在跑前可修)** — 依据:`Complex_Terrain_Wind_Warning.md:41:51` 参数表白纸黑字承认 WindNinja 初始化“**假设**(最简用法)”，且域尺寸/网格分辨率完全未出现——对 0.25° 输入取多大区域做“区域平均”直接改变 WindNinja 结果，可让 15% 门槛来回移动。技能先例：命名多个对象却不钉死适用哪一个的“预注册”不构成预注册 — 若不改的后果：结果出来后仍有解释自由度，“判据预先写定、跑之前不改”的声明形同虚设，示范结论可被质疑为可操纵。\n\n## 仅供参考（NOTE）\n- DEVINE 方法族整体漏收 — 依据：Grok 报告 `:64` 只有一句\"HuggingFace 有 Wind-Topo/DEVINE 权重”,项目页方法表(行 22–28)无 DEVINE 行。Le Toumelin et al. 2023 (AIES, DOI:10.1175/AIES-D-22-0034.1,AROME→30 m,阿尔卑斯 61 站验证)与 2024 NPG \"two-fold deep-learning strategy\"(AROME 校正+DEVINE,冬季/高海拔站改进最大，含高风速段改进)：这是与本示范同地域(阿尔卑斯)、同输出(30 m)、同验证方式(独立站)的最接近已发表方法，即使不作为参赛方法也应入表，否则“方法族覆盖”不完整。\n- 项目页 `:39` 称三个 AIWP 源均“含 100 m u/v\" — 据各模型原始论文，GraphCast 与 Pangu 的输出变量表没有 100 m 风(10 m u/v + 气压层风)，100 m u/v 是 FourCastNet v2 特有输出。我未核 A1 脚本本体，列证据不足；但若 FuXi-CFD 官方输入是 100 m(见上)，则 GraphCast/Pango 无法直接喂该分支，任务书须按源×高度写明匹配矩阵。\n- MOS 基线强度未写定 — 依据:`:40` “每站线性 MOS\"未说明是否分风向拟合。复杂地形站的风速误差强依赖风向，不分风向的单变量线性 MOS 是弱基线，“不输 MOS”的含金量随之为下限。\n- 站点独立性的真实来源应写明 — SwissMetNet 多数站经 GTS/SYNOP 进入 ERA5(即三个 AIWP 的训练数据)，被 COSMO 同化与否其实与本示范无关(对照是 GFS+AIWP,不是 COSMO);独立性实际来自“检验期(2023-10 起)晚于各模型训练截止”。这一论证应入设计依据，且各源训练截止日期须核实(我未核，见下)。\n- KiloGen 的“强风 RMSE 降约 10%”是对 0.25° ECMWF 业务预报的相对降幅，与判据“相对双线性插值降 ≥15%”口径不同，不可直接类比为门槛依据;`:53` 已如实标注“假设”，保持即可。\n\n## 我核对过的\n- 全文 → 与项目页表格一致；其行 32–37 的“未找到完整先例”结论同样漏 ACDF。\n- 全文 → 12 条核对的真实性与标注(✔/未核)与我所核一致；#2 的“Nat. Commun. 未能源打开”被我的免费读取推翻。\n- 全文 → 判据、参数表、假设标注如上引。\n- arXiv 2607.21460 摘要 → KiloGen 表述(25 km ECMWF 业务预报、>20 m/s RMSE 约 −10%、13 事件全胜 0.25°)逐句一致；作者 Cai 等，Lead 对知识卡署名的更正正确。\n- arXiv 2505.12732v1 摘要 → 10 m AGL 输入、CFD 真值、无实测，与 Lead 判断一致。\n- Nat. Commun. s41467-026-70562-5(全文网页)→ 独立高塔观测验证存在(Fig. 5);Methods 输入写 100 m 风。\n- arXiv 2609.11230(KiloDA)摘要 → 观测驱动重建、非预报输入，项目页只作线索的处理正确。\n- arXiv 2603.12828(ACDF)摘要 → 新发现先例，见 MUST-FIX 第 1 条。\n- arXiv 2609.10564(北挪威 FCN3/GraphCast/HRES 站点评估)→ AIWP 复杂地形强风普遍低估，可作次要指标背景(NOTE 未列，因不影响判断)。\n\n## 我没能核对的\n- ACDF、FuXi-CFD 期刊版、KiloGen 的正文细节(只读了摘要/网页可见部分；塔验证所用驱动场是否为 AI 预报未核)。\n- 各 AIWP 模型(GraphCast/Pangu/FCN v2)的训练截止日期与逐站输出变量表 — A1 脚本 未读，\"三源含 100 m u/v\"是否属实证据不足。\n- SwissMetNet 逐站是否进入 GTS/ERA5 同化、各站传感器高度与遮挡 — 站表尚未冻结，属执行期事项。\n- WindNinja 域内平均初始化对结果的实际影响 — 按审查规则不重跑、不新增计算。\n- MeteoSwiss 站是否被 COSMO/ICON 同化 — 审查问题所问，但与本示范对照链(GFS/AIWP)无关，未进一步检索。\n\n## 结论\n有保留地支持：三条文献判断方向成立、“值得继续 + 小示范”决策可维持；但必须先改三处——空白判断补 ACDF 并收窄口径、FuXi-CFD 按期刊版更新(塔验证存在、输入 100 m/10 m 冲突)、判据补钉死“不输 MOS”的定义/主方法归属/WindNinja 配置——之后冻结的示范才具备预注册效力。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 15:42",
+      "text": "Now revise the project page (table + frozen criteria v2) and task brief.审查 已经裁决：3 位审稿人都有保留地支持，\"值得继续、做小示范\"不变。但我原先说的\"AI 预报驱动地形降尺度没有完整先例\"不对，已经撤回，空白收窄了，示范的判据也重写成了 v2。下面是我逐条亲自核过的内容。\n\n**我之前写错、现在改正的四处**\n- **已有两个先例**：\n - **ACDF**（Wu 等 2026，arXiv 2603.12828）：用 AI 全球预报做订正和地形降尺度，到 500 m 分辨率。浙江 11 次台风，每次留出一场检验，站点风速误差比 Pangu 降 38.8%；在 Hagupit 台风上，它标出了一条后来真的失效的输电线。\n - **Brewer 等 2025**（WAF 40:187–206）：用 GraphCast 驱动 WRF，做下坡风暴的降尺度。\n- **FuXi-CFD**：\n - 我直接抓取了期刊网页核对，正式发表版已经在欧洲高塔上做过实测检验，但驱动用的是 ERA5 再分析，不是 AI 预报。\n - 输入是 100 m 风，不是我之前写的 10 m。\n - 论文指定的官方权重在 Zenodo（作者的 HF 仓库是同一份），许可 CC BY-NC。所以方法 (2) 可以用官方权重跑，第三方转载版照旧不用。\n- **KiloGen** 其实有官方代码，MIT 许可，只是没公开权重。\n- **补进阿尔卑斯的 DEVINE**（Le Toumelin 2023、2024）：和我们同一个地区，而且是把统计订正和地形降尺度组合起来用，是离我们示范最近的工作。\n\n**收窄后的空白**：还没人做过这样的组合——冷季、非台风的复杂地形，用快速降尺度（质量守恒或 CFD 代理），检验期不和模型训练重叠，并且和单站统计订正比。\n\n**示范判据 v2**（已重新冻结）\n- **只判一种组合**：WindNinja 降尺度，配 FourCastNet、提前 24 小时。其余组合只报不判，避免多个方法里事后挑最好的。\n- **三条全满足才算值得继续**：\n 1. 强风时次误差比直接插值降 15% 以上，且在至少 2/3 的站上胜出\n 2. 在单站统计订正的基础上再加地形降尺度，误差还要更低。只有这样，才说明地形降尺度带来了统计订正给不了的东西\n 3. 全部时次的误差不能比直接插值差。\n- **细节也钉死了**：\n - 预报和观测怎么按时间配对\n - 强风阈值改成只用训练期的数据定\n - WindNinja 的计算域和初始化方式\n - FuXi-CFD 只接有 100 m 风的预报源，GraphCast 和 Pangu 只有 10 m 风，不做外推。\n- **结论范围**：只说明所选站点的平均风误差，不代表阵风或工程预警有效。\n\n**Decision I made**：ideas 已经在按旧版任务书跑，这时撤不了。我另发了 v2 修订，它会在这一轮结束后马上送到：已经冻结的站表和取好的数据照用，判据和降尺度一律按 v2 重算，追加花费不超过 5 计算单元。为什么：取数这部分在两版里一样，可以复用，只重算判据和降尺度最省。错了的代价：旧版算的那部分白花，最多约 5 计算单元。\n\n**Deep Research 未做**：本月额度用完，额度恢复后补跑。现在没有需要你定的事。已上报 A 节点。\n\n\n\n\nSources:\n- [ACDF, arXiv 2603.12828]([external URL omitted]\n- [Brewer et al. 2025, WAF]([external URL omitted]\n- [FuXi-CFD, Nat. Commun. 2026]([external URL omitted]\n- [FuXi-CFD 官方权重 Zenodo]([external URL omitted]\n- [Le Toumelin et al. 2024, NPG]([external URL omitted]\n- [KiloGen 代码]([external URL omitted]\n\n（附件：E_审查bfed753a_裁决_20261014.md）\n\n（附件：Complex_Terrain_Wind_Warning.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 17:11",
+      "text": "【委托结果 · 实验室助手】E 最小示范：瑞士冷季 AI 预报→地形降尺度 vs SwissMetNet 实测\nWindNinja 不过冻结判据：相对直接插值，逐站强风 MAE 降幅中位数为 −2.87%，仅 4/12 站胜出，且 0/12 站不差于 MOS。FuXi-CFD 的作者官方权重已找到并通过官方样例推理，但尚未完成瑞士站检验；因此“WindNinja 或 FuXi-CFD 任一通过”的整体判据仍未判定，不能报总体不过。下一步应先解决 FuXi-CFD 所需的 100 m、9×9、1 km 输入与四套预报源的可比性，再决定是否补跑该方法。\n\n（附件：e_terrain_deliverables.zip）\n\n（附件：results.md）\n\n（附件：stations_frozen.csv）\n\n（附件：metrics.json）\n\n（附件：strong_mae_by_terrain.png）\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 17:11",
+      "text": "瑞士示范的旧版结果回来了：WindNinja 没过，但这一版不算裁决，以正在跑的 v2 为准。我看过原始结果文件，数字和回报一致。观测单位已确认是 m/s，取自官方参数表，不是 km/h。\n\n**旧版结果**\n- 12 个站，覆盖山脊、山口、谷底、高原各 3 个，站表在算误差之前就定死了。\n- **WindNinja 几乎没起作用**：强风时次误差比直接插值还略差 2.9%，只在 4/12 站更好；12 站里没有一站能比得上单站统计订正。\n- **最突出的现象**：四个预报源（FourCastNet、GraphCast、Pangu、GFS）在山脊站的强风时次都系统性偏低 13–15 m/s。0.25° 的网格看不见山脊。单站订正能把误差减掉约一半，WindNinja 只能修掉 0.5 m/s 左右。\n- **FuXi-CFD**：官方权重已从论文指定的 Zenodo 取到，校验码也记下了，官方样例能跑通。但它要 100 m 风、1 km 间距的输入，怎么从 0.25° 预报构造这一步还没定，所以没在瑞士站上跑。\n- **花费**：约 0.12 计算单元，Colab 会话已关。\n\n**为什么不拿这版下结论**：旧版有几处正是审查要求改的：\n- WindNinja 的计算域只有约 3 km，太小，地形加速效应出不来\n- 强风阈值用了包含检验期的数据\n- WindNinja 只在强风时次跑，没法算全时次误差，也就没法查误报\n- \"不输单站订正\"这一条定义不清。\n\nv217:15 前后已经开始跑：计算域约 10 km，阈值只用训练期数据，加了全时次护栏，还判\"地形降尺度在单站订正之外有没有增量\"。最终是值得继续还是搁置，按 v2 的冻结判据定。\n\n**预判**：照旧版的量级，v2 大概率也不过，因为地形降尺度的作用远小于单站订正。真到那一步，比较有价值的结论会是：0.25° AI 预报在山脊站强风时偏低十几 m/s，单站统计订正比物理降尺度有效得多。\n\n这一轮没有新的决定，项目页和线况总表已更新。v2 跑完会自动叫醒我。\n\n\n\n\n（附件：results.md）\n\n（附件：strong_mae_by_terrain.png）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 18:25",
+      "text": "【委托 · 来自 实验室 Lead】Colab 口径更正：不设单试验上限，>100 CU 先报\n告知（母项目 10-14 18:3x，对齐 Liang Hu\"现阶段多用 Colab、不限 CU\"），不用回复：(1) Colab 不设单试验上限，原\"≤20 CU\"\"≤10 CU\"作废，请改你项目页的边界和在跑任务书的说法；(2) 单试验预计超过 100 CU 先停下报 A 节点（--report），由上级定是否放行；(3) 用完必须 colab stop，不让会话空转；同一轮只派一个执行方。已在按 ≤20 CU 分段的试验可以合并，但不要为此重开会话或重提已跑的部分。超算单作业 ≤50 SU 不变。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 18:25",
+      "text": "E 节点已经按新口径改好：Colab 不设单试验上限，预计超过 100 CU 的先报 A 节点；用完必须 colab stop；同一轮只派一个执行方。\n\n- **项目页**：边界一节和示范预算一行都已改过，原来的\"≤20 CU\"\"≤10 CU\"标为作废。\n- **任务书**：旧版和 v2 修订两份末尾都加了\"口径更正\"一节。\n- **在跑的 v2**：没有另发消息。它已经在执行，补充消息要等这一轮结束才能送到，起不了作用。而且它只用一个 CPU 会话，每小时约 0.1 CU，原来的追加不超过 5 CU 本来也碰不到，不影响它的进度。没有重开会话，也没有重提已跑的部分。\n- 超算单作业不超过 50 SU 不变；E 节点目前也没有超算作业。\n\n## 结论\nE 节点已按新口径执行：Colab 不设单试验上限，预计超过 100 CU 先报 A 节点；用完必须 colab stop，同一轮只派一个执行方。项目页 和两份任务书都已改。在跑的 v2 示范只用一个 CPU 会话，花费远低于 100 CU，照常跑，不重开、不重提。"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-14 21:01",
+      "text": "【委托结果 · 实验室助手】E 最小示范 v2 修订（审查 后，以此为准）\n不过。所选瑞士站点、所选有效时刻的强风平均风速合并 MAE，双线性为 6.38 m/s，WindNinja 为 6.70 m/s，未达到降误差 ≥15% 的判据；仅 3/12 站改善。WindNinja+MOS 为 3.50 m/s，也高于双线性+MOS 的 3.25 m/s；全时次 WindNinja 为 3.09 m/s，高于双线性的 3.04 m/s。四条主判检查均未满足。这个结论不代表阵风或工程预警效能。\n\n本轮 CPU Colab 会话已停止，并核实活动会话列表中不再有本会话；新增用量估计约 0.30 CU，非逐会话精确账单。下一步若继续，应先核实逐站测风高度与地表覆盖；FuXi-CFD 则需先解决指定官方记录不直接提供权重的问题。\n\n（附件：results_v2.md）\n\n（附件：metrics_v2.json）\n\n（附件：strong_mae_by_terrain_v2.png）\n\n（附件：e_terrain_v2_deliverables.zip）\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-14 21:01",
+      "text": "E 节点的瑞士示范按冻结的 v2 判据没有过，四条全部不满足，所以 E 节点改为搁置。我核过结果文件里的数字，跑法和 v2 规定一致：每站约 10 km 的计算域，阈值只用训练期，强风时次 207 条，WindNinja 跑了 4295 次，全部成功。\n\n**结果**（12 个瑞士站，FourCastNet 提前 24 小时，用 2024 年 1–3 月检验）\n\n| 强风时次误差（m/s） | 直接插值 | WindNinja |\n| --- | --- | --- |\n| 不订正 | 6.38 | 6.70 |\n| 加单站统计订正 | 3.25 | 3.50 |\n| 全部时次（护栏） | 3.04 | 3.09 |\n\n- WindNinja 反而略差：误差升了 5.1%，判据要求降 15%；只在 3/12 站更好，判据要求至少 8 站。加了统计订正以后，它也没带来额外的改进。\n- **真正的问题在预报本身**：0.25° 的 AI 预报在强风时平均偏低约 6.4 m/s，山脊站最严重。这些山脊站比模式里的地形高出 500–830 m，而谷底站又比模式地形低 570–1080 m。\n- **单站统计订正**把强风误差减了一半，WindNinja 几乎不改变结果。旧版用 3 km 计算域，v2 用 10 km，结论一样。\n- **花费**：两轮合计约 0.42 计算单元，Colab 会话已关。\n- **适用范围**：结论只针对这些站在 00/12 时刻的平均风，不涉及阵风，也不说明工程预警有没有用。\n\n**Decision I made**：E 节点改为搁置，搁置原因和重启条件写进了项目页和决策记录。为什么：跑之前定好的判据清楚地没过；能带来改进的是单站订正，不是物理降尺度。这是实验室正常的搁置，随时可以重启，不是放弃复杂地形预警这个方向，所以没有另送 6 人。错了的代价：如果学习型降尺度其实有效，我们会晚一点才发现；重启时站表、观测数据和脚本都能直接复用，加测一种方法约 1 计算单元以内。\n\n**什么情况下重启**\n- 试学习型降尺度：FuXi-CFD 的官方权重已经拿到、核过校验码，另一种是阿尔卑斯的 DEVINE。要先写好输入怎么构造并预先登记，判据仍要求在单站订正之外还有改进。\n- 有了桥址或输电线的实测数据，改做\"单站订正 + 阵风\"的预警示范。\n- 数字孪生风洞的地形 LBM，要等学习型降尺度先证明有用之后再接。\n- Deep Research 额度恢复后补跑文献。本节点的 Deep Research 一直没做。\n\n**给 F 节点的提示**：用 AI 预报做风敏感作业预警之前，必须先做单站订正，否则在山区强风时会系统性低报。已上报 A 节点。\n\n\n\n\n\n\n（附件：results_v2.md）\n\n（附件：strong_mae_by_terrain_v2.png）\n\n（附件：E_示范v2不过_搁置_20261014.md）\n\n（附件：Complex_Terrain_Wind_Warning.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-21 08:47",
+      "text": "【委托 · 来自 AI 气象】R23.2d 进展与计划报告（10-21 批复准备）\nLiang Hu 10-21 开始批复 R21–R25，平台要求每个子项目准备「进展与计划」报告，摘要放在对话最前面。；只写文档，不开任何计算，不派计算类任务。\n写入范围只有一个文件：（目录已建好），不改别的文件。\n本子项目：R23.2d，项目页。标签（总控 10-20 复查后定，沿用，不要改成「搁置」或「结题」）：暂停 · 等待六审核定停止类别（拟否定结果）。\n报告五节：①做了什么；②结果与关键数字，每个数字附证据路径，从结果文件或决策记录抄，不凭记忆；③卡点；④近 2 周与 1–3 个月计划，都写成批准后才执行；⑤要 Liang Hu 定的事，与 A108、A169–A176 重叠的注明「随 A108 一并定」。只写已核实的结论，没核的标「未核」。\n参考：； 第五节；工作目录；上级节点报告 （可对照数字，不要照抄）。旧试验记录在，只读。\n你的最终回复就是给 Liang Hu 看的 3–6 行摘要，附报告路径；回复之后不要在该对话再发别的消息。"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-21 08:47",
+      "text": "正在核对证据文件里的数字（含有没有置信区间），然后写报告。R23.2d 的报告写好了，标签照总控 10-20 定的不变：暂停 · 等待六审核定停止类别（拟否定结果）。\n- **做了什么**：10-14 做了文献检索和 3 人，又在瑞士 12 个站做了冷季示范。用 FourCastNet v2 提前 24 小时的预报，比较 WindNinja 降尺度、直接插值和单站订正。\n- **结果**：按跑前定好的判据，四条全没过。强风时的误差，插值 6.38、WindNinja 6.70 m/s；两者各加单站订正后是 3.25 对 3.50 m/s，WindNinja 没带来额外改进。共约 0.42 CU，超算 0 SU。否定的只是\"0.25° 预报 + WindNinja\"这一种做法，不推到学习型降尺度。\n- **卡点**：要标\"否定结果\"，得先过 6 人，现在还没发。另外原结果没算置信区间，样本够不够排除有用的改进，这一条还没量化（未核）。\n- **要你定的一件事**：是否放行 6 人，外加审查前在 工作站 只读复算一次站点自助法区间。0 CU、0 SU，和 A108、A169–A176 都不重叠。\n\n报告：\n\n\n\n## 结论\nR23.2d 的报告已写好，只写了这一个文件。标签不变：暂停 · 等待六审核定停止类别（拟否定结果）。瑞士 12 站冷季示范按冻结的 v2 判据四条全没过（强风 MAE：插值 6.38、WindNinja 6.70 m/s；加单站订正后 3.25 对 3.50 m/s）。否定范围只限\"0.25° 预报 + WindNinja\"这一种做法。报告里每个数字都附了证据路径（ 第 6–18 行等）。要 Liang Hu 定的只有一件：是否放行 6 人审查加一次只读的自助法复算，0 CU，不与 A108、A169–A176 重叠。\n\n（附件：00_进展与计划_20261021.md）"
+    },
+    {
+      "role": "relay",
+      "who": "AI 气象大模型 Lead · 转达",
+      "ts": "2026-10-24 21:41",
+      "text": "【委托 · 来自 AI 气象】最新报告置顶（Liang Hu 要逐条看）\nLiang Hu 10-24 指令（平台转达）：把最新报告带到对话最前面，他要逐条看。本轮只回三行：报告路径、一句话现状、待 Liang Hu 定的事（已批的不列）；不做别的工作、不开计算、不下载文献。\n报告：；现状：暂停，随 R23.2 重构并入新方案；瑞士 12 站数据已有，供 M4 使用；待定：无。\n（原因：Liang Hu 10-24 指令）"
+    },
+    {
+      "role": "lead",
+      "who": "AI 气象大模型 Lead",
+      "ts": "2026-10-24 21:41",
+      "text": "- 报告：\n- 现状：暂停，随 R23.2 重构并入新方案；瑞士 12 个站的数据已经在手，留给 M4 用。\n- 待 Liang Hu 定：无。\n\n\n\n## 结论\nR23.2d 复杂地形风预警的报告在。现状：暂停，随 R23.2 重构并入新方案，瑞士 12 个站的数据已有，留给 M4 用。待 Liang Hu 定的事：无。\n\n（附件：00_进展与计划_20261021.md）"
+    }
+  ],
+  "files": {
+    "self": "e-complex-terrain-wind-warning.json",
+    "claims": null,
+    "pdf": {
+      "zh": "../../pdf/e-complex-terrain-wind-warning.zh.pdf",
+      "en": "../../pdf/e-complex-terrain-wind-warning.en.pdf"
+    }
+  }
+}

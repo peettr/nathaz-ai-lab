@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 780" width="1360" height="780" role="img" aria-label="Platform architecture">
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L12 6 L0 12 L3 6 Z" fill="#5c6b7c"/></marker></defs>
+<style>text { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', Inter, Arial, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif; }</style>
+<rect x="0" y="0" width="1360" height="780" rx="16" fill="#f5f5f7"/>
+<path d="M590 116 C480 130 260 168 260 204" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="405" y="135" text-anchor="end" font-size="14.5" font-weight="400" fill="#4b5867" >platform problems</text>
+<path d="M690 116 C760 130 850 170 850 204" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="800" y="137" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >research questions · approvals</text>
+<path d="M260 299 L260 382" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="274" y="346" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >tickets</text>
+<path d="M720 299 L720 382" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="734" y="346" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >delegations</text>
+<path d="M1095 299 L1095 382" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-dasharray="7 6" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="1109" y="346" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >review on demand</text>
+<path d="M700 477 L700 560" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="714" y="527" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >jobs (via safety guard)</text>
+<path d="M850 477 C940 492 1090 528 1090 560" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M540 477 C495 495 400 525 400 560" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-dasharray="7 6" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="435" y="518" text-anchor="end" font-size="14.5" font-weight="400" fill="#4b5867" >search</text>
+<rect x="500" y="24" width="360" height="92" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="500" y="24" width="7" height="92" rx="3.5" fill="#ae9142"/>
+<text x="680.0" y="54" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >Liang Hu · PI</text>
+<text x="680.0" y="81" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >sets the research direction,</text>
+<text x="680.0" y="102" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >selects ideas, makes the scientific calls</text>
+<rect x="80" y="205" width="360" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="80" y="205" width="7" height="94" rx="3.5" fill="#75839a"/>
+<text x="260.0" y="235" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >Platform Lead (Claude)</text>
+<text x="260.0" y="262" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >daily health check · triage</text>
+<text x="260.0" y="283" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >opens tickets</text>
+<rect x="520" y="205" width="760" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="520" y="205" width="7" height="94" rx="3.5" fill="#1c4f8f"/>
+<text x="900.0" y="235" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >{{leads}} Project &amp; line Leads (Claude)</text>
+<text x="900.0" y="262" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >plan · delegate · read results · judge · record decisions</text>
+<text x="900.0" y="283" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Leads delegate to each other across projects</text>
+<rect x="80" y="383" width="360" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="80" y="383" width="7" height="94" rx="3.5" fill="#75839a"/>
+<text x="260.0" y="413" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >Engineering sessions</text>
+<text x="260.0" y="440" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Claude Code: code · config · deploy</text>
+<text x="260.0" y="461" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >take tickets, up to 3 in parallel</text>
+<rect x="520" y="383" width="400" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="520" y="383" width="7" height="94" rx="3.5" fill="#4c8272"/>
+<text x="720.0" y="413" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >{{workers}} Worker agents (multi-model)</text>
+<text x="720.0" y="440" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >code · simulations · literature · figures</text>
+<text x="720.0" y="461" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >one per line + shared tool agents</text>
+<rect x="950" y="383" width="330" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="950" y="383" width="7" height="94" rx="3.5" fill="#796498"/>
+<text x="1115.0" y="413" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >{{reviewers}} Independent reviewers</text>
+<text x="1115.0" y="440" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >GPT · Gemini · Grok</text>
+<text x="1115.0" y="461" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Kimi · GLM · DeepSeek · Opus (backup)</text>
+<rect x="80" y="561" width="360" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="80" y="561" width="7" height="94" rx="3.5" fill="#ae9142"/>
+<text x="260.0" y="591" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >Shared knowledge base</text>
+<text x="260.0" y="618" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >full-text library · literature wiki</text>
+<text x="260.0" y="639" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >project memory pages</text>
+<rect x="520" y="561" width="360" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="520" y="561" width="7" height="94" rx="3.5" fill="#75839a"/>
+<text x="700.0" y="591" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >HPC &amp; GPU</text>
+<text x="700.0" y="618" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Notre Dame CRC · TACC Stampede3</text>
+<text x="700.0" y="639" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Google Colab A100 / H100</text>
+<rect x="910" y="561" width="370" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="910" y="561" width="7" height="94" rx="3.5" fill="#75839a"/>
+<text x="1095.0" y="591" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >Engineering software</text>
+<text x="1095.0" y="618" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >WRF · CM1 · OpenFOAM · LBM</text>
+<text x="1095.0" y="639" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Ansys · Fluent · MATLAB</text>
+<text x="80" y="704" text-anchor="start" font-size="14" font-weight="700" fill="#0c2340" letter-spacing=".06em">ALWAYS ON</text>
+<rect x="80" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="196" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >Command safety guard</text>
+<rect x="322" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="438" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >HPC job watcher</text>
+<rect x="564" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="680" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >Idle-only restarts</text>
+<rect x="806" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="922" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >Auto-resume after interruptions</text>
+<rect x="1048" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="1164" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >Change log &amp; snapshots</text>
+</svg>

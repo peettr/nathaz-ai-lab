@@ -1,0 +1,180 @@
+{
+  "id": "04922748",
+  "slug": "04922748",
+  "number": "L31.8f",
+  "title": {
+    "zh": "L31.8f 非台风特征流动对风机的影响",
+    "en": "L31.8f Impact of Non-Typhoon Flow Features on Wind Turbines"
+  },
+  "group": "core",
+  "parent": "de5038d9",
+  "depth": 2,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-25 18:10",
+  "end": null,
+  "updated": "2026-10-26 09:19",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8f 非台风特征流动对风机荷载与控制的影响」（Gemini 联网快查）完成，用时约 5 分钟，报告约 26316 字。\n- 报告：\n- 引文核对：（报告里的 DOI 28/55 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.1016/j.jweia.2020.104142)（阅读状态：已阅摘要及主要结论）。、10.1115/1.4023096)（阅读状态：已阅摘要及核心载荷对比图表）。、10.3390/en7106527)（阅读状态：已阅摘要）。、10.1063/1.4906103、10.1063/1.4906103)（阅读状态：已阅摘要）；lu、10.3390/en12142773)（阅读状态：已阅摘要）。、10.1016/s0141-0296(99)00058-9)（阅读状态：已阅全文要点）；vicroy、10.2514/3.46282)（阅读状态：已阅摘要及模型公式）。、10.1115/1.4055076)（阅读状态：已阅摘要）。、10.1016/j.engfailanal.2025.110387)（阅读状态：已阅摘要及现场灾损分析）。、10.1016/j.engstruct.2020.111157)（阅读状态：已阅摘要及数值模型框架）。、10.1016/j.engstruct.2025.120999)（阅读状态：已阅摘要）。、10.5194/wes-8-231-2023)（阅读状态：已阅全文方法与讨论部分）。、10.1016/j.jweia.2012.03.030)（阅读状态：已阅摘要及动力响应结论）。、10.5194/wes-2-533-2017)（阅读状态：已阅全文及实测分析部分）。 等。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。",
+    "en": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8f 非台风特征流动对风机荷载与控制的影响」（Gemini 联网快查）完成，用时约 5 分钟，报告约 26316 字。\n- 报告：\n- 引文核对：（报告里的 DOI 28/55 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.1016/j.jweia.2020.104142)（阅读状态：已阅摘要及主要结论）。、10.1115/1.4023096)（阅读状态：已阅摘要及核心载荷对比图表）。、10.3390/en7106527)（阅读状态：已阅摘要）。、10.1063/1.4906103、10.1063/1.4906103)（阅读状态：已阅摘要）；lu、10.3390/en12142773)（阅读状态：已阅摘要）。、10.1016/s0141-0296(99)00058-9)（阅读状态：已阅全文要点）；vicroy、10.2514/3.46282)（阅读状态：已阅摘要及模型公式）。、10.1115/1.4055076)（阅读状态：已阅摘要）。、10.1016/j.engfailanal.2025.110387)（阅读状态：已阅摘要及现场灾损分析）。、10.1016/j.engstruct.2020.111157)（阅读状态：已阅摘要及数值模型框架）。、10.1016/j.engstruct.2025.120999)（阅读状态：已阅摘要）。、10.5194/wes-8-231-2023)（阅读状态：已阅全文方法与讨论部分）。、10.1016/j.jweia.2012.03.030)（阅读状态：已阅摘要及动力响应结论）。、10.5194/wes-2-533-2017)（阅读状态：已阅全文及实测分析部分）。 等。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 开子项目",
+      "ts": "2026-10-25 18:10",
+      "text": "【Liang Hu 让 L31.8 风机抗台风多灾害韧性与性能化设计 分出的子对话】你是 L31.8f Lead。先读共用交接 （闸门 plan_only：只做文献与方案，不算、不提交；10-29 前交 00_启动方案.md 并 --report 上级）。\nLiang Hu 问（6）：非台风条件下，各种类似特征流动对此影响如何考虑。\n本子项目要回答：雷暴/下击暴流（非平稳、低空极值廓线）、龙卷、阵风锋、低空急流、冬季风暴/温带气旋、强切变与风向突变、山地/海岸地形加速、夜间稳定层结与 Kelvin-Helmholtz 波等，对风机荷载、控制（切出与偏航）、失稳与疲劳的影响；IEC 61400-1 的 EOG/EDC/ECD/EWS 极端事件模型与实测非平稳事件的差距；与台风特征流动的异同（能否共用一套表征与检验方法）。气象文献为主、风工程为辅，记文献量。\n参考只读：R16.3d 下击暴流蒙特卡洛危险性、R16.3e 雷暴阵风与 ASCE 口径项目页 H/C 环线索。与 L31.8b（各风类型对设计风况的统计贡献）分工：b 管多常见、多大，本子项目管流动结构如何作用于风机。\n目录："
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:10",
+      "text": "Progress: I'm going through the downburst and turbine cards already in the library. The quick search has been sent out, and the plan comes after that.Need repeated --query flags.Progress: the snowball process seems to have finished. Checking the pool now.Progress: the 690-entry pool has been hand-screened, and about 140 entries look relevant. I'm now removing author names I filled in from memory, then I'll write the plan.Progress: the plan is written. I'm fixing one figure in it that has no source, and then I'll report to L31.8.L31.8f 的启动方案写好了，已报给上级，等你批准。按 plan_only，这一轮只查了文献、读了已有材料，没有做任何计算。\n\n**方案要回答三件事**\n1. **作用矩阵**：8 类非台风流动 × 6 个风机环节（风场表征、切出、偏航、极值荷载、气动弹性失稳、疲劳），每格写机理、证据等级和依据页码。8 类是：下击暴流、阵风锋/冷池、低空急流、稳定层结/间歇湍流/KH 波、龙卷、风向突变/风速爬坡、地形加速、温带气旋/冬季风暴。\n2. **IEC 61400-1 的差距**：先定一组对风机直接有用的事件描述量，例如峰值风速、爬升时间、风向变化率与偏航速率之比、廓线鼻部高度相对轮毂的位置、转子内的切变与风向偏转。在公开实测事件上量出它们的分布，再和 EOG/EDC/ECD/EWS 的参数范围比。\"不覆盖 / 基本覆盖 / 不判\"三个判定词，开跑前已写成操作定义，其中门槛是假设。\n3. **能否和台风共用**：同一组描述量、同一条荷载检验链能不能同时用于台风和非台风流动，与 L31.8e 对一次。\n\n**矩阵初稿要点**（证据等级只是我的初判，没有送审）\n- 有定量先例的只有四处：下击暴流的极值荷载、风向突变对偏航的影响、低空急流的疲劳、稳定层结的疲劳。\n - 一篇设计条文研究算出，下击暴流下的塔底弯矩比 IEC 良态风高约 20%（PDF 第 10 页）。\n - 另一篇用单场实测下击暴流算出，IEC 的 EOG 和 ETM 刻画不全下击暴流的作用（PDF 第 5–7 页）。\n- 气动弹性失稳这一列基本没检到。下击暴流或风向突变把停机风机推进大偏航失稳区间的研究，一篇都没找到，这正对着 M2 那 34 例失败。\n- 我的初步判断：非台风流动在荷载之外，风险可能主要在控制。爬升快、风向转得比偏航还快，这和台风眼墙\"30 秒内风向转 30°\"是同一类问题。\n- IEC 差距目前只有单事件和一篇模拟研究作证据，没有统计结论，这是本子项目要补的。\n\n**文献量**\n- 库里已有下击暴流–风机的全文卡 11 张。\n- 引文滚雪球：识别 915 条，去重后 690 条。我逐条看题名，筛出相关的约 143 条：以风机为对象约 89 条，气象表征约 47 条，借方法 7 条。\n- 分布很不均：\n - 下击暴流约 36 篇，但集中在两三个课题组\n - 低空急流约 18 篇\n - 龙卷 10 篇，多是 2025–2026 年的新文章\n - 温带气旋/冬季风暴–风机只找到 1 条，基本是空白\n - KH 波和间歇湍流的气象文献没检到，要换检索词再查一轮。\n- 已派：本地已有的 9 篇交 litwiki 建卡，确无的 15 篇交 literature 取全文，两单都在排队。MDPI 的 1 篇按你的规定不取。\n- Deep Research 没做，本月额度已用完。Grok 也用不了，改走了 Gemini 联网快查，报告还没回来，回来后我补进方案第 4 节。\n\n**等 Liang Hu 定**\n1. 是否批准方案：两周内只做文献矩阵、数据可算性表、IEC 参数整理和实验冻结设计，0 SU。我建议批准。\n2. 8 类流动的优先级：我建议先做下击暴流/阵风锋、风向突变/爬坡、低空急流三类，其余五类只做文献矩阵。温带气旋列为第二轮检索的重点，不是不做。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无\n\n另有三点限制：IEC 61400-1 原文仍在 L31.8 的 ND 待取清单上，方案里凡涉及 IEC 参数都标\"二手、待原文核\"。和 L31.8b、L31.8e、L31.8c 的分工写在方案第 7 节，需要上级转给各方确认。滚雪球手筛表里，作者名只写了已经建卡核过的，其余只写年份和刊物。\n\n\n\n\n（附件：00_启动方案.md）\n\n（附件：L31.8f-01_滚雪球手筛_20261025.md）"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-10-25 18:18",
+      "text": "⚠️ Grok 不可用（402，熔断至 2026-10-25 23:40），本次改用 Gemini 联网快查（不占 Deep Research 额度）\n【深度调研】「L31.8f 非台风特征流动对风机荷载与控制的影响」（Gemini 联网快查）完成，用时约 5 分钟，报告约 26316 字。\n- 报告：\n- 引文核对：（报告里的 DOI 28/55 在 Crossref/OpenAlex 查到；只说明文献存在，内容是否支持论点仍要你核对）\n- 查不到的 DOI（可能编造或写错，不得直接采用）：10.1016/j.jweia.2020.104142)（阅读状态：已阅摘要及主要结论）。、10.1115/1.4023096)（阅读状态：已阅摘要及核心载荷对比图表）。、10.3390/en7106527)（阅读状态：已阅摘要）。、10.1063/1.4906103、10.1063/1.4906103)（阅读状态：已阅摘要）；lu、10.3390/en12142773)（阅读状态：已阅摘要）。、10.1016/s0141-0296(99)00058-9)（阅读状态：已阅全文要点）；vicroy、10.2514/3.46282)（阅读状态：已阅摘要及模型公式）。、10.1115/1.4055076)（阅读状态：已阅摘要）。、10.1016/j.engfailanal.2025.110387)（阅读状态：已阅摘要及现场灾损分析）。、10.1016/j.engstruct.2020.111157)（阅读状态：已阅摘要及数值模型框架）。、10.1016/j.engstruct.2025.120999)（阅读状态：已阅摘要）。、10.5194/wes-8-231-2023)（阅读状态：已阅全文方法与讨论部分）。、10.1016/j.jweia.2012.03.030)（阅读状态：已阅摘要及动力响应结论）。、10.5194/wes-2-533-2017)（阅读状态：已阅全文及实测分析部分）。 等。\n请读报告，对要采用的结论核对出处（本地有 PDF 的读原文），再按你的任务继续推进。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:18",
+      "text": "Progress: I've checked the quick-search report against the original Nguyen 2015 paper and caught one wrong figure. Writing up the verification now.Now write the verification file and update the plan's literature section.Gemini 快查的报告已经核完，只能当找文献的线索，不能当依据。可以引用的只有我拿原文核过的一条，方案第 4 节和矩阵都已据此更新。\n\n**报告的问题**\n- **DOI 只有一个真错**：29 个 DOI 里，系统报\"查不到\"的大多只是 DOI 后面粘了\"（阅读状态…）\"这类字，去掉后都查得到。真正查不到的只有一个：Nguyen & Manuel 2015 的 DOI 写成了 10.1063/1.4906103，正确的是 **10.1063/1.4905700**，我对过本地 PDF 首页。\n- **一条结论与原文相反**：报告说\"换不同湍流模型，疲劳估计会差好几倍\"。我读了原文：5 MW 机组算了 1000 次，加入湍流后，叶根挥舞弯矩的极值只比不加湍流时高 1.6% 和 2.5%，疲劳等效荷载高 13% 和约 25%（PDF 第 18 页，期刊页 013102-17）。方案里改用原文数字，并只说到这一步：在这项研究的条件下，湍流模型对疲劳的影响大于对极值的影响。\n- **没出处或没核的数字一律不用**：\"下击暴流峰值超出平稳风 20%–50%\"没给出处；软切出使疲劳增加 3%–6%、海岸过渡带来 10%–20% 疲劳误差，这两项原文还没取到。报告写的 ROSCO 仓库和版本号，也和 L31.8 上次的核对不符（当时核到仓库已迁到 NatLabRockies），不采用。\n\n**对方案的修改**\n- **下击暴流的疲劳一格**：改为有定量先例，依据就是上面 Nguyen 2015 的原文数字。\n- **温带气旋/冬季风暴一行**：补了两条只读过摘要的线索。一是软切出和风暴穿越控制（Tibaldi 2016）；二是 Schmidt 2025，说风机停机空转时，偏航偏差会让叶片抖振。整体仍算基本空白，因为还没有直接研究冬季风暴的风场结构怎样作用于风机。\n- **Schmidt 2025 值得优先看**：它和 L31.8 M2 那 34 例停机大偏航失败可能有关。取到原文后，建议 L31.8 一起看，这一点已经留言告诉了上级。\n\n**补派的取件**：报告里还有 9 篇池子里没有的新线索，包括低空急流负切变、软切出控制、空转疲劳、风向偏转与疲劳、稳定度与荷载、北海 NORA3 再分析。我逐篇查过本地，都没有，已派 literature 去取。连同前面两单，目前共有三单文献委托在排队。\n\n**等 Liang Hu 定的事**，和方案里写的一样：\n1. 是否批准方案。我建议批准，两周内不用超算机时。\n2. 8 类流动的优先级。我建议先做下击暴流/阵风锋、风向突变/风速爬坡、低空急流三类。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无\n\n\n\n\n（附件：L31.8f-02_快查核对_20261025.md）\n\n（附件：00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 18:44",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8f 非台风特征流动：本地已有 8 篇建原文卡\n8 篇原文卡及索引已完成，索引中的 8 个链接均已核验。第 4 篇有可读本地全文，但 Zotero DOI 精确查询未匹配父项键；卡中未猜测键值。\n\n- 索引 → \n- 10.1002/we.1740，WAHMBQ58 → \n- 10.1063/1.4905700，7UHY6T84 → \n- 10.3390/en7106527，Y6PZ4TKI → \n- 10.1016/j.jweia.2012.03.030，Zotero 键未匹配 → \n- 10.1002/we.2122，5HE42XSF → \n- 10.1016/j.engfailanal.2025.110387，QQT3EDHV → \n- 10.1016/j.jweia.2019.103961，TZL5NJZY → \n- 10.1016/j.jweia.2014.12.005，ASI8UKX6 → \n\n\n\n\n\n\n\n\n\n\n\n（附件：L31_8f_Local_Index_20261025.md）\n\n（附件：WAHMBQ58_L31_8f_nguyen_manuel_monte_carlo.md）\n\n（附件：7UHY6T84_L31_8f_nguyen_manuel_turbulence.md）\n\n（附件：Y6PZ4TKI_L31_8f_nguyen_manuel_transient.md）\n\n（附件：DOI_jweia_2012_03_030_L31_8f_kwon_kareem_butler.md）\n\n（附件：5HE42XSF_L31_8f_hawbecker_basu_manuel.md）\n\n（附件：QQT3EDHV_L31_8f_aslam_alipour_greenfield.md）\n\n（附件：TZL5NJZY_L31_8f_lombardo_zickar_gusts.md）\n\n（附件：ASI8UKX6_L31_8f_gunter_schroeder_outflow.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:44",
+      "text": "本地已有的 8 篇都建成了原文卡。我对照原文抽查了两处，都和卡片一致：Nguyen & Manuel 2015（Wind Energy）的表 IV 在 PDF 第 10 页，Kwon 2012 的阵风锋系数 2.015 在 PDF 第 5 页。方案第 4 节和矩阵已据此补上。\n\n**对方案有用的三条**\n- **控制环节的文献缺口更清楚了**：Nguyen 2015 做了下击暴流荷载的蒙特卡洛，每种暴流算 1000 次，叶根挥舞弯矩最大值的均值为 9.52 和 13.27 MN·m。但风速超过切出后，它仍按运行状态和原来的变桨逻辑算，没有模拟真实停机。所以已有的下击暴流荷载研究，在控制这一层说明不了多少，这支持\"非台风流动的主要缺口在控制\"这个初判。\n- **阵风锋的荷载一格改为有定量先例**：Kwon 2012 用叶片不转的简化机组算出阵风锋系数约 2.0，塔底剪力约为 ASCE 7 边界层基线的 2 倍。注意它对比的是 ASCE 7，不是 IEC，模型也很简化。\n- **有了一个真实损伤事件**：Hawbecker 2017 用 WRF 重建了 2011 年 Buffalo Ridge 风电场的雷暴。模型和测站都出现过 10 分钟内风向转了 150° 以上；风速爬升时，多数模拟方案的转子层切变指数超过 IEC 的 0.20；现场有多台叶片受损、一台塔屈曲。这说明风向变化率和转子内切变确实会同时突变。\n\n**另外两点**\n- **龙卷**：Greenfield 2024 的失效分析里，事发时风机在运行还是停机并不清楚，作者是按停机假设算的。这正是 L31.8a 的失效检验库需要补记的字段。\n- **库里有一条附件挂错了**：10.3390/en14175407 在 Zotero 里挂的 PDF 其实是另一篇论文（多风扇风洞那篇），所以 会误报\"本地已有\"。这篇属于 MDPI，按你的规定不取。我已告知上级，请它转平台修。\n\n还有两单取件在排队（第一单 15 篇、新线索 9 篇），回来后我抽查再补进方案。\n\n**等 Liang Hu 定的事**，和之前一样：\n1. 是否批准方案。我建议批准，两周内不用超算机时。\n2. 优先做的流动类型。我建议先做下击暴流/阵风锋、风向突变/风速爬坡、低空急流三类。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无\n\n\n\n\n（附件：00_启动方案.md）\n\n（附件：L31_8f_Local_Index_20261025.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 18:49",
+      "text": "【委托结果 · 文献检索智能体】L31.8f 取全文：非台风特征流动 15 篇\nWind turbine loads during simulated thunderstorm microbursts — 10.1063/1.3646764 — 未获取：工作站 Chrome 出现 Cloudflare 安全验证，该通道当日熔断；未重试。\nHow do convective cold pools influence the atmospheric boundary layer near two wind turbines in northern Germany? — 10.5194/wes-10-2237-2025 — 父项 5BHCDQWR，附件 QJQ2ZHNC — \nStructural impact assessment of low level jets over wind turbines — 10.1063/1.4945359 — 未获取：同社 工作站 通道已熔断，本篇未请求、未换通道。\nIdealized Offshore Low‐Level Jets for Turbine Structural Impact Considerations — 10.1002/we.70097 — 父项 DBC4365M，附件 52AVDQS9 — \nYaw-misaligned wind turbine system level loads driven by coastal low-level jets — 10.2514/6.2024-1700 — 父项 RFQ3F3XP，附件 SH29KPA8 — \nLarge‐eddy simulation of stable boundary layer turbulence and estimation of associated wind turbine loads — 10.1002/we.1580 — 父项 IANIZRGH，附件 AE8VPBC3 — \nOn wind turbine loads during the evening transition period — 10.1002/we.2355 — 父项 HMX76NUF，附件 FCIEN7S2 — \nImpacts of wind field characteristics and non-steady deterministic wind events on time-varying main-bearing loads — 10.5194/wes-7-1209-2022 — 父项 AKWCNHR4，附件 XZIFUBTU — \nExtreme coherent gusts with direction change – probabilistic model, yaw control, and wind turbine loads — 10.5194/wes-8-231-2023 — 父项 Q32C5NQS，附件 WFSPSK5D — \nInvestigating the loads and performance of a model horizontal axis wind turbine under reproducible IEC extreme operational conditions — 10.5194/wes-6-477-2021 — 父项 S6MQVUEP，附件 2MTXBHC9 — \nA data-driven reassessment of the extreme coherent gust with direction change — 10.5194/wes-2026-175 — 父项 9JSXCGNJ，附件 CASC6SH2 — \nMeasured gust events in the urban environment, a comparison with the IEC standard — 10.1016/j.renene.2019.07.058 — 父项 MPUVCQ2E，附件 QK75XSQ6 — \nAn observational climatology of anomalous wind events at offshore meteomast IJmuiden (North Sea) — 10.1016/j.jweia.2017.03.008 — 父项 GVHKQFBN，附件 EJ75TQNX — \nNumerical model for analysis of wind turbines under tornadoes — 10.1016/j.engstruct.2020.111157 — 父项 PCJ9VRS2，附件 GM37DG5F — \nMoving tornado-induced effects on a wind turbine: Insights into dynamic load responses — 10.1016/j.engstruct.2025.120999 — 父项 SK863PC9，附件 3CDKKQAA — \nLoad distribution patterns and structural effects of IEA 15MW wind turbine under downburst wind field — 10.1016/j.engstruct.2026.123966 — 父项 H3FE6VAJ，附件 UAMUMBXK — \n\n全部 14 份已取得 PDF 均从 Zotero 云端附件回读，并核查 PDF 可解析及首页身份。MDPI 10.3390/en8042977 按指令未取，不计入上述 16 篇。\n\n交付清单 → \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:49",
+      "text": "第一单取全文交回了：16 篇里取到 14 篇，2 篇 AIP 的没取到。\n\n**取到的 14 篇**都已放进 Zotero。literature 核过，每份 PDF 都能打开，首页也是对应的论文。按流动类型分：\n- 冷池：1 篇\n- 低空急流：2 篇（理想化海上急流的结构荷载；海岸急流下的偏航偏差）\n- 稳定层结：3 篇（稳定边界层 LES 荷载、傍晚过渡、非稳态事件对主轴承的影响）\n- IEC 事件与实测：5 篇\n - 风向突变阵风（ECD）的概率模型，以及 2026 年数据驱动重估 ECD 的预印本\n - 风机模型在可复现的 IEC 极端工况下的试验\n - 城市实测阵风与 IEC 的对比\n - 北海 IJmuiden 测风塔的异常风事件统计。\n- 龙卷：2 篇\n- IEA 15 MW 下击暴流：1 篇\n\n这 14 篇已派 litwiki 建原文卡，格式和上一批相同。我特别要求把事件参数单独列出来：上升时间、风向变化的幅度和速率、持续时间、切变指数、样本量、数据源。这些是 Q2（IEC 事件模型与实测的差距）直接要用的。卡回来后，我抽查原文再写进方案的矩阵。\n\n**没取到的 2 篇**是 AIP 的：微下击暴流下的风机荷载、低空急流的结构影响。工作站 的浏览器遇到 Cloudflare 验证，这个通道今天按规则停了，没有重试，也没有换通道。我约了明早 08:49 回访，先查本地有没有，没有就重派一次；还取不到就记为馆际互借。这两篇已记在。\n\n另一单新线索 9 篇的取件还在排队。\n\n**等 Liang Hu 定的事**，和之前一样：\n1. 是否批准方案。我建议批准，两周内不用超算机时。\n2. 优先做哪几类流动。我建议先做下击暴流/阵风锋、风向突变/爬坡、低空急流三类。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 18:58",
+      "text": "【委托结果 · 文献检索智能体】L31.8f 取全文（快查新线索 9 篇）\nL31.8f 的 9 篇全文均已取得，并核验了本地 PDF；其中 AIAA 一篇在本次复查 时已存在，直接复用，未重新下载。其余取件遵循 OA 优先及指定出版商通道。以下 Zotero key 为父条目 key，括号内为附件 key。\n\n- Impacts of the low-level jet’s negative wind shear on the wind turbine — 10.5194/wes-2-533-2017 — 4TR2XFHB（MFCSZVDH）→ \n- Kriging meta-models for damage equivalent load assessment of idling offshore wind turbines — 10.5194/wes-10-3069-2025 — ETK9UBJ4（FSQUEQS6）→ \n- The effect of wind direction shear on turbine performance in a wind farm in central Iowa — 10.5194/wes-5-125-2020 — 57QIFUJT（D723XIE4）→ \n- The influence of wind veer and drivetrain flexibility on fatigue loading for large floating wind turbines — 10.5194/wes-10-2903-2025 — DIRNH7SQ（C7TTNCM8）→ \n- The 3 km Norwegian reanalysis (NORA3) – a validation of offshore wind resources in the North Sea and the Norwegian Sea — 10.5194/wes-6-1501-2021 — TT4KWSWK（PDHT7BMX）→ \n- Lamar Low-Level Jet Project Interim Report — 10.2172/15006544 — ER4T68S5（NNXSQSUA）→ \n- Aeroservoelastic analysis of storm-ride-through control strategies for wind turbines — 10.2514/6.2016-1740 — NHG8TNCA（QSV2D24T）→ \n- Influence of atmospheric stability on wind turbine loads — 10.1002/we.1528 — V3IXHMQE（7DUM7DVD）→ \n- Wind turbine fatigue loads as a function of atmospheric conditions offshore — 10.1002/we.1959 — Q448TS4I（6WSJVJDK）→ \n\n注意：Lamar 报告的 PDF 封面题名用“Project”，OSTI/Zotero 元数据用“Program”；报告号 NREL/TP-500-34593 对应一致。入库器将该报告父条目建为 journalArticle，而非 report；本次未擅自修改元数据。\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 18:58",
+      "text": "快查报告里的 9 篇新线索，全文都取到了。我亲自读了其中两篇关键的，发现快查对这两篇的概括都与原文不符，已作废，也已更正告诉上级。\n\n**两处更正**\n- **Tibaldi & Hansen 2016（风暴穿越控制）**：快查说\"软切出能消除停机冲击，叶根疲劳只增加 3%–6%\"。原文没有这些数字：它只做了闭环模态分析，发现风暴穿越运行时，塔架第一阶纵向模态和传动链扭转模态的阻尼下降；作者在结论里写明，时域荷载留待以后研究（PDF 第 10 页）。\n- **Schmidt 2025（空转海上风机）**：快查说\"空转时偏航偏差 ±15° 会引起叶片剧烈抖振\"。原文也没有这个内容，它做的是空转工况损伤等效荷载的代理模型。所以我上一轮说它\"和 M2 那 34 例停机大偏航失败相关、值得优先看\"，这个建议撤回，已留言告诉上级。\n\n**对方案的影响**\n- 温带气旋/冬季风暴这一行：控制格只写\"风暴穿越运行会降低塔架和传动链的模态阻尼\"，并注明只是模态分析，没有荷载数字；失稳格退回\"未检到\"。这一行整体仍是基本空白。\n- 这份快查到目前为止出了三处错（Nguyen 2015、Tibaldi、Schmidt），所以方案里只引用我核过原文的内容。\n\n**接下来**\n- 这 9 篇已派 litwiki 建原文卡。前一批 14 篇的建卡还在做。两批回来后，我抽查原文，再补方案里的矩阵和 IEC 事件参数表。\n- 两篇 AIP 的文献明早 08:49 回访时重派。\n\n**等 Liang Hu 定的事**，和之前一样：\n1. 是否批准方案（两周不用超算机时，我建议批准）。\n2. 优先做哪几类流动：我建议先做下击暴流/阵风锋、风向突变/爬坡、低空急流。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无\n\n\n\n（附件：L31.8f-02_快查核对_20261025.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:11",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8f 新取到 14 篇建原文卡\n14 篇均已有原文卡；其中 wes-2026-175 明确标为讨论预印本。卡片只供原文事实与页码查找，不含 L31.8f 课题判断。\n\n索引 → \n\n\n10.5194/wes-10-2237-2025 · 5BHCDQWR → \n\n\n10.1002/we.70097 · DBC4365M → \n\n\n10.2514/6.2024-1700 · RFQ3F3XP → \n\n\n10.1002/we.1580 · IANIZRGH → \n\n\n10.1002/we.2355 · HMX76NUF → \n\n\n10.5194/wes-7-1209-2022 · AKWCNHR4 → \n\n\n10.5194/wes-8-231-2023 · Q32C5NQS → \n\n\n10.5194/wes-6-477-2021 · S6MQVUEP → \n\n\n10.5194/wes-2026-175 · 9JSXCGNJ → \n\n\n10.1016/j.renene.2019.07.058 · MPUVCQ2E → \n\n\n10.1016/j.jweia.2017.03.008 · GVHKQFBN → \n\n\n10.1016/j.engstruct.2020.111157 · PCJ9VRS2 → \n\n\n10.1016/j.engstruct.2025.120999 · SK863PC9 → \n\n\n10.1016/j.engstruct.2026.123966 · H3FE6VAJ → \n\n\n（附件：L31_8f_Batch2_Index_20261025.md）\n\n（附件：5BHCDQWR_L31_8f_batch2.md）\n\n（附件：DBC4365M_L31_8f_batch2.md）\n\n（附件：RFQ3F3XP_L31_8f_batch2.md）\n\n（附件：IANIZRGH_L31_8f_batch2.md）\n\n（附件：HMX76NUF_L31_8f_batch2.md）\n\n（附件：AKWCNHR4_L31_8f_batch2.md）\n\n（附件：Q32C5NQS_L31_8f_batch2.md）\n\n（附件：S6MQVUEP_L31_8f_batch2.md）\n\n（附件：9JSXCGNJ_L31_8f_batch2.md）\n\n（附件：MPUVCQ2E_L31_8f_batch2.md）\n\n（附件：GVHKQFBN_L31_8f_batch2.md）\n\n（附件：PCJ9VRS2_L31_8f_batch2.md）\n\n（附件：SK863PC9_L31_8f_batch2.md）\n\n（附件：H3FE6VAJ_L31_8f_batch2.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:11",
+      "text": "Progress: I've checked two ECD papers against the originals. Their conclusions point in opposite directions, and this changes how Q2's criteria should be written. Updating the plan now.第二批 14 张原文卡已经建好。我对照原文核了两篇关于风向突变阵风（ECD）的论文，发现它们的结论方向相反。这直接改变了 Q2（IEC 事件模型与实测差多少）该怎么判，方案已据此修改。\n\n**两篇 ECD 论文，结论相反**（数字都已核原文）\n- **Hannesdóttir 2023**：丹麦西部海岸一个站，10 年数据、92 个事件。按这个站的统计，IEC 的 ECD 参数约合 460 年一遇，看起来很保守。但把阵风参数的变化考虑进去之后，模拟算出的荷载反而比 ECD 高 20%–74%（PDF 第 1 页）。最不利的组合是：风速变化 10.3 m/s，上升时间 4.4 s，风向只转 14.9°，塔底弯矩 4.24×10⁵ kN·m，对比 ECD 的 2.43×10⁵（PDF 第 7 页）。\n- **2026 年的一篇讨论预印本**（作者我还没核）：用 319 台在役风机当传感器，识别出 356 个风速突变。四个地区按 50 年一遇取最快的事件，塔底峰值都比 ECD 低：美国、阿根廷、澳大利亚低 25%–28%，德国低 57%（PDF 第 21 页）。\n- **两篇一致的地方**：上升时间是决定荷载最主要的参数，风速变化和风向转角的幅度是次要的。\n- **为什么结论相反**：可能是场址不同，前一篇算了偏航控制、后一篇没研究控制器，50 年一遇的取法也不同。现在还分不清。\n\n**方案的修改**（看任何数据之前补写，写明了时间和原因）\n- **两层判定**：只看单个参数在不在 IEC 范围内，说明不了荷载有没有被覆盖。Q2 改成两层判：第一层看参数，第二层看荷载。荷载层要在上升时间、风速变化、风向转角的联合 50 年一遇组合里，挑荷载最大的那个，再和 IEC 比。两层结论并列写出，不用参数层代替荷载层。荷载层需要做气动弹性计算，属于远期，到时另报批。\n- **描述量**：上升时间是原定描述量之一，这次确认它是主要参数。\n- **与控制的关联**：前一篇的结果里含偏航控制，这与 L31.8c（全寿命控制）也有关，已留言告诉上级。\n\n**这批里其他可用的结果**\n- **冷池**：德国北部一个风电场的 120 次冷池，92 m 高度风速中值最多增加约 4 m/s，风向变化最多约 15°。\n- **城市阵风**：一年的实测里，阵风幅值比 IEC 高 23%，持续时间短 21%。注意它对照的是小风机标准 IEC 61400-2。\n- **低空急流**：两篇荷载研究。一篇用 IEA 15 MW 风机，急流下塔顶力矩的范围比同等平均切变时更宽；另一篇研究海岸急流中风机偏航失准的影响，作者称偏航误差超过 10° 后叶根弯矩约增加 20%–40%，这个数字我没核原文。\n\n**接下来**：第三批 9 张卡还在建；两篇 AIP 的论文明早 08:49 重派。\n\n**等 Liang Hu 定的事**，和之前一样：\n1. 是否批准方案（两周内不用超算机时，我建议批准）。\n2. 优先做哪几类流动：我建议先做下击暴流/阵风锋、风向突变/爬坡、低空急流三类。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无\n\n\n\n\n（附件：00_启动方案.md）\n\n（附件：L31_8f_Batch2_Index_20261025.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 19:26",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8f 快查新线索 9 篇建原文卡\n9 张卡均已核对 DOI、原文路径和七项指定抽取字段；索引中的 9 个链接均可定位到卡片。交付文件如下：\n\n- 批次索引 → \n- Gutierrez 2017（10.5194/wes-2-533-2017；4TR2XFHB）→ \n- Schmidt 2025（10.5194/wes-10-3069-2025；ETK9UBJ4）→ \n- Sanchez Gomez 2020（10.5194/wes-5-125-2020；57QIFUJT）→ \n- Krathe 2025（10.5194/wes-10-2903-2025；DIRNH7SQ）→ \n- Solbrekke 2021（10.5194/wes-6-1501-2021；TT4KWSWK）→ \n- Kelley 2004 Lamar 报告（10.2172/15006544；ER4T68S5）→ \n- Tibaldi 2016（10.2514/6.2016-1740；NHG8TNCA）→ \n- Sathe 2013（10.1002/we.1528；V3IXHMQE）→ \n- Holtslag 2016（10.1002/we.1959；Q448TS4I）→ \n\n\n\n\n\n\n\n\n\n\n\n\n（附件：L31_8f_Batch3_Index_20261025.md）\n\n（附件：4TR2XFHB_L31_8f_gutierrez_llj_negative_shear.md）\n\n（附件：ETK9UBJ4_L31_8f_schmidt_idling_kriging.md）\n\n（附件：57QIFUJT_L31_8f_sanchez_gomez_veer_power.md）\n\n（附件：DIRNH7SQ_L31_8f_krathe_veer_drivetrain.md）\n\n（附件：TT4KWSWK_L31_8f_solbrekke_nora3.md）\n\n（附件：ER4T68S5_L31_8f_kelley_lamar_report.md）\n\n（附件：NHG8TNCA_L31_8f_tibaldi_storm_control.md）\n\n（附件：V3IXHMQE_L31_8f_sathe_stability_loads.md）\n\n（附件：Q448TS4I_L31_8f_holtslag_offshore_fatigue.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 19:26",
+      "text": "第三批 9 张原文卡也建好了。L31.8f 方案所需的文献已经补齐，更新后的方案报给了上级，等你批准。\n\n**文献量**\n- 本题共有全文卡 42 张：这次新建 31 张，库里原有 11 张。我亲自拿原文抽查了其中 10 处。\n- 还没拿到的 3 篇：AIP 的 2 篇明早重派；MDPI 的 1 篇按规定不取。\n\n**这批核过原文、写进方案的**\n- **风向偏转（风向随高度旋转）**：Krathe 2025 的结果是，150 m 高度风速 5.5 m/s 时，不计风向偏转，22 MW 浮式风机塔顶前后弯矩的疲劳等效荷载会低估 50%，扭矩低估 72%（PDF 第 17 页）。所以\"转子范围内的风向偏转\"必须保留为描述量之一。\n- **夜间稳定层结**：Lamar 站一年的观测里，可能引起风机强烈动态响应的稳定层结条件约有 600 小时（PDF 第 24 页）。\n - Sathe 2013 的卡片写着：同一场址按中性算，塔底疲劳荷载是按非绝热算的 1.16 倍。这个数我没对过原文，方案里已注明。\n- **低空急流负切变、KH 波**：各只有一个事件或一个算例，都没有和 IEC 的基线做对比，只能当作机理示例。\n\n**两处已作废**\n- 快查说 Tibaldi 2016 的软切出使疲劳增加 3%–6%，说 Schmidt 2025 的空转风机在 ±15° 偏航时会抖振。两条在原文里都没有。\n- 卡片已建好，可以作为正式依据引用，但这两条说法不采用。\n\n**整体情况**\n- 风向突变、下击暴流、低空急流、稳定层结这四类已有可以引用的定量先例。\n- 最要紧的发现是上一轮那条：两篇 ECD 论文的结论方向相反，但都认为上升时间是主导参数。方案据此规定，判 IEC 差距要分参数层和荷载层两层来判。\n- 温带气旋/冬季风暴对风机的作用仍然基本是空白，列为第二轮检索的重点。\n\n**等 Liang Hu 定的事**\n1. 是否批准方案。两周内不用超算机时，我建议批准。\n2. 先做哪几类流动。我建议先做下击暴流/阵风锋、风向突变/爬坡、低空急流这三类。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无\n\n\n\n\n（附件：00_启动方案.md）\n\n（附件：L31_8f_Batch3_Index_20261025.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-26 08:50",
+      "text": "【定时回访】L31.8f：AIP 两篇 10.1063/1.3646764、10.1063/1.4945359 昨日因 Cloudflare 熔断未取；先，确无则派 literature 用 \n（这是你在 2026-10-25 18:49 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-26 08:50",
+      "text": "回访的两篇 AIP 文献已经处理好，结果回来会自动叫醒我，所以不再约回访。\n\n- **10.1063/1.4945359（低空急流对风机结构的影响）**：今天查本地发现它已经在 Zotero 里，不用再取，已派文献 Wiki 智能体建原文卡。\n- **10.1063/1.3646764（模拟微下击暴流下的风机荷载）**：本地确实没有，已重派文献检索智能体。只走统一取件入口，遇到验证页、登录页或没有权限就停下，不重试，也不换通道。再取不到就记为馆际互借。\n\n 已更新。\n\n等 Liang Hu 定：\n- 是否批准方案。两周内不用超算机时，我建议批准。\n- 先做哪几类流动。我建议先做下击暴流/阵风锋、风向突变/爬坡、低空急流三类。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-26 08:53",
+      "text": "【委托结果 · 文献检索智能体】L31.8f 取全文：AIP 1 篇重派\n已获取并验证全文 PDF（20 页），已入库 Zotero。本地查过、确无后，仅按指定命令执行了一次。\n\n- Wind turbine loads during simulated thunderstorm microbursts — DOI 10.1063/1.3646764 — Zotero key ZKPND4GI — 本地 PDF → \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-26 08:53",
+      "text": "昨天被 Cloudflare 拦下的那篇 AIP 文献今天取到了：《Wind turbine loads during simulated thunderstorm microbursts》，PDF 共 20 页，已入 Zotero（ZKPND4GI），本地副本在。已派文献 Wiki 智能体给它建原文卡。\n\n另一篇 AIP（低空急流对风机结构的影响）本地已有，建卡也在做。\n\n至此，这一轮能取到的文献都取到了，只剩一篇按规定不取的 MDPI。L31.8f 的方案在等你批准。两张卡回来后，我会抽查原文，再补进方案矩阵的下击暴流和低空急流两行。\n\n**等 Liang Hu 定的事**\n1. 是否批准方案。两周内不用超算机时，我建议批准。\n2. 先做哪几类流动。我建议先做下击暴流/阵风锋、风向突变/爬坡、低空急流三类。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-26 09:12",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8f 补 1 张原文卡：LLJ 结构影响\n这篇论文用 Reese 测风塔的一次低空急流与白天不稳定条件观测驱动 FAST；表 II 报告叶根挥舞弯矩均值为 593/933 kN·m（不稳定/急流）。IEC 正常风廓线仅在正文中作参照，没有 IEC 事件模型的同案荷载对照。卡片保留了原文表格与正文数值不一致之处，未替作者作归因判断。\n\n- 原文卡 →；DOI 10.1063/1.4945359，Zotero QBT2NC6S\n- 已追加索引 → \n\n\n\n\n（附件：QBT2NC6S_L31_8f_gutierrez_llj_structural.md）\n\n（附件：L31_8f_Batch3_Index_20261025.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-26 09:12",
+      "text": "低空急流结构影响那篇的原文卡建好了（Gutierrez 2016，JRSE）。我对着原文核了关键数字：同一测风塔上，一次低空急流事件和白天不稳定条件相比，叶根挥舞弯矩均值分别是 933 和 593 kN·m（PDF 第 13 页表 II）。\n\n这只是单个事件，原文也没有拿 IEC 极端事件模型做同工况对照，所以矩阵里低空急流\"极值荷载\"这一格仍记为\"单例\"，已写进方案。卡片里也照实记了原文表格和正文数值对不上的地方。\n\n另一张卡（模拟微下击暴流的风机荷载）还在建，回来后我同样抽查，再补进下击暴流那一行。\n\n等 Liang Hu 定：\n1. 是否批准方案。两周内不用超算机时，我建议批准。\n2. 先做哪几类流动。我建议先做下击暴流/阵风锋、风向突变/爬坡、低空急流三类。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-26 09:19",
+      "text": "【委托结果 · 文献 Wiki 智能体】L31.8f 补 1 张原文卡：模拟微下击暴流风机荷载\n该文以单一模拟微下击暴流情景驱动 NREL 5 MW 风机。作者报告：无偏航控制时，叶根弯矩最大绝对响应较所选 IEC EDC/ECD 案例分别高约 86%/20%；有偏航控制时低于 ECD。这不是多事件统计结论；模型未模拟超切出风速后的停机。\n\n- 原文卡（DOI 10.1063/1.3646764；Zotero ZKPND4GI）→ \n- 已更新索引 → \n\n\n\n\n（附件：ZKPND4GI_L31_8f_nguyen_microburst_loads.md）\n\n（附件：L31_8f_Batch3_Index_20261025.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-26 09:19",
+      "text": "最后一张卡（Nguyen、Manuel、Veers 2011，模拟微下击暴流下的风机荷载）也建好了。我对照原文核了关键结论，已经写进方案矩阵的下击暴流\"偏航\"一格。\n\n**原文怎么说**（PDF 第 17 页，期刊页 053104-16）：\n- 研究对象是一场模拟的微下击暴流，作用在 NREL 5 MW 风机上。\n- **不开偏航控制**：叶根弯矩的最大值比 IEC 的风向突变工况（EDC）高约 86%，比风向突变加相干阵风工况（ECD）高约 20%。\n- **开偏航控制**：叶根弯矩最大值降到 ECD 以下。作者的解释是，ECD 里阵风和风向变化来得更快，变桨控制跟不上。\n\n**为什么值得注意**：这和前面那两篇结论相反的 ECD 论文指向同一件事。荷载能不能超过 IEC 事件模型，取决于两样：事件变化有多快（上升时间），以及控制器跟不跟得上。\"控制是非台风流动的主要缺口\"这个初判，又多了一条原文依据。\n\n**局限**：这只是单个模拟情景，没有做多事件统计；风速超过切出值后，模型没有模拟停机。\n\n这一轮文献到此全部收齐。L31.8f 共有 44 张全文卡。方案在等你批准。\n\n**等 Liang Hu 定**：\n1. 是否批准方案。两周内不用超算机时，我建议批准。\n2. 先做哪几类流动。我建议先做下击暴流/阵风锋、风向突变/爬坡、低空急流这三类。\n\n卡住（待 PI）：无\n\n建议结题（待 Liang Hu）：无\n\n\n\n（附件：00_启动方案.md）"
+    }
+  ],
+  "files": {
+    "self": "04922748.json",
+    "claims": null,
+    "pdf": null
+  }
+}

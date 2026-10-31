@@ -1,0 +1,47 @@
+{
+  "id": "796028d2",
+  "slug": "796028d2",
+  "number": "L31.8",
+  "title": {
+    "zh": "L31.8 风机抗台风多灾害韧性与性能化设计 总控",
+    "en": "L31.8 风机抗台风多灾害韧性与性能化设计 总控"
+  },
+  "group": "core",
+  "parent": "6fbad1e4",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "796028d2.json",
+    "claims": null,
+    "pdf": null
+  }
+}

@@ -1,0 +1,384 @@
+{
+  "id": "c815466f",
+  "slug": "c815466f",
+  "number": "L29",
+  "title": {
+    "zh": "L29.6d1 高层风压预测与稀疏重构",
+    "en": "L29.6d1 High-Rise Wind Pressure Prediction and Sparse Reconstruction"
+  },
+  "group": "better",
+  "parent": "b9e31a7b",
+  "depth": 3,
+  "status": {
+    "zh": "在做",
+    "en": "In progress"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-21 22:51",
+  "end": null,
+  "updated": "2026-10-23 10:00",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "在同一高层风压数据（TPU 孤立高层、TPU 干扰子集、PoliMi）和同一预算下，回答：Q1 P1 各方法能否分出高下、哪些数值等价、谁在哪一维外推上占优；Q2 P2 调好的经典方法（GP、POD、线性随机估计）是否被新方法（C-WGAN、TL-POD-LSTM、CNN 超分辨率等）超过、在什么条件下；Q3 调参是否改变方法排序。PINO 在表面风压上物理项无定义，以 FNO 身份参赛，物理项的作用由 L29.6d2 回答。",
+    "goal_en": "On the same high-rise wind pressure datasets (TPU isolated high-rise, TPU interference subset, PoliMi) and under the same budget, answer: Q1 On P1, can the methods be differentiated, which ones are numerically equivalent, and which excels along each extrapolation dimension; Q2 On P2, are well-tuned classical methods (GP, POD, linear stochastic estimation) outperformed by newer methods (C-WGAN, TL-POD-LSTM, CNN super-resolution, etc.), and under what conditions; Q3 Does hyperparameter tuning alter the method ranking. Because the physics term of PINO is undefined on surface wind pressures, it competes as an FNO, while the role of the physics term is answered by L29.6d2."
+  },
+  "report": {
+    "zh": "# L29.6d1 高层风压预测与稀疏重构\n\n## 目标\n在同一高层风压数据（TPU 孤立高层、TPU 干扰子集、PoliMi）和同一预算下，回答：Q1 P1 各方法能否分出高下、哪些数值等价、谁在哪一维外推上占优；Q2 P2 调好的经典方法（GP、POD、线性随机估计）是否被新方法（C-WGAN、TL-POD-LSTM、CNN 超分辨率等）超过、在什么条件下；Q3 调参是否改变方法排序。PINO 在表面风压上物理项无定义，以 FNO 身份参赛，物理项的作用由 L29.6d2 回答。\n\n## 当前状态\n在做：Liang Hu 10-22 批启动方案（A197）。计算仍按方案「若批」执行：新计算等 Liang Hu 看过 T6 回答稿（11-02）；单作业约 ≥200 SU 或 >24 h 单独报批。\n\n## 已定决定\n- 10-21：C 块（调参是否改变排序）也在 P1、P2 上做；多保真与 PINN 首轮不纳入（数据无低保真、无流场，记「不适用于本数据」）；首轮重复 5 次。见启动方案第 9 节。\n\n## 试过与结果\n| 日期 | 做了什么 | 结果 | 文件 |\n| --- | --- | --- | --- |\n| 10-21 | 启动方案 | 方法清单（文献用过 + 应当适合）、划分、基线、计划、资源 | |\n| 10-22 | litwiki 补卡 | Luo 2023、Snaiki 2024 在同一 TPU 高层库上做 SVD/POD+QR 选点线性重构 → 列为 P2 线性强基线，测点选法（随机/QR）改为首轮因素；LSE 仍无文献；Meddage 2024、Huang 2017 全文未取得 | 启动方案 2.2、3.3、6 节（已修订） |\n| 10-22 | litwiki 全文补 5 卡 | Meddage 2024 只用 XGBoost、按数据行随机切分 → 只证同记录内插，作划分反例，方案加 3.4「不许随机按行切分」；Huang 2017 POD+BPNN 列入 P2（高度内插 RMSE 0.1508、外推 0.1633，p.14 Table 3）；Luo 2023 无 QR 对随机选点的对比 → 首轮选点因素填空白 | 启动方案 2.1、2.2、3.4、6 节 |\n| 10-22 | 文献滚雪球两轮（首轮 + Liang Hu 全线指令重跑，含 S2） | 首轮池 1260/初筛 424，Lead 选 A 档 30 篇（派 literature 取全文）；重跑池 2097/初筛 646，与首轮去重后新增 374 篇，纳入 10、B 档 11，派 litwiki 建卡。不改变结论；P2 方法清单加压缩感知（L1 稀疏）重构，P1b 加半经验横风荷载模型作非 ML 基线 |； |\n| 10-22 | litwiki 建卡 10 篇（重跑纳入，前缀 L29_6d1_s2_，多为摘要级，全文由 litwiki 另委托 取） | Q2 两条旁证（均为流场重构，非表面风压）：①Zhou 2026（`L29_6d1_s2_05`，预印本 PDF p.17、19 Fig.8）5 个传感器时，单数据集训练下 Kriging SSIM 0.502 胜深度网络 0.194–0.237，多数据集训练下深度网络 0.531–0.550 胜 Kriging 0.415——谁赢取决于训练数据量；②Ebert 2023（`L29_6d1_s2_04`，仅摘要）少传感器时 SNN 0.169、RF 0.168、gappy POD 0.184，三者接近。压缩感知（`_07`）与横风荷载模型（`_10`）尚无数字 | |\n| 10-22 | litwiki A 档 30 篇建卡（27 全文、3 摘要级；卡前缀 L29_6d1_A_，#7–10 补既有 R25.3 卡） | 同数据多方法：#1（`L29_6d1_A_01`，PDF p.8 Table 5，Lead 已核原文）平均 Cp 测试 RMSE DNN 0.048、DBN 0.056、ELM 0.076、WELM 0.095、RF 0.141、GBM 0.143，但按同风向样本随机拆分，只算内插；#3（`_A_03`，p.19 Table 6）极端负压 Cp<−3 RMSE GBRT 0.183 最低、RF 0.248、KAN 0.251、DTR 0.292；#19（「L29.6d1 A 档补卡」 |\n| 10-21 | 核卡 | 修正矩阵 v0：P1 有「同数据 ≥3 类方法」比较两篇（QN6Z9F4B PDF p.10；9CBNZGZB PDF p.11），但都无「同预算」证据 | 同上第 6 节 |\n\n## 未决与下一步\n- （10-30）SSRN 7370859 全文已核（随机留出、无外推、无峰值，主动学习 400/8,568）：主张不重叠，维持；B-Ding=PCA+GP 自实现；E-高度比 训练 Hr 0.5/1、测 1.5；P1b 可 10-30 一起冻结。见启动方案 10.6。\n- （10-29，Liang Hu 按创新性审查定）唯一主张改为「同调参预算、按布置整组外推（间距/高度比超出训练范围）、以峰值为目标时，调好的经典方法在何种测点数下不被新方法超过」；Fei Ding 的 TPU 相邻建筑代理（EMI 2023 / SSRN 7370859）按原文自实现为具名基线 B-Ding；P2 的 QR 选点不作新意；P2 划分与 C39.3 统一；P1b 冻结前先读 SSRN 7370859（litwiki 取件建卡中），未到则 P1b 推迟冻结、P1a/P2 照 10-30。见 第 10 节。\n- （10-29）方法清单候选：Transolver/GeoTransolver（NVIDIA PhysicsNeMo，Apache-2.0）作 P1 几何→表面 Cp 的「应当适合」候选，直接吃不规则测点；13 种几何可能数据不够，正是要检验的。随基准设计 d1 考虑，不改划分。依据。\n- 10-22 Liang Hu 批启动方案（A197），开工。\n- **里程碑 M1（10-27 18:00 前）**：①rc-lit-snowball 引文滚雪球补查 P1/P2 文献并由 Lead 筛选，采用的交 litwiki 建卡；②数据元信息只读核（TPU 高层与干扰子集、PoliMi 123 个 h5，只看清单与说明，不下载数据）。交，--report L29.6d。\n- 文献建卡：A 档 30 篇 + 重跑 10 篇已建卡；10-22 恢复补全文后，6 张摘要级卡确认已是全文级（litwiki），另建 Zhou 2003 卡（`L29_6d1_s2_11L29_6d1_s2_12`：风洞 95° 风向留出、77 层测试，Cp 均值 RMSE PSO-GRNN 0.0323、PSO-BPNN 0.0869，PDF p.9 Table 6；没有 IDW/Kriging 等简单基线，现场无全场误差，只作 P2 实测应用先例）；3 篇未取得：s2_02 退台 ANN（加拿大科学出版 403，当天熔断）、s2_09 矩形建筑风荷载工具（多伦多大学出版社 403，当天熔断）、s2_06 IABSE 测点布置（只有付费全文）——10-23 台式机重试（literature）仍未取得：CSP 的 PDF 返回 403（无订阅权限），UTP 出现 Cloudflare 验证页并当天熔断；IABSE 按规则不取。Decision：三篇不再重试，保持摘要级卡，不作数字依据（它们分别是退台建筑 ANN、矩形建筑荷载工具、早期测点布置，方法清单里都有替代全文文献）。下一步写 M1 文件。\n- 10-30 基准设计 d1 版（含事先声明的优势条件存档）。\n- 11-02 后若批：资源申请、最小例子复现原文数字。\n\n## 文献依据\n- 启动方案第 6 节 19 篇（卡片与页码）；滚雪球 A 档 30 篇与重跑纳入 10 篇建卡中。重跑结论：不改变已写结论，方案补两项方法（见试过与结果 10-22 行）。\n\n## 参数来源表\n| 参数 | 取值 | 来源 / 假设 | 查过哪里 |\n| --- | --- | --- | --- |\n| P2 测点数档 | 4/8/16/32/64 | 假设（覆盖 Dong 2025 的 4 点、Liu 2025 的 20/40 点） | NR_dong_2025 PDF p.12；L29_6d_01 PDF pp.3、5 |\n| 重复次数 | 5 | 假设（首轮缩减） | 基准设计 B8 |\n| 单次 GPU 训练时长 | ≤ 0.2 h | 假设，未实测 | — |\n| 干扰子集体量 | 每种施扰高度（37 个位置×72 风向）≈29.8 GB；全库 8568 文件≈95.8 GB | 10-22 逐工况 HEAD 实测（文件数×首文件大小） | |\n| 峰值估计 | 记录极值对窗口平均 | 本实验室约定 | 基准设计 B3 |\n| 工程容差 | 10%/25% 双档 | 参照，非规范 | 基准设计 B7 |\n\n## Liang Hu 注",
+    "en": "# L29.6d1 高层风压预测与稀疏重构\n\n## 目标\n在同一高层风压数据（TPU 孤立高层、TPU 干扰子集、PoliMi）和同一预算下，回答：Q1 P1 各方法能否分出高下、哪些数值等价、谁在哪一维外推上占优；Q2 P2 调好的经典方法（GP、POD、线性随机估计）是否被新方法（C-WGAN、TL-POD-LSTM、CNN 超分辨率等）超过、在什么条件下；Q3 调参是否改变方法排序。PINO 在表面风压上物理项无定义，以 FNO 身份参赛，物理项的作用由 L29.6d2 回答。\n\n## 当前状态\n在做：Liang Hu 10-22 批启动方案（A197）。计算仍按方案「若批」执行：新计算等 Liang Hu 看过 T6 回答稿（11-02）；单作业约 ≥200 SU 或 >24 h 单独报批。\n\n## 已定决定\n- 10-21：C 块（调参是否改变排序）也在 P1、P2 上做；多保真与 PINN 首轮不纳入（数据无低保真、无流场，记「不适用于本数据」）；首轮重复 5 次。见启动方案第 9 节。\n\n## 试过与结果\n| 日期 | 做了什么 | 结果 | 文件 |\n| --- | --- | --- | --- |\n| 10-21 | 启动方案 | 方法清单（文献用过 + 应当适合）、划分、基线、计划、资源 | |\n| 10-22 | litwiki 补卡 | Luo 2023、Snaiki 2024 在同一 TPU 高层库上做 SVD/POD+QR 选点线性重构 → 列为 P2 线性强基线，测点选法（随机/QR）改为首轮因素；LSE 仍无文献；Meddage 2024、Huang 2017 全文未取得 | 启动方案 2.2、3.3、6 节（已修订） |\n| 10-22 | litwiki 全文补 5 卡 | Meddage 2024 只用 XGBoost、按数据行随机切分 → 只证同记录内插，作划分反例，方案加 3.4「不许随机按行切分」；Huang 2017 POD+BPNN 列入 P2（高度内插 RMSE 0.1508、外推 0.1633，p.14 Table 3）；Luo 2023 无 QR 对随机选点的对比 → 首轮选点因素填空白 | 启动方案 2.1、2.2、3.4、6 节 |\n| 10-22 | 文献滚雪球两轮（首轮 + Liang Hu 全线指令重跑，含 S2） | 首轮池 1260/初筛 424，Lead 选 A 档 30 篇（派 literature 取全文）；重跑池 2097/初筛 646，与首轮去重后新增 374 篇，纳入 10、B 档 11，派 litwiki 建卡。不改变结论；P2 方法清单加压缩感知（L1 稀疏）重构，P1b 加半经验横风荷载模型作非 ML 基线 |； |\n| 10-22 | litwiki 建卡 10 篇（重跑纳入，前缀 L29_6d1_s2_，多为摘要级，全文由 litwiki 另委托 取） | Q2 两条旁证（均为流场重构，非表面风压）：①Zhou 2026（`L29_6d1_s2_05`，预印本 PDF p.17、19 Fig.8）5 个传感器时，单数据集训练下 Kriging SSIM 0.502 胜深度网络 0.194–0.237，多数据集训练下深度网络 0.531–0.550 胜 Kriging 0.415——谁赢取决于训练数据量；②Ebert 2023（`L29_6d1_s2_04`，仅摘要）少传感器时 SNN 0.169、RF 0.168、gappy POD 0.184，三者接近。压缩感知（`_07`）与横风荷载模型（`_10`）尚无数字 | |\n| 10-22 | litwiki A 档 30 篇建卡（27 全文、3 摘要级；卡前缀 L29_6d1_A_，#7–10 补既有 R25.3 卡） | 同数据多方法：#1（`L29_6d1_A_01`，PDF p.8 Table 5，Lead 已核原文）平均 Cp 测试 RMSE DNN 0.048、DBN 0.056、ELM 0.076、WELM 0.095、RF 0.141、GBM 0.143，但按同风向样本随机拆分，只算内插；#3（`_A_03`，p.19 Table 6）极端负压 Cp<−3 RMSE GBRT 0.183 最低、RF 0.248、KAN 0.251、DTR 0.292；#19（「L29.6d1 A 档补卡」 |\n| 10-21 | 核卡 | 修正矩阵 v0：P1 有「同数据 ≥3 类方法」比较两篇（QN6Z9F4B PDF p.10；9CBNZGZB PDF p.11），但都无「同预算」证据 | 同上第 6 节 |\n\n## 未决与下一步\n- （10-30）SSRN 7370859 全文已核（随机留出、无外推、无峰值，主动学习 400/8,568）：主张不重叠，维持；B-Ding=PCA+GP 自实现；E-高度比 训练 Hr 0.5/1、测 1.5；P1b 可 10-30 一起冻结。见启动方案 10.6。\n- （10-29，Liang Hu 按创新性审查定）唯一主张改为「同调参预算、按布置整组外推（间距/高度比超出训练范围）、以峰值为目标时，调好的经典方法在何种测点数下不被新方法超过」；Fei Ding 的 TPU 相邻建筑代理（EMI 2023 / SSRN 7370859）按原文自实现为具名基线 B-Ding；P2 的 QR 选点不作新意；P2 划分与 C39.3 统一；P1b 冻结前先读 SSRN 7370859（litwiki 取件建卡中），未到则 P1b 推迟冻结、P1a/P2 照 10-30。见 第 10 节。\n- （10-29）方法清单候选：Transolver/GeoTransolver（NVIDIA PhysicsNeMo，Apache-2.0）作 P1 几何→表面 Cp 的「应当适合」候选，直接吃不规则测点；13 种几何可能数据不够，正是要检验的。随基准设计 d1 考虑，不改划分。依据。\n- 10-22 Liang Hu 批启动方案（A197），开工。\n- **里程碑 M1（10-27 18:00 前）**：①rc-lit-snowball 引文滚雪球补查 P1/P2 文献并由 Lead 筛选，采用的交 litwiki 建卡；②数据元信息只读核（TPU 高层与干扰子集、PoliMi 123 个 h5，只看清单与说明，不下载数据）。交，--report L29.6d。\n- 文献建卡：A 档 30 篇 + 重跑 10 篇已建卡；10-22 恢复补全文后，6 张摘要级卡确认已是全文级（litwiki），另建 Zhou 2003 卡（`L29_6d1_s2_11L29_6d1_s2_12`：风洞 95° 风向留出、77 层测试，Cp 均值 RMSE PSO-GRNN 0.0323、PSO-BPNN 0.0869，PDF p.9 Table 6；没有 IDW/Kriging 等简单基线，现场无全场误差，只作 P2 实测应用先例）；3 篇未取得：s2_02 退台 ANN（加拿大科学出版 403，当天熔断）、s2_09 矩形建筑风荷载工具（多伦多大学出版社 403，当天熔断）、s2_06 IABSE 测点布置（只有付费全文）——10-23 台式机重试（literature）仍未取得：CSP 的 PDF 返回 403（无订阅权限），UTP 出现 Cloudflare 验证页并当天熔断；IABSE 按规则不取。Decision：三篇不再重试，保持摘要级卡，不作数字依据（它们分别是退台建筑 ANN、矩形建筑荷载工具、早期测点布置，方法清单里都有替代全文文献）。下一步写 M1 文件。\n- 10-30 基准设计 d1 版（含事先声明的优势条件存档）。\n- 11-02 后若批：资源申请、最小例子复现原文数字。\n\n## 文献依据\n- 启动方案第 6 节 19 篇（卡片与页码）；滚雪球 A 档 30 篇与重跑纳入 10 篇建卡中。重跑结论：不改变已写结论，方案补两项方法（见试过与结果 10-22 行）。\n\n## 参数来源表\n| 参数 | 取值 | 来源 / 假设 | 查过哪里 |\n| --- | --- | --- | --- |\n| P2 测点数档 | 4/8/16/32/64 | 假设（覆盖 Dong 2025 的 4 点、Liu 2025 的 20/40 点） | NR_dong_2025 PDF p.12；L29_6d_01 PDF pp.3、5 |\n| 重复次数 | 5 | 假设（首轮缩减） | 基准设计 B8 |\n| 单次 GPU 训练时长 | ≤ 0.2 h | 假设，未实测 | — |\n| 干扰子集体量 | 每种施扰高度（37 个位置×72 风向）≈29.8 GB；全库 8568 文件≈95.8 GB | 10-22 逐工况 HEAD 实测（文件数×首文件大小） | |\n| 峰值估计 | 记录极值对窗口平均 | 本实验室约定 | 基准设计 B3 |\n| 工程容差 | 10%/25% 双档 | 参照，非规范 | 基准设计 B7 |\n\n## Liang Hu 注"
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 开子项目",
+      "ts": "2026-10-21 22:51",
+      "text": "【Liang Hu 让 L29.6d 动力与CFD代理模型 分出的子对话】本编号 L29.6d1。负责矩阵中 P1 高层表面风压/风荷载预测（正问题）与 P2 稀疏测点重构全场风压（反问题），共用 TPU 高层库与 PoliMi 高层测压数据（Zenodo 10.5281/zenodo.3948348）。交回：启动方案（目标、两问题的方法清单——文献用过的 + 应当适合的、数据划分插值/外推、最简基线、近期 2 周与 1–3 月计划、资源估计）。共同背景：Liang Hu 10-21 批准 L29.6d 重新分拆为 3 个子项目（父方案；问题—方法矩阵；文献汇总页；评价规矩第 10–13 条；基准设计 v1）。Liang Hu 要求：问题来自抗风文献；方法从该问题文献实际用过的出发，再补应当适合的；回答能否选择或优化代理方法本身（调参是否改变方法排序）。PINO 与其他方法同一判据，不预设结论。\n第一件事：写本子项目启动方案，存 <本编号>/00_启动方案.md（模板），批准前只查文献、读已有材料、只读核数据元信息，不跑计算、不派计算类任务、不下载大数据。写入范围：只写 <本编号>/ 与 下本子项目页。完成后 --report 报 L29.6d。"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-21 22:51",
+      "text": "先说一下进度：材料已经读完（问题—方法矩阵、评价规矩第 10–13 条、基准设计 v1、P1/P2 相关的十几张文献卡），接下来写启动方案。方案和项目页写好了，补卡的委托也已派出。最后一步是向 L29.6d 上报。L29.6d1 的启动方案写好了，已上报 L29.6d。系统会自动把它登记到你的待批里。批准前只查文献、核数据元信息，没有跑任何计算，也没有下载大数据。\n\n**方案要点**\n- **要回答的三个问题**\n - Q1：高层风压预测上，各方法能不能分出高下？哪些数值上等价？哪些在风向、几何或干扰间距外推时占优？\n - Q2：稀疏测点重构时，经典方法（GP、POD、线性随机估计）调好以后，新方法（C-WGAN、迁移学习 POD-LSTM、CNN 超分辨率等）还能不能胜出？在多少测点、测点在已知测点范围内还是范围外、风向见没见过时胜出？\n - Q3：调参会不会改变方法排序？\n- **方法清单**：每题分两栏，一栏是文献实际用过的，一栏是应当适合的，每条都附卡片和页码。另外有两条最简基线必须同表比：线性映射，以及最近已知工况或双三次插值。\n- **数据**：TPU 孤立高层库为主。TPU 双高层干扰库只取一个子集，因为文献里树模型、GAN、符号回归、KAN 都是在这个库上做的。PoliMi 作第二数据源，用来检验结论离开 TPU 还成不成立。\n- **PINO**：输出是建筑表面风压，表面上没有可以算残差的方程，所以它的物理项在这里没有定义，只以 FNO 身份参赛。物理项有没有用由 L29.6d2 回答。\n- **核卡时更正了矩阵的一处**：矩阵 v0 写 P1「没有 ≥3 类方法的同预算比较」。实际上同一数据上比过 4 种方法的有两篇（Hu 2020；Šarkić Glumac 2023）。在它们的同数据比较里，平均风压系数 R² 只差约 0.02，RMS 差约 0.17。但两篇都没有证明各方法的调参预算对齐，所以「同预算比较」仍然空缺。已请 L29.6d 改矩阵。\n\n**Decision I made**\n- 调参是否改变排序（Q3），也在 P1、P2 上做。原因是这里大部分模型训练便宜。错了的代价是多用些 CPU 时。\n- 首轮不纳入多保真方法和 PINN，原因是数据里没有低保真数据，也没有流场。写成「不适用于本数据」，不写成这些方法不好。\n- 首轮每个设置重复 5 次，不是基准设计 v1 定的 10 次。实测出离散后再定要不要加。\n- 已派 litwiki 补卡（排队中）。这是文献工作，不算计算。\n\n**近两周**：10-24 补卡，10-27 只读核数据元信息，10-30 定基准设计 d1 版（跑之前写定优势条件并存档）。计算一律写成「若批」，等你看过 11-02 的 T6 回答稿再说。资源上限是按假设估的，没有实测：GPU 约 320 计算单元，CPU 不超过 200 核时，数据约 50 GB，放 TACC。\n\n## 结论\n- 启动方案已交，状态「待开工」，已上报 L29.6d。\n- 需要 Liang Hu 定的事只有一件：批不批本方案。我建议批，两周内只做文献和设计，不花算力。\n- 对矩阵 v0 的更正：P1「同数据多方法比较」有两篇，「同预算比较」仍然没有。\n\n\n\n\n（附件：00_启动方案.md）\n\n（附件：T6d1_高层风压预测与稀疏重构.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-21 23:23",
+      "text": "【委托结果 · 文献 Wiki 智能体】L29.6d1 补卡：高层风压预测与稀疏重构\nMeddage 2024 的准确期刊全文仍未取得，故输入字段、留出方式、比较方法、同预算调参及 PDF 数字均标 NR，未把同作者会议短文的数据移植过来。Huang 2017 再试取全文亦未成功，原摘要卡保持不变。Decision I made：对无准确 PDF 的论文只建摘要级卡——避免制造页码和基准数字；代价是 Meddage 的全文补基准要素尚未完成。\n\n- Meddage 2024 补卡，DOI，Zotero `8AXE458P` → \n\n- Xing 2022 gappy POD 补卡，DOI，Zotero 未匹配 → \n\n- Luo 2023 QR 布点补卡，DOI，Zotero 未匹配 → \n\n- Snaiki & Mirfakhar 2024 约束 QR 补卡，DOI，Zotero 未匹配 → \n\n- 综述追加节 → \n\n- Huang 2017 既有摘要卡（未修改），DOI，Zotero `PGWDX4HI` → \n\n（附件：L29_6d1_meddage_2024_transient_3d_xgboost.md）\n\n（附件：L29_6d1_xing_2022_gappy_pod_ship_pressure.md）\n\n（附件：L29_6d1_luo_2023_qr_sparse_pressure.md）\n\n（附件：L29_6d1_snaiki_2024_constrained_qr_mrdmd.md）\n\n（附件：Wind_Surrogate_Problem_Survey_L29_6d.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-21 23:23",
+      "text": "Fix the earlier P1 table row for Meddage, then dispatch literature for full texts.litwiki 的补卡回来了，我据此改了启动方案。这一批里最有用的是两篇在我们同一个 TPU 高层库上做稀疏重构的论文。\n\n**新卡带来的改动**\n- **P2 多了一个线性强基线。** 这两篇用的都是 TPU 单栋高层、500 个测点：\n - Luo 2023：先用 SVD/POD 压缩出模态，再按 QR 方法挑测点，用挑出的测点线性求模态系数，重构全场风压。它是按风向分别建模的，没做\"留出风向\"的外推。\n - Snaiki 2024：同一思路加了布点限制。迎风面放 31 个点时，不加限制的误差（RMSE）是 0.079，加三种禁布区域后是 0.087–0.107（PDF 第 13 页 Fig.5）。这些误差有一部分是在插值加密的网格上算的，我们只在原来的实测点上评。\n - 两篇都列为参赛方法，用来检验 C-WGAN、迁移学习这些新方法能不能胜过调好的线性方法。\n- **Decision I made：测点怎么选，从远期提前到首轮。** 每种重构方法在\"均匀随机选点\"和\"QR 选点\"下各跑一次，直接看\"测点放哪\"和\"用哪个方法\"哪个影响大。都是线性计算，代价很小；错了的代价只是多跑一个因素。\n- **线性随机估计（条件高斯）仍然找不到**风压重构里实际用它的论文。现在标为\"无卡片，基于本线推理\"，照样列为应当适合的方法。gappy POD 只有一篇船体风压的摘要级出处（Xing 2022），只当方法出处，不当建筑风压精度的证据。\n- **Meddage 2024、Huang 2017 仍然拿不到全文**，只有摘要卡，不作依据。按\"找原文派 literature\"的分工，已派 literature 取这两篇以及 Luo、Snaiki、Xing 三篇的期刊原文入 Zotero（委托回执被截断，编号没拿到）；取到后再派 litwiki 补全卡。\n\n方案第 2.2、3.3、6 节和项目页都已更新，文献表从 15 篇增至 18 篇。这次没有动目标、资源和要 Liang Hu 定的事，所以没有再报 L29.6d。方案仍在等 Liang Hu 批，批准前不做计算。\n\n\n\n（附件：00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-21 23:35",
+      "text": "【委托结果 · 文献检索智能体】L29.6d1 取原文入 Zotero：高层风压代理 5 篇\n5/5 篇期刊版全文已入 Zotero；以下是持久保存的本地 PDF 路径，云端附件均已完整回读验证。未建卡、未改 wiki。本地 Zotero 桌面端的文件同步可能滞后于云端。\n\n- Predicting transient wind loads on tall buildings in three-dimensional spatial coordinates using machine learning — DOI 10.1016/j.jobe.2024.108725 — Zotero 父条目 8AXE458P，PDF 附件 GKSU2Z8G → \n- Prediction of wind loads on high-rise building using a BP neural network combined with POD — DOI 10.1016/j.jweia.2017.07.021 — Zotero 父条目 PGWDX4HI，PDF 附件 VZAAA7MJ → \n- Optimal sensor placement for reconstructing wind pressure field around buildings using compressed sensing — DOI 10.1016/j.jobe.2023.106855 — Zotero 父条目 KW556HVS，期刊版 PDF 附件 RJM4VJ7A → \n- Multiresolution dynamic mode decomposition approach for wind pressure analysis and reconstruction around buildings — DOI 10.1111/mice.13304 — Zotero 父条目 X2V9HQDZ，PDF 附件 3ZSH3D4I → \n- Fusing sensor data with CFD results using gappy POD — DOI 10.1016/j.oceaneng.2022.110549 — Zotero 父条目 ABZJ8GQE，PDF 附件 44EASZHM → \n- 五篇的逐项校验记录 → \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-21 23:35",
+      "text": "Next step: dispatch litwiki to upgrade the 5 cards from the now-available full texts, and update the project page.literature 已把 5 篇论文的期刊版全文存进 Zotero，前两轮缺全文的问题解决了。\n\n- **入库的 5 篇**：\n - Meddage 2024：用 XGBoost 预测高层建筑的瞬态风压。\n - Huang 2017：先用 POD 降维，再用 BP 神经网络预测风荷载。\n - Luo 2023：用 QR 方法选测点，再重构风压场；数据是 TPU 高层库。\n - Snaiki 2024：在 Luo 的思路上加了布点限制；数据同样是 TPU 高层库。\n - Xing 2022：用 gappy POD 重构风压，对象是船体，不是建筑。\n- **已派 litwiki 据全文补卡**：5 张卡里有 3 张原来只有摘要级内容，2 张用的是预印本页码，这次全部按期刊全文补齐。每张卡都要写明训练和测试怎么分、属于内插还是外推、比了哪些方法、调参预算是否对齐，以及误差数字和页码。委托回执被截断，编号这次没拿到。\n- **卡回来以后**：我核对后更新启动方案的方法清单和文献表。Meddage 和 Huang 目前标着\"仅摘要、不作依据\"，有了全文后，看数字能否作依据。\n\n启动方案仍在等 Liang Hu 批。批准前只做文献，不做计算。项目页已经更新。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-21 23:41",
+      "text": "【委托结果 · 文献 Wiki 智能体】L29.6d1 据全文补全 5 张卡\n这五篇不构成同库、同目标、同调参预算的算法排名。Meddage 的 70/30 结果不证明时间外推；Snaiki 的密集候选网格由实测点插值得到；Xing 所举 35°/125° 与文中风洞每 10° 测角不一致，其测点压力来源标为 NR。\n\n- Meddage 2024，DOI 10.1016/j.jobe.2024.108725，Zotero 8AXE458P → \n- Huang 2017，DOI 10.1016/j.jweia.2017.07.021，Zotero PGWDX4HI → \n- Luo 2023，DOI 10.1016/j.jobe.2023.106855，Zotero KW556HVS → \n- Snaiki 2024，DOI 10.1111/mice.13304，Zotero X2V9HQDZ → \n- Xing 2022，DOI 10.1016/j.oceaneng.2022.110549，Zotero ABZJ8GQE → \n- 综述「L29.6d1 补卡」节 → \n\nDecision I made：Xing 的 35°/125° 压力输入来源记 NR，而不认作已核实的独立风洞测角；代价是该两角的融合误差不能用作明确的实测留出误差。Decision I made：Meddage 的切分只按同一 LES 工况内的测试解释；代价是不能用其 R² 支持未来时段外推。\n\n\n\n\n\n\n\n\n（附件：L29_6d1_meddage_2024_transient_3d_xgboost.md）\n\n（附件：NR_huang_2017_pod_bpnn_wind_loads.md）\n\n（附件：L29_6d1_luo_2023_qr_sparse_pressure.md）\n\n（附件：L29_6d1_snaiki_2024_constrained_qr_mrdmd.md）\n\n（附件：L29_6d1_xing_2022_gappy_pod_ship_pressure.md）\n\n（附件：Wind_Surrogate_Problem_Survey_L29_6d.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-21 23:41",
+      "text": "5 张卡已按期刊全文补全，我核过后改了启动方案。这一批对方案有三处实际影响：\n\n- **Meddage 2024 只能当反面例子。**\n - 它只用了 XGBoost 一种方法，没有任何基线。\n - 它把同一段 LES 记录的数据行随机分成 70% 训练、30% 测试。相邻时刻和相邻测点高度相关，测试数据几乎都在训练集里出现过，所以测试 R² 0.93 只说明\"同一段记录内的内插\"（PDF 第 8–11 页）。\n - **Decision I made：** 方案新增 3.4 节，规定所有划分都按整段时间、整个测点、整个风向或整个工况留出，不许按数据行随机抽。错了的代价只是测试集变小一些。\n- **Huang 2017 列入稀疏重构（P2）的方法清单。** 这篇是单栋方形高层，504 个测点里拿 120 个训练，其余 384 个检验。\n - 它把高度内插和高度外推分开报了：没参加训练的第 6 层（在训练楼层之间）时程误差 0.151，没参加训练的顶层（在训练楼层之外）0.163（第 14 页 Table 3）。我们方案里\"已知测点范围内／范围外分开报\"的划分，和它的做法一致。\n - 它的调参不是同预算（第 7 页），和反距离加权的对比只有图，没有汇总误差表。\n- **Luo 2023 没有比较\"QR 选点\"和\"随机选点\"。** 全文核过，同样测点数下两种选点方式的误差对比，它没有给。所以方案里首轮把\"选点方式\"当作一个因素去比，正好补上这个空白。\n\n另外两篇维持原判断。Snaiki 2024 的密集候选点是从实测点插值出来的，我们只在实测点上评误差。Xing 2022 是船体风压，只当 gappy POD 的方法出处；它有两个角度的压力来源对不上，litwiki 已标为 NR。\n\n文献表从 18 篇增至 19 篇，项目页已更新。文献补卡这一轮全部完成，没有还在跑的。方案仍在等 Liang Hu 批，批准前不做计算。\n\n\n\n（附件：00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 00:14",
+      "text": "【委托 · 来自 美丽新世界】启动方案已批（A197），开工\nLiang Hu 10-22 已批你的启动方案（A197，原话「你扫一下现在的这些项目和子项目，都给批了」）。请：①按你启动方案的近期计划开工，项目页状态改为「在做」；②方案里写明「另报批」的计算，以及单个作业约 200 SU 以上或超过 24 小时的计算，届时仍须单独报批（10-20 重定向「新计算等 Liang Hu 看过 T6 回答稿」的写法，按你方案原文执行）；③做文献综述时，在 / 之后再跑一次 （用法见公共规则「文献综述」节），筛选由你（Claude）做，不交 Gemini，采用的文献交 litwiki 建卡；④完成第一个里程碑后用 L29.6d，附结论草案路径。本轮只需交回：项目页已改「在做」的确认、第一个里程碑的内容与预计日期（本地时间）。"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 00:14",
+      "text": "Project page set to 在做. Launching the snowball run now (in background).L29.6d1 已开工，项目页状态改成了「在做」。\n\n**第一个里程碑 M1：10-27 18:00 前完成**（本地时间）。原定 10-24 的补卡在批准前已经做完，所以 M1 改为下面两件：\n1. **引文滚雪球补查文献**：已在 10-22 00:16 启动 ``。种子是方案里已有卡片的 15 篇论文，另加 5 组检索词。跑完后由我自己筛，采用的交 litwiki 建卡。我约了 10-22 03:16 回访，处理它的结果。\n2. **数据元信息只读核查**：TPU 孤立高层库、TPU 干扰库子集和 PoliMi 的 123 个 h5 文件，只看文件清单和说明文档，不下载数据。\n\n交付文件是，完成后 `--report` 报 L29.6d。\n\n**计算的闸门照方案原文执行**：新计算要等 Liang Hu 看过 11-02 的 T6 回答稿再定。单个作业约 200 SU 以上或超过 24 小时的，届时另行单独报批。\n\n## 结论\n- 项目页已改为 `status: 在做`，记了 Liang Hu 10-22 批准（A197）。\n- 第一个里程碑 M1，预计 10-27 18:00 前完成：\n - 内容：引文滚雪球补查 P1、P2 文献（10-22 00:16 已启动，由我筛选，采用的交 litwiki 建卡），加三套数据的元信息只读核查。\n - 交付：，完成后 `--report` 报 L29.6d。\n- 计算仍按方案写的「若批」执行：单作业约 200 SU 以上或超过 24 小时的另行报批。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 02:20",
+      "text": "【告知 · 来自 美丽新世界】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n告知：10-22 00:15 起 OpenAlex 免费额度（同出口 IP 共享）已用尽，HTTP 429，约到 10-22 20:00 才恢复；你 00:16 启动的 大概率已中止，请看日志，额度恢复后原命令重跑即续（已缓存部分不重取）。L29.6d 也排在 20:17 重跑；同 IP 共享额度，两边重跑请错开（建议你 21:00 以后），平台已知会配 API key。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 03:16",
+      "text": "【定时回访】L29.6d1 M1：读 与 prisma.md（日志 snowball.log），Lead 筛选 P1/P2 文献，采用的派 litwiki 建卡；随后做数据元信息只读核；M1 交付 10-27 18:00 前\n（这是你在 2026-10-22 00:16 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 03:16",
+      "text": "Snowball restarted with Crossref fallback (pid 1212555). Meanwhile doing the read-only data metadata check.正在核 PoliMi 数据：123 个文件对应 8 种配置（含地貌和相邻建筑干扰），配置写在文件内部属性里，我用按需读取的方式只取文件头，不下载整库。Works. Running it for all 123 files in the background.TPU 高层库的下载接口找到了，正在逐个工况列出风向文件数和大小（只发文件头请求，不下载数据）。TPU 测点在每个立面上是规则网格（2 cm 间距），展开后可以直接用 FNO/CNN，方案里列的这项风险可以撤掉。现在等 PoliMi 属性读完。M1 回访：文献滚雪球还没出结果，数据元信息核查已经有几项实质发现。\n\n**文献滚雪球**\n- 00:16 那一次被 OpenAlex 免费额度挡住，中途退出，没出结果。\n- 03:17 换成「OpenAlex 额度用完就转 Crossref」的模式重跑。现在排在另一条线后面，等 OpenAlex 空出来。\n- 已经取回的请求有缓存，不会重复访问。\n\n**数据元信息（只读，没有下载数据）**\n- **TPU 孤立高层库**：共 22 个工况、362 个文件，约 14.5 GB。之前 Gemini 摸底说是 394 个文件，以这次实际列出的为准。\n - 方形截面：0–50° 共 11 个风向。\n - 矩形截面：0–100° 共 21 个风向。\n - 风向步长都是 5°。\n- **TPU 测点是规则网格**：整读了一个 11.6 MB 的样例文件看结构，看完已删除。\n - 每个立面 5×5 个测点，间距 2 cm；四面展开正好是 20×5 的规则网格。\n - 所以 FNO、CNN 不用先插值。启动方案里\"测点不规则、网格类方法吃亏\"这条风险可以撤掉。\n- **PoliMi 不只是单栋楼多个风向**：每个文件内部记着配置，一共 8 种配置。\n - 配置分三个因素：两种测点板布置、两种来流剖面、有无相邻建筑及其位置和高度。\n - 也就是说，PoliMi 自带地貌和干扰两个可以做外推的维度，比原来以为的有用。\n - 样例文件：256 个测点，500 Hz，300 秒。\n - 123 个文件的配置对应表正在读，只取文件头，不下载整个文件。\n- **TPU 双高层干扰库**：119 个布置的文件数和大小正在逐个列。\n\nPoliMi 读完会自动叫醒我（回访号），到时把三项结果和滚雪球的筛选一起写进 M1 文件。M1 仍按 10-27 18:00 前交付。中间发现先记在。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 03:50",
+      "text": "【进程结束回访】L29.6d1 M1：PoliMi 123 个 h5 属性已读完；同时看 TPU 干扰库 tpu_adjacent.jsonl（pid 1223279）与 snowball（pid 1212555，日志）；整理写入 \n（这是你在 2026-10-22 03:19 本地时间登记的进程结束回访：进程 1216418 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 03:50",
+      "text": "The failures are a URL-encoding bug (`+` in file names), not missing files. Fixing and re-running only the 60 missing ones.Snowball finished with forward citations (OpenAlex). 424 items passed the mechanical prescreen; I'll screen titles myself.滚雪球找到的文献比原来多很多，尤其是高层风压的同数据多方法比较。先汇总 TPU 干扰库的元信息，再写 M1 文件。Now dispatching literature to fetch the selected papers' full texts (litwiki cards follow after).M1 进展：文献滚雪球已经跑完，数据元信息还差最后一部分。\n\n**文献滚雪球**\n- 跑出 1260 篇去重文献，关键词机械初筛后剩 424 篇，我逐题筛过。\n- 结论是：高层风压上\"同一数据比多种方法\"的论文比启动方案里认为的多。启动方案只找到 2 篇，这次至少新找到 3 篇，其中一篇的题目就是深度学习和机器学习方法预测高层风压的比较研究（2024）。\n- 另外填上了一个空缺：方案里\"线性随机估计在风压重构里找不到文献\"，这次找到一篇在 NIST 风压数据库上用它的（2003）。\n- 我选定 30 篇建卡（A 档）：高层风压预测 11 篇、稀疏重构 15 篇、测点布置 4 篇。清单在。\n- 已派 literature 取全文入 Zotero。平台委托名额已满，正在排队。全文取回后再派 litwiki 建卡。\n\n**数据元信息（只读，没有下载数据）**\n- **TPU 双高层干扰库**：119 种布置，每种 72 个风向，共 8568 个文件，约 96 GB。\n - 主楼截面 70×70 mm、高 280 mm，高宽比为 4。\n - 施扰楼有 3 种高度各布 37 个位置，另 2 种高度只各有 4 个位置。\n - 启动方案原估\"取一种施扰高度约 19 GB\"偏低，按实际文件算约 30 GB。资源估计在基准设计里改。\n- **PoliMi**：第一轮读文件属性时有 60 个失败。原因是文件名里的\"+\"号在网址里没有转义，是我脚本的问题，文件本身都在。现在正在补读。已经读到的 63 个文件里：\n - 8 种配置都出现了\n - 每个文件 256 个测点、500 Hz\n - 记录长 300 或 360 秒（15 万或 18 万步）。\n- **TPU 孤立高层库**：上一轮已核，362 个文件、约 14.5 GB，测点在每个立面上是规则网格。\n\nPoliMi 补读结束会自动叫醒我（回访号）。到时我把三套数据和文献筛选写进 M1 文件。M1 仍按 10-27 18:00 前交付。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 04:58",
+      "text": "【告知 · 来自 美丽新世界】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n6d 层滚雪球（1603 篇）里筛出一些属于你问题的文献，列在 第 5 节「d1」那一行。和你自己的清单去重后，你认为该收的并入你的 A 档；6d 不为它们建卡。不必回复。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 04:58",
+      "text": "【委托 · 来自 美丽新世界】文献滚雪球重跑（Liang Hu 10-22 全线指令）\nLiang Hu 10-22 原话：「我觉得你这个扫的不够。你干脆让所有现在所有的lead，只要是有单独文献库或者最近查过的，都需要重新滚一次。」（0 SU，只做 API 查询与阅读）。照任务书 做：跑一次 → 你本人逐题筛（不交 Gemini、不用 Deep Research）写 筛选_20261022.md（纳入/排除计数、纳入清单每篇一句用处）→ search 去重后委托 litwiki 建前 5–10 篇卡 → 判断是否改变你已写的结论或方案，写进你的项目页。本题属 ML 方向，加 --also-s2。种子之一：6d 层筛选 第 5 节里属于你的那一行 DOI（写进 seeds 文件），并与你已有清单去重。全机排队，不并发、不 kill；断了原命令重跑。交回一行：子项目号｜输出目录｜池总数/初筛通过/纳入数｜已委托建卡数｜是否改变结论（一句话）；缺前向、种子未解析照实写。建卡不必等完成，委托发出即可交回。 你的输出目录： 10-22 已跑过一次（ 档 30 篇），这次把那 30 篇 + 6d 转来的 d1 行 DOI 作种子，加 --also-s2 补 arXiv 预印本引文，新池与旧池去重后只筛新增部分。\n（原因：Liang Hu 10-22 全线指令；L29 根 Lead 任务书）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 04:58",
+      "text": "Research Chat 服务暂时连不上，正在重试预约回访。滚雪球已在后台排队运行。滚雪球重跑已经启动，还在排队，结果没出来。\n- **种子**：43 个 DOI，是上一轮的 30 篇 A 档加上 6d 层转来的 13 个，已去重。\n- **参数**：按要求加了 `--also-s2` 补 arXiv 预印本的引文；检索短语 7 组。\n- **状态**：现在排在另一条线的检索后面，等 OpenAlex 空出来。\n- **输出目录**：\n\nResearch Chat 服务刚才连不上，结束回访的预约暂时没登记成功，我在后台重试。如果一直登记不上，我在 10-22 08:00 前自己回来查。滚雪球结束后，我会和旧池去重、只筛新增部分，写，查重后委托 litwiki 建卡，然后交回结论。\n\nResearch Chat 仍连不上，改用本机后台等待进程结束（按进程号等，不用 pgrep）。回访登记还是失败，原因同样是连不上 Research Chat。我改成在本机后台盯滚雪球的进程（后台任务号 bsq54c0kr），进程一结束就会叫醒我，之后按计划筛选、建卡、交回。PoliMi 属性补读也还在跑，两件都没有中断。\n\nNow dedupe against the old pool and list only new prescreen-passed items.Update project page and the plan's method list.文献滚雪球重跑完成，不改变已写结论，只给方案补了两种方法；10 篇新文献已委托 litwiki 建卡。\n\n- **运行情况**：\n - 种子 43 个 DOI，全部解析成功。\n - 前向引文有。按要求加了 Semantic Scholar 补预印本引文；它有 2 篇种子因限流没取到引文（10.1016/j.jweia.2026.106481、10.26190/unsworks/32738），这两篇的 OpenAlex 部分正常。\n- **池子**：共 2097 篇，关键词初筛通过 646 篇。和我 10-22 首轮的池子去重、去掉种子后，新增 374 篇，这次只筛这 374 篇。\n- **筛选结果**（我逐题筛，没用 Gemini 或 Deep Research）：\n - 纳入 10 篇\n - 记录、暂不建卡 11 篇\n - 属于结构响应、转 L29.6d2 的 2 篇\n - 与已有条目重复 2 篇（一篇是预印本版，一篇是存档版）\n - 排除 349 篇，多是风速预报、城市风场、低矮房屋和机理研究。\n- **建卡**：先用 查过，库里都没有。已委托 litwiki 给 10 篇建卡（排第 5 位）。首轮选的 30 篇还在等 literature 取全文。\n- **对方案的影响**：不改变结论，因为本子项目还没有计算结论。补了两种方法：\n - 稀疏重构（P2）加「压缩感知」一族，就是假设风压场只由少数几个模态组成，再从少量测点把这几个模态解出来。\n - 基底力（P1b）加半经验的横风荷载模型，作非机器学习的对照基线。\n- **旁证**：另有两篇在同一数据上直接比了「神经网络和 gappy POD」「确定性和生成式」方法，但对象是流场，不是表面风压，只作 Q2 的旁证。\n\n项目页和启动方案已更新。\n\n## 结论\nL29.6d1｜｜池 2097／初筛通过 646（与首轮去重后新增 374）／纳入 10｜已委托建卡 10 篇（litwiki；首轮 A 档 30 篇在 literature 取全文）｜不改变已写结论，方案补两种方法：P2 加压缩感知重构，P1b 加半经验横风荷载基线。前向引文有；Semantic Scholar 因限流跳过 2 篇种子（10.1016/j.jweia.2026.106481、10.26190/unsworks/32738），43 个种子全部解析。\n\n\n\n（附件：筛选_20261022.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 05:33",
+      "text": "【委托结果 · 文献检索智能体】L29.6d1 取原文入 Zotero：高层风压预测与稀疏重构 30 篇\n按清单核对了 A 档第 1–30 条，但“30 篇全文 PDF 入 Zotero”尚未完成：3 篇已有可读 Zotero PDF，另取得并核验 6 篇 PDF、仅暂存本地，21 篇本轮未取得。检查到第 14 条时，Zotero 云 API 返回 HTTP 429；我停止云端请求，未把本地暂存文件冒称为已入库，也未建卡或修改 wiki。未取得的条目主要检查了 OpenAlex 的 PDF 位置；出版社授权访问和作者仓储尚未逐篇查完，因此不能判定其全文不存在。第 27 条是接受稿，第 28 条是 arXiv 预印本而非期刊 PDF，且原文研究对象为汽车模型。逐条结果如下（“未核实”指 Zotero parent key 未核实）：\n\n1. Comparative study on deep and machine learning approaches for predicting wind pressures on tall buildings — 10.1016/j.aej.2024.10.047 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n2. Machine learning based algorithms for wind pressure prediction of high-rise buildings — 10.1177/13694332221092671 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n3. Data-driven intelligent prediction of wind pressures on high-rise buildings subject to interference effects: A comparative study — 10.1016/j.jobe.2026.117020 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n4. Surrogate modelling of unsteady wind pressure on tall buildings with varying slenderness and side ratios using attention-based neural networks — 10.1016/j.jobe.2026.115384 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n5. Prediction of wind pressures on supertall buildings based on proper orthogonal decomposition and machine learning — 10.1002/tal.2174 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n6. Prediction of wind pressures on tall buildings using wavelet neural network — 10.1016/j.jobe.2021.103674 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n7. Transfer learning framework for the wind pressure prediction of high-rise building surfaces using wind tunnel experiments and machine learning — 10.1016/j.buildenv.2025.112620 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n8. Intelligent evaluation of interference effects between tall buildings based on wind tunnel experiments and explainable machine learning — 10.1016/j.jobe.2024.110449 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n9. Forecasting of pressure coefficient for wind interference due to surrounding tall building on a tall rectangular building using CFD data trained machine learning models — 10.1016/j.istruc.2025.108705 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n10. A multi-fidelity machine learning framework to predict wind loads on buildings — 10.1016/j.jweia.2021.104647 — KGUH9556 — \n11. WindMiL: Equivariant Graph Learning for Wind Loading Prediction — 10.48550/arXiv.2511.01226 — 未核实 — 版；未入 Zotero）。\n12. Interpolating wind pressure time-histories around a tall building - A deep learning-based approach — 10.1016/j.jweia.2024.105968 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n13. Wind-Induced Pressure Prediction on Tall Buildings Using Generative Adversarial Imputation Network — 10.3390/s21072515 — VIBMBDWP — Zotero PDF）。\n14. A hybrid machine learning framework for wind pressure prediction on buildings with constrained sensor networks — 10.1111/mice.13488 — VAHQEUIG — Zotero 仓储版 PDF）。\n15. Conditional Diffusion Model to Predict Structural Wind Loading Using Data from Sparse Sensors — 10.1061/jsendh.steng-16666 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n16. Randomized Time-Delayed Dynamic Mode Decomposition Approach for Reconstruction of Wind Pressure Fields on High-Rise Buildings — 10.1061/jenmdt.emeng-8506 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n17. The use of linear stochastic estimation for the reduction of data in the NIST aerodynamic database — 10.12989/was.2003.6.2.107 — 未核实 — 官方全文；未入 Zotero）。\n18. Interpolation of wind-induced pressure time series with an artificial neural network — 10.1016/s0167-6105(02)00155-1 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n19. Wind pressure data reconstruction using neural network techniques: A comparison between BPNN and GRNN — 10.1016/j.measurement.2016.04.049 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n20. Wind pressure field reconstruction based on unbiased conditional kernel density estimation — 10.1016/j.jweia.2022.104947 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n21. Wind pressure field reconstruction using a variance-extended KSI method: Both deterministic and probabilistic applications — 10.1016/j.probengmech.2023.103557 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n22. Wind pressure field reconstruction using a spatio-temporal decomposition-DNN method: Both deterministic and probabilistic applications — 10.1016/j.jweia.2026.106481 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n23. Sparse-measurement-based peak wind pressure evaluation by super-resolution convolutional neural networks — 10.1016/j.jweia.2023.105574 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n24. Recovery of missing field measured wind pressures on a supertall building based on correlation analysis and machine learning — 10.1016/j.jweia.2022.105237 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n25. High-fidelity reconstruction of wind pressure fields on connected super-high-rise structures using machine learning — 10.1177/13694332261441086 — 未核实 — 未获取；OpenAlex 未给出 PDF。\n26. Sensor-Outage-Aware Spatio-Temporal Graph Reconstruction of High-Rise Facade Pressure Fields — 10.48550/arXiv.2605.08159 — 未核实 — 版；未入 Zotero）。\n27. An optimal sensor placement scheme for wind flow and pressure field monitoring — 10.1016/j.buildenv.2023.110803 — 未核实 — PDF；未入 Zotero）。\n28. Optimization of sparse sensor placement for estimation of wind direction and surface pressure distribution using time-averaged pressure-sensitive paint data on automobile model — 10.1016/j.jweia.2022.105043 — 未核实 — 预印本，非期刊 PDF；未入 Zotero）。\n29. POD-Based Constrained Sensor Placement and Field Reconstruction from Noisy Wind M…\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 05:33",
+      "text": "literature 取全文这单只完成了一部分：A 档 30 篇只拿到 9 篇。中途 Zotero 的云端接口限流（返回 429），它就停了。\n\n**拿到的 9 篇**\n- 3 篇 Zotero 里本来就有全文。\n- 6 篇刚取到，暂存在本地，还没放进 Zotero。其中 1 篇是接受稿，2 篇是 arXiv 预印本；有一篇预印本研究的是汽车模型，不是建筑。\n- 补线性随机估计那篇（NIST 风压库，2003）拿到了期刊官方全文。\n- 第 29、30 条在它的回执里被截断了。本地暂存目录里有第 29 条的 PDF，所以 9 篇里算上了它。第 30 条的情况不明，已写进补取任务。\n\n**没拿到的 21 篇**\n- 它只查了 OpenAlex 有没有免费 PDF，没走出版社授权渠道。\n- 上一批 5 篇用出版社授权渠道都拿到了，所以这 21 篇不能算取不到。\n\n**Decision I made：拆成两单并行，不等全部到齐再建卡。** 错了的代价只是建卡分两批。\n- 已有全文的 9 篇，直接派 litwiki 建卡。\n- 另派 literature：等限流解除后把暂存的 PDF 放进 Zotero，其余 21 篇改走出版社授权渠道和作者仓储，逐篇去取。\n\n两个委托的回执都被截断，编号没拿到。完成时结果会自动发回来。\n\n**另外两处**\n- 项目页里 TPU 干扰库的体量已改成实测值：每种施扰高度约 29.8 GB，全库约 96 GB，原先估的是 19 GB。\n- PoliMi 补读文件属性时又失败 20 个，看报错应该是 Zenodo 限流，不是文件缺失。我稍后放慢速度只补这 20 个，读完写进 M1 文件。\n\nM1 仍按 10-27 18:00 前交付。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 05:35",
+      "text": "【进程结束回访】L29.6d1 滚雪球重跑（Liang Hu 10-22 全线指令）完成：读 与 prisma.md；与旧池 去重，只筛新增；写 筛选_20261022.md； 去重后委托 litwiki 建前 5–10 篇；更新项目页；交回一行给 L29 根 Lead（委托方）\n（这是你在 2026-10-22 05:00 本地时间登记的进程结束回访：进程 1495633 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 05:35",
+      "text": "这个回访要做的事，上一轮已经全部完成，不用再做。筛选结果在，纳入的 10 篇已委托 litwiki 建卡，交回的那一行也已写出。这次只顺手删掉了项目页里一处重复的「文献依据」小节，不再另约回访。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 05:36",
+      "text": "【进程结束回访】L29.6d1 滚雪球重跑（Liang Hu 10-22 全线指令）完成：读 与 prisma.md；与旧池 去重只筛新增；写 筛选_20261022.md； 去重后委托 litwiki 建前 5–10 篇；更新项目页；交回一行给委托方\n（这是你在 2026-10-22 05:04 本地时间登记的进程结束回访：进程 1495633 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 05:36",
+      "text": "这个回访是同一件事的重复预约，那时连不上 Research Chat，我重试登记了两次，结果两次都登记上了。要做的事已经全部做完，不用再做，也不再约回访。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 07:13",
+      "text": "【告知 · 来自 美丽新世界】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n6d 补 S2 检索又多出 4 篇可能属于你 P1/P2 的条目（3 篇无 DOI），列在 「转 d1」那一行；自定收不收，不必回复。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 07:13",
+      "text": "【委托结果 · 文献检索智能体】L29.6d1 A 档补取全文：21 篇未取得 + 6 篇暂存入库\n30 篇中，27 篇已有可读本地 PDF 及对应 Zotero 附件，3 篇仍缺全文。本单尚未达到 30 篇全文齐备；#2、#5、#25 的缺口须保留给建卡方。逐篇清单如下，key 为 Zotero 父条目 key；“未获取”表示没有可交付 PDF。\n\n1. Comparative study on deep and machine learning approaches for predicting wind pressures on tall buildings — 10.1016/j.aej.2024.10.047 — QFAB4GAV — \n2. Machine learning based algorithms for wind pressure prediction of high-rise buildings — 10.1177/13694332221092671 — 未入库 — 未获取：SAGE 授权渠道及作者仓储未找到可核验全文。\n3. Data-driven intelligent prediction of wind pressures on high-rise buildings subject to interference effects: A comparative study — 10.1016/j.jobe.2026.117020 — W922XX3D — \n4. Surrogate modelling of unsteady wind pressure on tall buildings with varying slenderness and side ratios using attention-based neural networks — 10.1016/j.jobe.2026.115384 — G4RDMJDX — \n5. Prediction of wind pressures on supertall buildings based on proper orthogonal decomposition and machine learning — 10.1002/tal.2174 — 未入库 — 未获取：Wiley 授权渠道及作者仓储未找到可核验全文。\n6. Prediction of wind pressures on tall buildings using wavelet neural network — 10.1016/j.jobe.2021.103674 — 7CWC6JSA — \n7. Transfer learning framework for the wind pressure prediction of high-rise building surfaces using wind tunnel experiments and machine learning — 10.1016/j.buildenv.2025.112620 — SJK28MW8 — \n8. Intelligent evaluation of interference effects between tall buildings based on wind tunnel experiments and explainable machine learning — 10.1016/j.jobe.2024.110449 — 4NWVA3IX — \n9. Forecasting of pressure coefficient for wind interference due to surrounding tall building on a tall rectangular building using CFD data trained machine learning models — 10.1016/j.istruc.2025.108705 — GCJR8WC5 — \n10. A multi-fidelity machine learning framework to predict wind loads on buildings — 10.1016/j.jweia.2021.104647 — KGUH9556 — \n11. WindMiL: Equivariant Graph Learning for Wind Loading Prediction — 10.48550/arXiv.2511.01226 — GKWU2KQK — \n12. Interpolating wind pressure time-histories around a tall building - A deep learning-based approach — 10.1016/j.jweia.2024.105968 — ZGAZJIHQ — \n13. Wind-Induced Pressure Prediction on Tall Buildings Using Generative Adversarial Imputation Network — 10.3390/s21072515 — VIBMBDWP — \n14. A hybrid machine learning framework for wind pressure prediction on buildings with constrained sensor networks — 10.1111/mice.13488 — VAHQEUIG — \n15. Conditional Diffusion Model to Predict Structural Wind Loading Using Data from Sparse Sensors — 10.1061/jsendh.steng-16666 — 2PSJV8CV — \n16. Randomized Time-Delayed Dynamic Mode Decomposition Approach for Reconstruction of Wind Pressure Fields on High-Rise Buildings — 10.1061/jenmdt.emeng-8506 — CGTF89HN — \n17. The use of linear stochastic estimation for the reduction of data in the NIST aerodynamic database — 10.12989/was.2003.6.2.107 — TCIPSRHA — \n18. Interpolation of wind-induced pressure time series with an artificial neural network — 10.1016/s0167-6105(02)00155-1 — IT3G97WC — \n19. Wind pressure data reconstruction using neural network techniques: A comparison between BPNN and GRNN — 10.1016/j.measurement.2016.04.049 — KAU7HME2 — \n20. Wind pressure field reconstruction based on unbiased conditional kernel density estimation — 10.1016/j.jweia.2022.104947 — NUT7UBKD — \n21. Wind pressure field reconstruction using a variance-extended KSI method: Both deterministic and probabilistic applications — 10.1016/j.probengmech.2023.103557 — QD3QCBM6 — \n22. Wind pressure field reconstruction using a spatio-temporal decomposition-DNN method: Both deterministic and probabilistic applications — 10.1016/j.jweia.2026.106481 — QXIPE4N3 — \n23. Sparse-measurement-based peak wind pressure evaluation by super-resolution convolutional neural networks — 10.1016/j.jweia.2023.105574 — J5ZW7BEE — \n24. Recovery of missing field measured wind pressures on a supertall building based on correlation analysis and machine learning — 10.1016/j.jweia.2022.105237 — DHX2TS9B — \n25. High-fidelity reconstruction of wind pressure fields on connected super-high-rise structures using machine learning — 10.1177/13694332261441086 — 未入库 — 未获取：SAGE 授权渠道及作者仓储未找到可核验全文。\n26. Sensor-Outage-Aware Spat…\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 07:13",
+      "text": "A 档 30 篇文献，全文已入 Zotero 27 篇，只有 3 篇取不到：\n- #2 高层风压的机器学习算法（SAGE，2022）\n- #5 超高层 POD 加机器学习（Wiley，2024）\n- #25 连体超高层风压重构（SAGE，2026）\n\n出版社授权渠道和作者仓储都查过，没找到全文。这 3 篇只建摘要级卡，不当数字依据。\n\n另外 18 篇的建卡已派给 litwiki，这是第二批；先到全文的 9 篇上一单已派，不重复。这一批里第 1、3、7、19 篇是在同一数据上比多种方法的研究，我要求逐个方法列出误差数字，Q1「各方法能不能分出高下」主要看这几篇。第 30 篇在回执里被截断，入库情况不明，我在任务里写了\"若已入库就一起建卡\"。委托回执也被截断，编号没拿到，完成时结果会自动发回来。\n\n项目页已更新。卡片回来后，我把文献部分和数据元信息一起写进 M1，10-27 18:00 前交。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 07:17",
+      "text": "【委托结果 · 文献检索智能体】回访回报：「美丽新世界 → 文献检索智能体」L29.6d1 A 档补取全文：21 篇未取得 + 6 篇暂存入库\n云端续传已结束；27 篇有对应 Zotero 附件及本地 PDF，3 篇仍缺全文、未入库。逐篇题名、DOI、Zotero 父/附件 key、PDF 绝对路径和版本已交付美丽新世界；#2、#5、#25 均为“未获取”，没有 PDF 路径或可报告的 Zotero key。\n\n- 30 篇逐篇 key、路径及缺口 → \n- 逐篇核验数据 → \n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 07:17",
+      "text": "literature 交来的总清单和上一条回报一致：30 篇里 27 篇已入 Zotero，只缺 #2、#5、#25。之前被截断的第 30 篇也核实了，出版社版 PDF 已入库（Zotero 键 8FIFMIMJ），所以第二批建卡任务里\"若已入库就一起建\"这一条会照做，不用再补派。\n\n这一轮没有新的待办，只等 litwiki 两批卡片回来，然后写 M1。逐篇的入库状态记在。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 07:25",
+      "text": "【委托结果 · 文献 Wiki 智能体】L29.6d1 A 档已取全文 9 篇建卡\n委托失败：fetch failed\n（过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 07:25",
+      "text": "litwiki 第一批建卡失败了，原因是平台网络错误，一张卡也没写出来。\n\n我重发时又被挡了，这次是全平台同时进行的委托满了，上限 32 个。为了避免两单写同一节文件时互相覆盖，我已经撤掉第二批，打算两批合成一单（A 档 30 篇）一起重发。问题是我先撤了第二批，重发才被拒，所以现在这两批都不在队列里。\n\n**Decision I made：** 合并单不靠手动重试。本机后台每 10 分钟提交一次，最多试 2 小时（后台任务 by05ruv5t），提交成功就停。任务书存在。\n- 这一单先做 #1、#3、#7、#19 这几篇同数据多方法比较，以及线性随机估计那篇（#17）。\n- 错了的代价：如果 2 小时内都提交不上，建卡会推迟。M1 截止是 10-27 18:00，时间还够。\n\n滚雪球重跑那 10 篇的建卡不受影响，还在正常进行。\n\nA 档 30 篇建卡的合并单在 07:26 第一次就提交成功了，排在 litwiki 队列第 14 位。完成后会自动发回来。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 07:47",
+      "text": "【委托结果 · 文献 Wiki 智能体】L29.6d1 滚雪球重跑纳入 10 篇建卡\n10 篇均已建卡，逐卡列出输入输出、划分与外推维度、比较方法、简单基线和调参预算；缺失的全文证据明确标 NR。第 5 篇的预印本有 PDF 页码及图号，其余 9 篇仍待委托 的全文结果，不能据摘要数字作逐表比较。\n\n- 10 张卡 → （文件名前缀 `L29_6d1_s2_`；DOI 与逐卡链接见下列综述）\n- 补卡综述 → \n- 论文索引 → \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n（附件：L29_6d1_s2_01_chen_2022_emd_cnn_pressure.md）\n\n（附件：L29_6d1_s2_02_bairagi_2021_setback_ann.md）\n\n（附件：L29_6d1_s2_03_ben_ali_2022_variational_assimilation.md）\n\n（附件：L29_6d1_s2_04_ebert_2023_gappy_pod_nn.md）\n\n（附件：L29_6d1_s2_05_zhou_2026_rooftop_reconstruction.md）\n\n（附件：L29_6d1_s2_06_facchini_2010_acquisition_points.md）\n\n（附件：L29_6d1_s2_07_qiu_2025_compressed_sensing.md）\n\n（附件：L29_6d1_s2_08_inoba_2023_sparse_sensing.md）\n\n（附件：L29_6d1_s2_09_abdelwahab_2026_wind_load_tool.md）\n\n（附件：L29_6d1_s2_10_hu_2024_crosswind_loads.md）\n\n（附件：Wind_Surrogate_Problem_Survey_L29_6d.md）\n\n（附件：Paper_Index.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 07:47",
+      "text": "滚雪球重跑纳入的 10 篇已经建好卡。其中 9 篇只有摘要级内容，全文 litwiki 已另派任务去取。\n\n这批卡里有两条对 Q2「调好的经典方法会不会被新方法超过」有用的旁证。两篇的对象都是流场重构，不是建筑表面风压。\n- **Zhou 2026（有全文，预印本第 17、19 页 Fig.8）**：都只用 5 个传感器，谁赢取决于训练数据有多少。只用一个数据集训练时，经典的 Kriging 比深度网络好；用多个数据集一起训练时，结果反过来。重构质量用 SSIM 衡量，越高越好：\n\n| 训练数据 | Kriging | 深度网络 |\n| --- | --- | --- |\n| 只用一个数据集 | 0.502 | 0.194–0.237 |\n| 多个数据集一起 | 0.415 | 0.531–0.550 |\n\n 这正好是我们 P2 要在测点数和数据量上分档检验的现象。\n- **Ebert 2023（只有摘要）**：传感器少的时候，两种机器学习方法和 gappy POD 误差很接近：浅层神经网络 0.169、随机森林 0.168、gappy POD 0.184。误差的定义和单位摘要里没写，只能当线索。\n\n压缩感知和横风荷载模型这两张卡目前还没有数字，等全文。\n\n这两条已经记进项目页。A 档 30 篇的建卡还在 litwiki 队列里排队。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 07:47",
+      "text": "【自动初查 · 未通过】你交回的结果还缺下面几项（按派活方的验收清单）：\n- 一行交回：L29.6d1｜输出目录｜池总数/初筛通过/纳入数｜已委托建卡数｜是否改变结论（结果中缺少子项目号 L29.6d1、输出目录、池总数/初筛通过数及是否改变结论的明确说明）\n- 筛选文件路径 \n\n验收清单：\n一行交回：L29.6d1｜输出目录｜池总数/初筛通过/纳入数｜已委托建卡数｜是否改变结论\n筛选文件路径 \n\n请补齐后重新给出完整的结论（包括已经做好的部分）；确实做不到的，写明原因和已经尝试过什么。\n\n你交回的是进度（转派/正在取/待…后再交）。本委托保持进行中：等你转派的结果回来、核过后再一次交回完整结论；需要先说进度，用 <委托方> --request '<进度>'，不要当结果交。"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 07:47",
+      "text": "滚雪球重跑这一单已经全部完成，没有还在等的部分。纳入的 10 篇已由 litwiki 建好卡，不需要再等别的结果。\n\n**运行与筛选**\n- **种子**：43 个 DOI 全部解析成功。种子来自首轮 A 档 30 篇和 6d 层转来的 d1 行 13 个，已去重。\n- **数据源**：OpenAlex（有前向引文）加 Semantic Scholar。Semantic Scholar 因限流，跳过了 2 篇种子的引文：10.1016/j.jweia.2026.106481、10.26190/unsworks/32738。这 2 篇在 OpenAlex 那边正常。\n- **池子**：共 2097 篇，关键词初筛通过 646 篇。和首轮池子去重、去掉种子后，新增 374 篇。\n- **筛选**：我逐题筛这 374 篇，没用 Gemini 或 Deep Research。\n - 纳入 10 篇\n - 记录、暂不建卡 11 篇\n - 转 L29.6d2 的 2 篇\n - 与已有条目重复 2 篇\n - 排除 349 篇。\n\n**建卡**\n- 10 篇都已建卡，文件名前缀 `L29_6d1_s2_`，在。\n- 其中 9 篇只有摘要级内容，全文 litwiki 已另派任务去取。\n\n**对结论和方案的影响**\n- 已写的结论不改变，因为本子项目还没有计算结论。\n- 方案补了两种方法：\n - 稀疏重构（P2）加「压缩感知」：假设风压场只由少数几个模态组成，再从少量测点把这几个模态解出来。\n - 基底力（P1b）加半经验横风荷载模型，作非机器学习的对照基线。\n- 新卡里有一条 Q2 的旁证（Zhou 2026，有全文，预印本第 17、19 页 Fig.8）。对象是屋顶流场，不是表面风压：\n - 同样 5 个传感器，只用单一数据集训练时，经典的 Kriging 比深度网络好\n - 用多个数据集一起训练时，深度网络比 Kriging 好。\n - 这和我们 P2 计划按测点数和数据量分档检验的设计一致。\n- 项目页已更新。\n\n## 结论\nL29.6d1｜｜池 2097／初筛通过 646（与 10-22 首轮池去重后新增 374）／纳入 10｜已委托建卡 10 篇，已完成（litwiki，卡前缀 `L29_6d1_s2_`；9 篇摘要级，全文另由 取）｜不改变已写结论，方案补两种方法：P2 加压缩感知重构，P1b 加半经验横风荷载基线。前向引文有；Semantic Scholar 因限流跳过 2 篇种子（10.1016/j.jweia.2026.106481、10.26190/unsworks/32738）；43 个种子全部解析。\n\n筛选文件：\n\n\n\n（附件：筛选_20261022.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 09:17",
+      "text": "【委托结果 · 文献 Wiki 智能体】L29.6d1 A 档 30 篇建卡（合并重发）\n30 篇均已在指定共享文献库形成可查记录，其中 27 篇有全文依据、3 篇明确限于摘要；不能把多数论文的随机测点测试误差解读为留风向或留几何外推精度。交付文件如下；逐篇 DOI、Zotero 键和卡片绝对路径见清单，所有卡片及索引也已打包。\n\n- 30 篇卡片及索引压缩包 → \n- 逐篇 DOI／Zotero 键／卡片路径清单 → \n- 论文索引 → \n- 「L29.6d1 A 档补卡」总表 → \n- 交付与证据边界说明 → \n\n\n\n\n\n\n\n（附件：L29_6d1_A30_cards_and_index.zip）\n\n（附件：card_manifest.json）\n\n（附件：Paper_Index.md）\n\n（附件：Wind_Surrogate_Problem_Survey_L29_6d.md）\n\n（附件：L29_6d1_A30_delivery.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 09:17",
+      "text": "A 档 30 篇都建好卡了：27 篇有全文，3 篇（#2、#5、#25）只有摘要。我抽查了 #1 的原文（PDF 第 8 页 Table 5），卡片上的数字和原文对得上。\n\n**对 Q1、Q2 有用的几组数字**（都是论文作者自己的结果，不是我们的检验）\n- **#1：7 种方法在同一数据上预测平均风压。** 测试误差（RMSE）从小到大：DNN 0.048、DBN 0.056、ELM 0.076、WELM 0.095、RF 0.141、GBM 0.143。\n - 这组数字不能代表外推能力：测试集是在同一风向的样本里随机抽的，只算内插。\n- **#3：极端负压（Cp<−3）的预测误差。** 梯度提升树 0.183 最低，随机森林 0.248，KAN 0.251，决策树 0.292。\n- **#19：重构坏掉的测点。** 三种神经网络的 RMS 误差分别是 5.98、6.34、6.82 Pa。\n\n**共同的缺口**\n- 多数论文没有和反距离插值、最近测点这类简单方法放在同一张表里比。\n- 也没有说明各方法的调参投入是否相同。\n- 测试集大多是随机抽的测点或样本，不是留出风向或留出几何。\n\n所以这些论文能说明方法之间有差别，但说明不了差别是方法本身带来的，还是调参多少、划分方式造成的。这正是本子项目的统一基准要补的。\n\n文献部分基本收齐：A 档 30 篇和重跑纳入的 10 篇都有卡了，只剩重跑那批 9 篇的全文还在补（litwiki）。下一步把文献结论和数据元信息合写成 M1 文件，10-27 18:00 前交给 L29.6d。项目页已更新。\n\n\n\n（附件：L29_6d1_A30_delivery.md）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 16:36",
+      "text": "【告知 · 来自 美丽新世界】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nGemini 打分对照又发现几篇属于你的候选，列在 第 9 节「转 d1」行；自定收不收，下载停止令在效，只做题名摘要判断。不必回复。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 18:28",
+      "text": "【委托 · 来自 美丽新世界】恢复文献取件与建卡（停止令已解除）\nLiang Hu 10-22：文献下载暂停 15:55 已解除，要求**今天内**恢复因停止令暂停的文献工作。规则：取件前对每个 DOI/题名先 工作目录 查本地（含 Liang Hu 台式机 I:\\Literature、Zotero、EndNote），已有的列路径/itemKey 直接用，只派确无的，任务书写“本地已查、确无”；注意 报「有条目无PDF」的仍需取 PDF；开放获取优先；Elsevier 只能让 bot 用 ≤100、每小时 ≤30；遇 403/验证码该出版商当天停，不绕过。你子树里其他因停止令暂停的取件/建卡/补全文/滚雪球也一并恢复。交回每项一行：「原编号→新派单编号（或 自己做/已完成/无）｜ 已有几篇、确无几篇」。 你要恢复的：9 篇摘要级卡的全文（原）；另 6d 第 9 节转给你的 3 篇候选若决定收也一并处理。\n（原因：Liang Hu 10-22 要求今天恢复）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 18:28",
+      "text": "暂停的文献工作已恢复，两单都已派出，正在排队。\n\n**原 （9 张摘要级卡补全文）**\n- 先用 查了本地，9 篇里 6 篇已有全文：literature 在暂停前已经取到，放在它的 `L29_6d1_PDFs` 目录。\n - 这 6 篇直接交给 litwiki，把卡升成全文级，不再下载。\n- 另 3 篇确无，派 literature 去取，任务书里写了\"本地已查、确无\"：\n - 退台建筑 ANN（加拿大科学出版社）\n - 风洞测点布置优化（IABSE）\n - 矩形建筑风荷载预测工具（CSCE）\n- 这 3 篇都不是 Elsevier，按原通道取，遵守每个出版商每天、每小时的上限。\n\n**6d 第 9 节转来的 3 篇候选**\n- 收 NIST 高层气动荷载数据库（2003）：可作 P1 数据来源背景。Zotero 里已有全文，并进 litwiki 那一单建卡。\n- 收台风山竹期间超高层幕墙风压重构（2023）：这是 P2 在实测数据上做重构的例子。本地确无，并进 literature 那一单取件。\n- 不收 KAN 高层干扰（2025）：库里已有卡 L3RKLLUC。\n\nliterature 取回那 3 篇后，我再派 litwiki 补那 3 张卡。项目页已更新。\n\n## 结论\n- 原 → 新派两单：litwiki （6 篇摘要级卡升全文）、literature （取 3 篇）｜ 已有 6 篇、确无 3 篇\n- 6d 第 9 节转来的 3 篇候选 → 收 2 篇、不收 1 篇｜ 已有 2 篇、确无 1 篇\n - NIST 2003（Zotero GL4ULHGI，已有）：并入 建卡\n - 山竹幕墙风压重构 10.1061/jsendh.steng-11303（确无）：并入 取件\n - KAN 10.1016/j.dibe.2025.100770（已有卡 L3RKLLUC）：不再处理\n- 本子树里没有其他因停止令暂停的取件、建卡或滚雪球。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 19:01",
+      "text": "【委托结果 · 文献 Wiki 智能体】L29.6d1 摘要级卡升全文（6 篇）+ NIST 高层数据库建卡\n指定的六张卡在本轮受理时已是全文级；已核对六份本地 PDF 的页数、sha256 与卡片记录一致，未重复下载或覆盖。此次澄清了 #4、#7 卡对“外推”的表述，并将综述中 #3 的误差下限更正为 20.9%。#2、#6、#9 未在本轮改动。\n\n新建的 Zhou 2003 卡（DOI 10.1061/(ASCE)0733-9445(2003)129:3(394)；Zotero `GL4ULHGI`，附件 `ICDGGPHU`）记录的是 NatHaz 高层建筑底部力矩、扭矩的 RMS 系数与谱，不是逐测点 Cp 数据；它也不是 NIST 另设的空气动力数据库。论文证明当时可在线交互查询，但不证明原始时程可批量下载；本次检查的两个 NatHaz 入口均无法解析。\n\n交付文件：\n- #1 Chen → \n- #3 Ben Ali → \n- #4 Ebert → \n- #7 Qiu → \n- #8 Inoba → \n- #10 Hu → \n- Zhou 2003 新卡 → \n- 综述补充说明 → \n\n\n\n\n\n\n\n\n\n\n（附件：L29_6d1_s2_01_chen_2022_emd_cnn_pressure_v2.md）\n\n（附件：L29_6d1_s2_03_ben_ali_2022_variational_assimilation_v2.md）\n\n（附件：L29_6d1_s2_04_ebert_2023_gappy_pod_nn_v2.md）\n\n（附件：L29_6d1_s2_07_qiu_2025_compressed_sensing_v2.md）\n\n（附件：L29_6d1_s2_08_inoba_2023_sparse_sensing_v2.md）\n\n（附件：L29_6d1_s2_10_hu_2024_crosswind_loads_v2.md）\n\n（附件：L29_6d1_s2_11_zhou_2003_nathaz_aerodynamic_loads.md）\n\n（附件：Wind_Surrogate_Problem_Survey_L29_6d.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 19:01",
+      "text": "（智能体出错：You've hit your session limit · resets 7:50pm (America/New_York)）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 19:05",
+      "text": "【委托结果 · 文献检索智能体】L29.6d1 补取全文 4 篇（本地已查、确无）\nReconstruction of Extreme Wind Pressures on Cladding of a Skyscraper during Super Typhoon Mangkhut — 10.1061/jsendh.steng-11303 — Zotero 父条目 XDKFE5GR、附件 X2AB72VG — PDF 首页身份，并从 Zotero 云端回读附件，SHA-256 与本地文件一致。\n\nPrediction of pressure coefficient on setback building by artificial neural network — 10.1139/cjce-2020-0100 — 既有 Zotero 父条目 HWZAZVQD — 未获取：官方 PDF 返回 403；加拿大科学出版已按规则当天熔断。\n\nOptimisation of the acquisition points in wind tunnel pressure measurements — 10.2749/222137810796064237 — Zotero key 未确认 — 未获取：官方页面仅提供付费全文和预览，预览不能作为全文。\n\nDevelopment of a Predictive Tool for Wind Load Assessment on Rectangular Buildings — 10.3138/csce-2025-0105 — Zotero key 未确认 — 未获取：官方 PDF 返回 403；University of Toronto Press 已按规则当天熔断。\n\n取件报告 → \n\n\n\n（附件：L29_6d1_四篇全文取件报告_20261022.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 19:05",
+      "text": "（智能体出错：You've hit your session limit · resets 7:50pm (America/New_York)）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 20:05",
+      "text": "【系统】Claude 会话额度刚才用满，你上一轮没能处理（回复是限额报错）。现在额度已恢复。请接着处理上一条消息，最后给出完整的最终答复；如果其实已经处理完，请把最终结论完整重述一遍。"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 20:05",
+      "text": "恢复取件的两单都回来了：4 篇缺全文的只取到 1 篇；litwiki 那单查明 6 张卡早已是全文级，另新建了 1 张卡。\n\n**litwiki**\n- 原本要升级的 6 张摘要级卡，其实已经是全文级了。litwiki 核对了页数和校验码，没有重复下载。\n- 顺手改了三处表述：#4、#7 两张卡里\"外推\"的说法，以及汇总页里 #3 的误差下限，改成 20.9%。\n- 新建了 Zhou 2003 卡，这里有一处更正：\n - 我上一轮把这篇叫作\"NIST 高层数据库\"，不准确。它是 NatHaz 的高层建筑气动荷载交互库，内容是基底弯矩、扭矩的 RMS 系数和功率谱，不是逐测点的风压系数。\n - 论文只证明当时能在线交互查询，不能证明原始时程可以批量下载；litwiki 查的两个 NatHaz 入口都打不开。\n - 所以它只能作 P1 基底力部分的背景，当不了我们的数据源。\n\n**literature**\n- 取到 1 篇：台风山竹期间超高层幕墙风压重构（2023），已入 Zotero（XDKFE5GR）。已派 litwiki 给它建卡，委托回执被截断，编号没拿到。\n- 3 篇没取到，都按规则停了，没有绕过：\n - 退台建筑 ANN：加拿大科学出版社返回 403，当天停止访问该出版商。\n - 矩形建筑风荷载预测工具：多伦多大学出版社返回 403，当天停止访问该出版商。\n - 风洞测点布置优化：IABSE 只有付费全文。\n- 我约了 10-23 11:05 回访，重试前两篇（先用 查本地）。IABSE 那篇保持摘要级卡，不作数字依据。\n\n项目页已更新。M1 仍按 10-27 18:00 前交。\n\n## 结论\n- 原 （9 张摘要级卡补全文）→ litwiki 已完成，literature 已完成｜ 已有 6 篇、确无 3 篇。\n - 已有的 6 篇：卡本来就是全文级，已核对一致，没有重复下载。\n - 确无的 3 篇都没取到：两篇遇 403，出版商当天停止访问，10-23 11:05 重试；IABSE 一篇只有付费全文，保持摘要级卡。\n- 6d 第 9 节转来的 3 篇候选 → 收 2 篇、不收 1 篇｜ 已有 2 篇、确无 1 篇。\n - Zhou 2003：已建卡 `L29_6d1_s2_11`。更正：它是 NatHaz 基底荷载交互库，不是逐测点风压库，也没有证据表明能批量下载。\n - 台风山竹幕墙风压重构：literature 已取到全文（Zotero XDKFE5GR），已派 litwiki 建卡。\n - KAN 高层干扰：库里已有卡 L3RKLLUC，不再处理。\n- 本子树里没有其他因停止令暂停的取件、建卡或滚雪球。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 20:06",
+      "text": "【系统】Claude 会话额度刚才用满，你上一轮没能处理（回复是限额报错）。现在额度已恢复。请接着处理上一条消息，最后给出完整的最终答复；如果其实已经处理完，请把最终结论完整重述一遍。"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 20:06",
+      "text": "上一条消息其实已经处理完了，下面把最终结论完整重述一遍。\n\n## 结论\n- **原 （9 张摘要级卡补全文）**：已完成，改派成两单：litwiki 、literature。 查过，本地已有 6 篇，确无 3 篇。\n - 已有的 6 篇：litwiki 核对页数和校验码后确认，这 6 张卡本来就是全文级，没有重复下载。顺手改正了两处：两张卡里\"外推\"的说法，以及汇总页里一处误差下限，改为 20.9%。\n - 确无的 3 篇都没取到：\n - 退台建筑 ANN：加拿大科学出版社返回 403，当天停止访问该出版商\n - 矩形建筑风荷载工具：多伦多大学出版社返回 403，当天停止访问该出版商\n - IABSE 测点布置：只有付费全文，保持摘要级卡。\n - 前两篇已约 10-23 11:05 回访重试，重试前先用 再查一遍本地。\n- **6d 第 9 节转来的 3 篇候选**：收 2 篇，不收 1 篇。 查过，本地已有 2 篇，确无 1 篇。\n - **Zhou 2003**：已建卡 `L29_6d1_s2_11`。需要更正一处：它是 NatHaz 的高层基底弯矩、扭矩交互库，不是逐测点风压库，也没有证据表明能批量下载。所以它只作 P1 基底力部分的背景，不当数据源。\n - **台风山竹超高层幕墙风压重构（10.1061/jsendh.steng-11303）**：literature 已取到全文并入 Zotero（XDKFE5GR），已派 litwiki 建卡（回执被截断，编号没拿到）。\n - **KAN 高层干扰（10.1016/j.dibe.2025.100770）**：库里已有卡 L3RKLLUC，不再处理。\n- **本子树里其他暂停的工作**：没有别的因停止令暂停的取件、建卡或滚雪球。\n- **M1**：仍按 10-27 18:00 前交给 L29.6d。项目页已更新。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-22 20:12",
+      "text": "【委托结果 · 文献 Wiki 智能体】L29.6d1 山竹超高层幕墙风压重构建卡\n这篇论文可作为山竹期间超高层幕墙风压重构的先例，但不能作为“现场 48 点训练、跨事件验证”的基准。95° 风向留出测试层 77F 的 Cp,mean RMSE 为 PSO-GRNN 0.0323、PSO-BPNN 0.0869（PDF p.9 Table 6）；文中未给 IDW/Kriging 同指标简单基线，也未给现场全场 RMSE。现场 −2.46 kPa 与未布点位置重构 −3.245 kPa 不是同位置预测残差（PDF pp.13–14 Fig.18）。\n\n- 论文卡，DOI，Zotero `XDKFE5GR` → \n- 综述补行 → \n\n\n\n\n（附件：L29_6d1_s2_12_huang_2023_mangkhut_cladding.md）\n\n（附件：Wind_Surrogate_Problem_Survey_L29_6d.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-22 20:12",
+      "text": "台风山竹那篇超高层幕墙风压重构已经建好卡（`L29_6d1_s2_12`）。\n\n**卡上的结果**\n- 风洞数据里，留出 95° 风向、在第 77 层测试，两种方法预测平均风压系数的误差（RMSE）分别是：PSO-GRNN 0.0323，PSO-BPNN 0.0869（PDF 第 9 页 Table 6）。\n- 文中没有拿反距离插值、Kriging 这类简单方法放在同一张表里比，现场数据也没给全场误差。\n- 现场实测的 −2.46 kPa 和重构出的 −3.245 kPa 不在同一个位置，所以不能当成预测误差来读（PDF 第 13–14 页 Fig.18）。\n\n**怎么用**：它只作 P2 的\"实测应用先例\"，不作方法比较的依据。同样缺简单基线这一点，和 A 档大多数论文一样。\n\n项目页已更新。这一轮恢复的取件和建卡到此全部完成。剩下的两篇（退台建筑 ANN、矩形建筑风荷载工具）按计划 10-23 11:05 重试，M1 在 10-27 18:00 前交。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-23 09:41",
+      "text": "【委托 · 来自 美丽新世界】台式机恢复：重派暂缓与被拦篇目\nLiang Hu 10-23 09:3x：台式机已恢复，今天就把你子树里上午暂缓的、以及此前被 403/验证码/熔断拦下的篇目重新派出。规则：Elsevier、ASCE、AIP、Wiley、AIAA、Canadian Science Publishing、World Scientific、Taylor & Francis、AMS、Project Euclid 这 10 家只用 工作站 原通道；Mac 停用。不取：ASCE 书籍章节（DOI 以 10.1061/97807844 开头，记下走馆际互借）、SSRN、IABSE 会议论文。先 工作目录 只取确无的（「有条目无PDF」算确无，取到挂原条目）；每家每台每天 ≤100 篇；遇验证码/登录页记下即停，不重试。交回一行：「新派单编号｜篇数（按出版商）｜ 已有几篇｜按规则不取几篇」；没有被拦篇目写「无」。\n（原因：Liang Hu 10-23 恢复台式机取件）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-23 09:41",
+      "text": "昨天被 403 挡下的 2 篇已经重新派给 literature，正在排队。上午没有暂缓的篇目。\n\n- **加拿大科学出版社**：退台建筑 ANN（10.1139/cjce-2020-0100），按规定用台式机 取。Zotero 里已有这条记录但没有 PDF，算确无，取到后挂回原条目。\n- **多伦多大学出版社**：矩形建筑风荷载工具（10.3138/csce-2025-0105）。这家不在台式机的 10 家名单里，照 工作站 原通道取。\n- **两篇派单前都用 查过**，本地都没有全文。\n- **按规则不取 1 篇**：IABSE 会议论文（风洞测点布置优化），卡片保持摘要级。\n\n原定今天 11:05 重试这两篇的回访已经撤掉，避免重复派单。\n\n## 结论\n｜2 篇（加拿大科学出版社 1 篇，用；多伦多大学出版社 1 篇，走 工作站 原通道）｜ 已有 0 篇（加拿大科学出版社那篇在 Zotero 有条目无 PDF，算确无）｜按规则不取 1 篇（IABSE 会议论文 10.2749/222137810796064237）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-23 09:59",
+      "text": "【委托结果 · 文献检索智能体】L29.6d1 重取被 403 拦下的 2 篇（本地已查、确无）\n两篇均重取未果，本地复查仍确无 PDF。Prediction of pressure coefficient on setback building by artificial neural network — DOI 10.1139/cjce-2020-0100 — Zotero 父项 HWZAZVQD：台式机取件器访问到 PDF 链接，但 PDF 请求返回 403（退出码 8，no_access）；未取得附件，未挂原条目。Development of a Predictive Tool for Wind Load Assessment on Rectangular Buildings — DOI 10.3138/csce-2025-0105 — Zotero key 未核得：UTP 浏览器出现 Cloudflare 安全验证页（Ray ID a4f13c44d8ddcbd5），已按规则将 UTP 当天熔断并停止，未取得 PDF。两篇均无可交付的本地 PDF 路径；未使用 Mac，也未取 IABSE 那篇。\n\n- 逐篇取件记录与闸口证据 → \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-23 09:59",
+      "text": "重派的 2 篇这次还是没取到（literature），本地复查也仍然没有全文。\n\n- **退台建筑 ANN**（加拿大科学出版社）：台式机找到了 PDF 链接，但下载返回 403，没有访问权限。\n- **矩形建筑风荷载工具**（多伦多大学出版社）：弹出 Cloudflare 安全验证页，按规则当天停止访问这家，没有重试。\n\n**Decision I made：这 2 篇加上 IABSE 那篇不再重取，卡片保持摘要级，不作数字依据。**\n- 原因：三篇都不是本子项目的核心证据，方法清单里同类方法都有全文文献可以替代。\n- 错了的代价：如果以后发现其中某篇有关键数字，再走馆际互借补，最多耽误几天。\n\n项目页已记下。文献部分到此收齐，接下来写 M1 文件，10-27 18:00 前交给 L29.6d。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-23 10:00",
+      "text": "【自动初查 · 未通过】你交回的结果还缺下面几项（按派活方的验收清单）：\n- 已有几篇\n- 按规则不取几篇\n\n验收清单：\n一行：新派单编号（或无）｜篇数（按出版商）｜ 已有几篇｜按规则不取几篇\n\n请补齐后重新给出完整的结论（包括已经做好的部分）；确实做不到的，写明原因和已经尝试过什么。"
+    },
+    {
+      "role": "bot",
+      "who": "美丽新世界",
+      "ts": "2026-10-23 10:00",
+      "text": "上一条回复只报了重取的结果，漏了\" 已有几篇\"和\"按规则不取几篇\"两项，这里补齐并完整重述。\n\n- **新派单**：literature，共 2 篇。\n - 加拿大科学出版社 1 篇：退台建筑 ANN（10.1139/cjce-2020-0100），按规定用台式机 取。\n - 多伦多大学出版社 1 篇：矩形建筑风荷载工具（10.3138/csce-2025-0105），照 工作站 原通道取。\n- **派单前查本地**：用 查过，两篇都没有全文，已有 0 篇。加拿大那篇在 Zotero 里有条目、没有 PDF，按规则算确无。\n- **按规则不取**：1 篇，是 IABSE 会议论文（风洞测点布置优化，10.2749/222137810796064237）。\n- **上午暂缓的篇目**：无。\n- **取件结果**：两篇都没取到，都按规则停下，没有重试。\n - 加拿大科学出版社：找到了 PDF 链接，但下载返回 403，没有访问权限。\n - 多伦多大学出版社：弹出 Cloudflare 验证页，当天停止访问这家。\n - 记录在。\n- **Decision I made：这 2 篇加上 IABSE 那篇不再重取，卡片保持摘要级，不作数字依据。** 三篇都不是核心证据，方法清单里同类方法都有全文文献可以替代。错了的代价：如果以后发现其中某篇有关键数字，再走馆际互借补。\n\n## 结论\n｜2 篇（Canadian Science Publishing 1 篇，用；University of Toronto Press 1 篇，走 工作站 原通道）｜ 已有 0 篇（2 篇都确无；CSP 那篇在 Zotero 有条目无 PDF，算确无）｜按规则不取 1 篇（IABSE 会议论文 10.2749/222137810796064237）。两篇都没取到：CSP 的 PDF 返回 403；UTP 出现 Cloudflare 验证页，当天停止访问该出版商。三篇不再重取，卡片保持摘要级。"
+    }
+  ],
+  "files": {
+    "self": "c815466f.json",
+    "claims": null,
+    "pdf": null
+  }
+}
