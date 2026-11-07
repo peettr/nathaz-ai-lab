@@ -1,0 +1,47 @@
+{
+  "id": "57da688b",
+  "slug": "57da688b",
+  "number": "L31.4a",
+  "title": {
+    "zh": "L31.4a 风压来源与可信度 总控",
+    "en": "L31.4a 风压来源与可信度 总控"
+  },
+  "group": "core",
+  "parent": "f16090e3",
+  "depth": 2,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "57da688b.json",
+    "claims": null,
+    "pdf": null
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "id": "798455e8",
+  "slug": "798455e8",
+  "number": "R16.5d",
+  "title": {
+    "zh": "R16.5d CANTO 精读与代码核查",
+    "en": "R16.5d CANTO close reading and code audit"
+  },
+  "group": "petw5",
+  "parent": "d11f6b29",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-11-01 20:25",
+  "end": null,
+  "updated": "2026-11-01 22:39",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "CFD Lead · 开子项目",
+      "ts": "2026-11-01 20:26",
+      "text": "【Liang Hu 让 R16.5 CFD 总控 分出的子对话】依据：Liang Hu 11-01 批 A310② 选 a（先精读、核代码，不快试），平台 Lead 转达，本任务已获批，不另交启动方案。这是一次性任务，只读文献与公开网页，不开算、不下载大数据、不快试、不上集群、不用 Colab。判断由你本人做，不用 Gemini。\n\n对象：NVIDIA CANTO（CAD-Native Transformer Operators，arXiv 2609.36806）。来源笔记（只读）：。 11-01 查过：本地确无。先自己从 arXiv 读原文（小 PDF 可取到 [local path omitted]，用完删）；要建 wiki 卡可派 litwiki，任务书附「本地已查、确无」。公众号的数字不算证据，每个数字回原文核，未核的写「未核」。\n\n\n卡里必须回答：\n① 方法要点与四个基准的数字，标原文页码（写清 PDF 页还是期刊页），基准名和指标定义式写全\n② NURBS 表示对建筑锐边、锐缘分离是否有天然短板；原文有无钝体或锐边算例（没有就写没有，自己的推断标「本线判断，无文献依据」）\n③ 训练数据规模和网格依赖，特别是训练与最终验收是否仍需网格\n④ 与 PhysicsNeMo 中 DoMINO、Transolver 等几何代理的关系（本线已有评估：、；原文未提的写未提）\n⑤ 对本线的前提：要先有多外形、多风向数据（R25 或 R21 A328 路径 a 补算）才有评估价值。核一下本线现状（Silsoe、CAARC 都是单外形），外形和风向的实际数量写清楚\n出口：X1 存档。转入条件：代码权重公开且我们有多外形数据时，与 PhysicsNeMo 一并评估，届时另报。若精读发现与这个出口冲突的事实，如实写明并上报，不自行改出口。\n\n写完：\n1. 用 告知 T13 卡路径（只写路径和一句话结论）\n2. 用"
+    },
+    {
+      "role": "bot",
+      "who": "CFD",
+      "ts": "2026-11-01 20:26",
+      "text": "接下来写精读卡。刚核到一条新事实：HiLiftAeroML 的 `full` 划分是按算例随机划分，不是留出新几何，这一点也会写进卡里。CANTO 精读卡已写完，出口维持 X1 存档：精读没有发现与这个出口冲突的事实。代码和权重 11-01 重新核查后仍未见公开，与 10-27 相同。这次只读文献和公开网页，没有开算；上报已排队，也已告知。\n\n**有三点与之前的说法不同：**\n1. **NURBS 对建筑锐边没有天然短板。** 这是我读后的判断，原文没有讨论建筑。原文的 AhmedML 就是带平面和锐边的钝体，平面用四控制点的片表示。短板在别处：输入没有来流，目标没有脉动和峰值，全场相对 L2 看不出前缘。\n2. **最受关注的 19.8% 不能当新几何上的能力。** 它指 HiLiftAeroML 表面压力相对 L2 从 5.65 降到 4.53，即 (5.65−4.53)/5.65。原文的划分按措辞对应官方的 `full`，也就是按算例随机划分，同一几何的其他迎角可能在训练集里。原文没有写明划分键名，这是我的读法。\n3. **转入条件的两条数据路径目前都没通。** A328 路径 a 已暂缓到 A191 定入流之后，R25.2 的 LES 也卡住在等 PI。\n\n**其他要点：**\n- **本线数据：** Silsoe 和 CAARC 各 1 个外形、1 个风向，共 2 组。基准训练算例最少约 210 例，差约 105 倍（210÷2）。\n- **网格：** 推理时不用给输入几何划分网格，但训练数据和最终 CFD 验收仍要网格。\n- **未核：**\n - 四个数据集原论文的来流和雷诺数\n - 图上的数值\n - 没查 GitLab、NGC 等其他站点，也没找到 Leibovici 的 GitHub 账号。\n\n 查不到代码不等于不存在，这些都在卡内写明。\n\n\n文件：\n- 精读卡：\n- 决策记录：（README 已加一行）\n\n\n\nSources:\n- [CANTO 项目页]([external URL omitted]\n- [arXiv 2609.36806]([external URL omitted]\n- [HiLiftAeroML 划分说明]([external URL omitted]\n- [AhmedML 数据集]([external URL omitted]\n- [NVIDIA/physicsnemo]([external URL omitted]\n- [Emmi-AI/noether]([external URL omitted]\n- [PINNeAPPle 第三方说明]([external URL omitted]\n\n（附件：.md）"
+    },
+    {
+      "role": "relay",
+      "who": "CFD Lead · 转达",
+      "ts": "2026-11-01 22:38",
+      "text": "【平台提醒，非 Liang Hu 指令】R16.5d 对话已开出 2 小时，还没看到启动方案文件。按规则请先写 （模板）放在本子项目目录，系统会自动登记给 Liang Hu 审批；批准前不能提交超算/Colab、不能派计算类任务，只做文献与准备。"
+    },
+    {
+      "role": "bot",
+      "who": "CFD",
+      "ts": "2026-11-01 22:38",
+      "text": "本对话（R16.5d）不写启动方案，这条提醒不适用。根 Lead 交办时已写明：依据 Liang Hu 11-01 批的 A310②（选 a），这是已获批的一次性任务，「不另交启动方案」。\n\n- **工作已完成**：精读卡已写好，上报已发，也已告知。根 Lead 11-01 20:40 已收妥并抽核，一致，维持 X1。\n- **线况**： 第 19 行已写「在做 · 建议结题（待 Liang Hu）」，理由是精读与代码核查已完成，也没有 CRC/TACC 运行根。\n- **之后**：本对话没有计算、作业或待派的活，也不会提交超算或 Colab。\n\n如果日检把 R16.5d 列进「无方案的新子项目」，这是同一情况，依据就是 A310②，不需要补方案。"
+    }
+  ],
+  "files": {
+    "self": "798455e8.json",
+    "claims": null,
+    "pdf": null
+  }
+}
