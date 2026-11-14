@@ -1,0 +1,2222 @@
+import sys
+from openmdao.api import Group, ImplicitComponent, ExplicitComponent, AnalysisError
+import openmdao.api as om
+from dafoam import PYDAFOAM
+from idwarp import USMesh
+from mphys.core import Builder
+import petsc4py
+from petsc4py import PETSc
+import numpy as np
+from mpi4py import MPI
+from mphys.utils.directory_utils import cd
+
+petsc4py.init(sys.argv)
+
+
+def _get_mphys_dafoam_var_name(discipline, mode):
+    """Return the DAFoam MPhys variable name for a discipline/mode pair."""
+    if mode == "surfCoord":
+        if discipline == "aero":
+            return "x_aero"
+        if discipline == "thermal":
+            return "x_thermal0"
+        return "x_%s" % discipline
+
+    if mode == "volCoord":
+        return "%s_vol_coords" % discipline
+
+    if mode == "state":
+        return "%s_states" % discipline
+
+    raise ValueError("Unsupported mphys variable mode '%s'" % mode)
+
+
+class DAFoamBuilder(Builder):
+    """
+    DAFoam builder called from runScript.py
+    """
+
+    def __init__(
+        self,
+        options,  # DAFoam options
+        mesh_options=None,  # IDWarp options
+        scenario="aerodynamic",  # scenario type to configure the groups
+        run_directory="",  # the directory to run this case in, default is the current directory
+    ):
+
+        # options dictionary for DAFoam
+        self.options = options
+
+        # mesh warping option. If no design variables are mesh related,
+        # e.g., topology optimization, set it to None.
+        self.mesh_options = mesh_options
+        # flag to determine if the mesh warping component is added
+        # in the nonlinear solver loop (e.g. for aerostructural)
+        # or as a preprocessing step like the surface mesh coordinates
+        # (e.g. for aeropropulsive). This will avoid doing extra work
+        # for mesh deformation when the volume mesh does not change
+        # during nonlinear iterations
+        self.warp_in_solver = False
+        # flag for aerostructural coupling variables
+        self.struct_coupling = False
+        # thermal coupling defaults to false
+        self.thermal_coupling = False
+
+        # the directory to run this case in, default is the current directory
+        self.run_directory = run_directory
+
+        # depending on the scenario we are building for, we adjust a few internal parameters:
+        if scenario.lower() == "aerodynamic":
+            # default
+            pass
+        elif scenario.lower() == "aerostructural":
+            # volume mesh warping needs to be inside the coupling loop for aerostructural
+            self.warp_in_solver = True
+            self.struct_coupling = True
+        elif scenario.lower() == "aerothermal":
+            # volume mesh warping needs to be inside the coupling loop for aerothermal
+            self.thermal_coupling = True
+        else:
+            raise AnalysisError(
+                "scenario %s not valid! Options: aerodynamic, aerostructural, and aerothermal" % scenario
+            )
+
+    # api level method for all builders
+    def initialize(self, comm):
+
+        self.comm = comm
+
+        with cd(self.run_directory):
+            # initialize the PYDAFOAM class, defined in pyDAFoam.py
+            self.DASolver = PYDAFOAM(options=self.options, comm=comm)
+            if self.mesh_options is not None:
+                # always set the mesh
+                mesh = USMesh(options=self.mesh_options, comm=comm)
+                self.DASolver.setMesh(mesh)  # add the design surface family group
+                self.DASolver.printFamilyList()
+
+    def get_solver(self):
+        # this method is only used by the RLT transfer scheme
+        return self.DASolver
+
+    # api level method for all builders
+    def get_coupling_group_subsystem(self, scenario_name=None):
+        dafoam_group = DAFoamGroup(
+            solver=self.DASolver,
+            use_warper=self.warp_in_solver,
+            struct_coupling=self.struct_coupling,
+            thermal_coupling=self.thermal_coupling,
+            run_directory=self.run_directory,
+        )
+        return dafoam_group
+
+    def get_mesh_coordinate_subsystem(self, scenario_name=None):
+
+        # just return the component that outputs the surface mesh.
+        return DAFoamMesh(solver=self.DASolver)
+
+    def get_pre_coupling_subsystem(self, scenario_name=None):
+
+        if self.mesh_options is None:
+            return None
+        else:
+            return DAFoamPrecouplingGroup(
+                solver=self.DASolver, warp_in_solver=self.warp_in_solver, thermal_coupling=self.thermal_coupling
+            )
+
+    def get_post_coupling_subsystem(self, scenario_name=None):
+        return DAFoamPostcouplingGroup(solver=self.DASolver)
+
+    def get_number_of_nodes(self, groupName=None):
+        # Get number of aerodynamic nodes
+        if groupName is None:
+            groupName = self.DASolver.designSurfacesGroup
+        nodes = int(self.DASolver.getSurfaceCoordinates(groupName=groupName).size / 3)
+
+        return nodes
+
+    def get_ndof(self):
+        # The number of degrees of freedom used at each output location.
+        return -1
+
+
+class DAFoamGroup(Group):
+    """
+    DAFoam solver group
+    """
+
+    def initialize(self):
+        self.options.declare("solver", recordable=False)
+        self.options.declare("struct_coupling", default=False)
+        self.options.declare("use_warper", default=True)
+        self.options.declare("thermal_coupling", default=False)
+        self.options.declare("run_directory", default="")
+
+    def setup(self):
+
+        self.DASolver = self.options["solver"]
+        self.struct_coupling = self.options["struct_coupling"]
+        self.use_warper = self.options["use_warper"]
+        self.thermal_coupling = self.options["thermal_coupling"]
+        self.run_directory = self.options["run_directory"]
+        self.discipline = self.DASolver.getOption("discipline")
+        # Use the official mphys surface-coordinate input name for this discipline.
+        self.surfCoordName = _get_mphys_dafoam_var_name(self.discipline, "surfCoord")
+        self.volCoordName = _get_mphys_dafoam_var_name(self.discipline, "volCoord")
+        self.stateName = _get_mphys_dafoam_var_name(self.discipline, "state")
+
+        if self.use_warper:
+
+            # if we dont have geo_disp, we also need to promote the x_a as x_a0 from the deformer component
+            self.add_subsystem(
+                "deformer",
+                DAFoamWarper(
+                    solver=self.DASolver,
+                ),
+                # Promote the official mphys surface-coordinate input name.
+                promotes_inputs=[self.surfCoordName],
+                promotes_outputs=[self.volCoordName],
+            )
+
+        # add the solver implicit component
+        self.add_subsystem(
+            "solver",
+            DAFoamSolver(solver=self.DASolver, run_directory=self.run_directory),
+            promotes_inputs=["*"],
+            promotes_outputs=[self.stateName],
+        )
+
+        if self.struct_coupling:
+            # Use the official mphys aerodynamic loads output name.
+            self.loadsName = "f_aero"
+            self.add_subsystem(
+                "force",
+                DAFoamForces(solver=self.DASolver),
+                promotes_inputs=[self.volCoordName, self.stateName],
+                # Promote the official mphys loads output name.
+                promotes_outputs=[self.loadsName],
+            )
+
+        if self.thermal_coupling:
+            self.add_subsystem(
+                "get_%s" % self.discipline,
+                DAFoamThermal(solver=self.DASolver),
+                promotes_inputs=["*"],
+                promotes_outputs=["*"],
+            )
+
+
+class DAFoamPrecouplingGroup(Group):
+    """
+    Pre-coupling group that configures any components that happen before the solver and post-processor.
+    """
+
+    def initialize(self):
+        self.options.declare("solver", default=None, recordable=False)
+        self.options.declare("warp_in_solver", default=None, recordable=False)
+        self.options.declare("thermal_coupling", default=None, recordable=False)
+
+    def setup(self):
+        self.DASolver = self.options["solver"]
+        self.warp_in_solver = self.options["warp_in_solver"]
+        self.thermal_coupling = self.options["thermal_coupling"]
+        self.discipline = self.DASolver.getOption("discipline")
+        # Use the official mphys surface-coordinate input name for this discipline.
+        self.surfCoordName = _get_mphys_dafoam_var_name(self.discipline, "surfCoord")
+        self.volCoordName = _get_mphys_dafoam_var_name(self.discipline, "volCoord")
+
+        # Return the warper only if it is not in the solver
+        if not self.warp_in_solver:
+            self.add_subsystem(
+                "warper",
+                DAFoamWarper(solver=self.DASolver),
+                # Promote the official mphys surface-coordinate input name.
+                promotes_inputs=[self.surfCoordName],
+                promotes_outputs=[self.volCoordName],
+            )
+
+        if self.thermal_coupling:
+            self.add_subsystem(
+                "%s_xs" % self.discipline,
+                DAFoamFaceCoords(solver=self.DASolver),
+                promotes_inputs=["*"],
+                promotes_outputs=["*"],
+            )
+
+
+class DAFoamPostcouplingGroup(Group):
+    """
+    Post-coupling group that configures any components that happen in the post-processor.
+    """
+
+    def initialize(self):
+        self.options.declare("solver", default=None, recordable=False)
+
+    def setup(self):
+        self.DASolver = self.options["solver"]
+
+        # Add Functionals
+        self.add_subsystem("functionals", DAFoamFunctions(solver=self.DASolver), promotes=["*"])
+
+
+class DAFoamSolver(ImplicitComponent):
+    """
+    OpenMDAO component that wraps the DAFoam flow and adjoint solvers
+    """
+
+    def initialize(self):
+        self.options.declare("solver", recordable=False)
+        self.options.declare("run_directory", default="")
+
+    def setup(self):
+        # NOTE: the setup function will be called everytime a new scenario is created.
+
+        self.DASolver = self.options["solver"]
+        DASolver = self.DASolver
+
+        self.run_directory = self.options["run_directory"]
+
+        self.discipline = self.DASolver.getOption("discipline")
+
+        self.solution_counter = 1
+
+        # pointer to the DVGeo object
+        self.DVGeo = None
+
+        # pointer to the DVCon object
+        self.DVCon = None
+
+        # setup some names
+        self.stateName = _get_mphys_dafoam_var_name(self.discipline, "state")
+        self.residualName = "%s_residuals" % self.discipline
+        self.volCoordName = _get_mphys_dafoam_var_name(self.discipline, "volCoord")
+
+        # initialize the dRdWT matrix-free matrix in DASolver
+        DASolver.solverAD.initializedRdWTMatrixFree()
+
+        # create the adjoint vector
+        self.localAdjSize = DASolver.getNLocalAdjointStates()
+        self.psi = PETSc.Vec().create(comm=PETSc.COMM_WORLD)
+        self.psi.setSizes((self.localAdjSize, PETSc.DECIDE), bsize=1)
+        self.psi.setFromOptions()
+        self.psi.zeroEntries()
+
+        # if true, we need to compute the coloring
+        if DASolver.getOption("adjEqnSolMethod") == "fixedPoint":
+            self.runColoring = False
+        else:
+            self.runColoring = True
+
+        # setup input and output for the solver
+        # we need to add states as outputs for all cases
+        local_state_size = DASolver.getNLocalAdjointStates()
+        self.add_output(self.stateName, distributed=True, shape=local_state_size, tags=["mphys_coupling"])
+
+        # now loop over the solver input keys to determine which other variables we need to add as inputs
+        inputDict = DASolver.getOption("inputInfo")
+        for inputName in list(inputDict.keys()):
+            # this input is attached to solver comp
+            if "solver" in inputDict[inputName]["components"]:
+                inputType = inputDict[inputName]["type"]
+                inputSize = DASolver.solver.getInputSize(inputName, inputType)
+                inputDistributed = DASolver.solver.getInputDistributed(inputName, inputType)
+                self.add_input(inputName, distributed=inputDistributed, shape=inputSize, tags=["mphys_coupling"])
+
+    def add_dvgeo(self, DVGeo):
+        self.DVGeo = DVGeo
+
+    def add_dvcon(self, DVCon):
+        self.DVCon = DVCon
+
+    # calculate the residual
+    # def apply_nonlinear(self, inputs, outputs, residuals):
+    #     DASolver = self.DASolver
+    #     # NOTE: we do not pass the states from inputs to the OF layer.
+    #     # this can cause potential convergence issue because the initial states
+    #     # in the inputs are set to all ones. So passing this all-ones states
+    #     # into the OF layer may diverge the primal solver. Here we can always
+    #     # use the states from the OF layer to compute the residuals.
+    #     # DASolver.setStates(outputs[self.stateName])
+    #     # get flow residuals from DASolver
+    #     residuals[self.stateName] = DASolver.getResiduals()
+
+    # solve the flow
+    def solve_nonlinear(self, inputs, outputs):
+
+        with cd(self.run_directory):
+
+            DASolver = self.DASolver
+
+            # set the solver input, including mesh, boundary etc.
+            DASolver.set_solver_input(inputs, self.DVGeo)
+
+            # before running the primal, we need to check if the mesh
+            # quality is good
+            meshOK = DASolver.solver.checkMesh()
+
+            # if the mesh is not OK, do not run the primal
+            if meshOK != 1:
+                DASolver.solver.writeFailedMesh()
+                raise AnalysisError("Mesh quality error!")
+                return
+
+            # if prepareCaseOnly is true, we just write the mesh/BC/IC to the disk and do not call solvePrimal
+            # The BC/IC have been updated and saved to the disk before solve_nonlinear, so here we just upddate
+            # the mesh
+            if DASolver.getOption("prepareCaseOnly"):
+                DASolver.solver.writeCurrentMeshPointsToConstant()
+                return
+
+            # call the primal
+            DASolver()
+
+            # if the primal fails, do not set states and return
+            if DASolver.primalFail != 0:
+                raise AnalysisError("Primal solution failed!")
+                return
+
+            # we can use step-average state variables, this can be useful when the
+            # primal has LCO
+            if DASolver.getOption("useMeanStates"):
+                DASolver.solver.meanStatesToStates()
+
+            # after solving the primal, we need to print its residual info
+            if DASolver.getOption("useAD")["mode"] == "forward":
+                DASolver.solverAD.calcPrimalResidualStatistics("print")
+            else:
+                DASolver.solver.calcPrimalResidualStatistics("print")
+
+            # assign the computed flow states to outputs
+            states = DASolver.getStates()
+            outputs[self.stateName] = states
+
+            # set states
+            DASolver.setStates(states)
+
+            # We also need to just calculate the residual for the AD mode to initialize vars like URes
+            # We do not print the residual for AD, though
+            DASolver.solverAD.calcPrimalResidualStatistics("calc")
+
+    def linearize(self, inputs, outputs, residuals):
+        # NOTE: we do not do any computation in this function, just print some information
+
+        self.DASolver.setStates(outputs[self.stateName])
+
+    def apply_linear(self, inputs, outputs, d_inputs, d_outputs, d_residuals, mode):
+        # compute the matrix vector products for states and volume mesh coordinates
+        # i.e., dRdWT*psi, dRdXvT*psi
+
+        # we do not support forward mode
+        if mode == "fwd":
+            om.issue_warning(
+                " mode = %s, but the forward mode functions are not implemented for DAFoam!" % mode,
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        DASolver = self.DASolver
+
+        # assign the states in outputs to the OpenFOAM flow fields
+        # NOTE: this is not quite necessary because setStates have been called before in the solve_nonlinear
+        # here we call it just be on the safe side
+        DASolver.setStates(outputs[self.stateName])
+
+        if self.stateName in d_residuals:
+
+            # get the reverse mode AD seed from d_residuals
+            seed = d_residuals[self.stateName]
+
+            # this computes [dRdW]^T*Psi using reverse mode AD
+            if self.stateName in d_outputs:
+                product = np.zeros(self.localAdjSize)
+                jacInput = outputs[self.stateName]
+                DASolver.solverAD.calcJacTVecProduct(
+                    self.stateName,
+                    "stateVar",
+                    jacInput,
+                    self.residualName,
+                    "residual",
+                    seed,
+                    product,
+                )
+                d_outputs[self.stateName] += product
+
+            # loop over all inputs keys and compute the matrix-vector products accordingly
+            inputDict = DASolver.getOption("inputInfo")
+            for inputName in list(inputs.keys()):
+                inputType = inputDict[inputName]["type"]
+                jacInput = inputs[inputName]
+                product = np.zeros_like(jacInput)
+                DASolver.solverAD.calcJacTVecProduct(
+                    inputName,
+                    inputType,
+                    jacInput,
+                    self.residualName,
+                    "residual",
+                    seed,
+                    product,
+                )
+                d_inputs[inputName] += product
+
+    def solve_linear(self, d_outputs, d_residuals, mode):
+        # solve the adjoint equation [dRdW]^T * Psi = dFdW
+
+        # we do not support forward mode
+        if mode == "fwd":
+            om.issue_warning(
+                " mode = %s, but the forward mode functions are not implemented for DAFoam!" % mode,
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        with cd(self.run_directory):
+
+            DASolver = self.DASolver
+
+            adjEqnSolMethod = DASolver.getOption("adjEqnSolMethod")
+
+            # right hand side array from d_outputs
+            dFdWArray = d_outputs[self.stateName]
+            # convert the array to vector
+            dFdW = DASolver.array2Vec(dFdWArray)
+
+            # run coloring
+            if self.DASolver.getOption("adjUseColoring") and self.runColoring:
+                self.DASolver.solver.runColoring()
+                self.runColoring = False
+
+            if adjEqnSolMethod == "Krylov":
+                # solve the adjoint equation using the Krylov method
+
+                # if writeMinorIterations=True, we rename the solution in pyDAFoam.py. So we don't recompute the PC
+                if DASolver.getOption("writeMinorIterations"):
+                    if DASolver.dRdWTPC is None or DASolver.ksp is None:
+                        DASolver.dRdWTPC = PETSc.Mat().create(self.comm)
+                        if (DASolver.getOption("adjEqnOption"))["readPCMat"]:
+                            viewer = PETSc.Viewer().createBinary("dRdWTPC.bin", "r", comm=self.comm)
+                            DASolver.dRdWTPC = PETSc.Mat().load(viewer)
+                        else:
+                            DASolver.solver.calcdRdWT(1, DASolver.dRdWTPC)
+                        DASolver.ksp = PETSc.KSP().create(self.comm)
+                        DASolver.solverAD.createMLRKSPMatrixFree(DASolver.dRdWTPC, DASolver.ksp)
+                # otherwise, we need to recompute the PC mat based on adjPCLag
+                else:
+                    # NOTE: this function will be called multiple times (one time for one obj func) in each opt iteration
+                    # so we don't want to print the total info and recompute PC for each obj, we need to use renamed
+                    # to check if a recompute is needed. In other words, we only recompute the PC for the first obj func
+                    # adjoint solution
+
+                    solutionTime, renamed = DASolver.renameSolution(self.solution_counter)
+
+                    if renamed:
+                        # write the deformed FFD for post-processing
+                        if DASolver.getOption("writeDeformedFFDs"):
+                            if self.DVGeo is None:
+                                raise RuntimeError(
+                                    "writeDeformedFFDs is set but no DVGeo object found! Please call add_dvgeo in the run script!"
+                                )
+                            else:
+                                self.DVGeo.writeTecplot("deformedFFDs_%d.dat" % self.solution_counter)
+                                self.DVGeo.writePlot3d("deformedFFDs_%d.xyz" % self.solution_counter)
+
+                        # write the deformed constraints for post-processing
+                        if DASolver.getOption("writeDeformedConstraints"):
+                            if self.DVCon is None:
+                                raise RuntimeError(
+                                    "writeDeformedConstraints is set but no DVCon object found! Please call add_dvcon in the run script!"
+                                )
+                            else:
+                                self.DVCon.writeTecplot("deformedConstraints_%d.dat" % self.solution_counter)
+
+                        # print the solution counter
+                        if self.comm.rank == 0:
+                            print("Driver total derivatives for iteration: %d" % self.solution_counter, flush=True)
+                            print("---------------------------------------------", flush=True)
+                        self.solution_counter += 1
+
+                    # compute the preconditioner matrix for the adjoint linear equation solution
+                    # and initialize the ksp object. We reinitialize them every adjPCLag
+                    adjPCLag = DASolver.getOption("adjPCLag")
+                    if DASolver.dRdWTPC is None or DASolver.ksp is None or (self.solution_counter - 1) % adjPCLag == 0:
+                        if renamed:
+                            # calculate the PC mat
+                            if DASolver.dRdWTPC is not None:
+                                DASolver.dRdWTPC.destroy()
+                            DASolver.dRdWTPC = PETSc.Mat().create(self.comm)
+                            if (DASolver.getOption("adjEqnOption"))["readPCMat"]:
+                                viewer = PETSc.Viewer().createBinary("dRdWTPC.bin", "r", comm=self.comm)
+                                DASolver.dRdWTPC = PETSc.Mat().load(viewer)
+                            else:
+                                DASolver.solver.calcdRdWT(1, DASolver.dRdWTPC)
+                            # reset the KSP
+                            if DASolver.ksp is not None:
+                                DASolver.ksp.destroy()
+                            DASolver.ksp = PETSc.KSP().create(self.comm)
+                            DASolver.solverAD.createMLRKSPMatrixFree(DASolver.dRdWTPC, DASolver.ksp)
+
+                # if useNonZeroInitGuess is False, we will manually reset self.psi to zero
+                # this is important because we need the correct psi to update the KSP tolerance
+                # in the next line
+                if not self.DASolver.getOption("adjEqnOption")["useNonZeroInitGuess"]:
+                    self.psi.set(0)
+                else:
+                    # if useNonZeroInitGuess is True, we will assign the OM's psi to self.psi
+                    self.psi = DASolver.array2Vec(d_residuals[self.stateName].copy())
+
+                if self.DASolver.getOption("adjEqnOption")["dynAdjustTol"]:
+                    # if we want to dynamically adjust the tolerance, call this function. This is mostly used
+                    # in the block Gauss-Seidel method in two discipline coupling
+                    # update the KSP tolerances the coupled adjoint before solving
+                    self._updateKSPTolerances(self.psi, dFdW, DASolver.ksp)
+
+                # actually solving the adjoint linear equation using Petsc
+                fail = DASolver.solverAD.solveLinearEqn(DASolver.ksp, dFdW, self.psi)
+
+            elif adjEqnSolMethod == "fixedPoint":
+                solutionTime, renamed = DASolver.renameSolution(self.solution_counter)
+                if renamed:
+                    # write the deformed FFD for post-processing
+                    # DASolver.writeDeformedFFDs(self.solution_counter)
+                    # print the solution counter
+                    if self.comm.rank == 0:
+                        print("Driver total derivatives for iteration: %d" % self.solution_counter, flush=True)
+                        print("---------------------------------------------", flush=True)
+                    self.solution_counter += 1
+                # solve the adjoint equation using the fixed-point adjoint approach
+                fail = DASolver.solverAD.runFPAdj(dFdW, self.psi)
+            else:
+                raise RuntimeError("adjEqnSolMethod=%s not valid! Options are: Krylov or fixedPoint" % adjEqnSolMethod)
+
+            # optionally write the adjoint vector as OpenFOAM field format for post-processing
+            psi_array = DASolver.vec2Array(self.psi)
+            solTimeFloat = (self.solution_counter - 1) / 1e4
+            DASolver.writeAdjointFields("function", solTimeFloat, psi_array)
+
+            # convert the solution vector to array and assign it to d_residuals
+            d_residuals[self.stateName] = DASolver.vec2Array(self.psi)
+
+            # if the adjoint solution fail, we return analysisError and let the optimizer handle it
+            if fail:
+                raise AnalysisError("Adjoint solution failed!")
+
+    def _updateKSPTolerances(self, psi, dFdW, ksp):
+        # Here we need to manually update the KSP tolerances because the default
+        # relative tolerance will always want to converge the adjoint to a fixed
+        # tolerance during the LINGS adjoint solution. However, what we want is
+        # to converge just a few orders of magnitude. Here we need to bypass the
+        # rTol in Petsc and manually calculate the aTol.
+
+        DASolver = self.DASolver
+        # calculate the initial residual for the adjoint before solving
+        rArray = np.zeros(self.localAdjSize)
+        jacInput = DASolver.getStates()
+        seed = DASolver.vec2Array(psi)
+        DASolver.solverAD.calcJacTVecProduct(
+            self.stateName,
+            "stateVar",
+            jacInput,
+            self.residualName,
+            "residual",
+            seed,
+            rArray,
+        )
+        rVec = DASolver.array2Vec(rArray)
+        rVec.axpy(-1.0, dFdW)
+        # NOTE, this is the norm for the global vec
+        rNorm = rVec.norm()
+
+        # read the rTol and aTol from DAOption
+        rTol0 = self.DASolver.getOption("adjEqnOption")["gmresRelTol"]
+        aTol0 = self.DASolver.getOption("adjEqnOption")["gmresAbsTol"]
+        # calculate the new absolute tolerance that gives you rTol residual drop
+        aTolNew = rNorm * rTol0
+        # if aTolNew is smaller than aTol0, assign aTol0 to aTolNew
+        if aTolNew < aTol0:
+            aTolNew = aTol0
+        # assign the atolNew and distable rTol
+        ksp.setTolerances(rtol=0.0, atol=aTolNew, divtol=None, max_it=None)
+
+
+class DAFoamMesh(ExplicitComponent):
+    """
+    Component to get the partitioned initial surface mesh coordinates
+    """
+
+    def initialize(self):
+        self.options.declare("solver", recordable=False)
+
+    def setup(self):
+
+        self.DASolver = self.options["solver"]
+
+        self.discipline = self.DASolver.getOption("discipline")
+
+        # design surface coordinates
+        self.x_a0 = self.DASolver.getSurfaceCoordinates(self.DASolver.designSurfacesGroup).flatten(order="C")
+
+        # add output
+        coord_size = self.x_a0.size
+        # Use the official mphys mesh-coordinate output name for this discipline.
+        if self.discipline == "aero":
+            self.x_a0_name = "x_aero0"
+        elif self.discipline == "thermal":
+            self.x_a0_name = "x_thermal0_mesh"
+        else:
+            self.x_a0_name = "x_%s0_mesh" % self.discipline
+        self.add_output(
+            self.x_a0_name,
+            distributed=True,
+            shape=coord_size,
+            desc="initial aerodynamic surface node coordinates",
+            tags=["mphys_coordinates"],
+        )
+
+    def mphys_add_coordinate_input(self):
+        self.add_input(
+            "x_%s0_points" % self.discipline,
+            distributed=True,
+            shape_by_conn=True,
+            desc="aerodynamic surface with geom changes",
+        )
+
+        # return the promoted name and coordinates
+        return "x_%s0_points" % self.discipline, self.x_a0
+
+    def mphys_get_surface_mesh(self):
+        return self.x_a0
+
+    def mphys_get_triangulated_surface(self, groupName=None):
+        # this is a list of lists of 3 points
+        # p0, v1, v2
+
+        return self.DASolver.getTriangulatedMeshSurface()
+
+    def mphys_get_surface_size(self, groupName):
+        return self.DASolver._getSurfaceSize(groupName)
+
+    def compute(self, inputs, outputs):
+        # just assign the surface mesh coordinates
+        if "x_%s0_points" % self.discipline in inputs:
+            # Write deformed surface coordinates to the official mphys mesh output name.
+            outputs[self.x_a0_name] = inputs["x_%s0_points" % self.discipline]
+        else:
+            # Write baseline surface coordinates to the official mphys mesh output name.
+            outputs[self.x_a0_name] = self.x_a0
+
+    def compute_jacvec_product(self, inputs, d_inputs, d_outputs, mode):
+        # we do not support forward mode AD
+        if mode == "fwd":
+            om.issue_warning(
+                " mode = %s, but the forward mode functions are not implemented for DAFoam!" % mode,
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        # just assign the matrix-vector product
+        if "x_%s0_points" % self.discipline in d_inputs:
+            # Propagate derivatives through the official mphys mesh output name.
+            d_inputs["x_%s0_points" % self.discipline] += d_outputs[self.x_a0_name]
+
+
+class DAFoamFunctions(ExplicitComponent):
+    """
+    DAFoam objective and constraint functions component
+    """
+
+    def initialize(self):
+        self.options.declare("solver", recordable=False)
+
+        # a list that contains all function names, e.g., CD, CL
+        self.funcs = None
+
+    def setup(self):
+
+        self.DASolver = self.options["solver"]
+        DASolver = self.DASolver
+
+        self.discipline = self.DASolver.getOption("discipline")
+
+        # setup some names
+        self.stateName = _get_mphys_dafoam_var_name(self.discipline, "state")
+        self.volCoordName = _get_mphys_dafoam_var_name(self.discipline, "volCoord")
+
+        # setup input and output for the function
+        # we need to add states for all cases
+        self.add_input(self.stateName, distributed=True, shape_by_conn=True, tags=["mphys_coupling"])
+
+        # now loop over the solver input keys to determine which other variables we need to add as inputs
+        inputDict = DASolver.getOption("inputInfo")
+        for inputName in list(inputDict.keys()):
+            # this input is attached to function comp
+            if "function" in inputDict[inputName]["components"]:
+                inputType = inputDict[inputName]["type"]
+                inputSize = DASolver.solver.getInputSize(inputName, inputType)
+                inputDistributed = DASolver.solver.getInputDistributed(inputName, inputType)
+                self.add_input(inputName, distributed=inputDistributed, shape=inputSize, tags=["mphys_coupling"])
+
+        # add outputs
+        functions = self.DASolver.getOption("function")
+        # loop over the functions here and create the output
+        for f_name in list(functions.keys()):
+            self.add_output(f_name, distributed=False, shape=1, units=None)
+
+    # get the objective function from DASolver
+    def compute(self, inputs, outputs):
+
+        # TODO. We should have added a call to assign inputs to the OF layer.
+        # This will not cause a problem for now because DAFoamFunctions is usually
+        # called right after the primal run.
+
+        DASolver = self.DASolver
+
+        DASolver.setStates(inputs[self.stateName])
+
+        funcs = {}
+        DASolver.evalFunctions(funcs)
+        for f_name in list(outputs.keys()):
+            outputs[f_name] = funcs[f_name]
+
+    # compute the partial derivatives of functions
+    def compute_jacvec_product(self, inputs, d_inputs, d_outputs, mode):
+
+        DASolver = self.DASolver
+
+        # TODO. this may not be needed
+        DASolver.setStates(inputs[self.stateName])
+
+        # we do not support forward mode AD
+        if mode == "fwd":
+            om.issue_warning(
+                " mode = %s, but the forward mode functions are not implemented for DAFoam!" % mode,
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        # loop over all d_inputs keys and compute the partials accordingly
+        inputDict = DASolver.getOption("inputInfo")
+        for functionName in list(d_outputs.keys()):
+
+            seed = d_outputs[functionName]
+
+            # if the seed is zero, do not compute
+            if abs(seed) < 1e-12:
+                continue
+
+            for inputName in list(d_inputs.keys()):
+                # compute dFdW * seed
+                if inputName == self.stateName:
+                    jacInput = inputs[self.stateName]
+                    product = np.zeros_like(jacInput)
+                    DASolver.solverAD.calcJacTVecProduct(
+                        self.stateName,
+                        "stateVar",
+                        jacInput,
+                        functionName,
+                        "function",
+                        seed,
+                        product,
+                    )
+                    d_inputs[self.stateName] += product
+                else:
+                    inputType = inputDict[inputName]["type"]
+                    jacInput = inputs[inputName]
+                    product = np.zeros_like(jacInput)
+                    DASolver.solverAD.calcJacTVecProduct(
+                        inputName,
+                        inputType,
+                        jacInput,
+                        functionName,
+                        "function",
+                        seed,
+                        product,
+                    )
+                    d_inputs[inputName] += product
+
+
+class DAFoamWarper(ExplicitComponent):
+    """
+    OpenMDAO component that wraps the warping.
+    """
+
+    def initialize(self):
+        self.options.declare("solver", recordable=False)
+
+    def setup(self):
+
+        self.DASolver = self.options["solver"]
+        DASolver = self.DASolver
+
+        self.discipline = self.DASolver.getOption("discipline")
+        # Use the official mphys surface-coordinate input name for this discipline.
+        self.surfCoordName = _get_mphys_dafoam_var_name(self.discipline, "surfCoord")
+        self.volCoordName = _get_mphys_dafoam_var_name(self.discipline, "volCoord")
+
+        # state inputs and outputs
+        local_volume_coord_size = DASolver.mesh.getSolverGrid().size
+
+        # Add the official mphys surface-coordinate input for the warper.
+        self.add_input(self.surfCoordName, distributed=True, shape_by_conn=True, tags=["mphys_coupling"])
+        self.add_output(self.volCoordName, distributed=True, shape=local_volume_coord_size, tags=["mphys_coupling"])
+
+    def compute(self, inputs, outputs):
+        # given the new surface mesh coordinates, compute the new volume mesh coordinates
+        # the mesh warping will be called in getSolverGrid()
+        DASolver = self.DASolver
+
+        # Read the official mphys surface-coordinate input for warping.
+        x_a = inputs[self.surfCoordName].reshape((-1, 3))
+        DASolver.setSurfaceCoordinates(x_a, DASolver.designSurfacesGroup)
+        DASolver.mesh.warpMesh()
+        solverGrid = DASolver.mesh.getSolverGrid()
+        outputs[self.volCoordName] = solverGrid
+
+    # compute the mesh warping products in IDWarp
+    def compute_jacvec_product(self, inputs, d_inputs, d_outputs, mode):
+
+        # we do not support forward mode AD
+        if mode == "fwd":
+            om.issue_warning(
+                " mode = %s, but the forward mode functions are not implemented for DAFoam!" % mode,
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        # compute dXv/dXs such that we can propagate the partials (e.g., dF/dXv) to Xs
+        # then the partial will be further propagated to XFFD in pyGeo
+        if self.volCoordName in d_outputs:
+            # Accumulate derivatives into the official mphys surface-coordinate input.
+            if self.surfCoordName in d_inputs:
+                dxV = d_outputs[self.volCoordName]
+                self.DASolver.mesh.warpDeriv(dxV)
+                dxS = self.DASolver.mesh.getdXs()
+                dxS = self.DASolver.mapVector(dxS, self.DASolver.allWallsGroup, self.DASolver.designSurfacesGroup)
+                # Write derivatives through the official mphys surface-coordinate input.
+                d_inputs[self.surfCoordName] += dxS.flatten()
+
+
+class DAFoamThermal(ExplicitComponent):
+    """
+    OpenMDAO component that wraps conjugate heat transfer integration
+
+    """
+
+    def initialize(self):
+        self.options.declare("solver", recordable=False)
+
+    def setup(self):
+
+        self.DASolver = self.options["solver"]
+        DASolver = self.DASolver
+
+        self.discipline = self.DASolver.getOption("discipline")
+
+        self.stateName = _get_mphys_dafoam_var_name(self.discipline, "state")
+        self.volCoordName = _get_mphys_dafoam_var_name(self.discipline, "volCoord")
+
+        self.add_input(self.volCoordName, distributed=True, shape_by_conn=True, tags=["mphys_coupling"])
+        self.add_input(self.stateName, distributed=True, shape_by_conn=True, tags=["mphys_coupling"])
+
+        # now loop over the solver input keys to determine which other variables we need to add as inputs
+        outputDict = DASolver.getOption("outputInfo")
+        for outputName in list(outputDict.keys()):
+            # this input is attached to the DAFoamThermal comp
+            if "thermalCoupling" in outputDict[outputName]["components"]:
+                self.outputName = outputName
+                self.outputType = outputDict[outputName]["type"]
+                self.outputSize = DASolver.solver.getOutputSize(outputName, self.outputType)
+                outputDistributed = DASolver.solver.getOutputDistributed(outputName, self.outputType)
+                self.add_output(
+                    outputName, distributed=outputDistributed, shape=self.outputSize, tags=["mphys_coupling"]
+                )
+                break
+
+    def compute(self, inputs, outputs):
+
+        self.DASolver.setStates(inputs[self.stateName])
+        self.DASolver.setVolCoords(inputs[self.volCoordName])
+
+        thermal = np.zeros(self.outputSize)
+
+        self.DASolver.solver.calcOutput(self.outputName, self.outputType, thermal)
+
+        outputs[self.outputName] = thermal
+
+    def compute_jacvec_product(self, inputs, d_inputs, d_outputs, mode):
+
+        if mode == "fwd":
+            om.issue_warning(
+                " mode = %s, but the forward mode functions are not implemented for DAFoam!" % mode,
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        DASolver = self.DASolver
+
+        for outputName in list(d_outputs.keys()):
+            seeds = d_outputs[outputName]
+
+            if self.stateName in d_inputs:
+                jacInput = inputs[self.stateName]
+                product = np.zeros_like(jacInput)
+                DASolver.solverAD.calcJacTVecProduct(
+                    self.stateName,
+                    "stateVar",
+                    jacInput,
+                    outputName,
+                    "thermalCouplingOutput",
+                    seeds,
+                    product,
+                )
+                d_inputs[self.stateName] += product
+
+            if self.volCoordName in d_inputs:
+                jacInput = inputs[self.volCoordName]
+                product = np.zeros_like(jacInput)
+                DASolver.solverAD.calcJacTVecProduct(
+                    self.volCoordName,
+                    "volCoord",
+                    jacInput,
+                    outputName,
+                    "thermalCouplingOutput",
+                    seeds,
+                    product,
+                )
+                d_inputs[self.volCoordName] += product
+
+
+class DAFoamFaceCoords(ExplicitComponent):
+    """
+    Calculate coupling surface coordinates based on volume coordinates
+
+    """
+
+    def initialize(self):
+        self.options.declare("solver", recordable=False)
+
+    def setup(self):
+
+        self.DASolver = self.options["solver"]
+        self.discipline = self.DASolver.getOption("discipline")
+        self.volCoordName = _get_mphys_dafoam_var_name(self.discipline, "volCoord")
+        if self.discipline == "aero":
+            self.surfCoordName = "x_aero0"
+        elif self.discipline == "thermal":
+            self.surfCoordName = "x_thermal0_mesh"
+        else:
+            raise AnalysisError(
+                "DAFoamFaceCoords only supports 'aero' or 'thermal' discipline, got '%s'" % self.discipline
+            )
+
+        DASolver = self.DASolver
+
+        self.add_input(self.volCoordName, distributed=True, shape_by_conn=True, tags=["mphys_coupling"])
+
+        # now loop over the solver input keys to determine which other variables we need to add as inputs
+        self.nSurfCoords = None
+        outputDict = DASolver.getOption("outputInfo")
+        for outputName in list(outputDict.keys()):
+            # this input is attached to the DAFoamThermal comp
+            if "thermalCoupling" in outputDict[outputName]["components"]:
+                outputType = outputDict[outputName]["type"]
+                outputSize = DASolver.solver.getOutputSize(outputName, outputType)
+                # NOTE: here x_surface0 is the surface coordinate, which is 3 times the number of faces
+                self.nSurfCoords = outputSize * 3
+                self.add_output(self.surfCoordName, distributed=True, shape=self.nSurfCoords, tags=["mphys_coupling"])
+                break
+
+        if self.nSurfCoords is None:
+            raise AnalysisError("no thermalCoupling output found!")
+
+    def compute(self, inputs, outputs):
+
+        volCoords = inputs[self.volCoordName]
+        surfCoords = np.zeros(self.nSurfCoords)
+        self.DASolver.solver.calcCouplingFaceCoords(volCoords, surfCoords)
+
+        outputs[self.surfCoordName] = surfCoords
+
+    def compute_jacvec_product(self, inputs, d_inputs, d_outputs, mode):
+        # there is no need to compute the jacvec_product because FUN2FEM assumes the surfCoords will not updated during optimization
+        # so it will set a zero seed for this anyway
+        pass
+
+
+class DAFoamForces(ExplicitComponent):
+    """
+    OpenMDAO component that wraps force integration
+
+    """
+
+    def initialize(self):
+        self.options.declare("solver", recordable=False)
+
+    def setup(self):
+
+        self.DASolver = self.options["solver"]
+
+        self.discipline = self.DASolver.getOption("discipline")
+        # Use the official mphys aerodynamic loads output name inside the force component.
+        self.loadsName = "f_aero"
+
+        self.stateName = _get_mphys_dafoam_var_name(self.discipline, "state")
+        self.volCoordName = _get_mphys_dafoam_var_name(self.discipline, "volCoord")
+
+        self.add_input(self.volCoordName, distributed=True, shape_by_conn=True, tags=["mphys_coupling"])
+        self.add_input(self.stateName, distributed=True, shape_by_conn=True, tags=["mphys_coupling"])
+
+        # now loop over the solver input keys to determine which other variables we need to add as inputs
+        outputDict = self.DASolver.getOption("outputInfo")
+        for outputName in list(outputDict.keys()):
+            # this input is attached to the DAFoamThermal comp
+            if "forceCoupling" in outputDict[outputName]["components"]:
+                self.outputName = outputName
+                self.outputType = outputDict[outputName]["type"]
+                outputSize = self.DASolver.solver.getOutputSize(self.outputName, self.outputType)
+                # Add the official mphys aerodynamic loads output.
+                self.add_output(self.loadsName, distributed=True, shape=outputSize, tags=["mphys_coupling"])
+                break
+
+    def compute(self, inputs, outputs):
+
+        self.DASolver.setStates(inputs[self.stateName])
+        self.DASolver.setVolCoords(inputs[self.volCoordName])
+
+        # Allocate the official mphys aerodynamic loads output buffer.
+        forces = np.zeros_like(outputs[self.loadsName])
+
+        self.DASolver.solver.calcOutput(self.outputName, self.outputType, forces)
+
+        # Write the integrated aerodynamic loads to the official mphys output.
+        outputs[self.loadsName] = forces
+
+        # print out the total forces. They shoud be consistent with the primal's print out
+        forcesV = forces.reshape((-1, 3))
+        fXSum = np.sum(forcesV[:, 0])
+        fYSum = np.sum(forcesV[:, 1])
+        fZSum = np.sum(forcesV[:, 2])
+        fXTot = self.comm.allreduce(fXSum, op=MPI.SUM)
+        fYTot = self.comm.allreduce(fYSum, op=MPI.SUM)
+        fZTot = self.comm.allreduce(fZSum, op=MPI.SUM)
+
+        if self.comm.rank == 0:
+            print("Total force:", flush=True)
+            print("Fx = %f" % fXTot, flush=True)
+            print("Fy = %f" % fYTot, flush=True)
+            print("Fz = %f" % fZTot, flush=True)
+
+    def compute_jacvec_product(self, inputs, d_inputs, d_outputs, mode):
+
+        DASolver = self.DASolver
+
+        if mode == "fwd":
+            om.issue_warning(
+                " mode = %s, but the forward mode functions are not implemented for DAFoam!" % mode,
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        # Read adjoint seeds from the official mphys aerodynamic loads output.
+        if self.loadsName in d_outputs:
+            seeds = d_outputs[self.loadsName]
+
+            if self.stateName in d_inputs:
+                jacInput = inputs[self.stateName]
+                product = np.zeros_like(jacInput)
+                DASolver.solverAD.calcJacTVecProduct(
+                    self.stateName,
+                    "stateVar",
+                    jacInput,
+                    self.outputName,
+                    "forceCouplingOutput",
+                    seeds,
+                    product,
+                )
+                d_inputs[self.stateName] += product
+
+            if self.volCoordName in d_inputs:
+                jacInput = inputs[self.volCoordName]
+                product = np.zeros_like(jacInput)
+                DASolver.solverAD.calcJacTVecProduct(
+                    self.volCoordName,
+                    "volCoord",
+                    jacInput,
+                    self.outputName,
+                    "forceCouplingOutput",
+                    seeds,
+                    product,
+                )
+                d_inputs[self.volCoordName] += product
+
+
+class OptFuncs(object):
+    """
+    Some utility functions
+    """
+
+    def __init__(self, daOptions, om_prob):
+        """
+        daOptions: dict or list
+            The daOptions dict from runScript.py. Support more than two dicts
+
+        om_prob:
+            The om.Problem() object
+        """
+
+        self.daOptions = daOptions
+        self.om_prob = om_prob
+        self.comm = MPI.COMM_WORLD
+
+    def findFeasibleDesign(
+        self,
+        constraints,
+        designVars,
+        targets,
+        constraintsComp=None,
+        designVarsComp=None,
+        epsFD=None,
+        maxIter=10,
+        tol=1e-4,
+        maxNewtonStep=None,
+        designVarsBound=None,
+    ):
+        """
+        Find the design variables that meet the prescribed constraints. This can be used to get a
+        feasible design to start the optimization. For example, finding the angle of attack and
+        tail rotation angle that give the target lift and pitching moment. The sizes of cons and
+        designvars have to be the same. The component list has one entry per constraint/design
+        variable pair. A design-variable component entry can be an integer, an integer string
+        (e.g. "1"), a Python-style range string (e.g. "1:3" means indices 1 and 2), or a
+        start:stride:-1 string (e.g. "1:3:-1" means indices 1, 4, 7, ... to the end). A range
+        applies the same Newton perturbation and update to every component it selects.
+        designVarsBound can be a list of [lower, upper] pairs, one pair for each design variable.
+        NOTE: we use the Newton method with 50% backtracking to reduce the residual norm.
+        Try at most five halvings, then accept the fifth reduced step even if the residual
+        increases and continue the Newton iterations.
+        """
+
+        if self.comm.rank == 0:
+            print("Finding a feasible design using the Newton method. ")
+            print("Constraints: ", constraints)
+            print("Design Vars: ", designVars)
+            print("Target: ", targets)
+
+        if len(constraints) != len(designVars):
+            raise RuntimeError("Sizes of the constraints and designVars lists need to be the same! ")
+
+        size = len(constraints)
+
+        # if the component is empty, set it to 0
+        if constraintsComp is None:
+            constraintsComp = size * [0]
+        if designVarsComp is None:
+            designVarsComp = size * [0]
+        # if the FD step size is None, set it to 1e-3
+        if epsFD is None:
+            epsFD = size * [1e-3]
+        # if the max Newton step is None, set it to a very large value
+        if maxNewtonStep is None:
+            maxNewtonStep = size * [1e16]
+        if (
+            len(constraintsComp) != size
+            or len(designVarsComp) != size
+            or len(epsFD) != size
+            or len(maxNewtonStep) != size
+        ):
+            raise RuntimeError("Component and Newton-option lists need to have the same size as constraints! ")
+        if designVarsBound is not None:
+            if len(designVarsBound) != size:
+                raise RuntimeError("designVarsBound needs one [lower, upper] pair for each design variable! ")
+            for bounds in designVarsBound:
+                if len(bounds) != 2 or bounds[0] > bounds[1]:
+                    raise RuntimeError("Each designVarsBound entry must be an ordered [lower, upper] pair! ")
+
+        # Convert design-variable strings. A three-field range retains its start and stride
+        # until the design-variable length is available below.
+        for i, component in enumerate(designVarsComp):
+            if isinstance(component, str):
+                try:
+                    if ":" in component:
+                        components = component.split(":")
+                        if len(components) == 2:
+                            start, stop = components
+                            component = list(range(int(start), int(stop)))
+                        elif len(components) == 3:
+                            start, stride, stop = components
+                            if int(stop) != -1 or int(stride) <= 0:
+                                raise ValueError
+                            component = slice(int(start), None, int(stride))
+                        else:
+                            raise ValueError
+                        if isinstance(component, list) and not component:
+                            raise ValueError
+                    else:
+                        component = int(component)
+                except ValueError:
+                    raise RuntimeError(
+                        "designVarsComp entries must be integer strings, non-empty 'start:stop' ranges, "
+                        "or 'start:stride:-1' ranges! "
+                    )
+                designVarsComp[i] = component
+
+        # main Newton loop
+        for n in range(maxIter):
+
+            # Newton Jacobian
+            jacMat = np.zeros((size, size))
+
+            # Later iterations reuse the primal evaluated at the accepted line-search step.
+            if n == 0:
+                self.om_prob.run_model()
+
+            # get the reference design vars and constraints values
+            dv0Components = []
+            for i in range(size):
+                dvName = designVars[i]
+                comp = designVarsComp[i]
+                val = self.om_prob.get_val(dvName)
+                if isinstance(comp, slice):
+                    # Resolve the end-of-array range after the design-variable length is known.
+                    comp = list(range(comp.start, len(val), comp.step))
+                    if not comp:
+                        raise RuntimeError("designVarsComp 'start:stride:-1' range selected no components! ")
+                    designVarsComp[i] = comp
+                # Preserve each selected value so a grouped perturbation can be reset exactly.
+                dv0Components.append(np.array(val[comp], copy=True))
+            con0 = np.zeros(size)
+            for i in range(size):
+                conName = constraints[i]
+                comp = constraintsComp[i]
+                val = self.om_prob.get_val(conName)
+                con0[i] = val[comp]
+
+            # calculate the residual. Constraints - Targets
+            res = con0 - targets
+
+            # compute the residual norm
+            norm = np.linalg.norm(res / targets)
+
+            if self.comm.rank == 0:
+                print("FindFeasibleDesign Iter: ", n, flush=True)
+                # Print one representative value per design variable, even for large ranges.
+                print("DesignVars: ", [np.atleast_1d(val)[0] for val in dv0Components], flush=True)
+                print("Constraints: ", con0, flush=True)
+                print("Residual Norm: ", norm, flush=True)
+
+            # break the loop if residual is already smaller than the tolerance
+            if norm < tol:
+                if self.comm.rank == 0:
+                    print("FindFeasibleDesign Converged! ", flush=True)
+                break
+
+            # perturb design variables and compute the Jacobian matrix
+            for i in range(size):
+                dvName = designVars[i]
+                comp = designVarsComp[i]
+                # perturb  +step
+                # Add the same step to every component selected by a range.
+                dvP = dv0Components[i] + epsFD[i]
+                self.om_prob.set_val(dvName, dvP, indices=comp)
+                # run the primal
+                self.om_prob.run_model()
+                # reset the perturbation
+                self.om_prob.set_val(dvName, dv0Components[i], indices=comp)
+
+                # get the perturb constraints and compute the Jacobian
+                for j in range(size):
+                    conName = constraints[j]
+                    comp = constraintsComp[j]
+                    val = self.om_prob.get_val(conName)
+                    conP = val[comp]
+
+                    deriv = (conP - con0[j]) / epsFD[i]
+                    jacMat[j][i] = deriv
+
+            # calculate the deltaDV using the Newton method
+            deltaDV = -np.linalg.inv(jacMat).dot(res)
+
+            # we can bound the delta change to ensure a more robust Newton solver.
+            for i in range(size):
+                if abs(deltaDV[i]) > abs(maxNewtonStep[i]):
+                    if deltaDV[i] > 0:
+                        deltaDV[i] = abs(maxNewtonStep[i])
+                    else:
+                        deltaDV[i] = -abs(maxNewtonStep[i])
+
+            # Backtrack from the reference design, halving the entire Newton step on rejection.
+            step = 1.0
+            maxLS = 5  # Maximum number of halvings after the full-step trial.
+            for backtrack in range(maxLS + 1):
+                for i in range(size):
+                    dvName = designVars[i]
+                    comp = designVarsComp[i]
+                    dvTrial = dv0Components[i] + step * deltaDV[i]
+                    # Keep absolute bounds and grouped-component updates for every trial.
+                    if designVarsBound is not None:
+                        dvTrial = np.clip(dvTrial, designVarsBound[i][0], designVarsBound[i][1])
+                    self.om_prob.set_val(dvName, dvTrial, indices=comp)
+
+                self.om_prob.run_model()
+                conTrial = np.zeros(size)
+                for i in range(size):
+                    conTrial[i] = self.om_prob.get_val(constraints[i])[constraintsComp[i]]
+                trialNorm = np.linalg.norm((conTrial - targets) / targets)
+
+                if self.comm.rank == 0:
+                    print("Line Search Step: ", step, "Residual Norm: ", trialNorm, flush=True)
+
+                # Accept an improving step, or the final halving even without improvement.
+                if (np.isfinite(trialNorm) and trialNorm < norm) or backtrack == maxLS:
+                    break
+                step *= 0.5
+
+
+class DAFoamBuilderUnsteady(Group):
+
+    def initialize(self):
+        self.options.declare("solver_options")
+        self.options.declare("mesh_options", default=None)
+        self.options.declare("run_directory", default="")
+
+    def setup(self):
+        self.run_directory = self.options["run_directory"]
+        self.solver_options = self.options["solver_options"]
+        self.mesh_options = self.options["mesh_options"]
+
+        with cd(self.run_directory):
+            # initialize the PYDAFOAM class, defined in pyDAFoam.py
+            self.DASolver = PYDAFOAM(options=self.solver_options, comm=self.comm)
+            if self.mesh_options is not None:
+                # always set the mesh
+                mesh = USMesh(options=self.mesh_options, comm=self.comm)
+                self.DASolver.setMesh(mesh)  # add the design surface family group
+                self.DASolver.printFamilyList()
+
+            self.x_a0 = self.DASolver.getSurfaceCoordinates(self.DASolver.designSurfacesGroup).flatten(order="C")
+
+        # if we have volume coords as the input, add the warper comp here
+        inputDict = self.DASolver.getOption("inputInfo")
+        for inputName in list(inputDict.keys()):
+            # this input is attached to solver comp
+            if "solver" in inputDict[inputName]["components"]:
+                inputType = inputDict[inputName]["type"]
+                if inputType == "volCoord":
+                    self.add_subsystem("warper", DAFoamWarper(solver=self.DASolver), promotes=["*"])
+                    break
+
+        # add the solver comp
+        self.add_subsystem("solver", DAFoamSolverUnsteady(solver=self.DASolver), promotes=["*"])
+
+    def get_surface_mesh(self):
+        return self.x_a0
+
+
+class DAFoamSolverUnsteady(ExplicitComponent):
+
+    def initialize(self):
+        self.options.declare("solver")
+        self.options.declare("run_directory", default="")
+
+    def setup(self):
+        self.DVGeo = None
+        self.DASolver = self.options["solver"]
+        self.run_directory = self.options["run_directory"]
+
+        DASolver = self.DASolver
+
+        self.dRdWTPC = None
+
+        self.adjEqnSolMethod = DASolver.getOption("adjEqnSolMethod")
+        if self.adjEqnSolMethod not in ["Krylov", "fixedPoint"]:
+            raise AnalysisError("adjEqnSolMethod is not valid")
+
+        inputDict = DASolver.getOption("inputInfo")
+        for inputName in list(inputDict.keys()):
+            # this input is attached to solver comp
+            if "solver" in inputDict[inputName]["components"]:
+                inputType = inputDict[inputName]["type"]
+                inputSize = DASolver.solver.getInputSize(inputName, inputType)
+                inputDistributed = DASolver.solver.getInputDistributed(inputName, inputType)
+                self.add_input(inputName, distributed=inputDistributed, shape=inputSize)
+
+        # here we define a set of unsteady component output, they can be a linear combination
+        # of the functions defined in DAOption->function
+        self.unsteadyCompOutput = DASolver.getOption("unsteadyCompOutput")
+        if len(self.unsteadyCompOutput) == 0:
+            raise AnalysisError("unsteadyCompOutput is not defined for unsteady cases")
+
+        functions = DASolver.getOption("function")
+        for outputName in list(self.unsteadyCompOutput.keys()):
+            # add the output
+            self.add_output(outputName, distributed=0, shape=1)
+            # also verify if the function names defined in the unsteadyCompOutput subdict
+            # is found in DAOption->function
+            for funcName in self.unsteadyCompOutput[outputName]:
+                if funcName not in functions:
+                    raise AnalysisError("%f is not found in DAOption-function" % funcName)
+
+    def add_dvgeo(self, DVGeo):
+        self.DVGeo = DVGeo
+
+    def compute(self, inputs, outputs):
+
+        with cd(self.run_directory):
+
+            DASolver = self.DASolver
+
+            # if readZeroFields, we need to read in the states from the 0 folder every time
+            # we start the primal here we read in all time levels. If readZeroFields is not set,
+            # we will use the latest flow fields (from a previous primal call) as the init conditions
+            readZeroFields = DASolver.getOption("unsteadyAdjoint")["readZeroFields"]
+            if readZeroFields:
+                DASolver.solver.setTime(0.0, 0)
+                deltaT = DASolver.solver.getDeltaT()
+                DASolver.readStateVars(0.0, deltaT)
+
+            # set the solver inputs.
+            # NOTE: we need to set input after we read the zero fields for forward mode
+            DASolver.set_solver_input(inputs, self.DVGeo)
+            # if dyamic mesh is used, we need to deform the mesh points and save them to disk
+            DASolver.deformDynamicMesh()
+
+            # before running the primal, we need to check if the mesh
+            # quality is good
+            meshOK = DASolver.solver.checkMesh()
+
+            # solve the flow with the current design variable
+            # if the mesh is not OK, do not run the primal
+            if meshOK:
+                # solve the primal
+                DASolver()
+            else:
+                # if the mesh fails, return
+                raise AnalysisError("Primal mesh failed!")
+                return
+
+            # if the primal solution fails, return
+            if DASolver.primalFail != 0:
+                raise AnalysisError("Primal solution failed!")
+                return
+
+            # get the objective functions
+            funcs = {}
+            DASolver.evalFunctions(funcs)
+
+            # now we can print the residual for the endTime state
+            DASolver.solver.calcPrimalResidualStatistics("print")
+
+            for outputName in list(self.unsteadyCompOutput.keys()):
+                outputs[outputName] = 0.0
+                # add all the function values for this output
+                for funcName in self.unsteadyCompOutput[outputName]:
+                    outputs[outputName] += funcs[funcName]
+
+    def compute_jacvec_product(self, inputs, d_inputs, d_outputs, mode):
+        if mode == "fwd":
+            om.issue_warning(
+                " mode = %s, but the forward mode functions are not implemented for DAFoam!" % mode,
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        DASolver = self.DASolver
+
+        # run coloring
+        if self.adjEqnSolMethod == "Krylov":
+            DASolver.solver.runColoring()
+
+            PCMatPrecomputeInterval = DASolver.getOption("unsteadyAdjoint")["PCMatPrecomputeInterval"]
+            PCMatUpdateInterval = DASolver.getOption("unsteadyAdjoint")["PCMatUpdateInterval"]
+
+        # NOTE: this step is critical because we need to compute the residual for
+        # self.solverAD once to get the proper oldTime level for unsteady adjoint
+        DASolver.solverAD.updateStateBoundaryConditions()
+        DASolver.solverAD.calcPrimalResidualStatistics("calc")
+
+        # calc the total number of time instances
+        # we assume the adjoint is for deltaT to endTime
+        # but users can also prescribed a custom time range
+        deltaT = DASolver.solver.getDeltaT()
+
+        endTime = DASolver.solver.getEndTime()
+        endTimeIndex = round(endTime / deltaT)
+
+        localAdjSize = DASolver.getNLocalAdjointStates()
+
+        ddtSchemeOrder = DASolver.solver.getDdtSchemeOrder()
+
+        # read the latest solution
+        DASolver.solver.setTime(endTime, endTimeIndex)
+        DASolver.solverAD.setTime(endTime, endTimeIndex)
+        # now we can read the variables
+        DASolver.readStateVars(endTime, deltaT)
+        # if it is dynamic mesh, read the mesh points
+        if DASolver.getOption("dynamicMesh")["active"]:
+            DASolver.readDynamicMeshPoints(endTime, deltaT, endTimeIndex, ddtSchemeOrder)
+
+        # now we can print the residual for the endTime state
+        DASolver.solverAD.calcPrimalResidualStatistics("print")
+
+        # init dRdWTMF
+        if self.adjEqnSolMethod == "Krylov":
+            DASolver.solverAD.initializedRdWTMatrixFree()
+
+        # precompute the KSP preconditioner Mat and save them to the self.dRdWTPC dict
+        if self.dRdWTPC is None and self.adjEqnSolMethod == "Krylov":
+
+            self.dRdWTPC = {}
+
+            # always calculate the PC mat for the endTime
+            DASolver.solver.setTime(endTime, endTimeIndex)
+            DASolver.solverAD.setTime(endTime, endTimeIndex)
+            # now we can read the variables
+            DASolver.readStateVars(endTime, deltaT)
+            # if it is dynamic mesh, read the mesh points
+            if DASolver.getOption("dynamicMesh")["active"]:
+                DASolver.readDynamicMeshPoints(endTime, deltaT, endTimeIndex, ddtSchemeOrder)
+            # calc the preconditioner mat for endTime
+            if self.comm.rank == 0:
+                print("Pre-Computing preconditiner mat for t = %f" % endTime, flush=True)
+
+            dRdWTPC1 = PETSc.Mat().create(PETSc.COMM_WORLD)
+            DASolver.solver.calcdRdWT(1, dRdWTPC1)
+            # always update the PC mat values using OpenFOAM's fvMatrix
+            # DASolver.solver.calcPCMatWithFvMatrix(dRdWTPC1)
+            self.dRdWTPC[str(endTime)] = dRdWTPC1
+
+            # if we define some extra PCMat in PCMatPrecomputeInterval, calculate them here
+            # and set them to the self.dRdWTPC dict
+            for timeIndex in range(endTimeIndex - 1, 0, -1):
+                if timeIndex % PCMatPrecomputeInterval == 0:
+                    t = timeIndex * deltaT
+                    if self.comm.rank == 0:
+                        print("Pre-Computing preconditiner mat for t = %f" % t, flush=True)
+                    # read the latest solution
+                    DASolver.solver.setTime(t, timeIndex)
+                    DASolver.solverAD.setTime(t, timeIndex)
+                    # now we can read the variables
+                    DASolver.readStateVars(t, deltaT)
+                    # if it is dynamic mesh, read the mesh points
+                    if DASolver.getOption("dynamicMesh")["active"]:
+                        DASolver.readDynamicMeshPoints(t, deltaT, timeIndex, ddtSchemeOrder)
+                    # calc the preconditioner mat
+                    dRdWTPC1 = PETSc.Mat().create(PETSc.COMM_WORLD)
+                    DASolver.solver.calcdRdWT(1, dRdWTPC1)
+                    # always update the PC mat values using OpenFOAM's fvMatrix
+                    # DASolver.solver.calcPCMatWithFvMatrix(dRdWTPC1)
+                    self.dRdWTPC[str(t)] = dRdWTPC1
+
+        if self.adjEqnSolMethod == "Krylov":
+            # Initialize the KSP object using the PCMat from the endTime
+            PCMat = self.dRdWTPC[str(endTime)]
+            ksp = PETSc.KSP().create(PETSc.COMM_WORLD)
+            DASolver.solverAD.createMLRKSPMatrixFree(PCMat, ksp)
+
+        inputDict = DASolver.getOption("inputInfo")
+
+        # init the dFdW vec
+        dFdW = PETSc.Vec().create(PETSc.COMM_WORLD)
+        dFdW.setSizes((localAdjSize, PETSc.DECIDE), bsize=1)
+        dFdW.setFromOptions()
+        dFdW.zeroEntries()
+
+        # init the adjoint vector
+        psi = dFdW.duplicate()
+        psi.zeroEntries()
+
+        # initialize the adjoint vecs
+        dRdW0TPsi = np.zeros(localAdjSize)
+        dRdW00TPsi = np.zeros(localAdjSize)
+        dRdW00TPsiBuffer = np.zeros(localAdjSize)
+        dFdWArray = np.zeros(localAdjSize)
+        psiArray = np.zeros(localAdjSize)
+        tempdFdWArray = np.zeros(localAdjSize)
+
+        # loop over all function, calculate dFdW, and solve the adjoint
+        # for functionName in list(d_outputs.keys()):
+        for outputName in list(self.unsteadyCompOutput.keys()):
+
+            # we need to zero the total derivative for each function
+            totals = {}
+            for inputName in list(inputs.keys()):
+                totals[inputName] = np.zeros_like(inputs[inputName])
+
+            seed = d_outputs[outputName]
+
+            # if the seed is zero, do not compute the adjoint and pass to
+            # the next funnction
+            if np.linalg.norm(seed) < 1e-12:
+                continue
+
+            # zero the vecs
+            dRdW0TPsi[:] = 0.0
+            dRdW00TPsi[:] = 0.0
+            dRdW00TPsiBuffer[:] = 0.0
+            dFdW.zeroEntries()
+
+            # loop over all time steps and solve the adjoint and accumulate the totals
+            adjointFail = 0
+            for n in range(endTimeIndex, 0, -1):
+                timeVal = n * deltaT
+
+                if self.comm.rank == 0:
+                    print("---- Solving unsteady adjoint for %s. t = %f ----" % (outputName, timeVal), flush=True)
+
+                # set the time value and index in the OpenFOAM layer. Note: this is critical
+                # because if timeIndex < 2, OpenFOAM will not use the oldTime.oldTime for 2nd
+                # ddtScheme and mess up the totals. Check backwardDdtScheme.C
+                DASolver.solver.setTime(timeVal, n)
+                DASolver.solverAD.setTime(timeVal, n)
+                # now we can read the variables
+                # read the state, state.oldTime, etc and update self.wVec for this time instance
+                DASolver.readStateVars(timeVal, deltaT)
+                # if it is dynamic mesh, read the mesh points
+                if DASolver.getOption("dynamicMesh")["active"]:
+                    DASolver.readDynamicMeshPoints(timeVal, deltaT, n, ddtSchemeOrder)
+
+                # print out residuals for debugging
+                if self.DASolver.getOption("debug"):
+                    DASolver.solverAD.calcPrimalResidualStatistics("print")
+
+                # calculate dFd? scaling, if time index is within the unsteady objective function
+                # index range, prescribed in unsteadyAdjointDict, we calculate dFdW
+                # otherwise, we use dFdW=0 because the unsteady obj does not depend
+                # on the state at this time index.
+                # NOTE: we just use the first function in the output for dFScaling and
+                # assume all the functions to have the same timeOp for this output
+                firstFunctionName = self.unsteadyCompOutput[outputName][0]
+                dFScaling = DASolver.solver.getdFScaling(firstFunctionName, n - 1)
+
+                # loop over all function for this output, compute their dFdW, and add them up to
+                # get the dFdW for this output
+                dFdWArray[:] = 0.0
+                for functionName in self.unsteadyCompOutput[outputName]:
+
+                    # calculate dFdW
+                    jacInput = DASolver.getStates()
+                    DASolver.solverAD.calcJacTVecProduct(
+                        "states",
+                        "stateVar",
+                        jacInput,
+                        functionName,
+                        "function",
+                        seed,
+                        tempdFdWArray,  # NOTE: we just use tempdFdWArray to hold a temp dFdW for this function
+                    )
+
+                    dFdWArray += tempdFdWArray * dFScaling
+
+                # do dFdW - dRdW0TPsi - dRdW00TPsi
+                if ddtSchemeOrder == 1:
+                    dFdWArray = dFdWArray - dRdW0TPsi
+                elif ddtSchemeOrder == 2:
+                    dFdWArray = dFdWArray - dRdW0TPsi - dRdW00TPsi
+                    # now copy the buffer vec dRdW00TPsiBuffer to dRdW00TPsi for the next time step
+                    dRdW00TPsi[:] = dRdW00TPsiBuffer
+                else:
+                    print("ddtSchemeOrder not valid!" % ddtSchemeOrder)
+
+                # check if we need to update the PC Mat vals or use the pre-computed PC matrix
+                if self.adjEqnSolMethod == "Krylov":
+                    if str(timeVal) in list(self.dRdWTPC.keys()):
+                        if self.comm.rank == 0:
+                            print("Using pre-computed KSP PC mat for %f" % timeVal, flush=True)
+                        PCMat = self.dRdWTPC[str(timeVal)]
+                        DASolver.solverAD.updateKSPPCMat(PCMat, ksp)
+                    if n % PCMatUpdateInterval == 0 and n < endTimeIndex:
+                        # udpate part of the PC mat
+                        if self.comm.rank == 0:
+                            print("Updating dRdWTPC mat value using OF fvMatrix", flush=True)
+                        DASolver.solver.calcPCMatWithFvMatrix(PCMat)
+
+                # now solve the adjoint eqn
+                DASolver.arrayVal2Vec(dFdWArray, dFdW)
+
+                if self.adjEqnSolMethod == "Krylov":
+                    adjointFail = DASolver.solverAD.solveLinearEqn(ksp, dFdW, psi)
+                elif self.adjEqnSolMethod == "fixedPoint":
+                    adjointFail = DASolver.solverAD.solveAdjointFP(dFdW, psi)
+
+                # if one adjoint solution fails, return immediate without solving for the rest of steps.
+                if adjointFail > 0:
+                    break
+
+                # loop over all inputs and compute total derivs
+                for inputName in list(inputs.keys()):
+
+                    # calculate dFdX
+                    inputType = inputDict[inputName]["type"]
+                    jacInput = inputs[inputName]
+                    dFdX = np.zeros_like(jacInput)
+                    tempdFdX = np.zeros_like(jacInput)
+
+                    # loop over all function for this output, compute their dFdX, and add them up to
+                    # get the dFdX for this output
+                    for functionName in self.unsteadyCompOutput[outputName]:
+                        DASolver.solverAD.calcJacTVecProduct(
+                            inputName,
+                            inputType,
+                            jacInput,
+                            functionName,
+                            "function",
+                            seed,
+                            tempdFdX,
+                        )
+                        # we need to scale the dFdX for unsteady adjoint too
+                        dFdX += tempdFdX * dFScaling
+
+                    # calculate dRdX^T * psi
+                    dRdXTPsi = np.zeros_like(jacInput)
+                    DASolver.vecVal2Array(psi, psiArray)
+                    DASolver.solverAD.calcJacTVecProduct(
+                        inputName,
+                        inputType,
+                        jacInput,
+                        "residual",
+                        "residual",
+                        psiArray,
+                        dRdXTPsi,
+                    )
+
+                    # total derivative
+                    totals[inputName] += dFdX - dRdXTPsi
+
+                # we need to calculate dRdW0TPsi for the previous time step
+                if ddtSchemeOrder == 1:
+                    DASolver.solverAD.calcdRdWOldTPsiAD(1, psiArray, dRdW0TPsi)
+                elif ddtSchemeOrder == 2:
+                    # do the same for the previous previous step, but we need to save it to a buffer vec
+                    # because dRdW00TPsi will be used 2 steps before
+                    DASolver.solverAD.calcdRdWOldTPsiAD(1, psiArray, dRdW0TPsi)
+                    DASolver.solverAD.calcdRdWOldTPsiAD(2, psiArray, dRdW00TPsiBuffer)
+
+            for inputName in list(inputs.keys()):
+                d_inputs[inputName] += totals[inputName]
+
+        # once the adjoint is done, we will assign OF fields with the endTime solution
+        # so, if the next primal does not read fields from the 0 time, we will continue
+        # to use the latest solutions from the previous design as the initial field
+        DASolver.solver.setTime(endTime, endTimeIndex)
+        DASolver.solverAD.setTime(endTime, endTimeIndex)
+        DASolver.readStateVars(endTime, deltaT)
+
+
+class DAFoamLinearConstraint(ExplicitComponent):
+    """
+    Helper component that computes per-pair linear combinations:
+        {output_name}_i = varA[i] * coeffA[i] + varB[i] * coeffB[i]
+
+    One output {output_name}_i is created per pair, with shape size[i].
+    All inputs are promoted by name, so they auto-connect when the parent
+    group uses promotes=["*"].
+
+    Parameters
+    ----------
+    varA : list of str
+        Names of the first group of input variables. All names across varA and
+        varB must be unique.
+    coeffA : float or list of float
+        Coefficients for varA. A single scalar is broadcast to all variables in varA.
+    varB : list of str
+        Names of the second group of input variables. Must have the same length as varA.
+    coeffB : float or list of float
+        Coefficients for varB. A single scalar is broadcast to all variables in varB.
+    size : int or list of int
+        Size of each input/output pair. varA[i], varB[i], and {output_name}_i all share size[i].
+        A single scalar is broadcast to all pairs.
+    output_name : str
+        Base name for the outputs. Outputs are named {output_name}_0, {output_name}_1, etc.
+        Use distinct output_name values when adding multiple instances to avoid name conflicts.
+
+    Usage
+    -----
+    # two instances with distinct output names
+    prob.model.add_subsystem(
+        "con1",
+        DAFoamLinearConstraint(
+            varA=["CD", "CL"], coeffA=1.0,
+            varB=["CM", "CN"], coeffB=-1.0,
+            size=1, output_name="con1",
+        ),
+        promotes=["*"],
+    )
+    # outputs: con1.con1_0, con1.con1_1
+
+    prob.model.add_subsystem(
+        "con2",
+        DAFoamLinearConstraint(
+            varA=["CD2", "CL2"], coeffA=[1.0, 2.0],
+            varB=["CM2", "CN2"], coeffB=[-1.0, 0.5],
+            size=[1, 1], output_name="con2",
+        ),
+        promotes=["*"],
+    )
+    # outputs: con2.con2_0, con2.con2_1
+    """
+
+    def initialize(self):
+        self.options.declare("varA", recordable=False)
+        self.options.declare("coeffA", recordable=False)
+        self.options.declare("varB", recordable=False)
+        self.options.declare("coeffB", recordable=False)
+        self.options.declare("size", recordable=False)
+        self.options.declare("output_name", recordable=False)
+
+    def setup(self):
+        varA, coeffA, varB, coeffB, size = self._expand_options()
+        output_name = self.options["output_name"]
+
+        # add one input per variable in varA and varB
+        for name, sz in zip(varA, size):
+            self.add_input(name, shape=sz)
+
+        for name, sz in zip(varB, size):
+            self.add_input(name, shape=sz)
+
+        # one scalar (or vector) output per pair, named {output_name}_0, _1, ...
+        for i, sz in enumerate(size):
+            self.add_output("%s_%d" % (output_name, i), shape=sz)
+
+    def _expand_options(self):
+        varA = self.options["varA"]
+        varB = self.options["varB"]
+        coeffA = self.options["coeffA"]
+        coeffB = self.options["coeffB"]
+        size = self.options["size"]
+
+        # broadcast scalar coefficients / sizes to match the number of pairs
+        if np.isscalar(coeffA):
+            coeffA = [coeffA] * len(varA)
+        if np.isscalar(coeffB):
+            coeffB = [coeffB] * len(varB)
+        if np.isscalar(size):
+            size = [size] * len(varA)
+
+        # all five lists must align one-to-one
+        if not (len(varA) == len(coeffA) == len(varB) == len(coeffB) == len(size)):
+            raise ValueError(
+                "varA, coeffA, varB, coeffB, and size must all have the same length, "
+                "got %d, %d, %d, %d, %d" % (len(varA), len(coeffA), len(varB), len(coeffB), len(size))
+            )
+
+        # OpenMDAO input names must be globally unique; catch accidental overlaps early
+        seen = set()
+        for name in list(varA) + list(varB):
+            if name in seen:
+                raise ValueError("Duplicate variable name '%s' found in varA/varB. All names must be unique." % name)
+            seen.add(name)
+
+        return varA, coeffA, varB, coeffB, size
+
+    def compute(self, inputs, outputs):
+        varA, coeffA, varB, coeffB, _ = self._expand_options()
+        output_name = self.options["output_name"]
+
+        # evaluate the linear combination for each pair
+        for i, (nameA, cA, nameB, cB) in enumerate(zip(varA, coeffA, varB, coeffB)):
+            outputs["%s_%d" % (output_name, i)] = inputs[nameA] * cA + inputs[nameB] * cB
+
+    def compute_jacvec_product(self, inputs, d_inputs, d_outputs, mode):
+        varA, coeffA, varB, coeffB, _ = self._expand_options()
+        output_name = self.options["output_name"]
+
+        if mode == "fwd":
+            om.issue_warning(
+                " mode = %s, but the forward mode functions are not implemented for DAFoam!" % mode,
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        # reverse mode: d_inputs += (dOutput/dInput)^T * d_outputs
+        # since output_i = cA*varA + cB*varB, the partial w.r.t. each input is just its coefficient
+        for i, (nameA, cA, nameB, cB) in enumerate(zip(varA, coeffA, varB, coeffB)):
+            out_name = "%s_%d" % (output_name, i)
+            if out_name in d_outputs:
+                if nameA in d_inputs:
+                    d_inputs[nameA] += cA * d_outputs[out_name]
+                if nameB in d_inputs:
+                    d_inputs[nameB] += cB * d_outputs[out_name]
+
+
+class DAFoamVSPVolume(ExplicitComponent):
+    """
+    Compute the volume of a VSP geometry using the OpenVSP
+    Python API mass-properties (slicing) tool.
+
+    Parameters (OpenMDAO options)
+    -----------------------------
+    vsp_file : str
+        Path to the .vsp3 script, e.g. "wing.vsp3".
+    vsp_vars : list of str
+        VSP parameter paths in "comp:group:var" format,
+        e.g. ["NACA:UpperCoeff_0:Au_0", "NACA:LowerCoeff_0:Al_0"].
+        Each entry is used as both the OpenMDAO input name and the VSP
+        parameter to update.
+    vsp_comp_names : list of str or None
+        Names of the VSP components whose combined volume is computed. All
+        geometries matching these names are included. If None or empty, all
+        components are included. Default None.
+    slice_dir : str
+        Slice direction: 'x', 'y', or 'z'. Default 'z'.
+    n_slices : int
+        Number of slices used by the mass-properties integrator. Default 10.
+    output_name : str
+        Name of the volume output variable.
+    step : float
+        Finite-difference step size. Default 1e-4.
+    relativeStep : bool
+        If False (default), step is an absolute perturbation.
+        If True, the actual perturbation is step * |val| (falls back to step when val == 0).
+    scaled : bool
+        If True (default), output is volume / volume_ref, where volume_ref is
+        the volume computed on the first call (the initial design point).
+        If False, output is the raw volume.
+
+    Inputs
+    ------
+    One scalar input per entry in vsp_vars, named by the exact vsp_vars string.
+
+    Outputs
+    -------
+    {output_name} : float
+        Volume (scaled by initial volume if scaled=True).
+
+    Usage
+    -----
+    prob.model.add_subsystem(
+        "vsp_vol",
+        DAFoamVSPVolume(
+            vsp_file="wing.vsp3",
+            vsp_vars=["Wing:UpperCoeff_0:Au_0", "Wing:LowerCoeff_0:Al_0"],
+            vsp_comp_names=["Wing", "Tail"],
+            slice_dir="x",
+            n_slices=10,
+            output_name="volume_val",
+            step=1e-4,
+            relativeStep=False,
+        ),
+        promotes=["*"],
+    )
+    """
+
+    def initialize(self):
+        self.options.declare("vsp_file", recordable=False)
+        self.options.declare("vsp_vars", recordable=False)
+        self.options.declare("vsp_comp_names", default=None, types=(list, type(None)), recordable=False)
+        self.options.declare("slice_dir", default="z", recordable=False)
+        self.options.declare("n_slices", default=10, recordable=False)
+        self.options.declare("output_name", recordable=False)
+        self.options.declare("step", default=1e-4, recordable=False)
+        self.options.declare("relativeStep", default=False, recordable=False)
+        self.options.declare("scaled", default=True, recordable=False)
+
+    def setup(self):
+        # reset reference and baseline volumes each time the problem is set up
+        self._vol_ref = None
+        self._vol_baseline = None  # volume at the last compute point; reused as FD baseline in compute_jacvec_product
+        # parm IDs are stable for the lifetime of the VSP model; resolved once and cached to avoid
+        # repeated FindGeomsWithName + FindParm calls on every compute / compute_jacvec_product
+        self._parms_cache = None
+        # one scalar input per VSP parameter; the full "comp:group:var" string is the OpenMDAO variable name
+        for var_str in self.options["vsp_vars"]:
+            self.add_input(var_str, distributed=False, val=0.0)
+        self.add_output(self.options["output_name"], distributed=False, val=0.0)
+
+    def _resolve_parms(self, vsp, vsp_vars):
+        """Return cached list of (parm_id, var_str); resolves against the live VSP model on first call only."""
+        if self._parms_cache is not None:
+            return self._parms_cache
+        result = []
+        for var_str in vsp_vars:
+            # each entry must be "comp:group:var" — split and look up the VSP parameter ID
+            parts = var_str.split(":")
+            if len(parts) != 3:
+                raise ValueError("vsp_vars entries must be 'comp:group:var', got '%s'" % var_str)
+            comp_name, group_name, parm_name = parts
+            geom_ids = vsp.FindGeomsWithName(comp_name)
+            if len(geom_ids) == 0:
+                raise RuntimeError("VSP component '%s' not found" % comp_name)
+            parm_id = vsp.FindParm(geom_ids[0], parm_name, group_name)
+            if parm_id == "":
+                raise RuntimeError(
+                    "Parameter '%s' in group '%s' not found on component '%s'" % (parm_name, group_name, comp_name)
+                )
+            result.append((parm_id, var_str))
+        self._parms_cache = result
+        return result
+
+    def _run_massprop(self, vsp):
+        """Run MassProp analysis on the current VSP model and return raw volume."""
+        slice_dir = self.options["slice_dir"]
+        n_slices = self.options["n_slices"]
+        vsp_comp_names = self.options["vsp_comp_names"]
+        _dir_map = {"x": 0, "y": 1, "z": 2}
+        if slice_dir.lower() not in _dir_map:
+            raise ValueError("slice_dir must be 'x', 'y', or 'z', got '%s'" % slice_dir)
+        analysis_name = "MassProp"
+        vsp.SetAnalysisInputDefaults(analysis_name)
+        vsp.SetIntAnalysisInput(analysis_name, "NumMassSlices", [n_slices])
+        vsp.SetIntAnalysisInput(analysis_name, "MassSliceDir", [_dir_map[slice_dir.lower()]])
+
+        shown_geom_ids = None
+        if vsp_comp_names:
+            # MassProp can operate on the special shown set. Preserve pyGeo's display state while
+            # temporarily making only the requested component geometries visible.
+            shown_geom_ids = list(vsp.GetGeomSetAtIndex(vsp.SET_SHOWN))
+            # OpenVSP 3.42.x has no HideAll(); clear the shown flag on every geom instead.
+            for geom_id in vsp.FindGeoms():
+                vsp.SetSetFlag(geom_id, vsp.SET_SHOWN, False)
+            # Convert each provided component name to the geometry IDs required by SetSetFlag.
+            for component_name in vsp_comp_names:
+                for geom_id in vsp.FindGeomsWithName(component_name):
+                    vsp.SetSetFlag(geom_id, vsp.SET_SHOWN, True)
+            vsp.SetIntAnalysisInput(analysis_name, "Set", [vsp.SET_SHOWN])
+
+        try:
+            rid = vsp.ExecAnalysis(analysis_name)
+            volume = vsp.GetDoubleResults(rid, "Total_Volume")[0]
+            # MassProp creates a temporary mesh geom; delete it so it doesn't accumulate across calls.
+            res_ids = vsp.GetStringResults(rid, "Mesh_GeomID")
+            vsp.DeleteGeom(res_ids[0])
+        finally:
+            if shown_geom_ids is not None:
+                # Restore the exact set of geometries that was visible before this calculation.
+                for geom_id in vsp.FindGeoms():
+                    vsp.SetSetFlag(geom_id, vsp.SET_SHOWN, False)
+                for geom_id in shown_geom_ids:
+                    vsp.SetSetFlag(geom_id, vsp.SET_SHOWN, True)
+
+        return volume
+
+    def compute(self, inputs, outputs):
+        import openvsp as vsp
+
+        parms = self._resolve_parms(vsp, self.options["vsp_vars"])
+
+        # save the current VSP parameter values (owned by pyGeo DVGeo) before we change anything
+        orig_vals = {parm_id: vsp.GetParmVal(parm_id) for parm_id, _ in parms}
+
+        # set VSP parameters to the current OpenMDAO input values and evaluate
+        for parm_id, var_str in parms:
+            vsp.SetParmVal(parm_id, float(inputs[var_str]))
+        vsp.Update()
+
+        volume = self._run_massprop(vsp)
+        # cache the unscaled volume so compute_jacvec_product can use it as the FD baseline
+        # without rerunning the unperturbed case
+        self._vol_baseline = volume
+
+        # revert VSP to its original state so pyGeo's model is not corrupted
+        for parm_id, _ in parms:
+            vsp.SetParmVal(parm_id, orig_vals[parm_id])
+        vsp.Update()
+
+        if self.options["scaled"]:
+            # capture reference volume on the first call (initial design point)
+            if self._vol_ref is None:
+                self._vol_ref = volume
+                if self.comm.rank == 0:
+                    print(
+                        "DAFoamVSPVolume: reference volume for %s = %g" % (self.options["output_name"], self._vol_ref)
+                    )
+            outputs[self.options["output_name"]] = volume / self._vol_ref
+        else:
+            outputs[self.options["output_name"]] = volume
+
+    def compute_jacvec_product(self, inputs, d_inputs, d_outputs, mode):
+        import openvsp as vsp
+        import time
+
+        if mode == "fwd":
+            om.issue_warning(
+                "mode = fwd not implemented for DAFoamVSPVolume",
+                prefix="",
+                stacklevel=2,
+                category=om.OpenMDAOWarning,
+            )
+            return
+
+        t_start = time.time()
+
+        output_name = self.options["output_name"]
+        # nothing to do if this output has no seed
+        if output_name not in d_outputs:
+            return
+
+        d_vol_out = d_outputs[output_name]
+        step = self.options["step"]
+        relativeStep = self.options["relativeStep"]
+        # baseline volume from the preceding compute call at the same input point
+        vol0 = self._vol_baseline
+
+        parms = self._resolve_parms(vsp, self.options["vsp_vars"])
+
+        # snapshot pyGeo's current VSP state before we touch any parameters
+        orig_state = {parm_id: vsp.GetParmVal(parm_id) for parm_id, _ in parms}
+
+        # move VSP to the current input values so our FD baseline matches vol0
+        for parm_id, var_str in parms:
+            vsp.SetParmVal(parm_id, float(inputs[var_str]))
+        vsp.Update()
+
+        # pre-filter to only the parameters that have a non-zero adjoint seed,
+        # so we don't waste MassProp calls on inactive design variables
+        active = [(pid, vs) for pid, vs in parms if vs in d_inputs]
+
+        for parm_id, var_str in active:
+            val = float(inputs[var_str])
+
+            # compute the forward-difference step size
+            if relativeStep:
+                h = step * abs(val) if abs(val) > 0.0 else step  # fall back to abs step if val == 0
+            else:
+                h = step
+
+            # perturb this parameter and re-tessellate (one Update per param)
+            vsp.SetParmVal(parm_id, val + h)
+            vsp.Update()
+            vol_pert = self._run_massprop(vsp)
+
+            # revert this parameter but defer vsp.Update() — the next iteration's SetParmVal+Update
+            # will re-tessellate with the reverted value already in place, saving one Update per step
+            vsp.SetParmVal(parm_id, val)
+
+            # forward-difference gradient of the raw volume
+            dvol_dvar = (vol_pert - vol0) / h
+            # if output is scaled, divide by the reference volume (chain rule)
+            if self.options["scaled"]:
+                dvol_dvar /= self._vol_ref
+
+            # reverse-mode accumulation: d_input += (dOutput/dInput)^T * d_output
+            d_inputs[var_str] += dvol_dvar * d_vol_out
+
+        # apply the pending revert for the last active parameter (deferred from the loop above)
+        vsp.Update()
+
+        # restore the exact VSP state that existed before this call so pyGeo is unaffected
+        for parm_id, _ in parms:
+            vsp.SetParmVal(parm_id, orig_state[parm_id])
+        vsp.Update()
+
+        if self.comm.rank == 0:
+            print(
+                "DAFoamVSPVolume: compute_jacvec_product for %s took %.2f s (%d active vars)"
+                % (output_name, time.time() - t_start, len(active))
+            )

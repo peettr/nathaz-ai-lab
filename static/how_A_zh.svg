@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 780" width="1360" height="780" role="img" aria-label="平台架构图">
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L12 6 L0 12 L3 6 Z" fill="#5c6b7c"/></marker></defs>
+<style>text { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', Inter, Arial, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif; }</style>
+<rect x="0" y="0" width="1360" height="780" rx="16" fill="#f5f5f7"/>
+<path d="M590 116 C480 130 260 168 260 204" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="405" y="135" text-anchor="end" font-size="14.5" font-weight="400" fill="#4b5867" >平台问题</text>
+<path d="M690 116 C760 130 850 170 850 204" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="800" y="137" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >科研问题 · 批复</text>
+<path d="M260 299 L260 382" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="274" y="346" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >工单</text>
+<path d="M720 299 L720 382" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="734" y="346" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >委托</text>
+<path d="M1095 299 L1095 382" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-dasharray="7 6" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="1109" y="346" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >按需送审</text>
+<path d="M700 477 L700 560" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="714" y="527" text-anchor="start" font-size="14.5" font-weight="400" fill="#4b5867" >作业（经安全守卫）</text>
+<path d="M850 477 C940 492 1090 528 1090 560" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M540 477 C495 495 400 525 400 560" fill="none" stroke="#6b7a8b" stroke-width="2.2" stroke-dasharray="7 6" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="435" y="518" text-anchor="end" font-size="14.5" font-weight="400" fill="#4b5867" >检索</text>
+<rect x="500" y="24" width="360" height="92" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="500" y="24" width="7" height="92" rx="3.5" fill="#ae9142"/>
+<text x="680.0" y="54" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >Liang Hu · PI</text>
+<text x="680.0" y="81" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >定方向、挑思路、做科学判断</text>
+<text x="680.0" y="102" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" ></text>
+<rect x="80" y="205" width="360" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="80" y="205" width="7" height="94" rx="3.5" fill="#75839a"/>
+<text x="260.0" y="235" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >平台 Lead（Claude）</text>
+<text x="260.0" y="262" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >每日体检 · 问题分诊</text>
+<text x="260.0" y="283" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >开工单</text>
+<rect x="520" y="205" width="760" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="520" y="205" width="7" height="94" rx="3.5" fill="#1c4f8f"/>
+<text x="900.0" y="235" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >{{leads}} 个项目与研究线 Lead（Claude）</text>
+<text x="900.0" y="262" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >计划 · 派活 · 读结果 · 判断 · 记录决定</text>
+<text x="900.0" y="283" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Lead 之间可跨项目互相委托</text>
+<rect x="80" y="383" width="360" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="80" y="383" width="7" height="94" rx="3.5" fill="#75839a"/>
+<text x="260.0" y="413" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >平台工程会话</text>
+<text x="260.0" y="440" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Claude Code：改代码 · 配置 · 部署</text>
+<text x="260.0" y="461" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >接工单，最多 3 单并行</text>
+<rect x="520" y="383" width="400" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="520" y="383" width="7" height="94" rx="3.5" fill="#4c8272"/>
+<text x="720.0" y="413" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >{{workers}} 个执行智能体（多模型）</text>
+<text x="720.0" y="440" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >写代码 · 跑模拟 · 查文献 · 出图</text>
+<text x="720.0" y="461" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >每线一个 + 共用工具智能体</text>
+<rect x="950" y="383" width="330" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="950" y="383" width="7" height="94" rx="3.5" fill="#796498"/>
+<text x="1115.0" y="413" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >{{reviewers}} 个独立审稿人</text>
+<text x="1115.0" y="440" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >GPT · Gemini · Grok</text>
+<text x="1115.0" y="461" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Kimi · GLM · DeepSeek · Opus（补位）</text>
+<rect x="80" y="561" width="360" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="80" y="561" width="7" height="94" rx="3.5" fill="#ae9142"/>
+<text x="260.0" y="591" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >共享知识库</text>
+<text x="260.0" y="618" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >全文文献库 · 文献 Wiki</text>
+<text x="260.0" y="639" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >项目记忆页</text>
+<rect x="520" y="561" width="360" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="520" y="561" width="7" height="94" rx="3.5" fill="#75839a"/>
+<text x="700.0" y="591" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >超算与 GPU</text>
+<text x="700.0" y="618" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Notre Dame CRC · TACC Stampede3</text>
+<text x="700.0" y="639" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Google Colab A100 / H100</text>
+<rect x="910" y="561" width="370" height="94" rx="16" fill="#ffffff" stroke="#d2d2d7" stroke-width="1.4"/>
+<rect x="910" y="561" width="7" height="94" rx="3.5" fill="#75839a"/>
+<text x="1095.0" y="591" text-anchor="middle" font-size="19" font-weight="700" fill="#0c2340" >工程软件</text>
+<text x="1095.0" y="618" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >WRF · CM1 · OpenFOAM · LBM</text>
+<text x="1095.0" y="639" text-anchor="middle" font-size="14.5" font-weight="400" fill="#565f69" >Ansys · Fluent · MATLAB</text>
+<text x="80" y="704" text-anchor="start" font-size="14" font-weight="700" fill="#0c2340" >始终在岗的保障</text>
+<rect x="80" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="196" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >每条命令过安全守卫</text>
+<rect x="322" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="438" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >作业结束自动叫醒</text>
+<rect x="564" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="680" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >重启部署只等空闲</text>
+<rect x="806" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="922" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >被打断的任务自动续做</text>
+<rect x="1048" y="719" width="232" height="34" rx="17" fill="#ffffff" stroke="#1c4f8f"/>
+<text x="1164" y="741" text-anchor="middle" font-size="14" font-weight="600" fill="#0c2340" >改动日志 + 每晚快照</text>
+</svg>

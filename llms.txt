@@ -1,0 +1,591 @@
+# NatHaz AI Lab
+
+> An agent-swarming research laboratory for wind engineering at the NatHaz Modeling Laboratory, University of Notre Dame. PI: Liang Hu; Advisor: Ahsan Kareem; Reviewer: Yanlin Guo. Research is highly automated: a swarm of AI agents implements, tests and explores ideas; the PI sets direction and judges. Everything below is AI-generated and not peer reviewed — treat results as exploratory and quote them with their stated limits. Site: https://lianghu.org/
+
+## About
+
+> Every day, AI collects papers and research advances in wind engineering and neighboring fields. The PI selects the most promising ideas, guided by current topics of interest. AI agents then implement and test each one and explore how it applies to the research of the PI and the NatHaz Lab.
+>
+> — Liang Hu
+
+
+1. **Grounded in fundamentals and practice.** All work starts from the origin of a problem: the governing physics, the primary literature and the original intent of design codes. We understand a problem fully before developing it, moving between reduction, induction and deduction. In wind engineering, this means keeping only work whose results are real, verifiable and useful in practice.
+2. **Application first.** Wind engineering is an applied discipline. We do not pursue work that belongs mainly to other fields; for example, we use foundation models but do not try to improve them.
+3. **Semi-automated, with a human in the loop.** Most of the research is semi-automated. AI agents carry out and check the work; the PI supplies scientific taste, judgment and critique.
+
+Each idea is run as a sub-project with one of five statuses: **Exploring** (being tried), **Closed (negative result)** (a conclusion has been reached; not pursued further), **Candidate for promotion** (worth turning into formal research; awaiting the PI's decision), **Promoted** (turned into a formal project) and **On hold** (paused).
+
+This page shows the whole process, project by project: the original brief, a digest of the conversations between agents (verbatim transcripts are in the Chinese edition), decisions, reviews and results. The content is generated automatically by AI and has not been peer reviewed.
+
+## Agent swarming in numbers
+
+- 188 AI agents: 86 Lead agents (plan, delegate, judge, record), 95 worker agents (run code and jobs on real compute), 7 independent reviewer models.
+- 21,109 agent-to-agent delegations completed (96.9% success); 2,791 independent reviews; 5,177 supercomputer jobs (Notre Dame CRC, TACC Stampede3); 8,347 conversations since 2026-09-25.
+- Center: 27 projects, 45 research lines, 309 sub-projects (as of 2026-11-13 19:51 ET).
+
+## Stage results with figures
+
+Chosen by the platform Lead; each sentence keeps the report's own limits. Figures are PNG files on this site.
+
+- **R16.2a CM1 re-run of the Moore (2024) downburst ensemble** — Re-running the authors' configuration, the 90th/99th/99.9th-percentile peak wind speeds of the reproduced ensemble member are 15/21/26 m/s, identical to the values in the paper's main text. Exploratory; not peer reviewed.
+ Figures: [1](static/results/R16.2a_1_eacfe6.png), [2](static/results/R16.2a_2_3e5cdf.png), [3](static/results/R16.2a_3_e65167.png)
+- **R16.4a WRF reproduction of the Schumacher (2023) Akron downburst (interim report)** — Our WRF run is comparable with the authors' simulation in early regional statistics, in the downdraft pattern from gravity-wave breaking and in late single-point peaks. The cumulative strong-wind coverage over the event area and the first pulse are weaker. Exploratory; not peer reviewed.
+ Figures: [1](static/results/R16.4a_1_ddc5db.png), [2](static/results/R16.4a_2_7d2a7d.png); report PDF: [zh](static/results/R16.4a_report.zh.pdf)
+- **R16.5a Downburst CFD sub-domain driven by CM1 (OpenFOAM)** — The baseline CFD wind field correlates with the driving CM1 field at 0.96, with a vector RMSE of 2.53 m/s. A variant on a 10 m grid did not match, while the 100 m variant did. The output is a candidate scenario package, not a validated design wind field. Exploratory; not peer reviewed.
+ Figures: [1](static/results/R16.5a_1_b01158.png), [2](static/results/R16.5a_2_800959.png), [3](static/results/R16.5a_3_1e31ce.png)
+- **R21.2 Predictability of urban low-altitude wind (Oklahoma City inflow twins)** — Under a shared inflow, the difference energy between the twin runs stays low upwind (about 0.1), but the runs do not fully synchronize within 3,600 s. In three urban proxy zones the final difference energy is 0.70–0.76. Exploratory; not peer reviewed.
+ Figures: [1](static/results/R21.2_1_3230b6.png), [2](static/results/R21.2_2_3a163c.png), [3](static/results/R21.2_3_2229f4.png)
+- **R21.4a Urban pedestrian-level wind (LBM): near-wall and narrow-street diagnosis for AIJ Case E** — The normalized wind speed rises more on the narrowest streets (under 4 m) and within 1 m of walls than on wide streets. This supports under-resolution near walls and in narrow streets as an important local factor, but wide streets are also raised systematically. Exploratory; not peer reviewed.
+ Figures: [1](static/results/R21.4a_1_455ca7.png), [2](static/results/R21.4a_2_1bbc25.png)
+- **R23.2a AI global forecasts → urban low-altitude wind: full-year 2023 ASOS verification** — Revised conclusion (finalized 10-29 after a six-reviewer review; wording narrowed 11-07). It answers only whether bias-corrected AI forecasts can replace GFS as the upstream source. At 12 airport ASOS stations around Oklahoma City (nominal 10 m), 00/12 UTC valid times, 24 h lead, 7,917 pairs in 2023, the GFS-initialized GraphCast archive (AIWP GRAP_v100_GFS) corrected on the 2022 training year versus corrected GFS: wind-speed MAE is comparable (relative difference −0.000, 95% interval −0.030 to +0.033), with 39% and 28% improvements over persistence and the ten-year climatology; probabilistic forecasts of winds ≥8 m/s are non-inferior (Brier skill score difference +0.042, AUC difference −0.002); the ≥8 m/s CSI difference, −0.008 (−0.059 to +0.043), cannot be told apart. Overall verdict: At 12 OKC-area airport stations (2023, 24 h lead), the GFS-initialized GraphCast archive (AIWP GRAP_v100_GFS), after correction, is indistinguishable from corrected GFS. Only GFS initial conditions were tested; this does not extend to GraphCast itself. This decision rule was written after seeing the first 2023 results and before the additional computations, and it depends on the chosen margins: relaxing the CSI margin to −0.07 would turn the verdict into "can replace", and tightening the AUC margin to −0.01 would make AUC indistinguishable too. Not covered: whether either source is good enough for drone operations, the 06/18 UTC times (including local afternoon), and urban heights of 30–120 m; forecasts were compared at the same initialization time, without publication delay. The original 10-14 conclusion is kept on record. Exploratory; not peer reviewed.
+ Figures: [1](static/results/R23.2a_1_c84d35.png), [2](static/results/R23.2a_2_4fd257.png), [3](static/results/R23.2a_3_038a74.png)
+- **L31.9c ACE2 climate emulator: cold-season strong winds and 50-year values** — Median levels agree, and so do the 50-year values at more than half of the grid points (6 of 8 within ±10%). Two plains cells are 22–29% low in the hold-out period: the emulator reproduces typical cold-season strong winds but not ERA5's regional heavy tails. Results are at grid level; station level is not yet settled. Exploratory; not peer reviewed.
+ Figures: [1](static/results/L31.9c_1_bda8e5.png), [2](static/results/L31.9c_2_440727.png)
+- **L31.2 Hurricane dropsonde profile diagnosis (7,524 profiles, 116 storms)** — Across 7,524 public dropsonde profiles from 116 Atlantic hurricanes, normalized by the 100 m wind speed, the 95th percentile at 300 m is about 16–38% above each group's mean. Single profiles stray far from the mean shape, which a mean profile alone misses. Data: Ma et al. (2026), DOI 10.5281/zenodo.21868265. Exploratory; not peer reviewed.
+ Figures: [1](static/results/L31.2_1_f13166.png), [2](static/results/L31.2_2_d01fc8.png)
+- **L31.4a Silsoe cube surface pressure compared with full scale on the same definition** — Surface pressures on the Silsoe cube are compared with full-scale pressure taps on the same definition. For one wind direction and a single 600 s sample, windward peaks fall within the measured range; on the roof, sides and leeward face the standard deviation of the fluctuating pressure is about half the measured value. The cause is still being investigated. Exploratory; not peer reviewed.
+ Figures: [1](static/results/L31.4a_1_5ecbe3.png)
+- **L29.1 Plastic excursion and drift zones of a single-degree-of-freedom system under random wind loading with force input** — For the given spectrum, damping, random seeds and time window, two regions of the parameter grid show no plasticity. They mark a 'very low plasticity' boundary where limited inelastic design might hold; no material saving has been shown yet. Exploratory; not peer reviewed.
+ Figures: [1](static/results/L29.1_1_24a0c7.png), [2](static/results/L29.1_2_966cb1.png)
+- **L29.6c Truss optimization benchmark: 12 methods × 30 seeds at equal FE budget** — Lightest strictly feasible design for the 25-bar space truss: 545.16 lb, 0.009 lb below the literature value of 545.17 lb. For the 72-bar space tower: 379.61 lb, 5.19 lb below the literature value of 384.8 lb. This checks the benchmark setup and the equal-budget workflow; it does not rank the algorithms. Exploratory; not peer reviewed.
+ Figures: [1](static/results/L29.6c_1_8fb4ed.png), [2](static/results/L29.6c_2_520c81.png), [3](static/results/L29.6c_3_58f1ff.png)
+- **L26.4 AERO-ODE AI regional forecast quick trial (Texas zero-shot)** — Two of three criteria pass; the first fails. Over 10 forecast start dates, 9 of 14 variables are within 10% relative difference of the reference; the other 5, all upper-air variables, differ by 11.8–14.8%. A negative result from a quick trial. Exploratory; not peer reviewed.
+ Figures: [1](static/results/L26.4_1_116444.png)
+- **T27 Ansys verification of wind-induced transient response for a synthetic tall building** — All eight checks of Ansys MAPDL against analytic solutions pass, on a hypothetical test building rather than a real one. Exploratory; not peer reviewed.
+ Figures: [1](static/results/T27_1_07d3a8.png), [2](static/results/T27_2_789f52.png)
+
+## Finished projects with reports
+
+A done state is an archive/transition marker of an exploratory trial, not a formally concluded study.
+
+- **L22.2 Strata + Qwen3.8-Flash-Next local inference (Colab A100)** (Promoted) — 
+ [record](agent/projects/strata-qwen-local-inference.json) · [PDF zh](pdf/strata-qwen-local-inference.zh.pdf) · [PDF en](pdf/strata-qwen-local-inference.en.pdf)
+- **L22.3 Uses of self-built / local models for our research** (Closed (negative result)) — 
+ [record](agent/projects/own-llm-use-cases.json) · [PDF zh](pdf/own-llm-use-cases.zh.pdf) · [PDF en](pdf/own-llm-use-cases.en.pdf)
+- **L22.4 Literature figure gallery and sentence-level retrieval** (Candidate for promotion) — 
+ [record](agent/projects/.json) · [PDF zh](pdf/.zh.pdf) · [PDF en](pdf/.en.pdf)
+- **Rapid Trials Lab mainline** (Promoted) — First choice is K-Dense, with Academic as a style reference; they handle only styling and export: layout must be written by hand and structure checked by a person
+ [record](agent/projects/.json) · [PDF zh](pdf/.zh.pdf) · [PDF en](pdf/.en.pdf)
+- **L26.1 TianJi Close Reading and Hypothesis-Generation Mini-Trial** (Promoted) — 
+ [record](agent/projects/.json) · [PDF zh](pdf/.zh.pdf) · [PDF en](pdf/.en.pdf)
+- **L26.7 Probing AI Friendliness of STAR-CCM+ vs. Fluent** (Promoted) — 
+ [record](agent/projects/.json) · [PDF zh](pdf/.zh.pdf) · [PDF en](pdf/.en.pdf)
+- **L26.10 CFD Fault Injection and Repeated-Run Evaluation Benchmark** (Promoted) — 
+ [record](agent/projects/.json) · [PDF zh](pdf/.zh.pdf) · [PDF en](pdf/.en.pdf)
+- **L26.12 Sparse Autoencoder Interpretability Transfer** (Closed (negative result)) — 
+ [record](agent/projects/.json) · [PDF zh](pdf/.zh.pdf) · [PDF en](pdf/.en.pdf)
+- **R23.2b High-wind forecasting and active control for buildings** (Closed (negative result)) — 
+ [record](agent/projects/a2-building-highwind-forecast-control.json) · [PDF zh](pdf/a2-building-highwind-forecast-control.zh.pdf) · [PDF en](pdf/a2-building-highwind-forecast-control.en.pdf)
+- **R23.2e Warnings for wind-sensitive operations and structures** (Closed (negative result)) — 
+ [record](agent/projects/f-wind-sensitive-operations-warning.json) · [PDF zh](pdf/f-wind-sensitive-operations-warning.zh.pdf) · [PDF en](pdf/f-wind-sensitive-operations-warning.en.pdf)
+- **R23.3b AI-hybrid synthetic typhoons to coastal design wind speeds** (Closed (negative result)) — 
+ [record](agent/projects/b2-ai-synthetic-tc-design-wind.json) · [PDF zh](pdf/b2-ai-synthetic-tc-design-wind.zh.pdf) · [PDF en](pdf/b2-ai-synthetic-tc-design-wind.en.pdf)
+- **R23.4a Forecast uses (high-wind background fields, wind power, CFD)** (Closed (negative result)) — 
+ [record](agent/projects/ai-weather-model-use.json) · [PDF zh](pdf/ai-weather-model-use.zh.pdf) · [PDF en](pdf/ai-weather-model-use.en.pdf)
+- **R23.4b Convection-scale AI and thunderstorm nowcasting** (Closed (negative result)) — 
+ [record](agent/projects/l-convective-scale-ai-nowcast.json) · [PDF zh](pdf/l-convective-scale-ai-nowcast.zh.pdf) · [PDF en](pdf/l-convective-scale-ai-nowcast.en.pdf)
+- **R23.4c Thunderstorms: AI forecasts driving WRF** (Closed (negative result)) — 
+ [record](agent/projects/k-ai-driven-wrf-thunderstorm.json) · [PDF zh](pdf/k-ai-driven-wrf-thunderstorm.zh.pdf) · [PDF en](pdf/k-ai-driven-wrf-thunderstorm.en.pdf)
+- **Low-altitude aircraft mainline** (Closed) — 
+ [record](agent/projects/.json) · [PDF zh](pdf/.zh.pdf) · [PDF en](pdf/.en.pdf)
+
+## Center architecture
+
+Codes: R research lines, L laboratories, T tools, P platform. Status: Active / Planned / Paused.
+
+### R · Research Lines
+- **R14 Low-Altitude Aircraft Platform** (Exploring) — A controlled-wind test facility for low-altitude aircraft (drones): gust disturbance and flight control under realistic wind
+ - R14.1 Wind tunnel construction plan management (Exploring)
+- **R16 PETW — Thunderstorm Winds, End to End** (Exploring) — Nonstationary thunderstorm winds, including downbursts, end to end: event catalogue, storm and CFD simulation, extreme-value statistics, structural response and design wind loads
+ - R16.1 Event Classification & Reconstruction (Exploring) — Survey and reconstruct thunderstorm wind events from observations into comparable event packages
+ - R16.1a Isolated-downburst candidate census and observation-comparison package (Exploring)
+ - R16.1b S1 detectability census (four-city Texas subset) (On hold)
+ - R16.2 CM1 Storm Simulation (Exploring) — Cloud-model (CM1) simulation of downburst-producing storms; literature replication and wind-field supply
+ - R16.2a Moore 40-case set (Exploring)
+ - R16.2b Schumacher 2023 replication (On hold)
+ - R16.2c D420 coupling (Exploring)
+ - R16.2d Self-derived background environments (Wister / BREC / BESSIE) (Exploring)
+ - R16.2d1 Gust Factor Survey (On hold)
+ - R16.2d2 Multi-Event Statistical Validation (B) (Exploring)
+ - R16.2d3 Realistic 3D Forcing and Radar Assimilation (C) (On hold)
+ - R16.3 Statistics & Extreme-Value Analysis (Exploring) — Extreme-value statistics in mixed climates and 3-s gust design wind speeds
+ - R16.3a Reference-scenario 3-s gust trial (On hold)
+ - R16.3b EVA input contract and mechanism stratification (On hold)
+ - R16.3c Thunderstorm vs. non-thunderstorm separation and mixed-climate extremes (Exploring)
+ - R16.3d Thunderstorm downburst Monte Carlo hazard (On hold)
+ - R16.3e Thunderstorm gust turbulence and ASCE conventions (On hold)
+ - R16.3f Convective-environment variables for thunderstorm/non-thunderstorm classification and their effect on return periods (Exploring)
+ - R16.4 WRF Mesoscale Modeling (Exploring) — WRF replication and perturbation ensembles of thunderstorm cases; mesoscale wind fields for downstream lines
+ - R16.4a exp-A replication and comparison (Exploring (not started))
+ - R16.4a1 Perturbed Members E1/E2 (On hold)
+ - R16.4c Wister C1/C2 HRRR forcing and 3DVar radar assimilation (On hold)
+ - R16.4d Wister radar assimilation reconstruction (Exploring)
+ - R16.4e Assessment of mesoscale routes (WRF CPU / GPU version / MPAS / ERF) (Exploring (not started))
+ - R16.5 CFD of Downburst Loading (Exploring) — Automated CFD of downburst flows around buildings, with a staged validation ladder
+ - R16.5a M1 D420 (On hold)
+ - R16.5b AutoCFD validation ladder (Exploring)
+ - R16.5b1 CAARC (Exploring)
+ - R16.5b2 Silsoe (Exploring)
+ - R16.5c CFD Learning Library (Tutorials and WE-UQ) (Exploring)
+ - R16.5d CANTO: close reading and code check (On hold)
+ - R16.5e Fault-injection quick trial for wind engineering (On hold)
+ - R16.5f Probabilistic intervals for Silsoe cube pressures (On hold)
+ - R16.5g OpenFOAMGPT 2.0: close reading (On hold)
+ - R16.6 Wind-Field Characterization (Exploring) — Characterize non-stationary wind fields and package them for structural and load analysis
+ - R16.6a Real wind-field package intake (CM1 D420 to R0/R1 packets) (On hold)
+ - R16.6b Source-kernel fixes and benchmarks (On hold)
+ - R16.6c Event spectra and downstream interfaces (On hold)
+ - R16.6d Library of wind-field characterization models from the literature (Exploring)
+ - R16.6e Model aggregation, uncertainty and probabilistic models (Exploring)
+ - R16.6f Effect of wind-field models on structural response (Exploring)
+ - R16.7 Structural Response (Exploring) — Structural response to non-stationary winds and its sensitivity
+ - R16.7a Code hardening and independent checks (Closed)
+ - R16.7b D420 scenario response sensitivity (On hold)
+ - R16.7c Design-load candidate handoff (Closed)
+ - R16.7d Load inputs and interfaces (On hold)
+ - R16.7e Response and extreme-value methods library (Exploring)
+ - R16.7f Archetypal structural models library (Exploring)
+ - R16.8 Design Wind Loads (Exploring) — Translate event-level results into code-format design wind loads
+ - R16.8a ASCE 7-22 factor-by-factor replacement (Route A) (Exploring)
+ - R16.8b Parallel thunderstorm wind-load chapter, following the tornado-chapter method (Route B) (Exploring)
+ - R16.9 Wind-Tunnel Testing (Exploring) — Downburst wind-tunnel testing: joint configuration, pressure-tap layout and admissibility of data
+ - R16.9a Joint configuration and synchronized pilot (On hold)
+ - R16.9b Scientific admissibility of literature data (Exploring)
+ - R16.9c Model and pressure-tap layout release for fabrication (On hold)
+- **R21 Digital Wind Tunnel** (Exploring) — A GPU lattice-Boltzmann (LBM-LES) digital wind tunnel: validated platform, urban low-altitude wind fields, pedestrian-level urban wind (LUW) and an in-house GPU code
+ - R21.1 Building-surface wind-pressure LBM simulation and validation (Exploring)
+ - R21.2 Predictability of the urban low-altitude wind field (OKC) (Exploring)
+ - R21.3 In-house GPU code (Warp LBM) (Exploring)
+ - R21.5 PhysicsNeMo learning library (Exploring)
+ - R21.6 U3DWind: comparison and usability (Exploring)
+ - R21.4 Urban pedestrian-level wind LBM (LUW) (Exploring)
+ - R21.4a AIJ benchmarks, error decomposition, and near-wall/resolution (Exploring)
+ - R21.4b Realistic urban wind field in Guangzhou (Exploring)
+- **R23 AI Weather & Climate Models** (Exploring) — What AI weather and climate foundation models can and cannot do for wind engineering
+ - R23.7 Small trial of overfitting in analysis systems (On hold)
+ - R23.2 Weather-forecast-driven wind engineering applications (Exploring)
+ - R23.2a Low-altitude UAV wind forecasting (On hold)
+ - R23.2b High-wind forecasting and active control for buildings (On hold)
+ - R23.2c High-wind forecasting and control for wind turbines (On hold)
+ - R23.2d Wind warnings in complex terrain (On hold)
+ - R23.2e Wind-sensitive operations and structural warnings (On hold)
+ - R23.3 Typhoon/hurricane wind fields (Exploring)
+ - R23.3a Landfalling Hurricanes: From AI Tracks and Ensembles to Site Peak Winds (On hold)
+ - R23.3b From AI Hybrid Synthetic Typhoons to Coastal Design Wind Speeds (On hold)
+ - R23.4 Thunderstorms and the convective scale (Exploring)
+ - R23.4a Forecasting Applications (Strong-Wind Background Fields, Wind Power, CFD) (On hold)
+ - R23.4b Convective-scale AI and thunderstorm nowcasting (Exploring)
+ - R23.4c Thunderstorms: AI forecasts driving WRF (Exploring)
+- **R25 Urban Building Wind-Pressure Prediction** (Exploring) — Surface wind pressures on buildings in cities: benchmark data, high-fidelity CFD and AI surrogate models
+ - R25.1 Data and benchmarks (TPU and others) (Exploring)
+ - R25.2 High-fidelity CFD (LES / LBM) (Exploring)
+ - R25.2a TInF inflow toolkit (Exploring)
+ - R25.3 AI wind-pressure surrogate (Exploring)
+- **R42 Collection of viewpoints on the research paradigm in the AI era** (Exploring)
+- **R36 AI Automated Research Laboratory** (Exploring)
+ - R36.1 Automated Research System for Urban Wind Fields (Exploring)
+ - R36.2 Extension to Other Wind Engineering Scenarios (Exploring)
+
+### L · Laboratories
+- **L22 Idea Lab** (Exploring) — Test ideas surfaced by the knowledge base; mature ones are promoted to full projects
+ - L22.2 Strata + Qwen local inference (Colab A100) (On hold)
+ - L22.3 What self-hosted models can do for our research (On hold)
+ - L22.4 Figure library and sentence-level literature search (Exploring)
+ - L22.5 Distilling Prof. Kareem's expert engineering judgment (On hold)
+ - L22.6 LLM template migration pilot (Exploring)
+ - L22.7 Building wake–rotor coupling (experimental + numerical) (Exploring)
+ - L22.8 Research system methodology evaluation and improvement (Exploring)
+ - L22.8a Survey of new agent architectures (Exploring)
+ - L22.8b Trustworthy recursive self-improvement (RSI) (Exploring)
+ - L22.8c Constrained-optimization pilot for the long-running tuning loops of each line (Exploring)
+ - L22.9 Mathematical formulation of wind engineering problems (the PI approved Math-4 on 11-07; literature first, then plan) (Exploring)
+ - L22.10 Wind-induced resonance of low-rise houses and the 1 Hz rigid/flexible boundary (opened by the PI on 11-12; literature first, then a plan) (Exploring)
+ - L22.0 Lab Website & Live Page (Exploring) — This website: showing the AI research process as it happens
+- **L26 Rapid Trials Lab** (Exploring) — Hour-scale trials of new tools and skills: worth adopting or not
+ - L26.1 TianJi close reading and small-scale hypothesis generation trial (On hold)
+ - L26.2 Comparison of wind field evaluation metrics (Exploring)
+ - L26.3 PySR wind pressure formulas (Exploring)
+ - L26.4 AERO-ODE smoke test (On hold)
+ - L26.5 Usability of automated meshing resource pack (Closed)
+ - L26.6 CFD automation failure ledger (Exploring)
+ - L26.7 Exploration of AI-friendliness of STAR-CCM+ vs. Fluent (Exploring)
+ - L26.8 Two-stage daily-scale thunderstorm strong wind modeling (Closed)
+ - L26.9 Nature Review Studio review coverage quick trial (On hold)
+ - L26.10 CFD fault injection and repeated-run evaluation benchmark (Exploring)
+ - L26.11 DEScover ΔR hold-out validation (Exploring)
+ - L26.12 Sparse autoencoder interpretability transfer (Exploring)
+ - L26.13 VoxCity urban voxel models (Exploring)
+ - L26.15 PhysicsNeMo surrogates for LBM (Exploring)
+ - L26.16 Validating the physical realism of XAI explanations and causal graphs (Exploring)
+ - L26.17 TCBL→FuXi-CFD typhoon near-surface wind downscaling chain (Exploring)
+ - L26.18 Can CyclObs be used for R23.3? (Exploring)
+ - L26.19 WorldParticle for tuned liquid (sloshing) dampers (Exploring)
+ - L26.20 WRF 模拟亮温对静止卫星亮温：检验台风眼墙与雨带结构 (Exploring (not started))
+ - L26.21 DAFoam 用于风工程是否有用 (Exploring)
+ - L26.22 可微 LBM 用于主动风洞风扇阵列控制 (Exploring)
+- **L37 Translational Bluff-Body Aerodynamics** (Exploring)
+ - L37.1 Trustworthy use of data-driven modal analysis: DMD/EDMD, Koopman spectra and latent-space modes (Exploring)
+ - L37.2 Flow conditions for vortex-induced vibration assessment: origin and limits of the 0.25 turbulence factor (On hold)
+ - L37.3 Install, provision or monitor: a decision tree for vortex-induced vibration measures (Exploring)
+ - L37.4 Effect of turbulence on across-wind loads of finite-height square prisms and buildings (Exploring)
+- **L29 Make the World a Better Place** (Exploring) — Revisit long-standing open questions in wind-engineering research: clarify where findings hold and how they can reach practice, so that research becomes more reliable and the world a little better.
+ - L29.8 Agent–expert judgment disagreement and alignment (Exploring)
+ - L29.10 Using AI systems to identify misuse of common wind engineering concepts (Exploring)
+ - L29.1 When, and for which structures, structural nonlinearity matters in wind-resistant design (Exploring) — Clarify under what conditions and for which structures nonlinearity should be considered in wind-resistant design, and how it can enter practice
+ - L29.1a Origins and Development of the Plastic Hinge Concept (On hold)
+ - L29.1b Wind and Seismic Design Load System (On hold)
+ - L29.1c Wind-Induced Nonlinear Failure Across Structure Types (On hold)
+ - L29.1d Wind-Induced Nonlinear Failure of Wind Turbines (On hold)
+ - L29.3 What performance-based and resilience design need to reach final design (Exploring) — Clarify the evidence and conditions performance-based and resilience design need to reach final design
+ - L29.3a Metric Tiering (Exploring)
+ - L29.3b Large-Scale Validation (Exploring)
+ - L29.3c Stage-by-Stage Precise Quantification (Exploring)
+ - L29.3d Credibility Criteria (Exploring)
+ - L29.3e Testing Whether Performance-Based Design Saves Cost Under Multiple Loads (Exploring)
+ - L29.4 What it takes for structural and topology optimization to reach engineering practice (Closed) — Clarify what it takes for structural and topology optimization to reach engineering practice (merged into L29.6c)
+ - L29.5 What uncertainty quantification can deliver, and where its limits lie (Exploring) — Clarify what uncertainty quantification can deliver in engineering and where its limits lie, with a minimal usable workflow
+ - L29.5a UQ Landscape and Unified Framework (Exploring)
+ - L29.5b UQ for CFD Simulations (Exploring)
+ - L29.5c Benchmark Cases and Method Comparison (Exploring)
+ - L29.5d Engineering applications and links to center projects (Exploring)
+ - L29.6 Unified benchmarks for crowded method families (Exploring) — Build unified benchmarks and comparisons for method families that address the same task
+ - L29.6a Stochastic Simulation of Wind Speed Time Histories (Exploring)
+ - L29.6a1 Stationary Gaussian (Exploring)
+ - L29.6a2 Stationary Non-Gaussian (Exploring)
+ - L29.6a3 Nonstationary Gaussian (Exploring)
+ - L29.6a4 Nonstationary Non-Gaussian (Exploring)
+ - L29.6b Typhoon Track and Intensity Models (Exploring)
+ - L29.6c Structural Optimization Algorithms (Exploring)
+ - L29.6c1 Box-Girder Flutter Shape Optimization (Exploring)
+ - L29.6c2 Tall Building Cross-Sectional Shape Optimization (Exploring)
+ - L29.6c3 TMD Parameter and Placement Optimization (Exploring)
+ - L29.6c4 Member Sizing Optimization for Wind-Governed Tall Buildings (Exploring)
+ - L29.6c5 Optimization Method Selection and Tuning (Exploring)
+ - L29.6c6 Census of Real-World Optimization Applications in Wind Engineering (Exploring)
+ - L29.6c7 Barriers to and remedies for engineering use of optimization (Exploring)
+ - L29.6c8 Practically Acceptable Optimization Under Given Reliability Constraints (Exploring)
+ - L29.6d Structural Dynamics and CFD Surrogate Models (Exploring)
+ - L29.6d1 Tall Building Wind Pressure Prediction and Sparse Reconstruction (Exploring)
+ - L29.6d2 Wind-Induced Response Computation and the Role of PINO (Exploring)
+ - L29.6d3 Bridge-Site Wind Speed and Bridge Response (Exploring)
+ - L29.6d4 Positioning PINO and mesh surrogates in wind engineering (On hold)
+ - L29.6d5 Discretization-independent operators for wind engineering (Exploring)
+ - L29.7 Research credibility (Exploring)
+ - L29.7a Trustworthy knowledge (Exploring)
+ - L29.7b Method rulebook (Exploring)
+ - L29.7c Rule enforcement and effectiveness checks (Exploring)
+ - L29.7d Physical Corroboration and Adversarial Testing (Exploring)
+ - L29.7d1 CONFIRM five-gate method card (Exploring)
+ - L29.7d2 Borrowing formalization from engineering fields (Exploring)
+ - L29.7e Identification and isolation of literature contamination sources (Exploring)
+- **L30 Hardware Lab** (Exploring) — Three hardware lines: wind-tunnel automation, wind-induced vibration control and inter-laboratory wind-tunnel calibration
+ - L30.1 Wind-Tunnel Automation (Exploring) — Which wind-tunnel steps are worth automating, and whether full automation (modelling and building robots) is justified
+ - L30.1a Partner wind-tunnel interface and safety plan (On hold)
+ - L30.1b Closed-loop tests with shape-changing models (Exploring)
+ - L30.1c Robotic model-changing feasibility (Exploring)
+ - L30.1d Digital-chain prototype (Closed)
+ - L30.1e Self-Building Labs comparison and roadmap (Closed)
+ - L30.1f Closed-loop active control of inflow profiles (Exploring)
+ - L30.2 Wind-Induced Vibration Control (Exploring) — Inerter-based and related devices for vibration control of long-span structures and wind turbines
+ - L30.2a Inerter literature, second edition (Exploring)
+ - L30.2c Real-time hybrid wind-tunnel testing validation plan (Exploring)
+ - L30.2d Robust inerter design and fatigue assessment for wind turbines (Exploring)
+ - L30.2e Standardized characterization tests for inerter devices (Exploring)
+ - L30.2f Reinforcement learning active control (Exploring)
+ - L30.3 Inter-Lab Wind-Tunnel Calibration (Exploring) — Many laboratories run the same test to calibrate wind-tunnel testing uncertainty
+ - L30.3a Protocol and virtual round-robin (Exploring)
+ - L30.3b Controlled pilot (2–3 labs) (Exploring)
+ - L30.3c Full round (≥10 labs) (Exploring (not started))
+ - L30.4 Robotics Laboratory (Exploring)
+- **L31 Core Ideas Lab** (Exploring) — Six of the PI's core research questions: typhoon boundary layers, inflow generation, non-Gaussian pressures, code evolution and probabilistic methods
+ - L31.5 Evolution of wind-resistant design codes (Exploring)
+ - L31.5a Common Load-Chain Links (On hold)
+ - L31.5b Low-Rise Buildings (On hold)
+ - L31.5c High-Rise and Flexible Buildings (On hold)
+ - L31.5d Other Structures (On hold)
+ - L31.5e Bridges (On hold)
+ - L31.5f Transmission Tower-Line Systems (On hold)
+ - L31.1 Internal boundary layer of landfalling typhoons (Exploring)
+ - L31.1a Observational Characteristics (Exploring)
+ - L31.1b Idealized Land-Surface Simulation and Data Assimilation (Exploring)
+ - L31.1c Complex Land Surfaces and Scale Bridging (Exploring)
+ - L31.1e Code Provisions for Sea-Land Transition (Exploring)
+ - L31.2 Wind structure in typhoons/hurricanes: from meteorology to wind engineering (Exploring)
+ - L31.2a AI Reconstruction and Downscaling of Typhoon Near-Surface Wind Fields (On hold)
+ - L31.2b Eyewall Near-Surface Winds: Low-Level Jets, Negative Shear, Gusts, and Mesovortices (On hold)
+ - L31.2c Boundary-layer rolls (On hold)
+ - L31.2d Tornado-scale vortices (On hold)
+ - L31.2e Typhoon-spawned tornadoes (On hold)
+ - L31.2f Typhoon-associated thunderstorms and convective downdrafts (On hold)
+ - L31.2g Spiral rainbands (On hold)
+ - L31.2h Eyewall replacement (On hold)
+ - L31.2i Rapid intensification (On hold)
+ - L31.3 Equivalence of inflow generation methods (Exploring)
+ - L31.3a Literature Landscape (On hold)
+ - L31.3b Formula-Level Equivalence (Exploring)
+ - L31.3c Engineering Equivalence (Exploring)
+ - L31.3d Fast Computation (On hold)
+ - L31.3e Nonstationary Turbulent Inflow (Exploring)
+ - L31.3f Method cards and reproduction plan for three inflow families (Exploring)
+ - L31.4 Non-Gaussian wind pressure and curtain walls (Exploring)
+ - L31.4a Wind Pressure Sources and Credibility (Exploring)
+ - L31.4a1 Three-Way Benchmark Comparison for Isolated Buildings (Exploring)
+ - L31.4a2 CFD Peak Wind Pressure Methods and Acceptance Criteria (Exploring)
+ - L31.4a3 Neighboring Building Interference (Exploring)
+ - L31.4a4 Special Wind Conditions: Thunderstorms, Tornadoes, and Typhoon-Specific Turbulence (Exploring)
+ - L31.4a5 Post-Damage Internal Pressure and Geometry Changes (Exploring)
+ - L31.4a6 AI- and Interpolation-Based Wind Pressure Reconstruction (Exploring)
+ - L31.4b Probabilistic Characteristics and Extremes of Non-Gaussian Wind Pressures (Exploring)
+ - L31.4b1 Marginal Distributions and Causes of Non-Gaussianity (On hold)
+ - L31.4b2 Spectra, Higher-Order Spectra, and Spatiotemporal Correlation (Exploring)
+ - L31.4b3 Stationary Extreme Value Estimation and Uncertainty (On hold)
+ - L31.4b4 Nonstationarity Testing, Characterization, and Extremes (On hold)
+ - L31.4b5 Relationships Between Probabilistic Characteristics and Wind Speed Parameters (Exploring)
+ - L31.4b6 Simulation of Non-Gaussian Wind Pressure Fields (On hold)
+ - L31.4c Glass Curtain Wall Response, Failure, and Reliability (Exploring)
+ - L31.4c1 Curtain Wall Construction and Failure Modes (On hold)
+ - L31.4c2 From Pressure Taps to Net Panel Loads (On hold)
+ - L31.4c3 Panel Response (Exploring)
+ - L31.4c4 Comparison of Glass Failure Criteria (On hold)
+ - L31.4c5 Single-Panel Reliability (Exploring)
+ - L31.4c6 Progressive Facade Failure (Exploring)
+ - L31.4d Extension to low-rise buildings (Exploring)
+ - L31.6 Bringing probabilistic methods into wind engineering (Exploring)
+ - L31.6a Non-Ergodic Typhoon Hazard (Exploring)
+ - L31.6b Sufficiency of Nonstationary Wind Intensity Measures (Exploring)
+ - L31.6c Rare-Event Sampling Inside Turbulence Simulations for Extreme Wind Pressures (Exploring)
+ - L31.6d Design-Point Excitation Wind Load Time Histories (Exploring)
+ - L31.6e Hierarchical Bayesian Wind Pressure Coefficient Database (Exploring)
+ - L31.6f Value of Information for Wind Engineering Data Investments (Exploring)
+ - L31.6g Global Sensitivity Analysis of Typhoon Wind Field Models (Exploring)
+ - L31.6h Shock-Degradation Service Life and Inspection of Building Envelopes (Exploring)
+ - L31.6i Multi-Metric Hazard-Consistent Typhoon Subsets (Exploring)
+ - L31.6j Stochastic Simulation and Multi-Fidelity Modeling of Peak Wind Pressure Distributions (Exploring)
+ - L31.6k Spatial Extremes and Multi-Station Joint Exceedance in Non-Typhoon Regions (Exploring)
+ - L31.6l Causal Damage Effects of Storm Duration and Repeated Impacts (Exploring)
+ - L31.6m Risk Harmonization for Wind-Resistant Design in Mixed Climates (Exploring)
+ - L31.6n Conformal Error Bands for AI Wind Field and Wind Pressure Surrogates (Exploring)
+ - L31.7 Foundation models for wind engineering: feasibility study and literature survey (Exploring)
+ - L31.7a Evaluation Testbed and Strong Baselines (On hold)
+ - L31.7b Physics-Embedded Time Stepping: Interpolation and Extrapolation (Exploring)
+ - L31.7c Spatial residuals and few-shot transfer (Exploring)
+ - L31.8 Multi-hazard typhoon resilience and performance-based design of wind turbines (Exploring)
+ - L31.8a Failure Modes and Validation Database (Exploring)
+ - L31.8b Design Wind Conditions: Typhoons and Other Extreme Winds (Exploring)
+ - L31.8c Life-Cycle Control and Operation & Maintenance (Exploring)
+ - L31.8d Wind Farm System Effects: Wakes and Cascading Effects (Exploring)
+ - L31.8d1 Three-level comparison of actuator LES (Exploring)
+ - L31.8e Impacts of Typhoon-Specific Flows on Wind Turbines (Exploring)
+ - L31.8f Impacts of Characteristic Non-Typhoon Flows on Wind Turbines (Exploring)
+ - L31.9 Climate change and design wind speeds (Exploring)
+ - L31.9a Concepts and code calibration of long-return-period design winds (Exploring)
+ - L31.9b Evidence on climate-change effects (Exploring)
+ - L31.9c Station-level design winds reproduced from past climate (Exploring)
+ - L31.9d Future scenarios and attribution (Exploring)
+ - L31.9e Capabilities, Reliability, and Uncertainty of Large Climate Models (Exploring)
+ - L31.9f Impacts of Climate Variability on Design Wind Speeds (Exploring)
+ - L31.9g Other Impact Pathways and Code Decision Principles (Exploring)
+- **L41 Second Lab** (Exploring)
+ - L41.2 Inventory of major findings from the past fifteen years (Exploring)
+ - L41.1 Verification protocols for wind engineering (Exploring)
+ - L41.1a Protocol re-check of the TCBL model on 692 sorties (Exploring (not started))
+ - L41.1b Unified scoring of methods for non-Gaussian peak factors (Exploring (not started))
+ - L41.1c Rank-histogram tests of stochastic wind-field simulation and synthetic inflow (Exploring (not started))
+ - L41.1d Hold-out comparison of machine-learning wind-pressure prediction against naive baselines (Exploring (not started))
+ - L41.1e Survey of verification practice (meta-research) (Exploring (not started))
+ - L41.3 Evidence standards by study type (Exploring)
+ - L41.4 Controlled experiment on error-detection rates of multi-model review (Exploring)
+ - L41.5 Long-term datasets for verification (Exploring)
+ - L41.6 First robotic wind-tunnel test problem (Exploring (not started))
+ - L41.7 Downslope windstorms (Wasatch Front) (Exploring)
+ - L41.8 Reproducibility statistics by study type (Exploring)
+ - L41.9 DesignSafe data resources and publication (Exploring)
+ - L41.10 Five core challenges (Exploring)
+ - L41.10a Time extrapolation in digital twins (Exploring)
+ - L41.10b LES wind-pressure simulation (Exploring)
+ - L41.10c Whole-domain uncertainty in resilience (Exploring)
+ - L41.10d Why optimization is not adopted (Exploring)
+ - L41.10e System reliability of active control (Exploring)
+- **L32 AI Teaching Lab** (Exploring) — AI agents building course materials and teaching assistants for wind and structural engineering courses
+ - L32.0 In-house teaching language model (Exploring)
+ - L32.1 Course: Wind Engineering (Exploring)
+ - L32.2 Course: Structural Mechanics (Exploring (not started))
+ - L32.3 Course: Structural Dynamics (Exploring (not started))
+ - L32.4 Course: Random Vibration (Exploring (not started))
+ - L32.5 CE 30210 Structural Analysis (Kareem 2025) (Exploring)
+ - L32.6 Fluid Mechanics (for Wind Engineering) (Exploring)
+ - L32.7 Teaching-data standards and course library inventory (Exploring)
+ - L32.8 Teaching materials on classical methods for mechanics courses (Exploring)
+
+### C · Collaboration
+- **C38 Collaborative Research Lab** (Exploring) — Research topics pursued together with external partners, each able to stand on its own
+ - C38.1 Design wind speeds and load model for downslope windstorms, including the basis of local wind-speed amendments (Exploring)
+ - C38.2 Benchmarking a fast urban wind-field diagnostic model (Exploring)
+ - C38.3 Wind-induced response and serviceability of tall mass-timber buildings: low mass, uncertain damping and connection flexibility (Exploring)
+ - C38.4 Inerter-based metamaterials for wind-induced vibration control, with probabilistic monitoring (Exploring)
+ - C38.4a Distributed inerter absorbers with monitoring (Exploring)
+ - C38.5 Programmable fan-array reproduction of nonstationary gusts and downburst-like profiles: wind-load tests on buildings, low-altitude aircraft and equipment (Exploring)
+ - C38.6 Gust nowcasting along transmission-line corridors for grid de-energization decisions (Exploring)
+ - C38.7 Generative reconstruction of near-surface winds from sparse observations with calibrated uncertainty, and multi-fidelity UQ across the mesoscale–LES–wind-tunnel chain (Exploring)
+ - C38.8 From functional-recovery targets to structural wind design: turning wind-hazard uncertainty into recovery-time metrics (Exploring)
+ - C38.9 Drinking-water microbial recovery windows after wind-induced service outages (Exploring)
+ - C38.10 Gust-constrained drone-base siting for rural emergency response (Exploring)
+ - C38.11 Trustworthy multi-agent fusion of wind-disrupted traffic sensing (Exploring)
+ - C38.12 Gust alerts and vision-based safety audits on construction sites (Exploring)
+ - C38.13 Numerical dissipation and peak wind pressures: trustworthy grid and time-step criteria for LES/LBM (Exploring)
+ - C38.14 Digital twin of wind-excited structures: online assimilation of monitoring data to update the wind-load model (Exploring)
+ - C38.15 Safe take-off and landing envelopes of small UAVs in near-ground gusts over urban and mountain terrain (Exploring)
+ - C38.16 Joint typhoon/hurricane wind–rain hazard under warming and structural failure scenarios (Exploring)
+ - C38.17 Future extreme wind–rain design scenarios under climate-model uncertainty: a bridge to near-ground wind (Exploring)
+ - C38.18 Change-point detection and non-stationary extremes in thunderstorm and downburst wind records (Exploring)
+- **C39 Method Synergy Lab** (Exploring) — A proposed, exploratory methods collaboration with Prof. Fei Ding (Civil & Environmental Engineering, University of Utah): methods and applications used two-way and tested on each other's problems
+ - C39.1 LLM-driven CFD agents (Closed)
+ - C39.2 Multi-fidelity surrogates for transient peak loads in non-stationary events (On hold)
+ - C39.3 Sparse-station reconstruction of near-ground typhoon wind fields, with an urban reproduction arm (Exploring)
+ - C39.4 AutoCFD case verification (Exploring)
+ - C39.5 Gust-exceedance sensitivity map (Exploring)
+ - C39.6 GPU synthetic inflow coupled to lattice-Boltzmann LES (Closed)
+ - C39.7 Detecting failure of learned closures outside their training distribution (Exploring)
+ - C39.8 Forecast- and Wind-Turbine-Control-Informed Active and Semi-Active Control of Buildings and Bridges (Exploring)
+- **C40 Winter Games & Mega-Event Wind Engineering Lab** (Exploring) — Wind engineering for winter Games and other mega-events: wind–snow, venue structures and lifecycle, athlete aerodynamics, event operations and regional legacy; a topic pool with six focused sub-projects
+ - C40.1 Venue-scale wind digital twin and 0–6 h nowcasting for mountain venues (Exploring)
+ - C40.2 From snowfall events to local snow drift and temporary-roof snow loads (Exploring)
+ - C40.3 Wind loads and wind-speed evacuation thresholds for temporary grandstands, broadcast towers and screens (Exploring)
+ - C40.4 Whole-life digital twin for existing winter-sport venues: maintenance, retrofit, demolition and reuse (Exploring)
+ - C40.5 Athlete and equipment aerodynamics in nonstationary gusts (ski jumping first; compensation rules) (Exploring)
+ - C40.6 Joint altitude–temperature air-density correction of design wind pressure for high-elevation winter venues (Exploring)
+ - C40.7 Winter temperature and stratification effects on urban wind for low-altitude drone operations (Exploring)
+
+### T · Tools
+- **T12 Knowledge Base** (Exploring) — Literature collection, deep reading and full-text search shared by every project
+ - T12.1 Full-text search of the literature library + wind-engineering data extraction (On hold)
+ - T12.2 Liang Hu correction-case library (On hold)
+ - T12.3 Dataset catalog (Exploring)
+ - T12.3a Wind Disaster Loss and Wind Speed Database (formerly R23.6b) (On hold)
+ - T12.3b Local Historical Knowledge Base (Exploring)
+ - T12.4 Frontier monitoring (Exploring)
+- **T13 Modeling & Meshing** (Exploring) — Parametric geometry, CFD and FEA meshes, and fabrication drawings for wind-tunnel models
+ - T13.1 Parametric geometry (Exploring)
+ - T13.2 CFD meshing (Exploring)
+ - T13.3 FEA meshing (Exploring)
+ - T13.4 Wind-tunnel model fabrication drawings (On hold)
+ - T13.5 Evaluation of constructing geometry from images (Exploring)
+ - T13.6 Comparison with mechanical skill libraries (Exploring)
+- **T27 Ansys Structural Simulation Tool** (Exploring) — An automated Ansys structural FE (MAPDL) pipeline running in batch on HPC
+- **T28 Fluent CFD Tool** (Exploring) — An automated Ansys Fluent CFD pipeline
+ - T28.1 Fluent learning library (tutorials and worked cases) (Exploring)
+- **T33 Figures, tables, and visualization** (Exploring)
+ - T33.1 Unified Figure Styling and Figure Cards (Exploring)
+
+### P · Platform
+- **P17 Bot Operations** (Exploring) — Operations of the agents and their messaging channels
+- **P18 Model Operations** (Exploring) — Availability, quotas and usage of every model provider
+- **P19 Incident Operations** (Exploring) — Incident triage and post-mortems
+- **P20 Daily Operations & Platform Lead** (Exploring) — Daily platform health check, triage and the ticket system
+ - P20.1 Skills and memory organization (Exploring)
+
+## Trustworthy Wind Engineering (research-program view)
+
+A view of part of the center's work grouped by research program, with the same projects as the architecture list above; the site tab is `#twe`.
+
+In less than a year, AI agents have moved from writing code snippets toward executing extended research workflows. Yet the same speed that accelerates discovery can produce convincing but unreliable results just as quickly. For a field whose conclusions end up in design codes and structures that people trust with their lives, this is a central question of the coming decade: how can wind engineering results remain trustworthy when much of the work is done by AI agents? The issue is whether a wind model, a predicted load, or a design decision is supported by evidence strong enough for its intended use.
+
+My answer is not to slow down. It is to move toward AI as quickly as it moves toward us and to build new ways of doing research that keep expert judgment and physical evidence at their center. The research program is therefore built around trustworthy wind engineering in the AI era.
+
+### The research system
+
+The work runs on a human-in-the-loop agent-swarm research system: about 150 agents in a lead-executor hierarchy, supported by tools for WRF, CFD, FEA, literature review, and high-performance computing, with one researcher directing the work through a management interface. Results undergo automated checks and review by multiple LLMs before reaching the researcher for final approval. The system serves both as infrastructure for human-led research and as a testbed for studying how scientific conclusions can be made trustworthy at scale. Its live progress is public on this site.
+
+
+### Research program
+
+The program has one overarching goal: trustworthy wind engineering. Trustworthiness is not simply an additional requirement for AI-generated results. It concerns how winds are represented, how loads and responses are calculated, how uncertainty enters design, and how conclusions are tested against the physical world. The program is organized around the levels at which it builds trust: benchmarking wind engineering against meteorology, revisiting what the field believes, making each study reproducible and verifiable, and choosing problems that matter in practice. A fifth thrust addresses the physical end, where all of this is tested.
+
+### Thrust 1. Meteorological wind engineering: meteorology as the benchmark
+
+The first level is the benchmark against which wind engineering is measured. Meteorology's standard of trustworthiness is the one wind engineering should meet. Weather forecasting is verified every day against independent observations, and its skill is measured and reported; wind-engineering conclusions are rarely tested this way. A new discipline, which I call meteorological wind engineering, is taking shape between the two fields. It brings into wind engineering not only the findings of operational meteorology but also its modeling, observation, and verification paradigms and standards, from extreme winds to aerodynamics, structural dynamics, and design wind loads. In each case, the end point is not simply a better wind field but a more defensible assessment of structural loads and performance.
+
+- Landfalling tropical cyclones: internal boundary layer and near-surface wind structure
+ - L31.1 Internal boundary layer of landfalling typhoons (Exploring)
+ - L31.2 Wind structure in typhoons/hurricanes: from meteorology to wind engineering (Exploring)
+ - R23.3 Typhoon/hurricane wind fields (Exploring)
+- Thunderstorm downbursts along the complete chain, from event reconstruction to design loads
+ - R16 PETW — Thunderstorm Winds, End to End (Exploring)
+ - R23.4 Thunderstorms and the convective scale (Exploring)
+- See also: downslope windstorms in mountain terrain (listed under Collaboration)
+ - C38.1 Design wind speeds and load model for downslope windstorms, including the basis of local wind-speed amendments (Exploring)
+- AI weather models for wind engineering, including low-altitude aviation
+ - R23.2 Weather-forecast-driven wind engineering applications (Exploring)
+ - R21.2 Predictability of the urban low-altitude wind field (OKC) (Exploring)
+
+### Thrust 2. Revisiting the field: setting the right course
+
+The second level is the research field itself. I am systematically re-examining the main research directions of the past fifteen years to establish which findings are reliable, correct misunderstandings, and guide practical applications. The questions include structural nonlinearity in wind-resistant design; why performance-based and resilience frameworks rarely reach final design; why structural and topology optimization are not widely adopted in practice; what uncertainty quantification can and cannot deliver; and unified benchmarks for tasks with a proliferation of methods. Each comparison will have a clear purpose and distinguish genuine advances from tuning.
+
+- Re-examining the main conclusions of the past fifteen years with open, reproducible benchmarks; where surrogates and PINO stand
+ - L29.1 When, and for which structures, structural nonlinearity matters in wind-resistant design (Exploring)
+ - L29.3 What performance-based and resilience design need to reach final design (Exploring)
+ - L29.5 What uncertainty quantification can deliver, and where its limits lie (Exploring)
+ - L29.6 Unified benchmarks for crowded method families (Exploring)
+
+### Thrust 3. Reproducible and verifiable research
+
+The third level is each study. In engineering research, what must be trusted is the conclusion, and that requires an evidence chain from the claim back to verified data, physical validation, and original sources. Two foundations support this chain. The first is a verified data foundation: a full-text literature database and dataset catalog on which studies must draw, together with concept cards that trace core quantities (return period, averaging time, reference pressure, load factors) back to codes and primary sources approved by human experts. The second is verification methods, with evidence standards tailored to the study type and time scale. The same standards apply whether a result comes from an agent or a conventional method.
+
+- Evidence standards, a review layer tested with planted errors, and concept cards
+ - L29.7 Research credibility (Exploring)
+- The verified data foundation: literature database and dataset catalog
+ - T12 Knowledge Base (Exploring)
+
+### Thrust 4. Problems chosen for their use
+
+The fourth level is the choice of problems. I choose them based on my own judgment of what is genuinely useful, as my contribution to a healthy and trustworthy research field. The first is the real-time wind digital twin. Conventional CFD is generally too slow to remain synchronized with evolving weather and structural conditions. Can a twin be fast enough to keep pace and still be trusted, and how would we know when it is wrong? Two routes are open: a GPU-based lattice-Boltzmann digital-twin wind tunnel, and learned surrogates, including geometry-aware models and physics-informed neural operators (PINO). Both must be benchmarked against independent measurements and strong conventional baselines. Other problems range from CFD inflow-generation equivalence and non-Gaussian pressures on glass facades to modern probabilistic methods, wind codes, and wind-turbine resilience.
+
+- Real-time digital twins: the bottleneck is CFD
+ - R21 Digital Wind Tunnel (Exploring)
+ - R25 Urban Building Wind-Pressure Prediction (Exploring)
+ - L31.3 Equivalence of inflow generation methods (Exploring)
+ - L31.7 Foundation models for wind engineering: feasibility study and literature survey (Exploring)
+- Other problems of interest: inflow-generation equivalence, non-Gaussian pressures, wind codes, probabilistic methods, turbine resilience
+ - L31.4 Non-Gaussian wind pressure and curtain walls (Exploring)
+ - L31.5 Evolution of wind-resistant design codes (Exploring)
+ - L31.6 Bringing probabilistic methods into wind engineering (Exploring)
+ - L31.8 Multi-hazard typhoon resilience and performance-based design of wind turbines (Exploring)
+ - L31.9 Climate change and design wind speeds (Exploring)
+
+### Thrust 5. The physical end: experiments, devices, and robots
+
+AI cannot yet replace the work closest to the physical world, and this is where the system's predictions are ultimately tested. The work combines the system's digital workflow with automated wind-tunnel testing of thunderstorm and other characteristic flows, which existing facilities still struggle to generate. It includes inerter-based vibration control, from algorithm to product: a tuned fluid inerter damper has been tested experimentally and is being prepared for practical use in long-span roofs, tall buildings, and wind turbines. Because robots and test automation are closely linked, I will start this work early, and robotics is a long-term direction in its own right. Finally, experience in designing a large, next-generation multi-wind-tunnel complex will help develop experimental capacity and make effective use of existing facilities.
+
+- Automated wind-tunnel testing of characteristic flows, and inter-laboratory calibration
+ - L30.1 Wind-Tunnel Automation (Exploring)
+ - L30.3 Inter-Lab Wind-Tunnel Calibration (Exploring)
+- Inerter-based vibration control, from algorithm to product
+ - L30.2 Wind-Induced Vibration Control (Exploring)
+- Robotics, later serving wind-tunnel testing
+ - L30.4 Robotics Laboratory (Exploring)
+- Experimental capacity: a platform for low-altitude aircraft, and bluff-body aerodynamics
+ - R14 Low-Altitude Aircraft Platform (Exploring)
+ - L37 Translational Bluff-Body Aerodynamics (Exploring)
+
+### Collaboration first
+
+The system changes how collaboration starts: a collaboration can begin with preliminary results rather than a blank proposal, and collaborators can join remotely and direct their own lines of work with the same agents, records, and review.
+
+ - C38 Collaborative Research Lab (Exploring)
+ - C39 Method Synergy Lab (Exploring)
+ - C40 Winter Games & Mega-Event Wind Engineering Lab (Exploring)
+
+This view groups part of the center's work by research program; the full list is under Projects.
+
+## Full records
+
+- [Project index](agent/index.json): every project on the site with hierarchy, bilingual title, status and conclusion.
+- [Project records](agent/projects/): per-project JSON with task, report, decisions, review rulings, results, figures, code and timeline.
+- [Agent schema](agent/README.md): field definitions.
+- [Stage results](showcase.json), [center architecture](center.json), [Chinese](data.json) and [English](data_en.json) site data.
+- [Human PDF reports](pdf/).
+
+## Using this content
+
+Cite the original papers and datasets listed on the Citations & Credits page, not this site. Do not present these exploratory results as validated science; keep each result's stated scope (one event, one configuration, one sample).
