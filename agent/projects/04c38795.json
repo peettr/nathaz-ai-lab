@@ -1,0 +1,489 @@
+{
+  "id": "04c38795",
+  "slug": "04c38795",
+  "number": "L26.20",
+  "title": {
+    "zh": "L26.20 WRF 模拟亮温对静止卫星亮温：检验台风眼墙与雨带结构",
+    "en": "L26.20 WRF-simulated vs. geostationary-satellite brightness temperatures: checking typhoon eyewall and rainband structure"
+  },
+  "group": "qtl",
+  "parent": "bd040db3",
+  "depth": 1,
+  "status": {
+    "zh": "放弃",
+    "en": "Closed (negative result)"
+  },
+  "status_class": "done",
+  "done": true,
+  "start": "2026-11-13 16:01",
+  "end": "2026-11-16 17:12",
+  "updated": "2026-11-16 17:12",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "你这些文件我都读不出来",
+    "en": "你这些文件我都读不出来",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "# L26.20 WRF 模拟亮温对静止卫星亮温：台风眼墙与雨带结构检验\n\n- 闸门：plan-only，Liang Hu 批准前只查文献、读已有材料、写方案；不下数据、不跑计算、不申请资源。\n- 跟进：R23.3（后报个例、结构闸、中心取法）；与 L26.18 共用个例；数据库全中心清单由 牵头（平台）。\n- 11-13：方案 v1 写好；只读核了 CRC：无 CRTM/RTTOV/UPP 模块；R23.3 Delta 2020 两臂 48 h 后报 d02 3 km 逐时、含全部水凝物（WDM6）。litwiki 建卡已派。\n\n## 参数来源表\n| 参数 | 值 |\n| --- | --- |\n| 主通道 | ~10.3 μm（ABI ch13 / AHI ch13） |\n| 冷云阈值 | 220 K |\n| FSS 邻域 | 30 km |\n| 有眼判定 | 眼区高于冷环 ≥10 K、冷环 ≥80% 方位闭合 |\n| 时间配对 | ≤5 min |\n| WRF 输入 | d02 3 km、49 层、WDM6 |\n| CRTM 有效半径（液/冰/雨/雪/霰） | 20/40/400/600/800 μm（主读法）；算子默认（并列） |\n\n- 11-13：litwiki 交回 14 卡；方案 v2（判据未改）：更正 Niu & Zou 2024 为 CrIS、新颖性按 Bi & Zou 2025 先例收窄；追加 Zhang, Zou & Tan 2023 补卡。\n- 11-13：第 15 卡（Zhang, Zou & Tan 2023）到，方案 v2.1 加 r_ew 并列读法（只描述），判据未改。\n- 11-14：A521 已批开工（总控转达）。D0：CRTM 改用 v2.3.0（v2.4 系数 UCAR FTP 已失效），EMC tarball 下载中；决策。\n\n- 11-14 16:30：CRTM v2.3.0 编通（ifort，make check 通过），补抽大端系数；ComputeOps 回复后提交 D0：CRC 作业 1751220， 已登记，卡。\n- 11-14 16:35：D0 完成（1751220）：A① 等温 max|BT−290|=0.445 K 过；短测 2000 列 ch13 199.7–298.3 K；全量推算约 4.6 核·时（≤60）；进 D1。见 ⑤。\n- 11-14 17:00：开 D1：脚本 d1_job.sh 等已就绪；GOES-16 CMIPC 下载中（长任务 1114-165724-398a）；ComputeOps 申请；卡。\n- 11-14 16:58：D1 提交 CRC 1751339（4 核， 已登记）；GOES-16 CMIPC 98 个文件 364 MB 下齐。\n- 11-14 20:50：D1 完成（1751339，15.1 核·时，累计约 15.2/60）：模拟 196/196、观测 49/49；初始时刻 ch08 少量 NaN，结构分析弃用初始时刻；描述：模拟冷云顶（<220 K）面积约为观测的 1/3–1/2。下一步 D2。\n- 11-14 21:09：D2 脚本 d2_metrics.py 写好，卡 跑前写定操作定义（观测中心=红外眼圆拟合，否则侦察机 VDM；B 取 7 种扰动最大变化的中位数；C 两臂都过才算）；ComputeOps 补充申请已发，等回复后提交。NHC VDM 27 份已下载。A② 需第二个台风：R23.3 的 Michael/Ian（L26.18 v3）在 CRC 跑。\n- 11-14 21:25：D2 Delta 完成（1752470）：配对 34；B ✗（无眼时次 r_ew 不稳，有眼 8 次 0.082 内）；C ✗（两臂 0.41、差中位 −0.017/−0.014；模拟冷云面积约观测 0.57 vs 1.0 内核）。判定词等 Michael/Ian（1751184/1751185 排队中）。证据，卡 EXPERIMENT_CARD_D2.md。\n- 11-15 09:17：回访：R23.3 线况记 Michael 1751184 已退出 0、Ian 1751185 运行中；CRC 主连接 socket 不在（R23.3 08:15 已报），本线未重连，已向平台登记受阻；约 13:17 再查。\n- 11-15 09:50：CRC 仍断（socket 不在）。先把第二台风要用的脚本通用化（只在本机写、未运行）：goes_fetch_v2.sh …（起始时刻/小时数/扇区 C 或 F 作参数）、d1_job_v2.sh …（台风与臂作参数）、goes_remap_v2.py …（扇区参数，2018 年扫描模式 M3 也能匹配）；D2 沿用 d2_metrics.py 不改。13:18 回访再查连接。\n- 11-15 13:20：CRC 主连接 13:18 已恢复。Michael 1751184 后报：GFS 一臂、d02 3 km 600×600、WDM6、逐时 49 个（与 Delta G48 同配置）；Ian 1751185 仍在跑（已出 61 个逐时，域 11.4–28.7°N，需全圆盘 F 扇区）。Michael GOES/VDM 下载中（长任务 1115-131938-2830），ComputeOps 补充申请已发；卡。[local path omitted] 余 222 GB（本线新写入 <1 GB）。\n- 11-15 13:21：Michael GOES 98 帧（379 MB）+ VDM 43 份下齐；D1 提交 CRC 1755137（smp 2，CO-）， 已登记。\n- 11-15 17:30：Michael D2 完成（1756121）。两台风合并（按 D1_Michael 卡 §6 跑前读法）：A② 71 配对/2 台风 ✔；B r_ew 0.174>0.15 ✗（只在无眼时次）；C 满足 0.47、差中位 −0.008 ✗ → 拟判\"放弃（限本配置）\"（若 A① 改读法不被认可则\"不判\"）。已送审 （6 份）。证据 、EXPERIMENT_CARD_D2.md ⑤-2。累计约 22.7/60 核·时。\n\n## 判定与放弃留档（11-15 18:10，审查 后）\n- 判定（条件式）：认可 A① 改读法 → 放弃（限本配置）；不认可 → 不判。依据 C；B 依读法而定。\n- 放弃原因：在本配置下，同时刻模拟–观测冷云二值场的 FSS 与错开 ±12 h 的 FSS 分不开（两台风、两臂、主/备有效半径都一样），这个检验不能当 R23.3 结构闸的一项。\n- 缺什么条件：模拟冷云面积与观测接近（本配置两台风模拟内核冷云约为观测的 0.6，雨带约 0.4）；或检验本身对面积偏差不敏感。\n- 什么情况下值得重试（均未验证）：① 改用分位数阈值（各自取同一面积分位，Roberts & Lean 2008 的做法）去掉面积偏差后再看 C；② 换微物理/冰相光学（模拟冷云面积改善后）；③ 只在有眼时次比较、并用无眼时次稳定的结构量代替最冷环半径。重试需新方案并预注册，不在本页改判据。\n- 交接：拟判结果抄送 R23.3 Lead（r23-）作参考，不作值得用交接。\n\n- 11-16：Liang Hu 认可 A① 等温解析参照（参谋转）→ 判定落为「放弃（限本配置）」，定稿 （含重开条件 5 条）。建议结题（待 Liang Hu）。\n- 11-16：补\"与文献的关系\"（定稿 §6）：文献可行＝定性看图/同化，本快试检验打分分辨力，二者不矛盾。",
+    "en": "# L26.20 WRF simulated brightness temperature vs geostationary satellite brightness temperature: a test of typhoon eyewall and rainband structure\n\n- Gate: plan-only; before the PI approves, only search the literature, read existing material and write the plan; no data downloads, no computation, no resource requests.\n- Follow-up: R23.3 (hindcast cases, structure gate, center method); cases shared with L26.18; the center-wide database inventory is led by  (platform).\n- 11-13: plan v1 written; read-only check of CRC: no CRTM/RTTOV/UPP modules; R23.3 Delta 2020 two-arm 48 h hindcasts, d02 3 km hourly, with all hydrometeors (WDM6). litwiki card creation dispatched.\n\n## Parameter source table\n| Parameter | Value |\n| --- | --- |\n| Main channel | ~10.3 μm (ABI ch13 / AHI ch13) |\n| Cold-cloud threshold | 220 K |\n| FSS neighborhood | 30 km |\n| Eye criterion | eye region ≥10 K warmer than the cold ring, cold ring closed over ≥80% of azimuths |\n| Time pairing | ≤5 min |\n| WRF input | d02 3 km, 49 levels, WDM6 |\n| CRTM effective radius (liquid/ice/rain/snow/graupel) | 20/40/400/600/800 μm (main reading); operator default (parallel) |\n\n- 11-13: litwiki returned 14 cards; plan v2 (criteria unchanged): corrected Niu & Zou 2024 to CrIS; novelty narrowed based on the Bi & Zou 2025 precedent; added a card for Zhang, Zou & Tan 2023.\n- 11-13: card 15 (Zhang, Zou & Tan 2023) arrived; plan v2.1 adds a parallel r_ew reading (descriptive only); criteria unchanged.\n- 11-14: A521 approved to start (relayed by the central coordinator). D0: CRTM switched to v2.3.0 (the v2.4 coefficient UCAR FTP no longer works); EMC tarball downloading; decision .\n\n- 11-14 16:30: CRTM v2.3.0 compiled (ifort, make check passed); big-endian coefficients extracted in addition; after ComputeOps replied, D0 submitted: CRC job 1751220,  registered, card .\n- 11-14 16:35: D0 completed (1751220): A① isothermal max|BT−290| = 0.445 K, passed; short test 2000 columns ch13 199.7–298.3 K; full run estimated at about 4.6 core-hours (≤60); moving to D1. See  ⑤.\n- 11-14 17:00: D1 started: scripts such as d1_job.sh ready; GOES-16 CMIPC downloading (long job 1114-165724-398a); ComputeOps request ; card .\n- 11-14 16:58: D1 submitted to CRC 1751339 (4 cores,  registered); GOES-16 CMIPC 98 files, 364 MB, fully downloaded.\n- 11-14 20:50: D1 completed (1751339, 15.1 core-hours, cumulative about 15.2/60): simulated 196/196, observed 49/49; small amount of NaN in ch08 at the initial time, so the initial time is dropped from the structure analysis; descriptive: simulated cold cloud-top area (<220 K) is about 1/3–1/2 of the observed. Next step D2.\n- 11-14 21:09: D2 script d2_metrics.py written; card  fixes operational definitions before the run (observed center = infrared eye circle fit, otherwise reconnaissance VDM; B takes the median of the maximum change across 7 perturbations; C counts only if both arms pass); supplementary ComputeOps request sent, submission after the reply. 27 NHC VDMs downloaded. A② needs a second typhoon: R23.3's Michael/Ian (L26.18 v3) running on CRC.\n- 11-14 21:25: D2 Delta completed (1752470): 34 pairs; B ✗ (r_ew unstable at times without an eye, within 0.082 for the 8 times with an eye); C ✗ (two arms 0.41, median differences −0.017/−0.014; simulated cold-cloud area about 0.57 of the observed vs 1.0 in the inner core). Verdict word awaits Michael/Ian (1751184/1751185 queued). Evidence , card EXPERIMENT_CARD_D2.md.\n- 11-15 09:17: Follow-up: the R23.3 line status records Michael 1751184 exited 0 and Ian 1751185 running; the CRC master connection socket is gone (reported by R23.3 at 08:15); this line did not reconnect and registered the blockage with the platform; recheck around 13:17.\n- 11-15 09:50: CRC still disconnected (socket gone). Meanwhile generalized the scripts needed for the second typhoon (written locally only, not run): goes_fetch_v2.sh … (start time/number of hours/sector C or F as parameters), d1_job_v2.sh … (typhoon and arm as parameters), goes_remap_v2.py … (sector parameter; also matches the 2018 scan mode M3); D2 keeps d2_metrics.py unchanged. Recheck the connection at the 13:18 follow-up.\n- 11-15 13:20: CRC master connection restored at 13:18. Michael 1751184 hindcast: one GFS arm, d02 3 km 600×600, WDM6, 49 hourly outputs (same configuration as Delta G48); Ian 1751185 still running (61 hourly outputs so far, domain 11.4–28.7°N, needs full-disk sector F). Michael GOES/VDM downloading (long job 1115-131938-2830); supplementary ComputeOps request sent; card . [local path omitted] has 222 GB left (new writes by this line <1 GB).\n- 11-15 13:21: Michael GOES 98 frames (379 MB) + 43 VDMs fully downloaded; D1 submitted to CRC 1755137 (smp 2, CO-),  registered.\n- 11-15 17:30: Michael D2 completed (1756121). Two typhoons combined (per the pre-run reading in D1_Michael card §6): A② 71 pairs/2 typhoons ✔; B r_ew 0.174>0.15 ✗ (only at times without an eye); C satisfied 0.47, median difference −0.008 ✗ → proposed verdict \"abandon (this configuration only)\" (\"not judged\" if the revised A① reading is not accepted). Sent for review  (6 reviews). Evidence , EXPERIMENT_CARD_D2.md ⑤-2. Cumulative about 22.7/60 core-hours.\n\n## Verdict and abandonment record (11-15 18:10, after review )\n- Verdict (conditional): if the revised A① reading is accepted → abandon (this configuration only); if not → not judged. Based on C; B depends on the reading.\n- Reason for abandonment: in this configuration, the FSS of same-time simulated vs observed binary cold-cloud fields cannot be distinguished from the FSS with a ±12 h offset (same for both typhoons, both arms, main/alternate effective radii), so this test cannot serve as an item of the R23.3 structure gate.\n- Missing conditions: simulated cold-cloud area close to the observed (in this configuration, the simulated inner-core cold cloud of both typhoons is about 0.6 of the observed, rainbands about 0.4); or a test that is itself insensitive to area bias.\n- When a retry would be worthwhile (none verified): ① switch to quantile thresholds (each taking the same area quantile, the approach of Roberts & Lean 2008) to remove the area bias, then recheck C; ② change the microphysics/ice-phase optics (after the simulated cold-cloud area improves); ③ compare only at times with an eye, and replace the coldest-ring radius with a structural quantity that is stable at times without an eye. A retry needs a new plan and preregistration; criteria are not changed on this page.\n- Handover: the proposed verdict is copied to the R23.3 lead (r23-) for reference, not as a worth-using handover.\n\n- 11-16: The PI accepted the A① isothermal analytical reference (relayed by the advisor) → verdict settled as \"abandon (this configuration only)\", finalized  (with 5 reopening conditions). Recommend closure (awaiting the PI).\n- 11-16: Added \"relation to the literature\" (finalized §6): literature feasibility = qualitative visual comparison/assimilation, while this rapid trial tests the discriminating power of the scores; the two do not contradict each other."
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 开子项目",
+      "ts": "2026-11-13 16:01",
+      "text": "【Liang Hu 让 L26 快试实验室 总控 分出的子对话】Liang Hu 11-13 批十一1①（平台，原话「b，甲，另外相关数据库和方法请提取」；讨论记录 十一1）。新快试 L26.20，跟进 R23.3（r23-），与 L26.18 并列、共用同一批后报个例（L26.18 v3 正在选 2017–2022 年 2–3 个台风，选定后对齐）。\n现阶段 plan-only（R11）：只查文献、写方案，不算、不派 bot 跑计算、不申请资源。\n1) 文献先上：Zou 2026 Engineering，DOI 10.1016/j.eng.2025.11.023，已有卡 EP8X6E64（ 查）；缺的方法与数据库文献委托 lit 补卡。Liang Hu 要求「相关数据库和方法请提取」：方案里单列一节，列出可用的卫星亮温数据库（来源、年份覆盖、分辨率、许可）与模拟亮温/结构诊断方法（各附 wiki 卡与页码）。\n2) 写，须写清：辐射传输算子（CRTM/RTTOV 等，按文献与可得性定，写 CRC 上是否可得）；哪颗卫星、哪个通道；结构指标（眼墙、雨带、RMW、不对称等）的操作定义与通过/放弃判据，开跑前写定；判定词各一句操作定义；**不用 b-deck 当裁判**；页头按本线快试格式（source/question/criteria/time_limit/resource_limit/status: 待试/conclusion）；计算在 CRC（Liang Hu 11-11：CRC 机时不必细抠），工作站 不算。\n3) 方案写好后：用 把方案路径告诉平台；并 --report 回总控。新外部数据/工具补 PUBLIC_CITATIONS.md。只在 下写。"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-13 16:01",
+      "text": "正在查 L26.18 和 R23.3 的个例与现有卡片，随后写 L26.20 方案。已确认 CRC 上没有现成的 CRTM/RTTOV 模块，正在查 R23.3 的 WRF 目录里有没有 UPP/CRTM 和水凝物变量。正在写 L26.20 启动方案。Now the literature delegation.L26.20 的启动方案 v1 写好了，在等你批。按规矩这一阶段只查了文献、写了方案：没有跑计算，没有申请资源，也没有下载数据。\n\n**要回答的问题**：把 R23.3 的 WRF 后报用辐射传输程序算成\"模拟红外亮温\"，和同一时刻静止卫星的实测亮温比较。用比出来的眼墙、雨带和不对称结构，能否检验台风结构，并且不依赖 b-deck。这里判的是这个检验方法本身能不能用，不是判 WRF 后报的好坏。\n\n**怎么做**\n- **辐射传输程序**：用 NOAA/JCSDA 的 CRTM（WRF 后处理包 UPP 里也带了它）。我只读查过 CRC，上面没有 CRTM、RTTOV 或 UPP 的现成安装，需要自己编译。RTTOV 要注册才能拿到，只作备选。\n- **卫星和通道**：主用 GOES-16 的 10.3 μm 红外通道；6.2 μm 水汽通道只描述，不进判定。西北太平洋个例用 Himawari 的同类通道，Zou 2026 用的也是它。\n- **结构指标**（判定前写好，实测和模拟用同一个脚本）：\n - 眼墙半径：最冷那一圈的半径\n - 有没有眼；眼和眼墙的温差\n - 内核和雨带里低于 220 K 冷云的覆盖比例\n - 一阶不对称：强度和方位\n - 空间相似度：FSS，一种允许位置稍有偏差的空间比对分数。\n- **不用 b-deck**：模拟一侧用模式自己的气压最低点定中心；实测一侧用红外眼的圆拟合定中心，没有眼时改用侦察机的中心定位。b-deck 只作对照列。\n\n**判定标准**\n- **值得用**：下面三条同时成立。\n - 能算出来：程序编得通，测试误差不超过 0.5 K；至少有 12 个时次能配上，来自至少 2 个台风。\n - 实测一侧的结构量稳定：中心挪动、阈值变化、取平均的方式变化时，结果变化小。\n - 能分出对错时刻：同一个模拟场，和同一时刻的实测比，要比和错开 12 小时的实测比更像。\n- **放弃**：能算，但第二条或第三条不成立。\n- **不判**：算不出来或样本不够。\n- **只描述、不进判定**：亮温的绝对偏差、两组后报之间的差、和侦察或 SAR 的最大风速半径的对比。原因是亮温差里混着微物理方案的影响，Zou 2026 正文第 99–100 页提到过这一点。\n\n**一个可以马上做的个例**：R23.3 的 Delta 2020 两组 48 小时后报已经在 CRC 上了，3 km 网格、逐小时 49 个时次，云和降水的各项变量都在。红外亮温不受 SAR 有没有拍到台风眼的限制，所以可以不等 L26.18 v3 选定个例，先用 Delta 做；之后再用和 L26.18 共用的个例补上。\n\n**数据库和方法清单**：按你的要求，方案第 5 节单独列出：\n- 卫星亮温数据库：GOES、Himawari、GridSat-B1、HURSAT、合并红外、TC-PRIMED、被动微波、CyclObs、SFMR/VDM、IBTrACS、CIMSS 产品；每项写了来源、年份、分辨率、许可。\n- 模拟亮温和结构诊断方法：CRTM、RTTOV、UPP、FSS、ARCHER、Dvorak 类方法等。\n- 许可等还没核实的标了\"待核\"。全中心的总清单由数据线负责，这一节和它对齐。\n\n**文献**：Zou 2026 已有卡片。另外 13 篇已交给文献 Wiki 建卡，交之前查过本地确实没有；其中 Roberts & Lean 2008（FSS 的出处）库里已有 PDF，只缺卡片。卡片到了以后出 v2，只补页码，判定标准不改。\n\n**已办**：已请平台把方案登记给你审批，也已报总控。项目页、线况表、引用页和决策记录都已更新。\n\n**要你定的三件事（都建议同意）**\n1. 开工：不用 TACC SU，不用 Colab；CRC 计算不超过 60 核·时，用正式配置短测后再按实测重报；存储不超过 15 GB；约 4 个工作日。\n2. 先用 Delta 2020 的现成后报做，L26.18 的个例到了再补。\n3. 用 CRTM；一天内编译不通就判\"不判\"，不自己改用要注册的 RTTOV。\n\n\n\n## 结论\nL26.20 启动方案 v1 已写好并报平台和总控，等你批上面三件事。文献卡在建，到了只补页码，判定标准不改。\n\n（附件：L26.20_00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-13 16:34",
+      "text": "【告知 · 来自 快试 · L26.18 CyclObs 能否用于 R23.3】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n来自 L26.18：与你共用的个例已选定——Michael 2018（起报 10-08 12，48 h）、Dorian 2019（08-29 00，84 h）、Ian 2022（09-25 12，60 h），备选 Fiona 2022。已请 R23.3（#见 L26.18）在 CRC 跑 GFS 驱动 9/3 km 完整后报，逐时 U10/V10/SLP；你要的亮温相关输出量（如 QRAIN/QSNOW/QGRAUP、OLR 或 CRTM 所需三维场）请直接向 r23-补提，赶在它开跑前。SAR 时刻与中心见 §2–§3。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-13 16:34",
+      "text": "【委托结果 · 文献 Wiki 智能体】L26.20 模拟亮温结构检验：方法与卫星数据库建卡（约 13 篇）\n已建 14 张 L26.20 卡：原清单 13 项，加一篇直接先例。13 张依据本地 PDF 标注了物理页；Bessho 一项只有书目卡，不能为方案 v2 提供原文页码。最重要的核正是：Niu & Zou (2024) 的 10.1029/2023JD040622 检验的是 NOAA-20 CrIS，**不是 AHI**；Minamide & Zhang 的 MWR 论文正式发表于 **2018 年**。\n\n找到了直接先例：Bi & Zou (2025), DOI 10.1029/2024JD041959，以 3 km WRF、RTTOV 和 FY-4A AGRI 比较台风亮温结构。其文中低波数重构 RMSE 不是模拟值相对卫星观测的误差，L26.20 不宜据此宣称已有观测分辨力数值。\n\n以下为逐篇核正 DOI、Zotero 父项、本地 PDF 和卡片路径；路径均为绝对路径。卡内分别写明可用于 L26.20 的条目及局限。\n\n1. Niu & Zou 2024 — 10.1029/2023JD040622 — QKPT9TVF — PDF — 卡 \n2. Hu & Zou 2023 — 10.1029/2023EA003215 — PTN2CN8V — PDF — 卡 \n3. Saunders et al. 2018 — 10.5194/gmd-11-2717-2018 — WEAQFTIU — PDF — 卡 \n4. Han et al. 2006, NOAA NESDIS 122 — **无 DOI** — TTES97TD — PDF — 卡 \n5. Knapp et al. 2011 — 10.1175/2011BAMS3039.1 — 5IGDPRAU — PDF — 卡 \n6. Razin et al. 2023 — 10.1175/BAMS-D-21-0052.1 — 36IBM6U6 — PDF （所读为 accepted/EOR 稿）— 卡 \n7. Bessho et al. 2016 — 10.2151/jmsj.2016-009 — Zotero 未匹配 — **未获取 PDF**：`` 确无，正式 `` 返回 HTML 而非 PDF（退出 8）；书目卡无可核原文页码 — 卡 \n8. Schmit et al. 2017 — 10.1175/BAMS-D-15-00230.1 — 5PECWFZ2 — PDF — 卡 \n9. Wimmers & Velden 2010 — 10.1175/2010JAMC2490.1 — GZKM99IQ — PDF — 卡 \n10. Otkin & Greenwald 2008 — 10.1175/2007MWR2293.1 — AD3MP8AS — PDF — 卡 \n11. Zhang, Minamide & Clothiaux 2016 — 10.1002/2016GL068468 — 2428FRTJ — PDF — 卡 \n12. Minamide & Zhang **2018** — 10.1175/MWR-D-17-0367.1 — JMEJCWWX — PDF — 卡 \n13. Roberts & Lean 2008 — 10.1175/2007MWR2123.1 — 已有 3TZK9WZM — PDF；FSS 式 (6)–(7) 在 PDF 物理页 7／期刊页 82 — 卡 \n14. 新增直接先例 Bi & Zou 2025 — 10.1029/2024JD041959 — 9PJD4TJI — PDF — 卡 \n\n已核对 14 张卡和索引链接均存在；DOI、取件及版本限制汇总 → \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n（附件：L26_20_acquisition_and_doi.md）\n\n（附件：L26_20_01_Niu_Zou_2024_CrIS.md）\n\n（附件：L26_20_02_Hu_Zou_2023_Lekima.md）\n\n（附件：L26_20_03_Saunders_2018_RTTOV12.md）\n\n（附件：L26_20_04_Han_2006_CRTM.md）\n\n（附件：L26_20_05_Knapp_2011_GridSatB1.md）\n\n（附件：L26_20_06_Razin_2023_TCPRIMED.md）\n\n（附件：L26_20_07_Bessho_2016_Himawari89.md）\n\n（附件：L26_20_08_Schmit_2017_GOESR_ABI.md）\n\n（附件：L26_20_09_Wimmers_Velden_2010_ARCHER.md）\n\n（附件：L26_20_10_Otkin_Greenwald_2008_MODIS.md）\n\n（附件：L26_20_11_Zhang_2016_GOESR_assimilation.md）\n\n（附件：L26_20_12_Minamide_Zhang_2018_Himawari.md）\n\n（附件：L26_20_13_Roberts_Lean_2008_FSS.md）\n\n（附件：L26_20_14_Bi_Zou_2025_Lekima_precedent.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-13 16:34",
+      "text": "v2 已改完，正在通知平台和总控。14 张文献卡都回来了。我按卡片把 L26.20 启动方案改成 v2，路径不变，判定标准一字未改。已告诉平台登 A 项时用 v2，也报了总控。\n\n**v1 有两处写错，已改正**\n- Niu & Zou 2024 用的是 NOAA-20 极轨卫星上的 CrIS，不是 Himawari 的 AHI。这一点我翻 PDF 原文核过，正文里没有 AHI 试验。所以方案里不再把它说成 Zou 2026 图 1 背后的那个试验。\n- Minamide & Zhang 是 2018 年发表的，不是 2017。\n\n**已经有人做过同类工作：Bi & Zou 2025**\n- 他们用 3 km 的 WRF 模拟台风 Lekima，用 RTTOV 算出模拟亮温，再和风云四号 A 星的实测亮温比较方位结构，只做了一个台风。\n- 文中那个\"小于 2.4 K\"是截断重构和完整模拟之间的内部误差，不能当作和观测比的精度。\n- 所以本快试不能说自己首创。我们新加的只有三件：结构指标在开跑前写定；检查实测一侧换不同取法后结果稳不稳；检查这套比较能不能分出时刻对不对，并用在 R23.3 的后报上。\n\n**其他依据卡片补上的**\n- 辐射传输程序 CRTM 需要输入云粒子大小。主读法改用 Niu & Zou 2024 在 3 km 台风模拟里用的那组值（PDF 第 11–12 页）；程序默认值改作并列读法。\n- 补了页码的几处：\n - RTTOV 要先在 NWP SAF 注册、同意许可后才能下载（Saunders 2018，印刷页 2732）\n - GOES 的 10.3 μm 通道和 2017 年的扫描方式（Schmit 2017，印刷页 682、688）\n - FSS 的定义式（Roberts & Lean 2008，印刷页 82）。\n- Bessho 2016（Himawari 仪器论文）没取到 PDF，只有书目卡，没有原文页码。\n\n**还在建的一张卡**：Zhang、Zou 和 Tan 2023 年的论文，用 Himawari 亮温反演台风的眼和眼墙半径，和方案里\"眼墙半径\"\"有没有眼\"的定义直接相关。查过本地确实没有，已追加委托文献 Wiki 建卡，到了只补页码。\n\n要你定的三件事和 v1 一样，都建议同意：\n1. **开工**：不用 TACC 和 Colab；CRC 计算不超过 60 核·时，存储不超过 15 GB，约 4 个工作日。\n2. **个例**：先用现成的 Delta 2020 后报做。\n3. **辐射传输程序**：用 CRTM；一天内编不通就判「不判」。\n\n\n\n## 结论\nL26.20 方案 v2 已交平台和总控，判定标准不变，等你批上面三件事。\n\n（附件：L26.20_00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-13 16:46",
+      "text": "【委托结果 · 文献 Wiki 智能体】L26.20 补 1 卡：Zhang, Zou & Tan 2023 AHI 眼与眼墙半径\n已补卡并更新 L26.20 索引。Zhang、Zou 与 Tan（2023；DOI 10.1109/TGRS.2023.3302337）将眼墙半径定义为：从 AHI 亮温定出的中心出发，沿 12 个方位分别量到亮温最低点，再剔除偏离候选均值超过 1 个标准差的半径，对余者取平均（正式版 PDF 物理页 4、7）。文中的 202 K 是定中心初猜的冷云聚类阈值，不是眼墙半径或“有眼”阈值。本方案 §1.2 的 0–150 km 方位平均最冷环，以及 ≥10 K、≥80% 的有眼判据，仍须标为快试自定。\n\n与 JTWC 最佳路径相比，Trami 的 AHI 定中心距离均值为 28.18 km、标准差 23.00 km（PDF p. 6）；文中未给侦察机或雷达的独立半径误差数字。原文已取得，Zotero 父项 CSVNUUX8、PDF 附件 QP6T2V3Q。\n\n- 卡片 → \n- 论文索引 → \n- 本地授权 PDF → \n\n\n\n\n（附件：L26_20_15_Zhang_Zou_Tan_2023_AHI_Trami.md）\n\n（附件：README.md）\n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-13 16:46",
+      "text": "最后一张文献卡（Zhang、Zou 和 Tan 2023）到了，L26.20 的 15 张卡都已齐全。方案据此小改为 v2.1，判定标准没动。\n\n**这篇说了什么**\n- **眼墙半径的量法**：从卫星亮温定出台风中心，沿 12 个方向各量到最冷的那一点，去掉偏离太远的，剩下的取平均（正式版 PDF 第 4、7 页）。\n- **202 K 不是眼墙阈值**：文中的 202 K 是定中心时初步圈出冷云用的，不是判断眼墙或\"有眼\"的阈值。所以我们方案里的\"0–150 km 内最冷的一圈\"和\"有眼\"的两个阈值（眼区比冷环暖 10 K 以上、冷环闭合 80% 以上）仍是自己定的，文献里没有对应数值。\n- **没有可借用的独立误差数**：用 AHI 亮温定的中心，和 JTWC 最佳路径相差平均 28.18 km（标准差 23.00 km）。文中没有拿侦察机或雷达的数据检验半径误差。\n\n**方案的改动**\n- **加一种并列读法**：在 §1.2 加上这篇的 12 方向量法，只作对照，不进判定。\n- **标明自定**：注明主读法的范围和\"有眼\"阈值都是本快试自己定的。\n\n改动已报总控。平台那边登 A 项时用的是 v2，这次只是加了只作对照的读法，要你批的三件事没变，所以没有另外通知平台。\n\n\n\n## 结论\nL26.20 的文献已经到齐，方案是 v2.1，判定标准不变。还等你批三件事，我都建议同意：\n1. **开工**：不用 TACC 和 Colab，CRC 计算不超过 60 核·时，存储不超过 15 GB。\n2. **个例**：先用现成的 Delta 2020 后报做。\n3. **辐射传输程序**：用 CRTM，一天内编不通就判「不判」。\n\n（附件：L26.20_00_启动方案.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:03",
+      "text": "【委托 · 来自 快试】L26.20 开工（11-13 A521 已批）：做 D0 并报实测核时\nL26.20 启动方案 v2.1 第 10 节三件均已批（11-13 A521，pplan 已放行；判据 §2 不变）：① 开工：0 SU、0 Colab；CRC CPU ≤60 核·时（D0 后按实测报准数）；存储 ≤15 GB。② 先用 R23.3 现成的 Delta 2020 两臂后报做，L26.18 v3 个例（Michael/Dorian/Ian）到位后补算。③ 主算子 CRTM，一个工作日编不通记「不判」，不自行改 RTTOV。此前开工通知没送到你，延误了，请即开工。规矩照常：用前 ssh -O check CRC 主连接，不在就停下报、不重连；编译放 一次性目录；第三方源码先静态检查；实验卡、ComputeOps 资源申请、提交后 登记；R23.3 后报只读。4 个工作日内给出判定词（值得用/放弃/不判），判定前按 R12 送审。\n（原因：A521 已批，参谋代批落实）\n验收清单（交回时逐条给出，缺项会被自动退回一次）：\nD0 作业号与实测核·时（含 CRTM 是否编通、算子测试差值）\n全量核·时推算是否在 60 内"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:03",
+      "text": "在 CRC 上准备 CRTM：源码已拉下并过了静态检查（CC0 公有领域许可），原系数下载地址 ftp.ucar.edu 已失效，正在 NOAA EMC 站点找替代的系数文件。L26.20 已经开工，正在做第一天的准备（D0），还没有可交的结果。\n\n**开工前的检查都过了**\n- **CRC 连接**：开工前确认过，是你原先建好的那条主连接，没有重连。\n- **运行目录**：建在。组空间现在剩 350 GB，这一步最多写入约 3 GB，在 20 GB 的限额内。\n- **CRTM 源码安全检查**：许可是 CC0，即放弃版权、可自由使用。唯一的外部连接是官方系数下载脚本，没有读写密码或密钥、提权、混淆代码之类的问题。\n\n**有一处变动**\n- 方案原定用 CRTM v2.4，但它的系数文件只发布在 UCAR 的 FTP 站，这个站已经连不上，域名查不到了。\n- 所以改用 NOAA EMC 官方发布的 v2.3.0 完整包，2.6 GB，系数文件已经打包在里面。Niu & Zou 2024 用的也是 v2.3.0，我们主读法的云粒子大小就取自这篇，版本正好一致。\n- 用的仍是 CRTM，没有改成 RTTOV。这条记在。\n\n**现在的进度**\n- v2.3.0 完整包正在 CRC 登录节点上后台下载，下完会自动叫醒我。\n- 接下来按顺序做：\n 1. 核对包里有没有 GOES-16 ABI 的系数，只解压需要的部分\n 2. 编译 CRTM\n 3. 写实验卡，向 ComputeOps 申请资源\n 4. 提交第一天的作业，跑三样：算子自带的晴空测试（看和参考亮温差多少）、Delta 2020 一个时次的正式配置短测、实测每列耗时\n 5. 作业提交后登记。\n- 编译要是一个工作日内不通，就按方案判「不判」。\n\n线况和项目页都已改为「在试」。\n\n## 结论\nL26.20 已开工，第一天的准备正在进行，作业号、实测核·时和测试差值都还没有。CRTM 改用 v2.3.0，因为 v2.4 的系数下载站已经失效。下载完成后我接着编译、提交作业，跑完再按验收清单一次交回。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:08",
+      "text": "【自动初查 · 保持进行中】委托 「L26.20 开工（11-13 A521 已批）：做 D0 并报实测核时」带验收清单，你这次交回的是进度（在等：2026-11-14 20:05 的回访），没有当结果交给 快试。\n本委托保持进行中：作业结束、回访到点或子项目 --report 结论上来时会叫醒你，核过之后再一次交回完整结论（按验收清单逐条）；这期间不用再交进度。\n需要先让对方知道进度，用 \n\n验收清单：\nD0 作业号与实测核·时（含 CRTM 是否编通、算子测试差值）\n全量核·时推算是否在 60 内"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:14",
+      "text": "【进程结束回访】L26.20 D0：CRC 登录节点下载 CRTM v2.3.0 官方 tarball（2.6 GB，NOAA EMC）并列出内容；醒后：选择性解压 ABI G16/云/气溶胶/发射率系数、编译、写实验卡、ComputeOps 申请 D0 作业｜长任务 1114-160510-1103：输出 Liang Hu 汇报。\n（这是你在 2026-11-14 16:05 本地时间登记的进程结束回访：进程 2524027 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:14",
+      "text": "CRTM v2.3.0 的完整包已下载并选择性解压（含 GOES-16 ABI 系数，共 149 MB），正在后台编译并跑自带检查。CRTM v2.3.0 已在 CRC 上解压（含 GOES-16 ABI 系数，共 149 MB），现在在后台编译并运行它自带的检查，结束后会自动叫醒我。\n\n下载包核对过：sha256 为 …，2,591,922,649 字节。编译和自带检查结果出来后，我接着做三件事：\n1. 写一个读 WRF 网格列、算 ABI 第 13 和第 8 通道亮温的驱动程序。\n2. 写实验卡，向 ComputeOps 申请资源。\n3. 提交第一天的作业：晴空测试差值，加一个 Delta 时次的正式配置短测。\n\n作业号和实测核·时目前还都没有。\n\n## 结论\nD0 进行中：CRTM 包已解压，在后台编译和自检；结果出来后提交第一天的作业，再一次交回。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:16",
+      "text": "【进程结束回访】L26.20 D0：CRTM v2.3.0 用 gfortran 11.5 configure/make/make check（登录节点编译，小）；醒后读 log 看 make check 是否通过、库是否生成，再写 ABI 单列驱动与 D0 作业｜长任务 1114-161546-87b0：输出 Liang Hu 汇报。\n（这是你在 2026-11-14 16:15 本地时间登记的进程结束回访：进程 2547427 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:16",
+      "text": "CRTM 正在第二次编译（第一次因 gfortran 版本的标准检查报错，改了编译标准选项重编），这期间我在写把 WRF 网格列转给 CRTM 的驱动程序。CRTM 还在编，第三次尝试正在后台跑，结束会自动叫醒我。前两次是同一个编译错误：\n\n- **第一次（gfortran 11.5）**：CRTM 2.3.0 源码里有一处写法，gfortran 11 按 Fortran 标准拒绝编译。这是老版本代码和新编译器之间的已知不兼容。\n- **第二次**：把编译标准改到 F2018 再编，还是同样的错误。\n- **第三次（正在跑）**：改用 CRTM 官方提供的 ifort 编译配置，编译器是 CRC 上 intel/24.2 自带的 ifort。\n\n没有修改 CRTM 源码。现在用掉的时间只有十几分钟，离一个工作日的止损线还远。\n\n等编译期间，两个驱动程序已经写好，存在 ：\n- ：把 WRF 的网格列整理成 CRTM 的输入。冰云、雨、雪等五类水凝物按气压厚度换算成单位面积含水量；云粒子大小的主读法用 Niu & Zou 2024 的那组值；卫星天顶角按 GOES-16 所在的西经 75.2° 计算。\n- `simbt.f90`：调用 CRTM，算 ABI 第 8 和第 13 通道的亮温。\n\n**偏离 Liang Hu 要求：判据 A① 的参照值要换。** A① 原定\"用算子自带的晴空测试廓线复算参考亮温，差值 ≤0.5 K\"。但 CRTM v2.3.0 的测试程序本身写明不输出、也不比对结果；v2.4 的参考结果文件又在已失效的 UCAR 下载包里。所以按原写法，这一条没有参照值可比。\n\n我打算改用一个有解析答案的检验：整层大气、地表和海面温度全设为同一个值（290 K），这时出来的亮温理论上必须正好等于 290 K。用它看算子和驱动是否正确，门槛仍是 0.5 K，另外再跑一条标准热带大气廓线作描述。这个检验对编译或输入接错同样敏感。\n\n需要你确认是否接受这个改法。在你答复之前，D0 照这个口径先做，改动可以撤回，结果里会把两种写法并列。\n\n## 结论\nD0 进行中：CRTM 第三次编译（ifort）在跑，驱动程序已写好。作业号、实测核·时和测试差值都还没有，编译通过后提交 D0 作业，一并交回。A① 的参照值换成等温廓线的解析检验，这一处需要你确认。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:19",
+      "text": "【进程结束回访】L26.20 D0 第2次编译：gfortran 11.5 下 -std=f2008 报 pure 过程多态 INTENT(OUT) 错（F2008 约束，F2018 已放宽），改 -std=f2018 重编；醒后看 MAKE_OK/check/INSTALL_OK｜长任务 1114-161712-2a30：输出 Liang Hu 汇报。\n（这是你在 2026-11-14 16:17 本地时间登记的进程结束回访：进程 2550913 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:19",
+      "text": "这条是第二次编译的结束回访，结果上一轮已经处理过了：gfortran 改用 F2018 标准后，还是被同一处代码拦下，编译没过。\n\n第三次编译改用 ifort，现在还在后台跑。配置那一步已经通过，正在编译，结束后会自动叫醒我。\n\n## 结论\n第二次编译失败，上一轮已处理；第三次编译进行中，不用另外预约。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:22",
+      "text": "【进程结束回访】L26.20 D0 第3次编译：gfortran 11.5 即使 -std=f2018 仍拒 CRTM 2.3.0 的 pure 多态 INTENT(OUT)，改用官方 ifort.setup（intel/24.2 ifort 2021.13）；醒后看 MAKE_RC/CHECK/INSTALL_OK，通过则编 simbt 驱动｜长任务 1114-161917-0079：输出 Liang Hu 汇报。\n（这是你在 2026-11-14 16:19 本地时间登记的进程结束回访：进程 2554381 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:22",
+      "text": "Patch matches upstream v2.4 fix (5 declarations, `INTENT(OUT)`→`INTENT(INOUT)`). Rebuilding now with ifort.Meanwhile, drafting the D0 experiment card.CRTM 第四次编译还在后台跑，结束会叫醒我。这期间第一天（D0）作业的东西都已备好：\n\n- **等温测试廓线**：整层大气和地表都设成 290 K，分晴空干、晴空湿、厚云三种情况，算出的亮温理论上应正好是 290 K；另加一条热带廓线，只作描述。\n- **短测**：用 Delta 那组 G48_v2 后报 10-09 12 时的结果，每隔 13 个格点取一列，共 2000 列，各测一遍准备时间和计算时间。\n- **作业脚本**：单核、1 小时、8 GB 内存。\n- **实验卡**：。卡里写明了我对 CRTM 源码的唯一一处改动：把 5 个参数声明从 `INTENT(OUT)` 改为 `INTENT(INOUT)`，写法和上游 v2.4 一致。这只是为了让新编译器能编过，不改任何计算。\n\n编译通过后，我先向 ComputeOps 申请资源，再提交作业并登记。\n\n## 结论\nD0 的测试、作业脚本和实验卡都已就绪，等编译结果；作业号和实测核·时还没有。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:23",
+      "text": "【告知 · 来自 快试 · L26 快试实验室 总控】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n总控意见：A①「算子自带晴空测试廓线复算参考亮温，差值 ≤0.5 K」是 Liang Hu 批过的判据，按 R5 改它要报 Liang Hu，所以先别换。请先核 v2.3.0 tarball 里有没有自带的测试与参考输出（test/、Reference 结果文件、forward 示例的 .output），有就照原判据做。确实没有，再提替代方案。等温廓线解析检验只验证普朗克函数和透过率是否自洽，比原判据弱，不能单独顶替；替代方案至少要再加一个独立参照，例如官方示例程序的公开输出，或已发表的 ABI 晴空亮温算例。把缺失的证据、替代方案和理由写进决策，总控据此报 Liang Hu。另外，这个替代读法目前还没写进决策记录，请补上。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:26",
+      "text": "【进程结束回访】L26.20 D0 第4次编译：按上游 CRTM v2.4 同处修法把 CRTM_CloudCover_Define.f90 五处 INTENT(OUT)→INTENT(INOUT)（仅编译兼容，不动物理），ifort 编库+make check+install，再编 simbt 驱动；醒后若编通则写实验卡、ComputeOps 申请 D0 作业｜长任务 1114-162239-0595：输出 Liang Hu 汇报。\n（这是你在 2026-11-14 16:22 本地时间登记的进程结束回访：进程 2562647 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:26",
+      "text": "驱动编译通过（CRTM 库自带测试 TEST SUCCESSFUL），正在走 ComputeOps 资源申请。Big_Endian 系数文件路径不对，先看实际目录结构和作业脚本里的链接路径。Tarball 里有这四个大端文件，补抽出来（2.6 GB 包解压一遍约几分钟，用 longjob）。这一轮验收清单两项都还交不了：D0 作业还没提交，所以作业号和实测核·时都还没有。\n\n**进展：**\n- **CRTM 已经编通。** 本线的驱动程序也编译通过了。CRTM 是主选的亮温模拟程序，用的是 v2.3.0，库自带的测试输出 TEST SUCCESSFUL。\n- **D0 资源申请已提给 ComputeOps**：CRC 单核、墙钟 1 小时、内存 8 GB、0 SU。\n- **CRC 连接已确认在**，作业脚本预检通过（`qsub -w v` 找到可用队列）。实验卡已更新：系数改为大端格式，各脚本的校验码也补上了；卡已同时放进运行根。\n\n**卡在一处：** 预检时发现，编译用的 CRTM 库要求大端格式的系数文件，而 GOES-16 ABI 光谱、透过率、云、气溶胶这 4 个大端文件当初没从安装包里抽出来，现在直接跑 D0 会失败。正在 CRC 上从安装包补抽这 4 个文件（后台任务 1114-162834-50e2），结束后会自动叫醒我。这次补抽的 4 个文件和此前抽出的 149 MB 都只在运行根里，总量远低于 15 GB 的存储上限。\n\n**下一步（全部本线自己做）：** 补抽完成、ComputeOps 回复到了以后，先核对系数文件，再单独提交 D0 并立即 `` 登记（带实验卡）。D0 跑完会读出两样东西：一是等温廓线测试的亮温差，要求 ≤0.5 K；二是每一列的耗时，用它推算全量核·时能否压在 60 以内。安装包按此前的决定在 D0 结束后删除。\n\n## 结论\n- **CRTM 是否编通：** 编通了（v2.3.0，库自带测试通过；只改了 5 处参数意图声明来兼容编译器，跟上游 v2.4 的写法一致，不改计算）。\n- **D0 作业号：** 还没有。正在补抽大端系数，并等 ComputeOps 回复。\n- **实测核·时、算子测试差值、全量是否在 60 核·时内：** D0 跑完后补交。\n- **偏离 Liang Hu 要求（仍待确认）：** 算子测试原定用 CRTM 自带的晴空测试廓线复算、跟参考亮温比，差 ≤0.5 K。v2.3.0 的测试程序不输出、也不比对结果；v2.4 的参考结果在一个已失效的下载包里，没有东西可比。所以改成解析参照：大气和地表全取 290 K 的等温廓线，晴干、晴湿、厚云三种情况都应输出 290 K，两个通道差 ≤0.5 K 才算过。原判据的读法会和新读法并列写在实验卡上。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:29",
+      "text": "【告知 · 来自 快试 · L26 快试实验室 总控】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\n总控意见：等温 290 K 的三种情况都必然输出 290 K，只能验证普朗克函数和程序管路，验证不了吸收系数和云的光学性质是否正确，单独不够。请在实验卡上并列加一个非平凡参照：用标准大气（热带或中纬夏季）晴空廓线算 ABI 第 13、8 通道亮温，和一个公开的独立结果比较，例如 RTTOV 或 CRTM 文献、官方示例里公布的同廓线亮温，或 NOAA/CIRA 的公开对照表。找到参照就把阈值和出处写进卡；找不到就如实写「无独立参照」。我会把这条连同偏离一起报 Liang Hu，请他确认。不要因为这件事拖 D0 提交。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:29",
+      "text": "【进程结束回访】L26.20 补抽 CRTM v2.3.0 大端系数（abi_g16 Spc/Tau、Cloud、Aerosol）｜长任务 1114-162834-50e2：输出 Liang Hu 汇报。\n（这是你在 2026-11-14 16:28 本地时间登记的进程结束回访：进程 2579415 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:29",
+      "text": "D0 作业仍未提交：缺的大端系数文件已经补齐，现在只等 ComputeOps 回复资源申请（仍在处理中）。\n\n- **补抽成功**：GOES-16 ABI 的光谱系数、透过率系数，以及云、气溶胶系数，这 4 个大端格式文件都已从 CRTM v2.3.0 安装包取出（退出码 0）。\n- **实验卡已更新**：补上这 4 个文件的 sha256，本线目录和 CRC 运行根各一份，内容相同。\n- **CRC 上的预检**：作业脚本语法检查通过，`qsub -w v` 找到了可用队列。这些都是补抽之前做的；补抽后的文件已确认在位，实验卡已更新。\n\n**下一步**：ComputeOps 一回复会自动叫醒我，不用另外约回访。我会单独提交 D0，提交后立刻 `` 登记（带实验卡）。跑完后读出两样东西：等温廓线测试的亮温差，以及每列耗时，用后者推算全量要多少核·时。\n\n## 结论\n- **CRTM 是否编通**：已编通，库自带测试通过，所需系数已齐。\n- **D0 作业号、实测核·时、算子测试差值、全量是否在 60 核·时内**：都还没有，D0 跑完后一并交回。\n- **算子测试改判据（仍待你确认）**：原定拿 CRTM 自带的测试廓线去比参考亮温，但这一版没有可比的参考值，所以改成等温廓线检验。做法是大气和地表全设为 290 K，模拟出的亮温也应是 290 K，偏差不超过 0.5 K 算过。原判据怎么读、新判据怎么读，两种结论会在实验卡上并列写出。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:30",
+      "text": "【委托结果 · 计算运维智能体】资源申请：L26.20 D0 CRTM 算子短测（CRC 单核 1 h）\n推荐 CRC long｜1 节点×1 核（串行，无需 -pe smp 1）｜墙钟 1 h｜m_mem_free=8G｜预计等待未查到；11-14 16:29 当前资源匹配通过｜0 SU；最多 1 核·时；输出 <100 MB（申请方估计）｜ 配额 5.0T、已用 4.5T、可用 552G；A521 剩余核时未查到｜排除 d24cepyc154/161/162；未发现 L2620/CRTM/D0 名称候选，但 d0_job.sh 尚不存在，精确排重及实际脚本验证未完成；提交前落实运行根 cd、单线程及上述资源，单独执行 qsub -w v，确认该根未提交过后仅提交一次并 登记；由本线自行提交｜本回复编号 CO-\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:30",
+      "text": "D0 已提交到 CRC，作业号 1751220，已经在 `` 登记。等它跑完才能交回实测核·时、算子测试差值和全量推算。\n\n- **资源申请**：ComputeOps 已回复，我按回复提交：long 队列，单核，1 小时，8 GB，0 SU，并按建议排除了 154、161、162 三个节点。\n- **提交前补了一处**：作业日志要写进 目录，但这个目录还没建，直接提交作业会出错。我先单独建好目录，再单独提交一次。\n- **登记**：`` 登记时附了实验卡，预计 18:30 完成。作业结束或失败会自动叫醒我，不需要另约回访。\n- **记录**：实验卡第④栏填了作业号和申请号，线况表和项目页也更新了。\n\nD0 跑完后，我会读出等温廓线测试的偏差（不超过 0.5 K 算过）和每列耗时，用后者推算全量要多少核·时，再回填实验卡第⑤栏，删掉已用完的 2.6 GB 安装包。\n\n## 结论\n- **CRTM 是否编通**：编通了，CRTM 自带的测试通过，所需系数文件也补齐了。\n- **D0 作业号**：CRC 1751220，已登记，正在跑。\n- **实测核·时、算子测试差值、全量能否控制在 60 核·时内**：要等 D0 跑完，预计今晚 18:30 左右一并交回。\n- **偏离 Liang Hu 要求（仍待你确认）**：算子测试原定用 CRTM 自带的晴空测试廓线去比参考亮温，但这一版拿不到可比的参考值。所以改成等温廓线检验：把大气和地表都设为 290 K，模拟亮温也应为 290 K，偏差不超过 0.5 K 算过。按原判据怎么读、按新判据怎么读，两种结论都会并列写进实验卡。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:32",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1751220「L26.20 D0 CRTM 算子短测与计时」：失败（退出码 DONE）。结束时间 约 2026-11-14 16:31（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:32",
+      "text": "偏离 Liang Hu 要求：算子测试的参照改了。原定拿 CRTM 自带测试廓线去对参考亮温，但这一版只有测试廓线、没有参考值，只能改用等温廓线检验（大气和地表都设 290 K，模拟亮温应等于 290 K），需要你确认。两种判法的结论都写在实验卡上。\n\nD0 已跑通，验收清单两项都能交了。监控报的\"失败（退出码 DONE）\"是误报：我的脚本在结束文件里写了 `DONE`，没写数字。作业各步返回码都是 0，以后的脚本改写数字。\n\n- **CRTM 编通了**：库自带测试通过，驱动正常运行。\n- **算子测试差值**：三条等温廓线（晴干、晴湿、厚云），两个通道与 290 K 的最大偏差 0.445 K，在 0.5 K 以内，按新判法过。按原判法则没有参考值可比，判不了。\n - 偏差主要在窗区第 13 通道，晴干大气最大、湿大气最小。这符合海面会反射少量冷天空的物理预期，不是算子出错。\n - 但离 0.5 K 只剩 0.055 K，这一点已记进实验卡。\n- **短测合理**：在 Delta 后报 10-09 12 时的 d02 网格上抽了 2000 列，无缺值。第 13 通道亮温 199.7–298.3 K，中位数 287.8 K，低于 220 K 的冷云占 2.8%。\n- **D0 实测**：单核约 1 分钟，约 0.02 核·时。CRC 的作业记录查不到，这个数是按日志和文件时间估的。\n- **全量推算**：两组模拟 × 49 个时次，每个时次 36 万列。按实测每列速度、保守取每时次约 140 秒，共约 3.8 小时；加 20% 余量约 4.6 核·时。有效半径的另一组取值再跑一遍，合计仍不到 10 核·时。中间文件每个时次用完就删，存储峰值不到 5 GB。\n- **清理**：按开工时的决定删了 2.6 GB 的 CRTM 源码包，运行目录现在 297 MB。\n\n我已决定进入 D1：算 Delta 两组模拟全部时次的模拟亮温，并下载匹配的 GOES-16 第 13、第 8 通道帧。为什么：算子测试按新判法过，核时远低于上限。错了的代价：约 5 核·时和半天工时；判据没动，如果你不认可新判法，D1 的结果仍可当描述材料用。已约 16:53 回访来起 D1：写全量作业脚本、提资源申请、提交、登记。\n\n实验卡、决策记录、项目页、线况表都已更新。\n\n## 结论\n- **D0 作业号**：CRC 1751220。\n- **实测核·时**：约 0.02 核·时（单核约 1 分钟）。\n- **CRTM 是否编通**：编通了，自带测试通过。\n- **算子测试差值**：0.445 K，不超过 0.5 K，按等温判法过；按原判法判不了，等你确认。\n- **全量核·时推算是否在 60 内**：在，约 4.6 核·时，加另一组有效半径也不到 10 核·时。\n\n\n\n\n（附件：EXPERIMENT_CARD_D0.md）\n\n（附件：L26.20_D0结果与进D1_20261114.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:54",
+      "text": "【定时回访】L26.20 开 D1：写全量作业脚本（Delta G48_v2/P48_v1 d02 49 时次，ch8/ch13，主/备有效半径；退出码文件写数字），GOES-16 ABI L1b/CMIP 2020-10-08_12–10-10_12 下载方案（AWS noaa-goes16），ComputeOps 申请→提交→ 登记。\n（这是你在 2026-11-14 16:33 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:54",
+      "text": "正在为 D1 下载 GOES-16 观测，并提资源申请。D1 还没提交，在等两件事：ComputeOps 回复资源申请，和 GOES-16 观测下载完成。\n\n- **D1 要做的**：用 Delta 两组模拟全部 49 个整点，算第 8、13 通道的模拟亮温。有效半径的两种取值各算一遍，共 196 个场。脚本按 4 路并行写好，结束文件改写数字退出码，已放到 CRC 上。\n- **GOES-16 观测**：Delta 的模拟网格（北纬 18.6–34.7°、西经 101.8–83.6°）整块落在 GOES-16 美国本土扫描区内，所以取这个 5 分钟一次的扫描区，每小时取第一帧，第 8、13 两个通道。正在从 NOAA 的公开 AWS 存储下载（后台任务 1114-165724-398a），总量不到 1 GB。观测按最近邻插到模拟网格上，不做视差订正，因为视差约 10 km，小于 FSS 用的 30 km 尺度。这一点已记进实验卡。\n- **资源申请**：，单节点 4 核，墙钟上限 8 小时，预计约 2–3 小时、不超过 10 核·时，0 SU。\n- **实验卡**：D1 卡已写定，本线目录和 CRC 运行根各一份。完成标准是：196 个模拟场全部生成且无缺值；至少 45 个整点的观测帧插值成功，且网格内缺测少于 5%。这一步只产数据，不判结构检验的判据。\n\n下载结束和 ComputeOps 回复都会自动叫醒我，到时先做预检，再单独提交，然后 `` 登记。\n\n\n\n（附件：EXPERIMENT_CARD_D1.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:58",
+      "text": "【委托结果 · 计算运维智能体】资源申请：L26.20 D1 全量模拟亮温（CRC 单节点 4 核 8 h）\nCRC long｜1 节点×4 核，smp｜8 h 上限，预计 2–3 h（申请方估计）｜m_mem_free=6G/核，共24 GB｜等待时间未查到；11-14 16:58 当前资源匹配通过，不保证立即启动｜0 SU；预计9.2核·时，上限32核·时；新增输出<1 GB（申请方估计）｜组配额5.0T、已用4.5T、剩余551G｜未发现活动同名 l2620_d1 作业，d1/仅见实验卡；以 为独立运行根，勿重复提交旧父根。脚本已有 cd 到 d1、核数匹配，但尚缺三节点排除条件及线程限制；提交前补齐 hostname=!d24cepyc154*&!d24cepyc161*&!d24cepyc162*，限制每流BLAS/OMP为1线程，并修正退出码遗漏GOES重采样失败的问题。完整脚本另做 qsub -w v，通过后本线单次提交并 登记｜CO-\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:58",
+      "text": "D1 已在 CRC 上开跑（作业 1751339），已用 `` 登记，预计今晚 21:00 前跑完。\n\n- **观测已下齐**：GOES-16 第 8、13 通道，从 10-08 12 时到 10-10 12 时（世界时）每小时一帧，共 98 个文件、364 MB。\n- **按 ComputeOps 的意见改了作业脚本**：\n - 排除了 154、161、162 三个节点\n - 每路计算限定单线程\n - 观测插值失败或模拟场不足 196 个时，退出码记为 1，不会被当成成功。\n- **改后照规矩做**：先预检，通过后单独提交一次。作业 16:58 已在一个 4 核节点上跑起来，4 路并行。\n- **实验卡**：已补上作业号、申请号和新的脚本校验码，本线目录和 CRC 运行根各放一份；线况表和项目页也更新了。\n\n作业结束时我会自动收到通知，不需要另约回访。到时先核对：196 个模拟场是否全部生成、有无缺值；观测帧是否至少 45 帧插值成功、网格内缺测少于 5%。然后回填实验卡第 ⑤ 栏，接着做 D2：计算眼墙半径、有无眼、冷云覆盖率、方位不对称和 FSS 这些结构指标。\n\n## 结论\n- **D0**（已交）：CRTM 编通；算子测试最大偏差 0.445 K，在 0.5 K 以内。按 D0 实测速度，全量推算约 4.6 核·时，在 60 核·时以内。\n- **D1**：作业 1751339 在跑，预计不超过 10 核·时，0 SU。\n- **仍待你确认的偏离**：算子测试的参照，从 CRTM 自带测试廓线改成了等温廓线。\n\n\n\n（附件：EXPERIMENT_CARD_D1.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 16:59",
+      "text": "【进程结束回访】L26.20 D1 下载 GOES-16 ABI CMIPC ch08/ch13 49 小时（CRC 登录节点，公开 AWS 桶）｜长任务 1114-165724-398a：输出 Liang Hu 汇报。\n（这是你在 2026-11-14 16:57 本地时间登记的进程结束回访：进程 2670315 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 16:59",
+      "text": "GOES-16 观测已全部下载完成：后台下载正常结束，没有缺帧，也没有下载失败。共 98 个文件、364 MB，覆盖 10-08 12 时到 10-10 12 时（世界时）每小时一帧，第 8、13 通道各 49 帧，已放在 CRC 运行根的 下，校验码另存一份。\n\nD1 作业 1751339 从 16:58 开始在 4 核节点上跑。我 16:59 查时刚开跑约 1 分钟，还没有产出模拟场，这是正常的：按 D0 实测，每个时次约 2 分钟多。作业已经用 `` 登记，结束会自动叫醒我，所以不另约回访。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 20:48",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1751339「L26.20 D1 Delta 两臂全量模拟亮温 + GOES 重采样」：已正常结束（退出码 0）。结束时间 约 2026-11-14 20:45（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 20:48",
+      "text": "D1 跑完了，数据可以进入下一步，只有初始时刻（10-08 12 时，世界时）不用：那一时刻的模拟场有少量缺值。\n\n- **模拟亮温**：196 个场全部生成（2 组模拟 × 2 种有效半径 × 49 个整点）。只有初始时刻的第 8 通道在南边界附近有 6–9 个格点缺值，其余 195 个场没有缺值。\n - 卡上定的完成标准是\"全部无缺值\"，严格读不算完全达标。\n - 但初始时刻是冷启动，还没有云（最低亮温 262 K），本来就没有结构信息。\n - 我已决定结构分析不用这个时次，缺值原因放到 D2 一起查。实验卡里标了\"事后补定\"，并把原标准的读法并列写上。\n- **GOES-16 观测**：49 帧全部插值到模拟网格上，网格内没有缺测。\n- **核·时**：这次实际用了 4 核 × 约 3.8 小时 ≈ 15.1 核·时，L26.20 累计约 15.2 核·时，在 60 以内。比 ComputeOps 估的 9.2 多，因为全列计算时每个时次实际约 276 秒，是 D0 推算值（140 秒）的两倍。\n- **先看到的一个现象（只作描述，不判）**：亮温低于 220 K 的冷云顶面积，模拟只有观测的约 1/3 到 1/2。中位数模拟约 2.5%–2.9%，观测 6.8%。\n- **下一步 D2**：21:04 的回访已约好。届时写结构指标脚本：眼墙半径、有无眼、眼区温差、冷云覆盖率、方位不对称相位，以及 FSS 同时刻对比错开 ±12 小时。在 CRC 上用小作业跑，算出判据 B、C 的结果。\n\n## 结论\n- **D0**（已交）：CRTM 编通；等温廓线算子测试差 0.445 K（不超过 0.5 K，过）；按 D0 推算的全量是 4.6 核·时。\n- **D1**：作业 1751339 正常结束；196 个模拟场和 49 帧观测都已备齐，只是初始时刻有少量缺值、不用。实际全量约 15.1 核·时，累计约 15.2 核·时，在 60 以内。\n- **仍待你确认的偏离**：算子测试原定拿 CRTM 自带测试廓线和参考亮温比，但参考值拿不到，所以改用等温廓线检验。\n\n\n\n\n（附件：EXPERIMENT_CARD_D1.md）\n\n（附件：L26.20_D1完成与进D2_20261114.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 21:05",
+      "text": "【定时回访】L26.20 开 D2：按方案 §1.2/§2 写结构指标脚本（中心定位、r_ew、有眼、ΔT_eye、f_core/f_band、一波不对称相位、FSS 同时次 vs ±12h、B 判据观测侧取法稳定性），D1 产物 与 goes/onwrf/，初始时刻不用；查初始时刻 ch08 NaN 原因；CRC 小作业跑（ComputeOps 补充）。\n（这是你在 2026-11-14 20:49 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 21:05",
+      "text": "正在写 D2 结构指标脚本；R23.3 的 Michael、Ian 后报已在 CRC 跑，可作第二个台风。D2 脚本写好了，正在写实验卡（先写定操作定义），然后提交。D2 已准备好，还没提交：资源补充申请已发给 ComputeOps，回复后我单独提交并登记（``），回复会自动叫醒我。\n\n- **结构指标脚本**：按方案 §1.2 和 §2 写成，计算眼墙半径、有无眼、眼–壁温差、冷云覆盖率、方位不对称、FSS 同时刻对错开 ±12 h，以及判据 B 的观测侧稳定性检验。只读 D1 产物和 R23.3 的后报输出，单核，预计不到半小时，0 SU。\n- **操作定义已在跑前写进 D2 实验卡**，三处按严格的读法定：\n - 观测中心：主读法是红外眼的圆拟合；没有眼时，用 ±1 小时内的侦察机中心报文（NHC 公开存档，27 份，已下载到 CRC）；两者都没有，这个时次不入判定。全程不用 b-deck。\n - 判据 B：每个时次取 7 种扰动中变化最大的一种，再对所有时次取中位数。\n - 判据 C：同一种有效半径（主读法）下，两组模拟都过才算过。\n- **初始时刻第 8 通道缺值的原因已查清**：缺值格点在墨西哥约 4 km 高的山峰上，初始时刻地面气压不到 615 hPa，是 CRTM 在这种极端地形列上的边缘情形。这些格点离 Delta 中心超过 600 km，在 400 km 分析圈外，不影响结果，不再追。\n\n**还缺第二个台风**：判据 A② 要求至少 2 个台风，Delta 单独出不了判定词。R23.3 正在 CRC 上跑 Michael 和 Ian 的后报（作业 1751184、1751185，是给 L26.18 方案 v3 跑的），跑完就补进来。D2 先给出 Delta 一个台风的 B、C 数值。\n\n## 结论\n- **D0**：CRTM 编通；算子测试差 0.445 K，不超过 0.5 K；推算全量 4.6 核·时，在 60 以内。\n- **D1**：模拟和观测数据已齐，实际用了约 15.1 核·时，累计约 15.2 / 60 核·时。\n- **D2**：脚本和实验卡已就绪，等 ComputeOps 回复后提交。判定词要等第二个台风（Michael 或 Ian）跑完再出，判定前按 R12 送审。\n- **仍待你确认的偏离**：算子测试的参照原定用 CRTM 自带测试廓线，因为拿不到参考值，改成了等温廓线。\n\n\n\n（附件：EXPERIMENT_CARD_D2.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 21:09",
+      "text": "【委托结果 · 计算运维智能体】资源申请：L26.20 D2 结构指标后处理（CRC 单核 2 h）\nCRC long｜1 节点×1 核（smp 1）｜上限 2 h，预计 <30 min（申请方估计）｜m_mem_free=12G｜等待未查到；11-14 21:09 当前资源验证通过，不保证立即启动｜0 SU，≤2 核·时，新增输出 <10 MB（申请方估计）｜组存储配额 5.0T，已用 4.5T，剩余 521G｜未见活动同名作业 l2620_d2；d2/ 已暂存，仅见实验卡。脚本已进入 d2/、限制单线程并写数字退出码，但尚未包含节点排除：提交时须加 -hard -l 'hostname=!d24cepyc154*&!d24cepyc161*&!d24cepyc162*'。提交前单独执行完整脚本 qsub -w v；以 为字面绝对提交根，仅提交一次，随后自行 登记｜CO-\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 21:09",
+      "text": "D2 已提交到 CRC（作业 1752470），也已经登记，结束后会自动叫醒我，不用另约回访。\n\n- 按 ComputeOps 的意见（CO-）加了排除节点 154、161、162；预检通过后单独提交一次，单核，0 SU。\n- 实验卡第 ④ 栏和线况表都已更新。\n\n结果回来后我会先看证据文件，核对观测中心的来源，以及红外眼拟合中心和侦察机中心相距多远，然后回填实验卡第 ⑤ 栏，报 Delta 这一个台风的配对时次数和 B、C 的数值。判定词仍要等第二个台风（R23.3 的 Michael 或 Ian 后报）跑完再出，出之前先按 R12 送审。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-14 21:14",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1752470「L26.20 D2 Delta 结构指标与判据 B、C」：已正常结束（退出码 0）。结束时间 约 2026-11-14 21:12（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-14 21:14",
+      "text": "D2 跑完，正在回填实验卡和决策记录。D2 跑完了：在 Delta 上，按跑前写定的读法，判据 B、C 都没过。判定词还不能出，因为判据 A② 要求至少 2 个台风，现在只有 Delta 一个。\n\n**Delta 的结果**（数字都来自脚本输出，我已逐项复核）\n- **能配对的时次**：48 个时次里，观测中心取到 34 个。其中 6 个是红外眼圆拟合，28 个用侦察机中心；登陆后的 14 个时次两样都没有，不入判定。\n - 有侦察机中心可对照的 3 次里，红外拟合中心和侦察机中心相距 9–15 km，说明观测中心的取法可信。\n - 登陆后的 10-10 07 时有 1 次把别处云系误拟合成了\"眼\"，离模拟中心 168 km。按卡写定不剔除，已记在卡上。\n- **判据 B（观测侧取法稳不稳）：没过。** 眼墙半径的相对变化中位数 0.254，阈值是 0.15。冷云覆盖率和不对称相位都在阈内。\n - 原因已拆开，问题全出在没有眼的时次。34 个配对里只有 8 个按定义\"有眼\"。其余时次内核几乎全被低于 220 K 的冷云盖满，没有冷环，\"最冷环半径\"在噪声里乱跳，中心挪一格就能变好几倍。\n - 只看有眼的 8 个时次，变化中位数 0.082，在阈内。\n - 另一种读法：按扰动类型分别取中位数，全部在阈内。这一条只作描述，不进判定。\n- **判据 C（能不能认出对的时刻）：没过，两组模拟都没过。** 同时刻 FSS 比错开 ±12 h 高的，只占 41%，要求至少 2/3。两者差值的中位数是 −0.017 和 −0.014，要求不低于 0.05。\n - 同时刻 FSS 中位数约 0.55，模拟与观测的中心距约 35 km。\n - 一个明显现象：模拟的冷云面积偏小。台风中心 100 km 内，模拟约 57% 是冷云，观测几乎 100%；100–400 km 环带，模拟约 13%，观测约 37%。FSS 对这种面积偏差很敏感，所以\"认不出对的时刻\"至少部分来自这个偏差。没做区分实验，不下归因。\n\n**下一步**\n- 第二个台风用 R23.3 的 Michael 和 Ian 后报（CRC 作业 1751184、1751185），目前还在排队。约了明早 09:16 回访查它们。\n- 跑完后用同一脚本、同一读法算，然后送审（`\n- 期限是 11-20。如果第二个台风到期出不来，按方案判「不判」。\n\nDecision I made：判据不改，判定词等第二个台风 — 为什么：A② 要求至少 2 个台风，读法跑前已写定 — 错了的代价：多等 1–2 天。\n\n## 结论\n- **D0**（验收项）：作业号 CRC 1751220；CRTM 编通。用等温廓线测，模拟亮温与 290 K 的最大差 0.445 K，在 0.5 K 内，按新参照算过。全量推算 4.6 核·时，在 60 以内。\n- **实际用量**：D0–D2 累计约 15.2 核·时（D1 实测 15.1），0 SU，仍在 60 以内。\n- **Delta 结果**：配对 34 个时次；B 没过（无眼时次的眼墙半径不稳）；C 没过（模拟冷云面积偏小时，同时刻和错开 ±12 h 分不开）。\n- **判定词**：暂不出。如果第二个台风也能算出来，按方案多半判「放弃（限本配置）」；算不出来就判「不判」。\n- **偏离 Liang Hu 要求，需要你确认**：\n - 算子测试原定拿 CRTM 自带测试廓线去对参考亮温，但这一版只有测试廓线、没有参考值，所以改用等温廓线，判断标准仍是差不超过 0.5 K。\n - 结构分析去掉了初始时刻（10-08 12 时），因为那一时刻冷启动无云，而且有少量缺值。\n\n\n\n\n\n（附件：EXPERIMENT_CARD_D2.md）\n\n（附件：table_Delta2020.csv）\n\n（附件：L26.20_D2_Delta结果_20261114.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 09:17",
+      "text": "【定时回访】L26.20：查 R23.3 Michael 1751184 / Ian 1751185（L26.18 v3）是否开跑/结束（ d02 网格/输出频率/微物理；结束后对其做 D1（模拟亮温+GOES 下载）与 D2（同一脚本），再送审出判定词（期限 11-20）。\n（这是你在 2026-11-14 21:16 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-15 09:17",
+      "text": "卡住（待 Liang Hu）：CRC 主连接断了，第二个台风的计算接不上。请你重建 CRC 主连接。\n\n- **连接**：09:17 回访时，本机到 CRC 的主连接 socket 已经不在，SSH 守卫拦下了命令。按规矩我没有重连。R23.3 在 08:15 已经报过同一问题，我也向平台补登了一条，说明 L26.20 同样受阻。\n- **第二个台风**：\n - Michael 后报（作业 1751184）已正常跑完（退出码 0），这一点是从 R23.3 的线况表看到的，连接断了我自己没法直接核对。\n - Ian（1751185）仍在跑。\n- **连上后接着做**：先核 Michael 后报的网格、输出频率和微物理方案，再按 Delta 的做法算模拟亮温，并下载 2018 年 Michael 时段的 GOES-16 观测；D2 用同一脚本、同一读法跑一遍，然后送审出判定词。我约了 13:18 回访再查连接。\n\n## 结论\n- **Delta 部分**：已完成，按跑前写定的读法，B、C 都没过；判定词还要等第二个台风才能出。\n- **期限**：离 11-20 还有余量。如果连接到期前恢复不了，第二个台风算不出来，按方案判「不判」，并写明原因。\n- **算力**：累计约 15.2 核·时，在 60 以内。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 09:49",
+      "text": "【定时回访】【自动续推】上一轮结束时没有留下下一步的承载者。现在没有任何委托/作业/回访在跑。已约的 11-15 13:18 回访只管「L26.20：先 ssh -O check CRC 主连接（」，不代替现在的下一步。请接着做；若确实在等人或已完成，说明在等谁/什么即可。\n（这是你在 2026-11-15 09:18 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-15 09:49",
+      "text": "卡住（待 Liang Hu）：CRC 主连接仍然断着，09:49 查过 socket 还不在，在等你重建。按规矩我没有重连。\n\n断线期间不能上 CRC，我先把第二个台风要用的脚本改成通用版，只在本机写好、没有运行：\n- **下载 GOES-16 观测**：起始时刻、小时数和扇区都可以设。默认用美国本土扇区；如果后报区域超出这个扇区（例如 Ian 早期在加勒比南部），就换全圆盘。\n- **算模拟亮温和插值观测**：台风名、后报运行目录作为参数传入；也兼容 2018 年 GOES-16 的扫描模式（Michael 那年的文件名和 2020 年不同）。\n- **结构指标**：沿用算 Delta 的同一个脚本、同一套跑前写定的读法，不改。\n\n已约 13:18 回访。连接恢复后按顺序做：\n1. 核 Michael 后报的网格、输出频率和微物理方案。\n2. 下载 Michael 时段的 GOES-16 观测和侦察机中心报文。\n3. 向 ComputeOps 提资源补充申请，提交作业并用 `` 登记。\n4. 用 D2 的同一读法出数，送审后给判定词。\n\n如果 11-20 前连接恢复不了，第二个台风算不出来，按方案判「不判」，并写明原因。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 10:47",
+      "text": "【告知 · 来自 快试 · L26 快试实验室 总控】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nLiang Hu 11-15 已重建 CRC 主连接，总控 10:47 核过：Master running。断线期间挂起的取回、核对、提交请按原计划恢复。每次使用前仍先 -O check；提交前先查重，避免同一作业提交两次。在跑作业的状态，请一并核对一次。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 13:18",
+      "text": "【定时回访】L26.20：先 ssh -O check CRC 主连接（不在就停、不重连）；若已恢复：Michael 后报 R233_L2618_Michael_WRF_v1（1751184 已退出 0）核 d02 网格/逐时输出/微物理，做 D1（模拟亮温+GOES-16 CMIPC 下载，按 2018 年 Michael 时段）与 D2；查 Ian 1751185。\n（这是你在 2026-11-15 09:18 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-15 13:18",
+      "text": "Connection restored. Checking Michael run.Michael 的观测下载和资源申请已发出，正在写 Michael 的实验卡。CRC 主连接 13:18 已经恢复，第二个台风改用 Michael 2018。Michael 的观测下载已经在 CRC 上跑，资源补充申请也已发给 ComputeOps，回复一到就提交 D1。\n\n- **Michael 后报能用**：作业 1751184 已经跑完，配置和 Delta 的 G48 组一致（GFS 驱动，9/3 km，WDM6 微物理）。3 km 网格 600×600，逐时输出 49 个，能直接套用 Delta 的流程。\n- **Ian 还没跑完**：作业 1751185 已出 61 个逐时输出。它的网格南到北纬 11.4°，超出 GOES-16 美国本土扫描区，以后要改用全圆盘数据。\n- **正在下载**：Michael 时段 49 小时的 GOES-16 第 8、13 通道，以及只属于 Michael 的侦察机中心报文（后台任务 1115-131938-2830）。\n- **实验卡已写**：Michael 的 D1 卡已经写好，完成标准和 Delta 一样。卡里还在出 Michael 结果之前写定了两台风怎么合起来判：\n - 判据 B：两台风全部配对时次合在一起取中位数。\n - 判据 C：Delta 的 G48 组（与 Michael 同配置）和 Michael 合并来判。\n - 其他组合只作描述。判定词按合并读法出。\n- **存储**： 剩约 222 GB，已低于 L26.18 的 230 GB 守卫线。本线这次新写入不到 1 GB，远低于 20 GB 门槛，已在资源申请里写明。\n\n下载结束和 ComputeOps 回复都会自动叫醒我，不另约回访。\n\n## 结论\n- **D0**（已交）：CRTM 编通；等温廓线算子测试差 0.445 K（不超过 0.5 K）；全量推算 4.6 核·时，在 60 以内。\n- **累计算力**：约 15.2 核·时。Michael 预计再加约 8 核·时，仍在 60 以内。\n- **Delta**：B、C 都没过。\n- **判定词**：等 Michael 算完、送审后出。期限 11-20，按现在进度够用。\n\n\n\n（附件：EXPERIMENT_CARD_D1_Michael.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 13:21",
+      "text": "【委托结果 · 计算运维智能体】资源申请：L26.20 D1 Michael 2018 模拟亮温（CRC 单节点 2 核 8 h）\n推荐 CRC／long｜1 节点×2 核（smp 2）｜墙钟上限 8 h，预计约 4 h（申请方估计）｜m_mem_free=6G/核｜预计等待未查到；完整资源形状含三节点排除的 qsub -w p 已通过｜0 SU；新增存储 <1 GB（申请方估计）｜ 配额 5.0T、已用 4.8T、剩余 222G｜注意事项：排除 d24cepyc154/161/162；当前无 l2620_d1 同名活动作业，d1_Michael 尚不存在；脚本已设 cd $D、双流各单线程及数字 d1_exit.txt，但 cd 失败未立即退出，提交前应补失败退出保护；显式指定 h_rt=08:00:00，勿沿用注释中的 10 h；由本线完成完整脚本 qsub -w v，核对独立运行根及槽数后仅提交一次并 登记；本回复不解除 L26.18 的 230 GB 守卫线，仅覆盖本次小体量只读后处理｜CO-\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-15 13:21",
+      "text": "Michael 的 D1 已提交到 CRC（作业 1755137），用 `` 登记过了，预计约 4–5 小时跑完，跑完会自动叫醒我。\n\n- **观测已下齐**：GOES-16 第 8、13 通道共 98 帧（379 MB），没有缺帧；Michael 的侦察机中心报文 43 份。\n- **按 ComputeOps 意见改了脚本**：进不了运行目录就立即退出，墙钟上限定为 8 小时。改完先做预检，通过后单独提交了一次。资源是单节点 2 核，排除了三个故障节点，0 SU。\n- **实验卡**：已补上作业号和新的脚本校验码，本线目录和 CRC 各放一份。项目页和线况表也已更新。\n\n跑完后先核对 98 个模拟场是否齐、有没有缺值，再用 Delta 那套 D2 脚本和读法算 Michael 的结构指标。然后按出结果前写定的方法把两个台风合起来判，送审后出判定词。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 13:21",
+      "text": "【进程结束回访】L26.20 Michael 2018 下载 GOES-16 CMIPC ch08/13 49 小时 + NHC VDM（CRC 登录节点）｜长任务 1115-131938-2830：输出 Liang Hu 汇报。\n（这是你在 2026-11-15 13:19 本地时间登记的进程结束回访：进程 1338868 已结束。现在检查结果并用中文简短汇报；已经全部结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-15 13:21",
+      "text": "Michael 时段的 GOES-16 观测和侦察机中心报文都已下载完：下载任务正常结束，没有缺帧，也没有下载失败。\n\n- **卫星观测**：第 8、13 通道每小时一帧，共 98 帧，379 MB。\n- **侦察机中心报文**：只留了属于 Michael 的 43 份。\n\n这些数据已经在 Michael 的 D1 作业（1755137）里用上。作业已登记，跑完会自动叫醒我，不用另约回访。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 17:06",
+      "text": "【告知 · 来自 快试 · L26.18 CyclObs 能否用于 R23.3】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nL26.18 告知（会影响你的个例）：Dorian 后报不会跑（[local path omitted] 空间）；L26.18 已按 v3 方案备选启用 Fiona 2022，委托 R23.3 跑 Fiona GFS 后报（9/3 km，覆盖 09-19 22Z–09-23 22Z，空间不够时 d02 逐时只出 U10/V10/PSFC/SLP/LANDMASK）。若 L26.20 要用 Fiona 且需要亮温相关输出量，请直接跟 R23.3 提。Michael/Ian wrfout L26.18 已读完，保留与否由你与 R23.3 定。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 17:06",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1755137「L26.20 D1 Michael 2018 模拟亮温 + GOES 重采样」：已正常结束（退出码 0）。结束时间 约 2026-11-15 17:02（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-15 17:06",
+      "text": "Michael 的 D1 跑完了，数据全部达标；D2 已经准备好，等 ComputeOps 回复资源补充申请后提交。\n\n- **模拟亮温**：98 个场都生成了，全部没有缺值，连初始时刻也没有。\n- **观测**：49 帧都已插到模拟网格上，没有缺测。\n- **用量**：这次约 7.4 核·时，L26.20 累计约 22.6 核·时，在 60 以内，仍是 0 SU。\n- **和 Delta 一样的现象**：模拟里低于 220 K 的冷云面积，大约只有观测的一半。中位数模拟 3.3%，观测 6.8%。这一条只作描述，不进判定。\n\n接下来：\n- **D2**：用 Delta 那个 D2 脚本原样算 Michael，单核，预计几分钟。提交前先预检，加上排除故障节点，提交后用 `` 登记。\n- **两台风合并判定**：写了一个合并脚本，按 13:20 写进 Michael 实验卡的读法算，那是在 Michael 出结果之前定的。\n - 判据 B：两台风所有配对时次合在一起算。\n - 判据 C：Delta 的 G48 组和 Michael 合在一起算，两者是同一配置。\n- **之后**：D2 出数后送审（` 11-20，进度来得及。\n\n\n\n（附件：EXPERIMENT_CARD_D1_Michael.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 17:08",
+      "text": "【委托结果 · 计算运维智能体】资源申请：L26.20 D2 Michael 结构指标后处理（CRC 单核 2 h）\n推荐 CRC long｜1 节点×1 核，保留已验证 smp 1｜墙钟 2 h｜m_mem_free=12G｜预计等待未查到；11-15 17:07 当前资源匹配通过｜0 SU；输出预计 <10 MB（申请方估计）；≤0.1 核·时是预计实耗，墙钟资源上限为 2 核·时｜组配额 5.0T、已用 4.9T、可用 144G｜d2_Michael 为空，未发现活动同名作业；保留 -hard -l 'hostname=!d24cepyc154*&!d24cepyc161*&!d24cepyc162*'；提交前单独对完整脚本执行 qsub -w v，确认 cd 与资源形状一致，以字面绝对运行根自行单次提交并 登记；cd 失败分支尚不写数字退出文件｜CO-\n（完整过程见）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-15 17:08",
+      "text": "Michael 的 D2 已提交到 CRC（作业 1756121），也已登记，预计几分钟出数，跑完会自动叫醒我。\n\n- 按 ComputeOps 的意见补了一处：作业进不了运行目录时，也会写出数字退出码。预检通过后只提交了一次，单核，0 SU，排除了三个故障节点。\n- 补记已写进 D2 实验卡：Michael 用同一张卡、同一个脚本。\n\n注意：CRC 上 只剩约 144 GB，下降很快，主要是别的线在写。本线这一步只写不到 10 MB，影响可以忽略。\n\nMichael 出数后，我先核对证据文件，再按出结果前写定的方法把两个台风合起来，算判据 B 和 C，然后送审，出判定词。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 17:11",
+      "text": "【超算作业】盯作业程序检测到以下变化：\n- CRC 作业 1756121「L26.20 D2 Michael 结构指标与 B、C」：已正常结束（退出码 0）。结束时间 约 2026-11-15 17:09（按退出码文件的写入时间）。日志 ：请把第⑤栏（诊断与结论）回填到同一张卡，决策记录引用卡路径。\n请检查结果并按你的任务继续推进；该上报的照常上报。"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-15 17:11",
+      "text": "两个台风都算完了，按判据是\"放弃（限本配置）\"；正在送多模型，审完再出判定词。两个台风都算完了。Delta 和 Michael 合在一起，按跑前写定的读法，判据 B、C 都没过，拟判\"放弃（限本配置）\"。这个判定已送多模型审查（要 6 份意见），审完我再正式出判定词。\n\n**Michael 单独的结果**\n- 能配上的时次 37 个。其中 8 个用红外眼拟合定中心；有侦察机中心可对照的 6 次里，两者中心相差 8–40 km。\n- 判据 B 单独看是过的：眼墙半径变化中位数 0.105。\n- 判据 C 没过：同时刻比错开 ±12 小时更像的时次只占 53%，差值中位数 +0.004。\n- 模拟和观测的中心相距中位 67 km。冷云面积模拟同样偏小：内核约 0.65（观测约 0.99），雨带约 0.14（观测约 0.34）。\n\n**两台风合并（Michael 出结果前已写定读法）**\n- **判据 A 成立**：算子测试按等温廓线的新读法过；配对 71 个时次，来自 2 个台风。\n- **判据 B 没过**：眼墙半径相对变化中位数 0.174，超过 0.15。问题只出在没有眼的时次：内核整片是冷云时，\"最冷环\"找不到确定位置。有眼的时次两台风都稳定，约 0.08。\n- **判据 C 没过**：68 对里只有 47% 是同时刻更像，差值中位数 −0.008，模拟分不出对的时刻。换 Delta 的另一组模拟（P48）和 Michael 合并，结果相同。\n- 可能的原因（只作描述，没做区分实验，不归因）：两个台风的模拟冷云面积都只有观测的约一半。用 220 K 这个固定阈值时，FSS 主要反映面积差，而不是结构位置。\n\n## 结论\n- **验收清单**（11-14 已交）：D0 作业号 CRC 1751220。CRTM 编通，算子测试差 0.445 K。全量推算 4.6 核·时，在 60 以内。\n- **实际用量**：累计约 22.7 核·时，在 60 以内，0 SU。\n- **判定词（待）**：拟判\"放弃（限本配置）\"。适用范围仅限 CRTM v2.3.0、ABI 第 13 通道、220 K 阈值与 33 km 邻域、R23.3 的 9/3 km WDM6 后报、Delta 2020 和 Michael 2018。\n- **偏离 Liang Hu 要求**：算子测试的参照，从\"官方参考亮温\"改成了\"等温廓线\"，因为前者拿不到。\n - 你认可这个改法，结论就是\"放弃（限本配置）\"。\n - 你不认可，结论就是\"不判\"。\n- **下一步**：审查意见回来后我写裁决，再定判定词，并写放弃页（原因、缺什么、什么情况下值得重试）。在 11-20 期限内。\n\n\n\n\n（附件：EXPERIMENT_CARD_D2.md）\n\n（附件：d2_combined_Delta_Michael.json）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 17:28",
+      "text": "【审查结果】L26.20 快试判定：按方案 §2（11-13 写定）与跑前写定的操作定义（D2 卡、D1_Michael 卡 §6），\"WRF 模拟 ABI ch13 亮温 vs GOES-16 观测亮温的结构检验\"在本配置（CRTM v2.3.0、BT<220 K、33 km FSS 邻域、R23.3 9/3 km WDM6 后报、Delta 2020 + Michael 2018）上应判\"放弃（限本配置）\"——A 成立（A① 用等温解析参照代替无法获得的官方参考值，偏离待 PI 确认；A② 71 配对/2 台风），B 不过（合并 r_ew 相对变化中位 0.174>0.15，只在无眼时次失败），C 不过（合并满足比例 0.47、差中位 −0.008）。请审：判定是否成立、操作定义/代码是否有会翻转 B 或 C 结论的错误（如中心取法、FSS 实现、±12 h 对照）、失败原因表述是否越界。\n6 位审稿人的意见已收齐（6/6 份有效）。请逐条核实依据后裁决：分\"必须改\"和\"仅供参考\"，回应每一条站得住的反对，保留未采纳的异议；需要 Liang Hu 定的升级给 Liang Hu。\n\n### 审稿人 E · Gemini\n## 实际作答模型：gemini-4-argon-high（gemini）\n\n## 结论\n\n**有保留地支持**。\n\n支持在本快试限定配置（CRTM v2.3.0、GOES-16 ABI ch13 10.3 μm、BT<220 K 阈值、33 km FSS 邻域、R23.3 9/3 km WDM6 后报、Delta 2020 + Michael 2018）下判**「放弃（限本配置）」**（若 PI 不确认 A① 等温解析参照替代原方案的算子自带参考值，则按原方案 §2 判**「不判」**）。经逐行核对代码与复算结果表，不存在会翻转总判定词的代码或操作定义错误（即使判据 B 改按各扰动类型分别取中位数、按四方向中心扰动均值或仅在有眼时次评估而转为通过，判据 C 在全部台风、双臂、主/备有效半径及各种 ±12 h 聚合方式下均不通过，按方案 §2「B 不成立或 C 不成立」仍判「放弃（限本配置）」）。保留意见在于：C 的失败原因有一处越界的主次归因表述、两处描述性统计子集口径错位，以及两台风合并读法的补充时点与比值定义式需在结论正文中补齐说明（见 MUST-FIX 1–3）。\n\n---\n\n## 必须改（MUST-FIX）\n\n1. **[MUST-FIX 1 · 失败原因归因越界（违反固定核对项 1）]**\n - **位置**：[EXPERIMENT_CARD_D2.md]([local path omitted] 第 37 行。\n - **问题**：该段标题写明「失败原因拆开（描述，未做区分实验，不归因）」，但末尾写为「**绝对阈值下 FSS 主要反映面积偏差而非位置结构**」。本快试未做去面积偏差的区分实验（如 Roberts & Lean 2008 的等分位数阈值 FSS 对照），在无区分实验支撑下断言「主要反映面积偏差而非位置结构」属于未经检验的主次归因，且与同文件第 24 行（[EXPERIMENT_CARD_D2.md]([local path omitted]\n - **修改要求**：删去「主要反映面积偏差而非位置结构」的主次归因措辞，退回第 24 行的描述口径（仅陈述模拟与观测的冷云面积比例差异，以及 FSS 对面积偏差敏感、未做等分位阈值区分实验故不下主次归因）。\n\n2. **[MUST-FIX 2 · 描述性统计的子集说明与数值错位（固定核对项 2）]**\n - **位置**：[EXPERIMENT_CARD_D2.md]([local path omitted] 第 21 行、[#L24]([local path omitted] 第 24 行；对照 [table_Delta2020.csv]([local path omitted]\n - **问题**：\n 1. 第 24 行写「前 16 个时次（**只能和 +12 h 比**，后面的观测冷云较少、反而更像偏小的模拟）差中位数 −0.072/−0.039，后 18 个 +0.050/+0.030」。复算 [table_Delta2020.csv]([local path omitted] 可知：−0.072（`−0.0717`）与 −0.039（`−0.0387`）确为前 16 个配对时次（`2020-10-08_13` 至 `2020-10-09_04`）的中位数，但其中**只有前 12 个时次（`10-08_13` 至 `10-09_00`）无 `−12 h` 对照、只能和 `+12 h` 比**；第 13–16 个时次（`10-09_01` 至 `10-09_04`，見第 14–17 行）同时具有 `fss_-12` 与 `fss_+12`（只是 `fss_+12 > fss_-12` 被取为 `fss_lagmax`）。\n 2. 第 21 行写「无眼时次（多为 VDM 中心、内核被 <220 K 冷云盖满，f_core 中位 0.997）」。复算 [table_Delta2020.csv]([local path omitted] 可知：`0.997`（`0.9966`）是 Delta **全部 34 个配对时次**的 `obs_f_core` 中位数（与第 24 行一致），而 26 个**无眼时次**（`obs_eye == False`）的 `obs_f_core` 中位数为 `0.9997`（四舍五入为 `1.000`，其中 13 个时次恰为 `1.0`）。\n - **修改要求**：将第 24 行括号修正为「前 12 个无 −12 h 对照、第 13–16 个同时有 ±12 h 但 +12 h 较高」；将第 21 行无眼时次 `f_core` 中位数修正为 `1.000`（或注明 `0.997` 为全样本 34 时次中位数）。\n\n3. **[MUST-FIX 3 · 比值定义式、两台风合并读法补充时点及判据 B 并列读法披露（固定核对项 2、3）]**\n - **位置**：[EXPERIMENT_CARD_D2.md]([local path omitted] 第 12、34–36 行；[EXPERIMENT_CARD_D1_Michael.md]([local path omitted] 第 6 行；[L26.模拟亮温结构检验.md]([local path omitted] 第 43 行。\n - **问题**：\n 1. **比值定义式未在文档写出**：`r_ew 相对变化` 在代码 [d2_metrics.py]([local path omitted] 第 172 行定义为 $|r_{\\text{ew,pert}} - r_{\\text{ew,base}}| / r_{\\text{ew,base}}$（以未扰动基线为分母），但方案与实验卡正文均未写出该算式（固定核对项 2 要求「比值类量先给定义式」）。\n 2. **合并读法的补充时间点与 B 的读法敏感性**：[L26.20_00_启动方案.md]([local path omitted] §2（11-13）未规定多台风如何合并；两台风合并读法于 `2026-11-15 13:2017:10`）前，但**在 Delta D2 结果（`2026-11-14 21:25`）已知之后**。对判据 B，不同合理读法结论不同：① 主读法（每时次 7 种扰动取最大、两台风 71 时次合并取中位数）`r_ew_rel = 0.174 > 0.15` 不过（排序第 35 位为 `0.140`、第 36 位中位数为 `0.174`，仅差 1 个时次过线）；② 分台风看，Delta 不过（`0.254`）、**Michael 单台风通过（`0.105 ≤ 0.15`）**；③ 按扰动类型分别取中位数（合并后四方向中心扰动中位数 `0.000–0.057`，或每时次四方向中心扰动先取均值再取中位数 `0.070 ≤ 0.15`）或仅在有眼时次（`n=22`，合并中位数 `0.077 ≤ 0.15`）评估，**B 均通过**。\n - **修改要求**：在结论摘要与实验卡中：① 补写 定义式；② 明确标注两台风合并读法补定于 `11-15 13:20`（Delta D2 后、Michael 出数前），并将 B 的上述并列读法（Michael 单台风过、按扰动类型分别计/有眼时次计过）与主读法并列写出，同时说明因 C 在所有读法下均不成立，B 的读法差异不改变「放弃（限本配置）」的总判定；③ 保留 A① 偏离未被 PI 确认时改判「不判」的并列分支。\n\n---\n\n## 仅供参考（NOTE）\n\n1. **一阶傅里叶不对称相位的符号方向（不影响 B 与 C）**\n - **位置**：[d2_metrics.py]([local path omitted] 第 77–78 行。\n - **说明**：代码计算 `z = 2 * np.mean(wa * np.exp(-1j * thc))` 后取 `np.degrees(np.angle(z)) % 360`，注释写为 `direction (from north, clockwise) of max coldcdiff(a, b)`（第 161 行）满足 `cdiff(360-a, 360-b) == cdiff(a, b)`，且判据 C 不使用相位，该符号反转对 B、C 判定结果零影响，仅影响 中描述性相位列的绝对角度定义。\n\n2. **判据 B 中 `valid80` 扰动在现有网格内恒为无操作（不影响 B 与 C）**\n - **位置**：[d2_metrics.py]([local path omitted] 第 45–47 行；[summary_Delta2020.json]([local path omitted]\n - **说明**：`polar(cj, ci)` 仅对 WRF d02 域内格点生成坐标，而 GOES-16 CMIPC 在域内无缺测（`ok = np.isfinite(tv)` 全为 `True`），超出 d02 边界的 400 km 圆扇区未计入分母 `tot`，故 `good == tot` 恒成立，`valid80` 在全部 71 个时次上的变化均为 `0.0`。由于主读法对 7 种扰动取最大值，即便将出界扇区计入 `tot`，`max_r_ew_rel` 只会不变或更大，不会使 B 翻转为通过。\n\n3. **`r_ew` 最小搜索半径与 `obs_eye_center` 迭代退回 VDM 的现象（不翻转 B 或 C）**\n - **位置**：[d2_metrics.py]([local path omitted] 第 54–56 行、[#L88-L111]([local path omitted] 第 88–111 行。\n - **说明**：\n 1. 径向分箱 `rc` 从 `1.5 km`（`0–3 km`）开始搜索 `Tbar(r)` 最小值，而 `0–3 km` 仅含中心附近 1–4 个格点，未受 36 方位平均平滑，无眼密蔽云区时极易因单格点冷噪声落入 `r_ew = 1.5 km`（Delta 8 次、Michael 3 次），导致中心平移 1 格（3 km）时相对变化 $|p - 1.5|/1.5$ 高达数倍至 28 倍。\n 2. `obs_eye_center` 在 Delta 仅拟合出 6 次 `IR_eye_fit`、在 Michael 仅拟合出 8 次，但最终 中 `obs_eye == True` 在 Delta 有 8 次、Michael 有 14 次（即 Delta 有 2 次、Michael 有 6 次因初猜或圆拟合移动超阈值退回 VDM 中心，而在 VDM 中心处实际满足 §1.2「有眼」判据）。反之，Delta `2020-10-10_07`（登陆后）`IR_eye_fit` 误锁到距模拟中心 167.6 km 的云团；复算表明，若剔除 `2020-10-10_07`，合并 B 的 `r_ew_rel` 中位数为 `0.157 > 0.15`，合并 C 为 `n=67, frac=0.463, med=-0.0095`，B 与 C 结论均不翻转。\n\n4. **备选有效半径（`alt`）及部分纯描述项的文档与代码对应关系**\n - **位置**：[prep_wrf.py]([local path omitted] 第 4、13 行 vs [L26.20_00_启动方案.md]([local path omitted] 第 65 行、[L26.模拟亮温结构检验.md]([local path omitted] 第 26 行。\n - **说明**：方案 §3 与项目页参数表写并列有效半径为「所编 CRTM 版本的默认值 / 算子默认（并列）」，而 CRTM 要求有效半径作为显式输入，[prep_wrf.py]([local path omitted] 实际传入的是经验假设值 （代码注释已标 `assumption, sensitivity only`）。此外，方案 §1.2 提及的「只描述、不进判据」项（Zhang, Zou & Tan 2023 的 12 方位最冷点 `r_ew` 并列读法、相对各自 6 h 移动方向的不对称相位）未在 中实现输出。以上均属描述列，不影响 §2 任何判据。\n\n---\n\n## 我核对过的\n\n### 固定核对项逐条回答\n1. **「通过」与归因用词**：\n - **限定范围**：已核对 [EXPERIMENT_CARD_D2.md]([local path omitted] 第 36 行与审查问题表述，结论已严格限定到本算子版本（CRTM v2.3.0）、本通道（ABI ch13 10.3 μm）、本指标配置（BT<220 K、33 km FSS 邻域）、本模式配置（R23.3 9/3 km WDM6 后报）与本样本（Delta 2020 + Michael 2018）。\n - **归因用词**：核对发现 [EXPERIMENT_CARD_D2.md]([local path omitted] 第 37 行末尾「绝对阈值下 FSS 主要反映面积偏差而非位置结构」属于未经区分实验的主次归因，已列入 **MUST-FIX 1**；其余归因（如第 20 行 `f_bandr_ew`）均有分层复算数据直接支撑。\n - **判据是否事后改动**：\n - 方案 §2 主判据（[L26.20_00_启动方案.md]([local path omitted] 11-13 写定后未改。\n - A① 因 CRTM v2.3.0 自带测试不输出参考亮温、v2.4 UCAR FTP 失效，在 D0 提交前（11-14）改为等温廓线解析参照（`max|BT−290 K| = 0.445 K ≤ 0.5 K`），已在 [EXPERIMENT_CARD_D0.md]([local path omitted] 与 [EXPERIMENT_CARD_D2.md]([local path omitted] 标注偏离待 PI 确认并并列原读法（「无法判定 → 不判」）。\n - D1 完成判据（「全部无 NaN」）因 Delta 初始时刻 `2020-10-08_12` 南边界高地形 `ch08` 有 6/9 个 NaN 格点，在 [EXPERIMENT_CARD_D1.md]([local path omitted] 标注「事后补定 11-14 20:50：结构分析不用初始时刻」并并列原判据读法。\n\n2. **数字是否程序化生成**：\n - 使用 Python 对 [summary_Delta2020.json]([local path omitted] 与 [d2_combined_alt_P48.json]([local path omitted] 进行了全量逐项复算：\n - **A②**：Delta 配对 34 时次（IR 眼拟合 6、VDM 28、无中心 14），Michael 配对 37 时次（IR 眼拟合 8、VDM 29、无中心 11），合计 `71 ≥ 12`、台风数 `2 ≥ 2`，全部匹配。\n - **B**：Delta 主读法中位数 `r_ew_rel = 0.2540`（有眼 8 次 `0.0821`、无眼 26 次 `0.7778`）、`f_core = 0.0036`、`f_band = 0.0838`、`ph_ring = 6.35°`（`n=20`）、`ph_band = 7.60°`；Michael 主读法中位数 `r_ew_rel = 0.1053`（有眼 14 次 `0.0770`、无眼 23 次 `0.3111`）、`f_core = 0.0106`、`f_band = 0.0870`、`ph_ring = 14.07°`（`n=23`）、`ph_band = 13.54°`；两台风合并（`n=71`）`r_ew_rel = 0.1739`、`f_core = 0.0071`、`f_band = 0.0857`、`ph_ring = 7.26°`、`ph_band = 11.33°`，与实验卡完全一致。\n - **C**：Delta（`n=34`）G48 主，P48 主 `0.4118, -0.0139`，G48 备 `0.4118, -0.0218`，P48 备 `0.5000, -0.0060`；Michael（`n=34`，37 个配对时次中有 3 个时次 `2018-10-08_14`、`10-08_19`、`10-10_07` 的 `±12 h` 均无有效观测中心故不入 C）主，备；合并主读法（G48+Michael，`n=68`），并列（P48+Michael，`n=68`）`frac = 0.4706, med = -0.0040`，与实验卡完全一致。\n - **算式与比值定义式**：D0 核时推算算式已在 [EXPERIMENT_CARD_D0.md]([local path omitted] 写出；FSS 定义式已在方案 §1.2 写出；但 `r_ew 相对变化` 的定义式仅在代码中体现而未写入文档正文，且 [EXPERIMENT_CARD_D2.md]([local path omitted] 有两处描述性子集说明错位，已列入 **MUST-FIX 2、3**。\n\n3. **判定词有无操作定义与脚本逐行核对**：\n - 「值得用（限本配置）」「放弃（限本配置）」「不判」「有眼」等判定词在开跑前（11-13 [L26.20_00_启动方案.md]([local path omitted] §1.2、§2）均有明确操作定义；代码级操作定义于跑前写入 [EXPERIMENT_CARD_D2.md]([local path omitted] §5；两台风合并规则于 `11-15 13:20`（Delta D2 后、Michael 出数前）写入 [EXPERIMENT_CARD_D1_Michael.md]([local path omitted] §6（需按 **MUST-FIX 3** 显式披露时点与 B 的并列读法）。\n - 已逐行读过全部本地脚本与代码（核对 sha256 全部与实验卡一致）：[d2_metrics.py]([local path omitted] 行）、[combine_B_C.py]([local path omitted] 行）、[prep_wrf.py]([local path omitted] 行）、[simbt.f90]([local path omitted] 行）、[goes_remap.py]([local path omitted] 行）、[goes_remap_v2.py]([local path omitted] 行）、[make_isotest.py]([local path omitted] 行）、[grid_bt.py]([local path omitted] 行）、[read_bt.py]([local path omitted] 行）及作业脚本 、。\n\n---\n\n## 我没能核对的\n\n1. **CRC 集群端原始与中间大文件**：受只读沙箱且不连集群限制，未能直接读取 CRC 下的 CRTM v2.3.0 补丁后源码与二进制系数包、GOES-16 原始 NetCDF 与重采样 `.npz`、模拟亮温 `.npz`、NHC VDM 原始报文文本、作业日志以及 下的 `wrfout_d02_*` 原始文件。\n2. **R23.3 结构闸 SLP 脚本的一致性**：[EXPERIMENT_CARD_D2.md]([local path omitted] 第 8 行注明模拟中心 SLP 订正公式未与 R23.3 脚本逐行对照（证据不足）。\n3. **未导出的上游委托原话**：[rc_review_appendix_20261115_171230.md]([local path omitted] 说明中未导出的 `` 对话记录（其余未导出的 8 个编号 ``…`` 经核实为本地 8 个代码/结果文件的 sha256 前缀，已直接读取原文件并核验哈希一致）。\n\n---\n\n## 结论\n\n**有保留地支持** L26.20 在本配置（CRTM v2.3.0、GOES-16 ABI ch13 10.3 μm、BT<220 K 阈值与 33 km FSS 邻域、R23.3 9/3 km WDM6 后报、Delta 2020 + Michael 2018）下判**「放弃（限本配置）」**（若 PI 不认可 A① 等温解析参照替代原判据，则判**「不判」**）。代码实现与操作定义无会翻转总判定词的错误（判据 C 在全部台风、双臂、主/备有效半径及各种 ±12 h 对照取法下均不通过），但在正式出结论前须完成 3 项修改：① 删去 [EXPERIMENT_CARD_D2.md]([local path omitted] 第 37 行未经区分实验的「绝对阈值下 FSS 主要反映面积偏差而非位置结构」主次归因表述，退回第 24 行的非归因口径；② 修正 [EXPERIMENT_CARD_D2.md]([local path omitted] 第 21 行（无眼时次 `obs_f_core` 中位数实为 `1.000`，`0.997` 为全样本 34 时次中位数）与第 24 行（前 16 个时次中仅前 12 个无 `−12 h` 对照，第 13–16 个同时有 `±12 h` 对照）的子集表述；③ 在正文中补写 `r_ew 相对变化11-15 13:20`），并并列给出判据 B 在分台风（Michael 单台风过）、按扰动类型分别取中位数及有眼时次子集下可通过的读法（同时注明因 C 恒不过故不改变总判定词）。\n\n### 审稿人 A · GPT-6\n## 实际作答模型：gpt-6-astra（codex）\n\n## 结论\n\n**有保留地支持。**现有结果支持“按 D2 卡及 D1_Michael 卡 §6 的实际读法，B、C 均不过”；但**尚不能无条件认定“按原方案 A 成立，因此放弃”**。A① 替代判据仍待确认，失败原因文字也有明确错误和越界。\n\n未发现已能证明会翻转 B 或 C 的错误；这不等于已经证明修正实现细节后结论不变，后者**证据不足**。\n\n以下路径均相对于； 代表其中的。\n\n## 必须改（MUST-FIX）\n\n1. **“A 成立”必须保留条件，不能作为原方案已经通过。** \n 原方案要求“算子自带晴空测试廓线复算参考亮温”；D0 实际改为等温廓线与 290 K 比较，卡内明确写了“偏离待 Liang Hu 确认”“原读法无法判定”。两种验证不能直接等同。现阶段只能写条件性拟判；坚持原读法时，A① 尚未得到验证，不能据此定案“放弃”。 \n **位置：**。\n\n2. **“失败只在无眼时次”超出了分组中位数能够支持的结论。** \n 有明确反例：Delta `2020-10-08_18` 的 `obs_eye=True`，最大半径相对变化为 **0.2069**；Michael `2018-10-09_18` 同样有眼，变化为 **0.5217**。两者均超过 0.15。可以陈述“有眼组中位数达标、无眼组中位数不达标”，不能写成逐时次的排他性结论。另外，代码始终定义并返回最冷径向箱；“无眼时最冷环位置无定义”也混淆了计算定义与眼墙物理解释。 \n **位置：**；、；、。\n\n3. **失败原因段落存在错误事实与未经支持的归因。** \n - “前 16 个时次只能和 +12 h 比”不符合结果表。例如 Delta `2020-10-09_01` 已同时具有 −12 h、+12 h 两项 FSS。\n - “至少部分来自模拟冷云面积偏小”“FSS 主要反映面积偏差而非位置结构”已经是归因判断；前置“未做区分实验、不归因”不能消除这层含义。现有材料只证明冷云覆盖偏小与 C 不过同时出现，不能证明贡献大小。\n - D0 的“不是算子错误”同样强于其展示的验证证据。 \n **位置：**。\n\n4. **应明确实际扰动尺度和写定时点，不能笼统称原判据未改。** \n 原方案 B 写“中心 ±1 像元（约 2 km）”；代码是在 **3 km WRF 网格**上移动一格。D2 卡写出了“一格”，但未明确交代这与原方案物理尺度的差异。两台风合并读法则是在 **Delta 结果已知、Michael 结果未知**时写定，不能统称为全部结果产生前预注册。是否采用 2 km 会翻转 B，**证据不足**。 \n **位置：**；。\n\n5. **固定核对项②尚未全部闭合：不能声称所有报告数字均已独立程序化核实。** \n 主 B/C 数字有明确生成代码和结果文件；但 D0 的测试原始输出、D1 的域内占比输出\n\n…（本条中间省略 8943 字符）…\n\n无异常；合并中位数复算为 r_ew=0.1739130435、f_core=0.0071326676、f_band=0.0856695440、相位 7.25675°/11.32682°，与 d2_combined_Delta_Michael.json:2-15 完全一致。有眼组中位数 Delta 0.08210、Michael 0.07704；无眼组分别 0.77778、0.31111。\n- C 全部判定数：逐行核对 `fss_diff=fss_same−max(fss_±12)` 无异常；主读法合并为 32/68=0.470588、差中位 −0.00759302，P48 并列为 32/68、−0.00402104。Delta 两臂和 Michael 的主、备有效半径读法均未达到\"比例≥2/3 且中位差≥0.05\"。\n- 数字生成链与阈值：:172-185、197-202、223-235 和 :8-19 中的相对变化定义、FSS 公式、±12 h 取较高者、0.15/0.10/45°、2/3/0.05 均与卡面一致；卡片哈希前缀与现存 d2_metrics.py、combine_B_C.py、summary、table、B_perturb 文件全部相符。本判定没有区间下界需要另核。\n- 事后定义：D1 的初始时刻弃用确为事后补定并注明时间，但剔除后仍有 71 配对，未造成 A② 或 B/C 结论依赖该时次；Michael 合并规则的时序如上列 NOTE。\n\n## 我没能核对的\n- 本机证据包没有 CRC 上的原始 WRF、GOES、模拟亮温 NPZ 和作业日志，因此不能从原始场独立重算 FSS，也不能量化上述零填充邻域问题对 C 的影响；该影响为证据不足。\n- R23.3 的实际中心脚本未列入证据，无法核实模拟 SLP 最低点是否与其一致。\n- CRTM 官方参考亮温及 PI 对 A① 替代读法的最终确认均未提供；只能确认偏离已披露，不能视为已获批准。\n\n## 结论\n可交给委托方：在 PI 接受 A① 替代读法的前提下，\"放弃（限本配置）\"判定成立，B 的独立失败已足够；C 数字虽复算一致，但需保留其零填充邻域与\"缺测不计\"定义不一致的问题，\"FSS 主要反映面积偏差\"的归因不得保留为已证实结论。若 PI 不接受 A①，则应按方案判\"不判\"。\n\n### 审稿人 C · DeepSeek\n## 实际作答模型：deepseek-flash（deepseek）\n\n我会加载审查技能并阅读证据文件。\n\n## 结论\n有保留地支持：在冻结的 C 读法下，\"放弃（限本配置）\"站得住（C 在两臂、两台风、换一种 ±12 h 聚合都不过，且余量很大）；但\"B 不过\"这一条按方案 §2 原文读法站不住（三种扰动族各自的中位数都远在阈内），并且卡与线况表里两句失败原因表述与数据不符、或越界归因。判定词本身不受影响（C 独立支持\"放弃\"），A 的部分仍取决于 Liang Hu 对 A① 改读法的确认。\n\n## 必须改（MUST-FIX）\n- **B 的\"不过\"是聚合约定的产物，不是 §2 原文的结论** — 依据：方案 写的是\"在三种扰动下的变化…满足：r_ew 相对变化中位数 ≤0.15\"； 换成\"每时次取 7 种中的最大变化，再对时次取中位数\"。按原文的逐类读法，从 、 的 per_type_median 复算：Delta 各类 r_ew 0.0–0.0648、Michael 0.0–0.0571；两台风合并后逐类中位 c+y 0.0444、c−y 0.0571、c+x 0、c−x 0.0513、thr215/thr225/valid80 均 0，把 7×71 个变化值一起去中位数得 0.0。只有\"每时次取 7 种最大再取中位\"才得 0.1739。若不改的后果：判定记录把\"观测侧取法不稳\"写成既成事实交给 PI/R23.3，而按冻结文本 B 是过的；应写明 B 结论依赖聚合约定并列出逐类数值（这不是事后改判据——max-of-7 是 11-14 21:08 跑前写定——但方案 §0 要求\"要改记决策\"，此处只当成了\"落到代码的操作定义\"）。\n- **C 的失败原因存在无区分实验的越界归因** — 依据：`EXPERIMENT_CARD_D2.md:37`\"绝对阈值下 FSS 主要反映面积偏差而非位置结构\"与自己 、 的 center_sep_km）；`EXPERIMENT_CARD_D1.md:4` 自记未做视差订正、云顶 ~15 km、天顶角 30–40° 时位移约 10 km；以及 diff 的时间结构（我从 G48 main 复算：前 16 时次差中位 −0.0717、后 18 时次 +0.0504，与卡 `:24` 一致，说明失败有明显时间相位成分，不是单纯面积）。若不改的后果：这句会被 R23.3 当成\"C 为什么失败\"的诊断，直接指向错误的修补方向。\n- **\"B 的失败只在无眼时次\"不成立** — 依据： + （obs_eye）：有眼时次中 Delta 2020-10-08_18 的 max_r_ew_rel=0.207（r_ew 43.5 km，中心距 25.2 km）、2020-10-10_07=0.96；：2018-10-09_18 = 0.522。22 个有眼时次里 3 个单次超过 0.15（无眼为 49 个时次中 33 个超阈）。若不改的后果：这句话已写进，会作为失败机理被引用；应写成\"以中位计失败由无眼时次驱动（有眼中位 0.082/0.077），但有眼时次中 3/22 单次超过 0.15，其中 1 个是卡 `:19` 已认定为误判的时次\"。\n\n## 仅供参考（NOTE）\n- **B 的失败余量只有一个时次** — 合并中位 0.1739 是 71 个值的第 36 个，而恰好 36 个值 >0.15；去掉卡 `:19` 自记的误判时次 10-10_07（该值 0.96）后 n=70、中位 0.1567，仍 >0.15，但余量只剩 4.5%。建议在判定句旁写明\"1 个时次量级的余量\"，否则 0.174>0.15 会被读成有余量的失败。\n- **A① 的替换读法** — 方案 `:49` 要求\"用算子自带晴空测试廓线复算参考亮温\"；D0 用的是自造等温廓线比 290 K，而 0.445 K 中约 0.4 K 是卡 `EXPERIMENT_CARD_D0.md:24` 自认的物理发射率效应，即该测试的真实误差异常余量只有 0.055 K，且它检验的是辐射一致性而非与官方参考值的一致。claim 句里已带\"偏离待 PI 确认\"，故只列为 NOTE；但判定词不能在任何后续版本里丢掉这个条件（不认可 → 不判，见 `EXPERIMENT_CARD_D2.md:36`）。\n- **两台风划分的时间戳成立** — 附录 #516（13:18）与 mtime 17:06 也早于 Michael D2 作业。合并读法本身在 Delta 已知 B、C 均不过之后写定，这一点应在记录里点明（虽不影响结论）。\n- **C 的稳健性比卡里写的更强** — 我把 ±12 h 的\"取较高者\"换成两者平均重算：Delta 满足比例 0.529、差中位 0.0334；Michael 0.588、0.0187，两臂两台风仍不过（阈 0.667 / 0.05）。建议把这条写进判定证据，因为 C 是判定词唯一真正挂靠的那一条。\n- **B 的相对变化定义式只在代码里** — 是 |p−base|[local path omitted]，卡 `:12` 只写\"相对变化\"。另有 8 个 Delta 时次基准 r_ew 落在第一个极坐标箱（1.5 km），相对变化可达 28 倍（ 最大值 28.0）；卡 `:21` 提到\"可达数倍\"，但没说明这使\"相对变化\"在该子集上是退化量。\n- **±12 h 对照有 1/3 是单边的** — 从 复算：12 个时次只有 +12 h、12 个只有 −12 h、10 个两者都有。卡 `:24` 的\"前 16 个时次（只能和 +12 h 比）\"不准确（10-09_01…04 两个 lag 都有），\"前 16/后 18\"的中位数 −0.0717/+0.0504 本身复算一致。\n- **视差与 B 的扰动尺度** — 未做视差订正约 10 km，是 B 的中心扰动（±1 格 = 3 km）的 3 倍；卡里只作描述，但应在\"观测侧结构量\"的局限里明写，因为它同样会进入 r_ew 与 FSS。\n- **FSS 邻域 33 km 与方案 30 km 的差异** — NFSS=11、DX=3 → 33 km，卡 `:13` 已注明\"最接近 30 km 的奇数窗\"，属披露充分。\n- **方案 §1.2 要求的\"另报相对各自 6 h 移动方向\"的相位没有实现** — `d2_metrics.py:78` 只给相对正北的相位（且在 Lambert 网格上以 j 轴当正北，有约 1–6° 的收敛角偏差）。只描述项，不影响判定。\n- **D1 完成判据是事后放宽的** — `EXPERIMENT_CARD_D1.md:10` 自己写明\"事后补定 11-14 20:50\"才把\"全部无 NaN\"放宽为\"初始时刻除外\"。披露充分、且缺值在距眼 >600 km 的 ch08，但不该在别处被表述为\"D1 达标\"。\n- **判定词的配置串应写 Michael 的单臂 runs** — `:36R233_L2618_Michael_WRF_v1` 的 GFS 单臂，Delta 才是两臂；\"限本配置\"里点明这一点更可复现。\n\n## 我核对过的\n- **固定项 1（判定词/归因）**：值得用/放弃/不判三个词在方案 `:47–53EXPERIMENT_CARD_D2.md:36` 一致；B/C 的通过/不过均按写定读法判，未发现事后改阈值（max-of-7 是 11-14 21:08 跑前写定）。但失败原因有两处越界（见 MUST-FIX 2、3）。\n- **固定项 2（数字程序化）**：全部复算一致——配对 34+37=71；观测中心来源 6/28/14 与 8/29/11；B 合并 r_ew 0.17391、f_core 0.00713、f_band 0.08567、相位 7.26°/11.33°；C 合并 n=68、满足比例 0.47059、差中位 −0.00759；Delta 单臂 0.4118/−0.0170（P48 0.4118/−0.0139）、Michael 0.5294/+0.0041；有眼/无眼拆分 Delta 8/0.0821 对 26/0.7778、Michael 14/0.0770 对 23/0.3111；冷云面积 sim/obs 0.568/0.9966（内核）、0.131/0.366（带）、0.6545/0.9872、0.1351/0.3403；中心距中位 36.96/67.08 km；VDM 距离 8.7/13.6/14.9 km 与 8.0–39.8（中位 15.6）km；模拟最低气压 Delta 957.8–984.7、Michael 945.9–983.5 hPa。所有卡里的 sha256 前缀与本地副本逐一对上（d2_metrics.py 、combine_B_C.py 、prep_wrf.py 、simbt.f90 、goes_remap.py/`_v2` 95300495/、d2_job*.sh、B_perturb/summary/table 六件、d2_combined）。\n- **固定项 3（脚本逐行）**： 245 行全读。中心：模拟侧 d02 内距边 10 格最低 SLP（HGT 递减订正，`:28–30`）；观测侧最大 <220 K 连通云团质心→9 km 平滑最暖点初猜→0.5–1.5 r_ew 冷环圆拟合（>50 km 拒绝），最后用 §1.2 有眼门控，否则 ±1 h 最近 VDM（`:88–111, 143–149`）。FSS：11×11 uniform_filter、`v` 掩膜、0–400 km 圆、（`:190–202`），两场各按自身中心取框，圆心落域内、分析圈不受边界稀释。±12 h：`fss_same − max(fss_{−12}, fss_{+12})`，严格 `>0`、中位 `≥0.05`（`:223–234`）。B：7 种扰动逐时取 nanmax 再取中位、相位仅在基准振幅 ≥0.1 时算、环与带都须 ≤45°（`:164–187`）。合并脚本 `combine_B_C.py:13–19`）；未发现会翻转 C 的实现错误。\n- ：水凝物 kg/m² = q·dp/g、reff 只在有水处非零、xland>1.5 判水面，扩展层 6 层、总 55 层，与卡一致。\n- ：只取 ch8/ch13、CRTM_Forward、BT 直接输出；海面覆盖率按 wfrac，Land_Type=1。\n- ：PUG 正投影反算（phc/rc/sx/sy/sz→x,y）正确；DQF>1 置缺；最近邻到 WRF 网格。地角定位的正确性还有独立旁证：红外眼拟合中心与 VDM 相距 8–40 km。\n- 作业脚本 、：臂名、reff main/alt、49 时次×2 的 98 场、退出码文件与卡一致。\n\n## 我没能核对的\n- **A① 的 0.445 K**：本机只有，没有 D0 的算子输出（CRTM 源包已删、d0 产物只在 CRC）；这个数只能按卡 D0 `:24` 的逐项值接受，不能独立复算。\n- **两臂/两台风 wrfout 的 3 km、49 层、WDM6**：只在 CRC，本轮不连 SSH，无法直接读头信息；Michael 的\"与 Delta G48 同配置\"依据的是实验卡与线况表，不是文件。\n- **GOES-16 CMIPC 原始文件与 DQF 处理**：98 帧只在 CRC，本机无原始件，无法复核重采样后的缺测与 DQF 置缺。\n- ** 在 CRC 上是否与本机副本同一份**：本机副本 sha256 与卡里前缀一致，但 CRC 侧未直接比对（只读限制）。\n- **10-10_07 那个误判中心的成因**（为何在该时次无 VDM 可用、拟合落到 168 km 外的云系）：本机无该时次的 GOES 场与日志，只能按卡 `:19` 的记录接受。\n\n### 审稿人 H · Opus（AGY）\n## 实际作答模型：claude-opus-5-5-high（gemini）\n\n## 结论\n**有保留地支持。**\n\n- **C 不过，结论站得住。** 我用表格复算了 Delta（G48_v2 臂）和 Michael：满足比例 14/34=0.41、18/34=0.53，合并 32/68=0.47；差中位数 −0.017、+0.004，合并 −0.008。这些数在每一种读法下都离阈值很远：分台风或合并、G48/P48、主读法或备读法有效半径都一样。我没找到能把 C 翻过来的代码错误。中心取法、FSS 实现和 ±12 h 对照里有几处小问题（见 NOTE），按最大影响算也翻不了。所以按 §2，**单凭 C 不过就够判「放弃」**。\n- **B 不过要加限定。** 它完全取决于 D2 卡跑前写定的「每时次 7 种扰动取最大，再取中位数」这一读法。按逐类扰动分别取中位数（并列读法，已在 summary 里输出），两台风全部在阈内。\n- **判定词必须写成条件式。** A① 是改读法，PI 还没确认；原读法下 A① 无法判定，按 §2 应判「不判」。\n\n## 必须改（MUST-FIX）\n1. **失败原因的措辞越界。**\n - 位置： ⑤-2 第 100 行（与 汇总处同文）。\n - 问题：「绝对阈值下 FSS **主要**反映面积偏差而非位置结构」是没做区分实验的归因。同一行自己写了「不归因」；Delta ⑤ 第 87 行只写到「至少部分…不下归因」。\n - 改法：退回描述，例如「两台风模拟冷云面积均明显偏小；FSS 对面积偏差敏感（Roberts & Lean 2008）；未做区分实验，C 失败与面积偏差的关系不判」。\n2. **B 不过没并列另一种合理读法。**\n - 依据：方案 §2 原文是「三种扰动下的变化…中位数 ≤0.15」，没规定怎么跨扰动聚合。D2 卡第 75 行跑前写定「取最大」，这本身合规。\n - 问题：合并结论（⑤-2 第 97 行，及本委托摘要）只报了取最大读法。按 里的 `per_type_median`，两台风各类扰动都在阈内：\n - Delta：r_ew ≤0.065，f_band ≤0.083，相位 ≤5.9°\n - Michael：r_ew ≤0.057，f_band ≤0.084，相位 ≤13.5°。\n - 补充：取最大读法下，分台风结果是 Michael 单独 0.105（过）、Delta 0.254（不过），合并 0.174（不过）。\n - 改法：结论里写成「B 按跑前写定的取最大读法不过；按逐类中位读法两台风各自在阈内（合并值未算）；判定词不依赖 B（C 单独不过即足以判放弃）」。\n3. **判定词要写成条件式。**\n - 问题：委托摘要写「A 成立」。实际上 A① 是用等温解析参照替代原判据（D0 卡 §5 与 ⑤），属于偏离、待 Liang Hu 确认。\n - 改法：交付的判定句必须同时带上 ⑤-2 第 99 行的另一支：「若不认可 A① 改读法 → 不判」。不能只写「放弃」。\n4. **一处事实性描述有误。**\n - 位置： 第 87 行，「前 16 个时次（只能和 +12 h 比…）」。\n - 复算：前 16 个配对时次里只能和 +12 h 比的是 12 个，另 4 个 ±12 h 都有。差中位数 −0.072 / +0.050 我复算一致，只是括号说明不对。\n - 同句「后面的观测冷云较少、反而更像偏小的模拟」是解释，我没核：**证据不足**，应标成描述或删去。\n\n## 仅供参考（NOTE）\n1. **中心扰动量与方案不一致，且没标偏离。** 方案 §2 写「±1 像元（约 2 km）」；代码 第 165–166 行和 D2 卡第 75 行用的是 ±1 个 WRF 格（3 km），比方案更严。会不会翻 B：证据不足；不影响判定词。\n2. **「有效像元 ≥80% 方位」这一扰动实际没起作用。** 两台风观测缺测都是 0（D1 卡 ⑤），`per_type_median` 里 valid80 各项全为 0。所以「三种扰动」实际只检了两种，应在结论里注明。\n3. **r_ew 相对变化的分母可能很小。**\n - 代码：第 55 行在 0–150 km 内取最冷环，含最内一格 r=1.5 km；第 172 行定义相对变化为 |p−base|[local path omitted]。\n - Delta 有 8 个无眼时次基准 r_ew=1.5 km，挪一格中心，变化就是数倍。这照字面符合 §1.2。\n - 「最冷环位置无定义」（第 100 行）准确说是「最小值落在中心格或噪声里，相对变化分母过小」。\n - 另外，相对变化的定义式只写在代码里，卡里没写出来。\n4. **不对称相位方向是反的。** `asym` 第 77 行用 exp(−iθ)，θ 为正北顺时针；对 wa=A+B·cos(θ−φ)，算出的辐角是 −φ。所以报出的「最大冷云方向」东西镜像。B 用的是相位差，不受影响；但表里描述用的相位列是错的，交给 R23.3 前要改。\n5. **±12 h 对照池漏了初始时刻的观测。**\n - 代码：OBS 只按 `TIMES[1:]` 建（第 19、135–136 行），初始时刻的观测不能当 t−12 用。D1 的决定只是不用冷启动的**模拟**，并没有排除观测。\n - 影响：每台风最多 1 个时次。即便它翻成满足，比例也只有 33/68=0.485，翻不了 C。\n6. **Delta 10-10_07 一次红外拟合认错了云系。** 拟合中心离模拟中心 167.6 km（复算确认），按卡保留。剔除后比例为 32/67=0.478，翻不了。\n7. **模拟中心逐时跳动较大。** 最低 SLP 格点逐时跳动最大约 45 km（Delta、Michael 都有）。SLP 用 PSFC/HGT/T2 订正，也没和 R23.3 结构闸脚本逐行对照（D2 卡第 71 行已自认）。这会给 FSS 加噪声；会不会翻 C：证据不足，但离阈值的差距很大。\n8. **合并读法的写定时间。** 合并读法（D1_Michael §6，11-15 13:20）写在 Delta 结果（11-14 21:25）之后，「Michael 结果出来之前」属实，但不是在所有结果之前。不过 B、C 在分台风或合并任一读法下都不过（B 按取最大读法），所以写定时间不影响结论。\n9. **A① 新读法检得比较窄。**\n - 等温参照只检发射与基尔霍夫一致性，不检气体透过率和云光学。\n - 余量只有 0.055 K。\n - D0 卡 ⑤ 的「符合物理预期，**不是算子错误**」没经检验，是断言。\n10. **其他小问题。**\n - GOES 重投影没做视差订正（ 文档串已注明）。\n - FSS 的 `uniform_filter(mode='constant')` 把出域像元当 0 计入邻域比例（第 199–200 行），只影响边缘。\n - 「内核 1/2–2/3、雨带约 1/3–2/5」是手工从中位数算的（0.57 / 0.66；0.36 / 0.40），能复算但不是程序直接输出。\n\n## 我核对过的\n- **固定项 1（「通过」与归因用词）**\n - 本次没有说「通过」。判定词限定到了本算子、本通道、本阈值与邻域、本后报和这两个台风。\n - 判据：§2 的 11-13 文本没改。操作定义（初始时刻弃用、取最大、33 km 窗、合并读法）都写在卡里，并注明了写定时间。初始时刻弃用标了「事后补定 11-14 20:50」，并列记录了原读法。\n - 不合格：第 100 行「主要反映面积偏差」是归因（见 MUST-FIX 1）。\n- **固定项 2（数字是否程序化生成）**\n - 用 python 只读复算了这些数，全部一致：合并 B 0.174 / 0.007 / 0.086 / 7.3° / 11.3°（n=71）；合并 C 0.47 / −0.008（n=68）；分台风 B 0.254、0.105；有眼/无眼 0.082/0.778、0.077/0.311；中心来源 6/28/14、8/29/11；同时刻 FSS 中位 0.56；中心距中位 37 / 67 km；f_core、f_band 中位数。\n - 的阈值、字段名（max_*、fss_diff、arm、reff=main、限配对时次）逐行读过，和卡一致。\n - 本次判定不涉及区间下界。比值类量里，r_ew 相对变化的定义式只在代码里（NOTE 3）。\n- **固定项 3（判定词有无操作定义）**\n - 「满足（差>0）」「配对」「有眼」「放弃 / 不判」开跑前都有一句定义。A① 偏离已标注并并列原读法。\n - 全文逐行读过：中心、极坐标、有眼、B 的 7 种扰动、FSS 式 (6)–(7)、11 格窗、400 km 圆、±12 h 取较高。\n - 找到的问题：扰动量 3 km 与 2 km 不一致、valid80 扰动没起作用、相位符号、初始观测被排除（见 NOTE）。\n- 同时读了 （最近邻、DQF>1 置缺）和 （有效半径主读法 20/40/400/600/800 μm、卫星天顶角）。\n\n## 我没能核对的\n- `simbt.f90` 没读；CRTM 的单位、通道与系数是否对应也没核。\n- 等温测试与短测的原始日志在集群上，读不到。\n- 卡里自报的写定时间，没用文件时间戳独立验证。\n- R23.3 结构闸的中心脚本、Michael 后报是否真是「9/3 km WDM6 同配置」：读不到集群。\n- 复审附录 和其中引用的对话记录没读。\n- Roberts & Lean 2008 原文页没对照，只按方案转述的公式核了代码。\n- 逐类读法下的两台风合并 B 值：没算（按要求不新增计算）。\n- 中心跳动或视差对 FSS 的具体影响：证据不足。\n\n## 结论\n**有保留地支持**判「放弃（限本配置：CRTM v2.3.0、ABI ch13、BT<220 K、33 km 邻域、R23.3 9/3 km WDM6 后报、Delta 2020 + Michael 2018）」。\n\n- 判定的依据是 **C 不过**：合并满足比例 0.47、差中位数 −0.008。这在每种读法下都成立，我也没发现能翻转它的代码错误。\n- **B 不过**只在跑前写定的「7 种扰动取最大」读法下成立。逐类读法下两台风各自都在阈内，结论应并列写出，并注明判定不依赖 B。\n- 交付前要改三处：\n 1. 删掉「FSS 主要反映面积偏差」这类没经区分实验的归因\n 2. 判定句写成条件式：A① 改读法待 Liang Hu 确认，否则判「不判」\n 3. 更正 Delta「前 16 个时次只能和 +12 h 比」的描述（实际是 12 个）。"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-15 17:28",
+      "text": "审查裁决已记好，正在把结果抄送 R23.3 Lead。偏离 Liang Hu 要求：算子测试改用了等温廓线参照。原定是拿 CRTM 自带测试廓线去对官方参考亮温，但官方参考值拿不到。改法是让大气和地表都为 290 K，看模拟亮温偏离 290 K 多少，实测最大偏差 0.445 K，在 0.5 K 以内。需要你确认。\n\n审查已经完成，6 份意见都有效，都\"有保留地支持\"。判定是条件式的：你认可这个改法，判\"放弃（限本配置）\"；不认可，判\"不判\"。\n\n**判定依据只靠判据 C。** 判据 C 问的是：模拟能不能把同一时刻的观测和错开 ±12 小时的观测分开。Delta 和 Michael 合并 68 对，同时刻更像的只占 47%（要求 ≥2/3），差值中位数 −0.008（要求 ≥0.05）。分台风看、换 Delta 另一组模拟、换另一种有效半径，或者去掉唯一一个分析圈出了模拟区域的时次，全都不过。审稿人没有找到能翻转这个结论的代码错误。\n\n判据 B 过不过取决于读法，不影响判定：按跑前写定的读法（每个时次取 7 种扰动里最大的变化），眼墙半径变化中位数 0.174，没过；按扰动类型分别取中位数就过。两种读法都写进了实验卡。\n\n**审稿人要求必须改的，都已改完：**\n- 删掉了\"FSS 主要反映冷云面积偏差\"这句没做区分实验的归因，改成只并列描述：冷云面积偏小、中心距、视差。\n- \"B 只在无眼时次失败\"改成\"以中位数计由无眼时次驱动\"，并列出有眼时次里 3 个超阈的例子。\n- 更正了两处描述错误：Delta 早期时次的 ±12 h 对照情况、无眼时次冷云比例的中位数。\n- 补写了眼墙半径相对变化的定义式，并注明两台风合并读法是在 Delta 结果出来后、Michael 结果出来前写定的。\n- 披露了几处实现和方案的差异，逐条量化过，都不翻转结论：中心扰动用 3 km 而不是方案的约 2 km；\"有效方位 ≥80%\"这项扰动实际没起作用；描述用的不对称相位方向是镜像的；FSS 出域像元按非事件计入。\n- 有一条异议我保留了：一位审稿人认为方案里\"不判\"的条款没写\"不认可改读法\"这种情况。我的处理是：原测试没做成，判据 A 就不成立，最接近的是\"不判\"。这一点也由你定。\n\n**放弃已留档，写进了项目页：**\n- 原因：本配置下这项检验分不出对的时刻，不能作为 R23.3 结构闸的一项。\n- 值得重试的情况：改用分位数阈值，去掉冷云面积偏差；或换微物理、冰相光学之后模拟冷云面积变得接近观测；或只用有眼时次的结构量。\n- 结果已抄送 R23.3 Lead，并说明不建议把\"亮温结构\"加进它的结构闸。\n\n## 结论\n- **验收清单**（11-14 已交）：D0 作业号 CRC 1751220；CRTM 编通；算子测试差 0.445 K；按 D0 实测速度推算全量 4.6 核·时，在 60 以内。\n- **实际用量**：累计约 22.7 核·时，0 SU，在 60 以内。\n- **判定词**：放弃（限本配置）。条件是你认可上面的算子测试改法；不认可则为不判。适用范围：CRTM v2.3.0、ABI 第 13 通道、220 K 阈值、33 km 邻域、R23.3 的 9/3 km WDM6 后报、Delta 2020 和 Michael 2018。已审，在 11-20 期限内。\n- **等 Liang Hu**：确认算子测试改用等温廓线参照。确认后，我把项目页状态从\"在试\"改成\"放弃\"。\n\n\n\n\n\n（附件：L26.20_判定与审查裁决_20261115.md）\n\n（附件：EXPERIMENT_CARD_D2.md）\n\n（附件：L26.模拟亮温结构检验.md）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-15 21:48",
+      "text": "【告知 · 来自 快试 · L26 快试实验室 总控】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nR23.3 要把 Delta 两臂 48 h（R233_B3_DELTA_P48_v1、R233_B3_DELTA_G48_v2）和 L26.18 的 Michael、Ian 后报（R233_L2618_Michael_WRF_v1、R233_L2618_Ian_WRF_v1）打包到 Google Drive（gdfull:CRC_Archive/20261115_R233/WRF/petw_runs/），核对通过后从 CRC 删除。总控已答复：这两组本线都读完了，派生结果在自己目录里——L26.20 的 d1、d1_Michael 两个模拟亮温目录，L26.18 v3 的 A 读数。今后不要再引用这些原始 wrfout 路径；如果审稿要求重算，从 Drive 取回。Fiona 是新的后报，不在这次归档范围。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-16 16:27",
+      "text": "【告知 · 来自 快试 · L26 快试实验室 总控】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nR23.3 要把 Fiona 三段（R233_L2618_Fiona{A,B1,B2}_WRF_v1）和 Dorian（R233_L2618_Dorian_WRF_v1）的原始 wrfout 传 Drive 后从 CRC 删，CRC 上只留评估实际读的变量（slim_v1/）。L26.20 现在用的是 Delta 加 Michael。如果打算读 Fiona 或 Dorian 算模拟亮温（CRTM 要三维水凝物、T、P、QVAPOR 等），请马上用 --report 回总控，写明变量和时次；不打算读就不用回。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-16 16:27",
+      "text": "【委托 · 来自 快试】Liang Hu 认可 A① 等温解析参照：按条件式落判定并定稿\nLiang Hu 11-16 在 回「同意」（参谋转），认可 A① 改用等温解析参照（0.445 K ≤0.5 K）。请按你写好的条件式落判定词「放弃（限本配置：CRTM v2.3.0、ABI ch13、BT<220 K、33 km 邻域、R23.3 9/3 km WDM6 后报、Delta 2020+Michael 2018）」，并按审查的必须改项定措辞（不把结果归因于面积偏差）。\n定稿要写明：A① 是 Liang Hu 11-16 认可的改读法，原读法无参照可比；B、C 的数字从脚本输出程序化生成；重开条件，例如换微物理方案或换后报配置、换通道或阈值、加有效半径敏感性、扩大个例数等，你按证据写。\n（原因：Liang Hu 确认改读法）\n验收清单（交回时逐条给出，缺项会被自动退回一次）：\n判定词定稿与文件路径\n重开条件"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-16 16:27",
+      "text": "L26.20 的判定已定稿：**放弃（限本配置）**。判定词、项目页、决策记录、线况表和对外引用表都已更新。\n\n**验收清单**\n\n1. **判定词定稿与文件路径**\n - 判定词：放弃（限本配置：CRTM v2.3.0、ABI ch13、BT<220 K、33 km 邻域、R23.3 9/3 km WDM6 后报、Delta 2020+Michael 2018）。\n - 定稿：。\n - 算子测试（A①）写明是 Liang Hu 11-16 认可的等温参照改读法，原读法无参照可比。\n - B、C 的数字都由脚本输出程序化读出，并附了脚本和结果文件的校验码。\n - 措辞按审查的必须改项定：C 失败的原因没有拆开、不归因；冷云面积偏小、中心距、视差只作并列描述。\n > | L26.20 | WRF 模拟亮温对静止卫星亮温：检验台风眼墙与雨带结构（Liang Hu 11-13 批十一1①；跟进 R23.3；与 L26.18 共用个例） | 放弃（限本配置，11-16 定稿）：C 不过——Delta 2020+Michael 2018 合并 68 对，同时刻 FSS 胜过 ±12 h 的比例 0.47、差中位 −0.008（各读法都不过）；B 按跑前读法 0.174>0.15 不过、逐类读法过，判定不依赖 B；A① 用 Liang Hu 11-16 认可的等温解析参照（0.445 K）。不建议把亮温结构加进 R23.3 结构闸。定稿；CRC 约 22.7 核·时、0 SU。建议结题（待 Liang Hu） | |\n3. **重开条件**（满足任一项，另写方案并预注册后才重开）：\n 1. 去掉面积偏差再做 C：两边各取同一面积分位作阈值，或换成对面积不敏感的位置类指标。现有数据就够，不用新算模式。\n 2. 换微物理方案或冰相光学，使模拟冷云面积接近观测。本轮主、备两组有效半径都试过，C 都不过，所以单换有效半径不算重开理由。\n 3. 换后报配置，例如 1 km 内层，或强度更接近观测的后报。\n 4. 换通道或阈值：水汽第 8 通道，或 200/210/230 K 等多阈值。\n 5. 扩大个例（Ian、Dorian 等），只比有眼时次，并用对无眼时次稳定的结构量代替最冷环半径。\n\n**其他更新**\n- 项目页 ：status 改为「放弃」，conclusion 已填。\n- 决策记录。\n- 补齐了：\n - CRTM v2.3.0 的下载地址和许可证\n - GOES-16 CMIPC 数据（公开桶）\n - NHC 侦察机中心报文存档\n - ABI 通道参数文献 Schmit 等 2017、GOES-R 产品用户指南\n - 眼墙半径并列读法来源 Zhang、Zou & Tan 2023\n - WRF 与 GFS（只读使用 R23.3 的后报）\n - NumPy、SciPy、netCDF4 等 Python 库与 Intel Fortran 编译器。\n\n**建议结题（待 Liang Hu）**：判定词已落、经审，没有未完成的必做项。CRC 上约 1 GB 的运行目录保留，以备重开。\n\n## 结论\n- **判定词**：L26.20 放弃（限本配置：CRTM v2.3.0、ABI 第 13 通道、BT<220 K、33 km 邻域、R23.3 9/3 km WDM6 后报、Delta 2020 + Michael 2018）。\n- **依据**：C 不过。同一个模拟亮温场，和同时刻的观测比、和错开 ±12 小时的观测比，FSS 分不开：合并 68 对里同时刻更高的只占 0.47（要求 ≥2/3），差值中位数 −0.008（要求 ≥0.05）。换组、分台风、换有效半径读法也都不过。\n - B 按跑前写定的读法不过（0.174 > 0.15），按扰动类型分别取中位数则过；判定词不依赖 B。\n - 算子测试按 Liang Hu 11-16 认可的等温参照，差 0.445 K，过。\n - C 失败的原因没有拆开，不作归因。\n - 不建议把\"亮温结构\"加进 R23.3 的结构闸。\n- **重开条件**（任一项）：分位数阈值等去掉面积偏差的 C 检验、换微物理或冰相光学、换后报配置、换通道或阈值、扩大个例并只看有眼时次。\n- **资源**：CRC 约 22.7 核·时（上限 60），0 SU；审查。\n- **建议结题（待 Liang Hu）**。\n\n\n\n\n\n（附件：L26.20_判定定稿_20261116.md）\n\n（附件：L26.模拟亮温结构检验.md）\n\n（附件：L26.20_判定定稿_20261116.md）"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-11-16 16:38",
+      "text": "你这些文件我都读不出来"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-16 16:38",
+      "text": "抱歉。原来那几个文件名带中文、格式是 Markdown，在你那边可能打不开。我重新做了两份 Word 文件，文件名全用英文：\n\n- **L26_20_summary.docx**：一页摘要，只写结果，建议先看这份。\n- **L26_20_final_verdict_full.docx**：完整定稿，内容和之前那份相同。\n\n摘要内容如下，直接在这里也能看：\n\n**一句话结论：放弃（只限本次配置）。** 拿模拟亮温和 GOES-16 卫星亮温比台风的冷云结构，在本次配置下，模拟和同一时刻卫星的相似度，并不比和错开 12 小时的卫星高。所以这个方法不宜加进 R23.3 的结构检验。\n\n| 判据 | 结果 |\n| --- | --- |\n| A 能算 | 过：算子测试误差 0.445 K，用的是你认可的等温参照；两台风共 71 个可比时次 |\n| B 卫星侧稳不稳 | 按事先写定的读法不过（0.174 > 0.15），按另一种读法过；判定不靠它 |\n| C 能否分出对的时刻 | 不过：68 对里只有 47% 是同时刻更像，要求至少 2/3。这是放弃的依据 |\n\n另外看到两个现象：模拟的冷云面积只有卫星的一半左右；模拟和卫星的台风中心平均差 37–67 km。没做区分实验，所以不说 C 失败是这些原因造成的。\n\n**值得重开的情况：**\n- 换一种不受冷云面积偏差影响的比法，现有数据就能做\n- 换微物理方案\n- 换更准的后报\n- 换通道或阈值\n- 增加台风个例。\n\n用了约 22.7 核·时，0 SU。建议结题，需要你下令。\n\n如果 Word 文件还是打不开，告诉我你是用手机还是电脑、点开时看到什么，我再换 PDF 试。\n\n\n\n\n（附件：L26_20_summary.docx）\n\n（附件：L26_20_final_verdict_full.docx）"
+    },
+    {
+      "role": "pi",
+      "who": "Liang Hu（PI）",
+      "ts": "2026-11-16 16:40",
+      "text": "原有文章方法为什么可行？"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-16 16:40",
+      "text": "原文的方法和我们这次检验的不是同一件事，两者不矛盾。原文证明的是\"模拟亮温可以算出来、画出来，和卫星图放在一起比\"；我们这次查的是\"把它当成一个打分工具，能不能稳定地分出模拟的好坏\"。前者站得住，后者在本次配置下没过。\n\n**原文（及最接近的先例）实际做了什么**\n\n1. **Zou 2026**（Engineering，知识库卡 EP8X6E64，方案里引的是 PDF pp.5–6、Fig. 1）\n - 图 1 只是并排放了\"模拟涡度\"和\"模拟亮温\"，看两者形态是否对应。没有拿卫星实测亮温去给模拟打分。\n - 文中有一处对我们正相关：台风 Hinnamnor 换两套微物理方案，涡度差别不大，模拟亮温却差别明显。也就是说，亮温对云的物理假设很敏感。\n2. **Bi & Zou 2025**（JGR，卡 L26_20_14），是最接近的先例：\n - 只有一个台风（Lekima），模拟 18 小时，看图对比，再把亮温按方位分解成不同波数（PDF pp.4–9）。\n - 文中那个\"误差 <2.4 K\"，是\"截断后的波数重构\"和\"完整模拟场\"之间的内部误差，不是模拟和卫星之间的误差（PDF pp.10–11）。\n - 文中没有检验\"这个对比能不能分出对的时刻和错的时刻\"。\n3. **Minamide & Zhang 2018**（卡 L26_20_12）是同化研究：把卫星亮温喂进模式，强制模式向观测靠拢。这时模拟和观测对得上，是同化的结果，不能说明一个独立后报能被亮温正确评判。\n4. **Otkin & Greenwald 2008**（卡 L26_20_10）：不同微物理方案算出的 11 μm 亮温差别很大。这同样说明亮温首先反映云的物理假设。\n\n**为什么它们\"可行\"、我们却\"放弃\"**\n\n- **\"可行\"的标准不同。** 文献里的可行，是指算得出来、看图结构对得上、可以做描述分析。我们按事先写定的判据，要求同时刻的相似度明显高于错开 12 小时的相似度。这一条文献里没人做过，这也正是这次快试的新意所在。\n- **样本和条件不同。** 先例是单台风、短时段（18 小时）、用观测效果较好的模式配置做的。我们用的是 R23.3 的 48 小时独立后报，模拟中心离实测 37–67 km，模拟冷云面积约为卫星的一半。在这种条件下，模拟场和哪个时刻的卫星图比都差不多像。不过我们没做区分实验，不能断定原因就是面积偏小或中心偏差。\n- **我们的结果其实和文献的提醒一致。** 亮温对微物理和云光学假设很敏感（Zou 2026、Otkin & Greenwald 2008），所以用它给模拟打分时，它反映的未必是台风结构本身。\n\n**怎么用这个结论**\n\n- 原文方法用于看图诊断、做结构描述，仍然可用。\n- 本次配置下，不宜把它作为 R23.3 结构闸里能判好坏的一项。\n- 如果你想再试一次让它\"能打分\"的版本，最省事的是重开条件第 1 条：两边各取同一面积比例作阈值，去掉冷云面积偏差，再看能否分出对的时刻。现有数据就够，不用新算模式。要做的话你说一声，我就开。\n\n这段对比我先补进项目页和定稿，作为\"与文献的关系\"一节。上面这段\"与文献的关系\"已经补进定稿（第 6 节）和项目页，下面的 Word 版也重新生成了，含这一节。\n\n\n\n（附件：L26_20_final_verdict_full.docx）"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-16 17:12",
+      "text": "【定时回访】【自动续推】上一轮结束时没有留下下一步的承载者。现在没有任何委托/作业/回访在跑。请接着做；若确实在等人或已完成，说明在等谁/什么即可。\n（这是你在 2026-11-16 16:41 本地时间预约的回访。现在检查并用中文简短汇报结果；如果作业还没结束且仍需跟踪，用 再预约下一次；已经结束就不要再预约。）"
+    },
+    {
+      "role": "lead",
+      "who": "快试实验室 Lead",
+      "ts": "2026-11-16 17:12",
+      "text": "L26.20 已经全部做完，现在只等你决定两件事，不需要另约回访：\n\n1. **结题**：判定已定稿为\"放弃（限本配置）\"，也过了，我的建议是结题，需要你下令。\n2. **要不要试\"能打分\"的版本**：就是上一轮提的重开条件第 1 条——模拟和卫星各取同一面积比例作阈值，去掉冷云面积偏差，再看能不能分出对的时刻。现有数据就够，不用新算模式，在 CRC 上不到 1 核·时。按快试规矩，我会另开一页、先写定判据再跑。你说\"做\"我就开。\n\n在等你回复期间，我这边不再动 L26.20。"
+    },
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-16 19:13",
+      "text": "【告知 · 来自 快试 · L26 快试实验室 总控】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）"
+    }
+  ],
+  "files": {
+    "self": "04c38795.json",
+    "claims": null,
+    "pdf": {
+      "zh": "../../pdf/04c38795.zh.pdf",
+      "en": "../../pdf/04c38795.en.pdf"
+    }
+  }
+}

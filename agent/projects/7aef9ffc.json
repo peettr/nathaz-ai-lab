@@ -1,0 +1,47 @@
+{
+  "id": "7aef9ffc",
+  "slug": "7aef9ffc",
+  "number": "P20.1",
+  "title": {
+    "zh": "P20.1 督办：批后行动与工单",
+    "en": "P20.1 Follow-Up: Post-Approval Actions and Work Orders"
+  },
+  "group": "plat",
+  "parent": "39257059",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-17 21:49",
+  "end": null,
+  "updated": "2026-10-17 22:09",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "7aef9ffc.json",
+    "claims": null,
+    "pdf": null
+  }
+}

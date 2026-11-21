@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>横风向驰振：Den Hartog 判据与极限环 · Transverse galloping (v2)</title>
+<style>
+:root{
+  --bg:#f3f5f8; --card:#ffffff; --ink:#17212c; --muted:#5a6775; --faint:#8a96a3; --line:#dde3ea; --grid:#e9edf2;
+  --accent:#2460c8; --accent-soft:#e4edfb; --bad:#cf3f2b; --bad-soft:#fdebe7; --ok:#14795a; --ok-soft:#e2f4ed;
+  --amber:#a86a0a; --amber-soft:#fbf1dc; --violet:#7a4fc4; --body:#3b6fd1; --shadow:0 1px 2px rgba(20,30,45,.06),0 4px 14px rgba(20,30,45,.05);
+}
+html[data-theme="dark"]{
+  --bg:#0d1218; --card:#151c25; --ink:#e7ecf2; --muted:#a3afbc; --faint:#74808d; --line:#273140; --grid:#1f2833;
+  --accent:#6ea8ff; --accent-soft:#1a2a44; --bad:#ff7d68; --bad-soft:#3a1f1b; --ok:#4fcb9f; --ok-soft:#15302a;
+  --amber:#e8b658; --amber-soft:#33290f; --violet:#b596f5; --body:#5b8fee; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;-webkit-text-size-adjust:100%}
+html[data-lang="zh"] .en, html[data-lang="en"] .zh{display:none !important}
+header{display:flex;align-items:center;gap:16px;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--card)}
+header h1{font-size:20px;line-height:1.25;margin:0;font-weight:650;letter-spacing:.01em}
+header p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.hgrow{flex:1;min-width:0}
+.tools{display:flex;gap:8px;flex-shrink:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--bg)}
+.seg button{border:0;background:transparent;color:var(--muted);padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--accent);color:#fff}
+html[data-theme="dark"] .seg button.on{color:#0d1218}
+.app{display:grid;grid-template-columns:348px minmax(0,1fr);gap:16px;max-width:1560px;margin:0 auto;padding:16px}
+.viz{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:16px;align-content:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;min-width:0}
+.card h2{font-size:14px;margin:0 0 8px;font-weight:650;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card h2 small{font-weight:400;color:var(--muted);font-size:12px}
+.span2{grid-column:1 / -1}
+canvas{display:block;width:100%;border-radius:8px}
+#cvScene{height:300px}#cvTime{height:230px}#cvAmp{height:310px}#cvCf{height:310px}
+.controls h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin:16px 0 6px;font-weight:650}
+.controls h3:first-child{margin-top:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 11px;font:inherit;font-size:13px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+html[data-theme="dark"] .chip.on{color:#0d1218}
+.srcbox{margin-top:8px;font-size:12.5px;line-height:1.5;color:var(--muted);border-left:3px solid var(--accent);padding:6px 10px;background:var(--accent-soft);border-radius:0 8px 8px 0}
+.srcbox.warn{border-left-color:var(--amber);background:var(--amber-soft)}
+.tag{display:inline-block;font-size:11px;font-weight:650;padding:1px 7px;border-radius:999px;margin-right:6px;vertical-align:1px}
+.tag.lit{background:var(--ok-soft);color:var(--ok)}.tag.der{background:var(--accent-soft);color:var(--accent)}.tag.ill{background:var(--amber-soft);color:var(--amber)}
+.row{margin-top:9px}
+.row label{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;gap:8px}
+.row output{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+input[type=range]{width:100%;margin:4px 0 0;accent-color:var(--accent);height:24px;touch-action:pan-y}
+.coef{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.coef label{font-size:12px;color:var(--muted);display:block}
+.coef input{width:100%;font:inherit;font-size:13px;padding:5px 6px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font-variant-numeric:tabular-nums}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.btn{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:8px 11px;font:inherit;font-size:13px;cursor:pointer}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+html[data-theme="dark"] .btn.pri{color:#0d1218}
+.btn:active{transform:translateY(1px)}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.5}
+.status{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;font-weight:600;font-size:14.5px;line-height:1.4}
+.status.ok{background:var(--ok-soft);color:var(--ok)}.status.bad{background:var(--bad-soft);color:var(--bad)}.status.mid{background:var(--amber-soft);color:var(--amber)}
+.status i{flex:0 0 10px;height:10px;border-radius:50%;background:currentColor;margin-top:5px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.kv div{border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:0}
+.kv b{display:block;font-size:19px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kv span{display:block;font-size:12px;color:var(--muted);line-height:1.35}
+.kv .neg b{color:var(--bad)}.kv .pos b{color:var(--ok)}
+.msg{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+.msg.warn{color:var(--amber)}
+var,.v{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-style:italic}
+sub,sup{font-size:.72em;line-height:0}
+.notes{max-width:1560px;margin:0 auto;padding:0 16px 28px}
+.notes .card{padding:18px 22px}
+.notes h2{font-size:17px}
+.notes h3{font-size:14px;margin:18px 0 6px}
+.notes p,.notes li{font-size:13.5px;color:var(--ink);margin:4px 0}
+.notes ul{padding-left:20px;margin:4px 0}
+.eq{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:16px;padding:6px 12px;margin:6px 0;background:var(--bg);border-radius:8px;overflow-x:auto;white-space:nowrap}
+.eq em,.eq i{font-style:italic}
+.src{color:var(--muted);font-size:12.5px}
+table.t{border-collapse:collapse;width:100%;font-size:13px;margin-top:6px}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.t th{color:var(--muted);font-weight:600;font-size:12px}
+.scrollx{overflow-x:auto}
+footer{color:var(--faint);font-size:12px;text-align:center;padding:0 16px 24px}
+@media (max-width:1080px){
+  .app{grid-template-columns:minmax(0,1fr);padding:10px;gap:10px}
+  .viz{display:contents}
+  #cardScene{order:0}#cardRead{order:1}.controls{order:2}#cardTime{order:3}#cardAmp{order:4}#cardCf{order:5}
+  header{padding:10px 12px;flex-wrap:wrap;gap:8px}
+  .hgrow{flex:1 1 100%}
+  .kv b{font-size:16.5px;white-space:normal}
+  header h1{font-size:16.5px}
+  #cvScene{height:250px}#cvTime{height:200px}#cvAmp,#cvCf{height:270px}
+  input[type=range]{height:32px}
+  .notes{padding:0 10px 20px}.notes .card{padding:14px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="hgrow">
+    <h1><span class="zh">横风向驰振：Den Hartog 判据、起振风速与极限环</span><span class="en">Transverse galloping: Den Hartog criterion, onset speed and limit cycles</span></h1>
+    <p><span class="zh">单自由度 · 准定常气动力 · 时程积分 + 平均法（Krylov–Bogoliubov）· 教学演示 v2</span><span class="en">Single degree of freedom · quasi-steady aerodynamics · time integration + averaging (Krylov–Bogoliubov) · teaching demo v2</span></p>
+  </div>
+  <div class="tools">
+    <div class="seg" id="segLang"><button data-v="zh">中文</button><button data-v="en">EN</button></div>
+    <div class="seg" id="segTheme"><button data-v="light"><span class="zh">亮</span><span class="en">Light</span></button><button data-v="dark"><span class="zh">暗</span><span class="en">Dark</span></button></div>
+  </div>
+</header>
+
+<div class="app">
+<section class="card controls" id="cardCtl">
+  <h3><span class="zh">截面预设</span><span class="en">Cross-section preset</span></h3>
+  <div class="chips" id="chips"></div>
+  <div class="srcbox" id="srcbox"></div>
+  <h3><span class="zh">气动系数</span><span class="en">Aerodynamic coefficients</span> <span style="text-transform:none;letter-spacing:0;font-weight:400">C<sub>Fy</sub> = A<sub>1</sub>s − A<sub>3</sub>s³ + A<sub>5</sub>s⁵ − A<sub>7</sub>s⁷, s = ẏ/U</span></h3>
+  <div class="coef">
+    <div><label>A<sub>1</sub> = −G</label><input type="number" id="A1" step="0.01"></div>
+    <div><label>A<sub>3</sub></label><input type="number" id="A3" step="1"></div>
+    <div><label>A<sub>5</sub></label><input type="number" id="A5" step="10"></div>
+    <div><label>A<sub>7</sub></label><input type="number" id="A7" step="100"></div>
+  </div>
+  <p class="hint" id="coefHint"></p>
+
+  <h3><span class="zh">来流与结构</span><span class="en">Flow and structure</span></h3>
+  <div class="row"><label><span><span class="zh">风速</span><span class="en">Wind speed</span> <var>U</var></span><output id="oU"></output></label><input type="range" id="U" min="0" max="40" step="0.05" value="12"></div>
+  <div class="row"><label><span><span class="zh">结构阻尼比</span><span class="en">Damping ratio</span> <var>ζ</var></span><output id="oz"></output></label><input type="range" id="z" min="0.0005" max="0.05" step="0.0001" value="0.005"></div>
+  <div class="row"><label><span><span class="zh">每延米质量</span><span class="en">Mass per unit length</span> <var>m</var></span><output id="om"></output></label><input type="range" id="m" min="0.5" max="50" step="0.01" value="10"></div>
+  <div class="row"><label><span><span class="zh">横风向自振频率</span><span class="en">Natural frequency</span> <var>n</var><sub>1</sub></span><output id="on"></output></label><input type="range" id="n" min="0.5" max="10" step="0.01" value="2"></div>
+  <div class="row"><label><span><span class="zh">迎风面高度（特征尺寸）</span><span class="en">Face height (reference size)</span> <var>B</var></span><output id="oB"></output></label><input type="range" id="B" min="0.02" max="0.5" step="0.0002" value="0.1"></div>
+  <div class="row"><label><span><span class="zh">空气密度</span><span class="en">Air density</span> <var>ρ</var></span><output id="or"></output></label><input type="range" id="r" min="1.0" max="1.3" step="0.005" value="1.225"></div>
+  <div class="btns">
+    <button class="btn" id="bDefault"><span class="zh">默认工况</span><span class="en">Default case</span></button>
+    <button class="btn" id="bPS"><span class="zh">P&amp;S 1964 试验工况</span><span class="en">P&amp;S 1964 test case</span></button>
+  </div>
+  <p class="hint" id="caseHint"></p>
+
+  <h3><span class="zh">动画</span><span class="en">Animation</span></h3>
+  <div class="btns">
+    <button class="btn pri" id="bKick"><span class="zh">小扰动</span><span class="en">Small kick</span></button>
+    <button class="btn" id="bBig"><span class="zh">大扰动</span><span class="en">Large kick</span></button>
+    <button class="btn" id="bSweep"><span class="zh">自动扫风速</span><span class="en">Sweep wind speed</span></button>
+    <button class="btn" id="bPause"><span class="zh">暂停</span><span class="en">Pause</span></button>
+  </div>
+  <div class="row"><label><span><span class="zh">时间加速</span><span class="en">Time acceleration</span></span><output id="oS"></output></label>
+    <div class="seg" id="segSpeed" style="margin-top:4px"><button data-v="1">1×</button><button data-v="4">4×</button><button data-v="16">16×</button><button data-v="64">64×</button></div></div>
+  <p class="hint"><span class="zh">起振很慢（常常要几百个周期），所以默认加速播放。「自动扫风速」先升后降，画出滞回环。</span><span class="en">Build-up is slow (often hundreds of cycles), so time is accelerated by default. “Sweep” ramps the wind speed up and then down to trace the hysteresis loop.</span></p>
+</section>
+
+<div class="viz">
+  <section class="card" id="cardScene">
+    <h2><span class="zh">截面、来流与相对攻角</span><span class="en">Section, flow and relative angle of attack</span> <small id="sceneNote"></small></h2>
+    <canvas id="cvScene"></canvas>
+  </section>
+  <section class="card" id="cardRead">
+    <h2><span class="zh">实时计算</span><span class="en">Live results</span></h2>
+    <div class="status" id="status"><i></i><span id="statusTxt"></span></div>
+    <div class="kv" id="kv"></div>
+    <div class="msg" id="msg"></div>
+  </section>
+  <section class="card span2" id="cardTime">
+    <h2><span class="zh">响应时程</span><span class="en">Response time history</span> <small><span class="zh">运动方程的数值积分（RK4）；虚线为平均法给出的稳态振幅</span><span class="en">numerical integration of the equation of motion (RK4); dashed lines are the steady amplitudes from averaging</span></small></h2>
+    <canvas id="cvTime"></canvas>
+  </section>
+  <section class="card" id="cardAmp">
+    <h2><span class="zh">稳态振幅随风速</span><span class="en">Steady amplitude vs wind speed</span> <small><span class="zh">平均法；圆点为时程积分的当前振幅</span><span class="en">averaging method; the dot is the current amplitude from time integration</span></small></h2>
+    <canvas id="cvAmp"></canvas>
+  </section>
+  <section class="card" id="cardCf">
+    <h2><span><span class="zh">横向力系数</span><span class="en">Lateral force coefficient</span> C<sub>Fy</sub>(α)</span> <small><span class="zh">阴影为当前振动扫过的攻角范围</span><span class="en">shaded band: range of α swept by the current motion</span></small></h2>
+    <canvas id="cvCf"></canvas>
+  </section>
+</div>
+</div>
+
+<section class="notes">
+<div class="card">
+<h2><span class="zh">说明：公式出处、适用条件与局限</span><span class="en">Notes: sources, validity and limitations</span></h2>
+
+<div class="zh">
+<h3>1. 模型与公式（逐条给出处）</h3>
+<p><b>准定常横向力。</b>物体以速度 <var>ẏ</var> 横向运动时，它「看到」的相对来流偏转一个角度，tan α = <var>ẏ</var>/<var>U</var>。假设此刻的气动力等于静止物体在该攻角下测到的力：</p>
+<div class="eq">F<sub>y</sub> = ½ ρ U² B · C<sub>Fy</sub>(α)，&nbsp; C<sub>Fy</sub> = −[C<sub>L</sub>(α) + C<sub>D</sub>(α) tan α] / cos α</div>
+<p class="src">Simiu &amp; Yeo, <i>Wind Effects on Structures</i>, 第 4 版, 2019, 式 (20.4)–(20.7)，书页 297（PDF 第 323 页）。该书取 y 向下为正；Holmes 的写法取 z 向上为正、攻角变化 Δα = −ż/U（式 5.45 上方）。两种符号约定描述的是同一件事，本页图中 y 向上为正，标的攻角是 α = −ẏ/U。</p>
+<p><b>运动方程与净阻尼。</b></p>
+<div class="eq">m [ ÿ + 2ζω<sub>1</sub>ẏ + ω<sub>1</sub>² y ] = F<sub>y</sub> ≈ −½ ρ U² B · G · ẏ/U，&nbsp; G = (dC<sub>L</sub>/dα + C<sub>D</sub>)<sub>α=0</sub></div>
+<div class="eq">d = 2mω<sub>1</sub>ζ + ½ ρ U B · G</div>
+<p class="src">Simiu &amp; Yeo 2019, 式 (20.8)、(20.11)–(20.13)，书页 298（PDF 第 324 页）。</p>
+<p><b>Glauert–Den Hartog 判据。</b>d &lt; 0 时失稳（充分条件）；因为 ζ &gt; 0，必须先有 G &lt; 0（必要条件）。圆柱 dC<sub>L</sub>/dα = 0，所以不会驰振。</p>
+<p class="src">Simiu &amp; Yeo 2019, 式 (20.14) 及其后一段，书页 299（PDF 第 325 页）；Holmes &amp; Bekele, <i>Wind Loading of Structures</i>, 第 4 版, 式 (5.45) 后「den Hartog's criterion」，书页 182（PDF 第 203 页）；Parkinson &amp; Smith 1964, 式 (18) 后，第 231 页（PDF 第 7 页）。</p>
+<p><b>起振风速与 Scruton 数。</b>令 d = 0：</p>
+<div class="eq">U<sub>cr</sub> = −8π ζ n<sub>1</sub> m / (ρ B G)，&nbsp; U<sub>cr</sub>/(n<sub>1</sub>B) = 2 Sc / (−G)，&nbsp; Sc = 4π ζ m / (ρ B²)</div>
+<p class="src">Holmes &amp; Bekele 第 4 版, 式 (5.46)、(5.47)、(5.48)，书页 182–183（PDF 第 203–204 页）。原书式 (5.48) 排印缺 π 和 η（印成「4 struct m」），这里按式 (5.46)→(5.47) 反推补回。同一结果的另外两种写法：Parkinson &amp; Smith 式 (19) U<sub>0</sub> = 2β/(nA)，第 231 页；Naudascher &amp; Rockwell 式 (7.22)、(7.24) (V<sub>r</sub>)<sub>cr</sub> = 4π Sc/[dC<sub>y</sub>/dα]，其中 Sc = 2mζ/(ρd²)，书页 186–187（PDF 第 205–206 页）。各书 Scruton 数的定义差一个常数因子，本页用 Holmes 的定义。</p>
+<p><b>非线性横向力多项式。</b>要得到振幅，线性化不够，需要 C<sub>Fy</sub> 随 ẏ/U 的整条曲线：</p>
+<div class="eq">C<sub>Fy</sub> = A<sub>1</sub>(ẏ/U) − A<sub>3</sub>(ẏ/U)³ + A<sub>5</sub>(ẏ/U)⁵ − A<sub>7</sub>(ẏ/U)⁷，&nbsp; A<sub>1</sub> = dC<sub>Fy</sub>/dα|<sub>0</sub> = −G</div>
+<p class="src">Parkinson &amp; Smith 1964, 式 (2)，第 227 页（PDF 第 3 页），原文记作 A、B、C、D；方柱系数 A = 2.69、B = 168、C = 6270、D = 59900 见图 2 图题，第 228 页（PDF 第 4 页），光滑流、Re = 22 300、拟合范围 −16° &lt; α &lt; 16°。Simiu &amp; Yeo 式 (20.15)，书页 300（PDF 第 326 页）是同一形式（另含偶次项 A<sub>2</sub>），引自 Novak 1972 式 (2)，第 28 页（PDF 第 2 页）。</p>
+<p><b>平均法（Krylov–Bogoliubov 一次近似）。</b>设 y = a cos(ω<sub>1</sub>t + φ)，a 缓变，对一个周期取平均：</p>
+<div class="eq">da/dt = a { −ζω<sub>1</sub> + (ρ U B / 4m) [ A<sub>1</sub> − ¾ A<sub>3</sub> q² + ⅝ A<sub>5</sub> q⁴ − (35/64) A<sub>7</sub> q⁶ ] }，&nbsp; q = aω<sub>1</sub>/U</div>
+<div class="eq">稳态：A<sub>1</sub>(1 − U<sub>cr</sub>/U) − ¾ A<sub>3</sub> q² + ⅝ A<sub>5</sub> q⁴ − (35/64) A<sub>7</sub> q⁶ = 0</div>
+<p class="src">Parkinson &amp; Smith 1964, 式 (9)、(10)，第 229 页（PDF 第 5 页）；稳态式 (20)，第 233 页（PDF 第 9 页）；稳定性由 F′(R) 的符号判断，式 (16)、(17)，第 230 页（PDF 第 6 页）。系数 1、¾、⅝、35/64 与 Novak 1972 表 1 的 B<sub>r</sub>（1.0、0.75、0.625、0.54688）一致，第 31 页（PDF 第 5 页）。本页的式子是把原文的无量纲式换回有量纲量（n = ρh²/2m，β = ζ，U<sub>原文</sub> = U/ω<sub>1</sub>h），换算过程见 README。</p>
+<p><b>归一化后的通用曲线。</b>以 a ω<sub>1</sub>/U<sub>cr</sub> 对 U/U<sub>cr</sub> 作图，曲线与质量、阻尼无关（原文图 5，第 236 页，PDF 第 12 页；Novak 1972 结论 6，第 37 页）。高风速时趋于过原点的渐近线，原文给出 Ȳ<sub>s</sub> ≈ 0.3 U（式 25，第 237 页），本页由系数算得 0.293。</p>
+
+<h3>2. 截面预设的系数出处</h3>
+<div class="scrollx"><table class="t">
+<tr><th>预设</th><th>页面取值</th><th>出处或标注</th></tr>
+<tr><td>方柱（光滑流）</td><td>A<sub>1</sub> = 2.69，A<sub>3</sub> = 168，A<sub>5</sub> = 6270，A<sub>7</sub> = 59900；St = 0.135</td><td><b>文献值。</b>Parkinson &amp; Smith 1964 图 2 图题，第 228 页（PDF 第 4 页）；St 同页正文。</td></tr>
+<tr><td>矩形 2:1（顺风向长）</td><td>A<sub>1</sub> ≈ 2.33；高次项无</td><td><b>由文献数值反推。</b>Novak 1972 第 38 页（PDF 第 12 页）：二维光滑流（Santosham 数据，Re = 20 400）起振风速 Ū<sub>0</sub> = Un/β = 0.429，由式 (19) 得 A<sub>1</sub> = 1/0.429。原文说用了 11 次多项式，但没有列出系数，所以本页只算线性判据和 U<sub>cr</sub>，不画振幅。</td></tr>
+<tr><td>矩形 1:2（宽面迎风）</td><td>A<sub>1</sub> = 0</td><td><b>文献值（定性）。</b>Novak 1972 第 42 页（PDF 第 16 页）：光滑流中 A<sub>1</sub> = 0，零位置在任何风速下稳定；足够大的初始扰动可触发大幅驰振（硬激励），本页没有这部分的系数，未建模。</td></tr>
+<tr><td>D 形（平面迎风）</td><td>A<sub>1</sub> = −0.1</td><td><b>示意值，无文献依据。</b>文献只给定性结论：光滑流中 D 形截面不会从静止起振，需要相当大的振幅触发；湍流会大幅改变这一点（Naudascher &amp; Rockwell 1994，书页 207，PDF 第 226 页）。</td></tr>
+<tr><td>圆形</td><td>A<sub>1</sub> = −C<sub>D</sub> = −1.2</td><td>dC<sub>L</sub>/dα = 0 是<b>文献结论</b>（Simiu &amp; Yeo 书页 299）；C<sub>D</sub> = 1.2 是<b>示意值，无文献依据</b>，只要 C<sub>D</sub> &gt; 0 结论不变。</td></tr>
+<tr><td>自定义</td><td>手动输入</td><td>使用者自己给的数，不是文献值。</td></tr>
+</table></div>
+<p class="src">示意图里画阻力和升力矢量时用到的 C<sub>D</sub>（方柱和矩形取 2.0，D 形和圆取 1.2）只用来画图，是示意值，不进入任何计算；图中力矢量的长度也只是示意比例。</p>
+
+<h3>3. 准定常假设什么时候成立</h3>
+<ul>
+<li>准定常意味着气动力与运动同相、没有滞后，这要求物体运动速度远小于来流速度，也就是折减风速 U/(n<sub>1</sub>B) 足够大。Naudascher &amp; Rockwell 给的量级是「大约大于 20」（§7.2.4，书页 185，PDF 第 204 页）。本页在 U<sub>cr</sub>/(n<sub>1</sub>B) &lt; 20 时给出提示，20 取自这句话，原文是量级性的说法，不是严格界限。</li>
+<li>折减风速应明显高于涡脱共振对应的值 1/St。方柱 St = 0.135，对应 U/(n<sub>1</sub>B) ≈ 7.4（Parkinson &amp; Smith 第 228 页）。阻尼低、起振风速靠近涡振区时，试验点偏离理论曲线，滞回变小（同文第 237 页）。</li>
+<li>导数 dC<sub>Fy</sub>/dα 与运动频率无关，可以由静止模型测力得到，这是驰振与颤振的区别（Simiu &amp; Yeo 书页 300，PDF 第 326 页）。</li>
+</ul>
+
+<h3>4. 本页的局限</h3>
+<ul>
+<li>只有横风向一个自由度，二维、均匀光滑来流。湍流会明显改变 C<sub>Fy</sub> 曲线：矩形 2:1 在湍流度 8.5% 以上可以不再驰振，矩形 1:2 反而变得不稳定（Novak 1972 第 39–43 页）。</li>
+<li>没有涡激力，也没有涡振与驰振的耦合；低 Scruton 数时两者会相互作用。</li>
+<li>方柱多项式只在 |α| &lt; 16° 内拟合；高风速渐近线对应 α ≈ 16.3°，已在拟合范围边缘，页面在超出时会提示。</li>
+<li>只有方柱有完整的文献多项式。其余预设只做线性判据，时程是线性模型（没有极限环，振幅到显示上限即停）。硬激励型驰振（矩形 1:2、D 形）未建模。</li>
+<li>为了让动画在越过 U<sub>cr</sub> 后能自己起振，积分里保留了 0.002B 的背景扰动；截面动画的摆动节奏是放慢显示的，振幅和攻角是实时积分值。</li>
+<li>系数随雷诺数、棱角圆角、展弦比、端部条件变化；页面数值只对应原文的试验条件，不能直接用于设计。</li>
+</ul>
+
+<h3>5. 参考文献</h3>
+<ul>
+<li>Simiu, E., Yeo, D. (2019). <i>Wind Effects on Structures: Modern Structural Design for Wind</i>, 4th ed., Wiley. 第 20 章。</li>
+<li>Holmes, J. D., Bekele, S. (2021). <i>Wind Loading of Structures</i>, 4th ed., CRC Press. §5.5.2。</li>
+<li>Parkinson, G. V., Smith, J. D. (1964). The square prism as an aeroelastic non-linear oscillator. <i>Quart. J. Mech. Appl. Math.</i> 17(2), 225–239.</li>
+<li>Novak, M. (1972). Galloping oscillations of prismatic structures. <i>J. Eng. Mech. Div. ASCE</i> 98(EM1), 27–46.</li>
+<li>Naudascher, E., Rockwell, D. (1994). <i>Flow-Induced Vibrations: An Engineering Guide</i>, Balkema. §7.2.4, §7.4。</li>
+</ul>
+</div>
+
+<div class="en">
+<h3>1. Model and formulas (with sources)</h3>
+<p><b>Quasi-steady lateral force.</b> A body moving across the flow with velocity <var>ẏ</var> sees the relative wind turned through an angle with tan α = <var>ẏ</var>/<var>U</var>. The force at that instant is assumed equal to the force measured on the fixed body at that angle of attack:</p>
+<div class="eq">F<sub>y</sub> = ½ ρ U² B · C<sub>Fy</sub>(α),&nbsp; C<sub>Fy</sub> = −[C<sub>L</sub>(α) + C<sub>D</sub>(α) tan α] / cos α</div>
+<p class="src">Simiu &amp; Yeo, <i>Wind Effects on Structures</i>, 4th ed., 2019, Eqs. (20.4)–(20.7), p. 297 (PDF p. 323). That book takes y positive downward; Holmes takes z positive upward with Δα = −ż/U (above Eq. 5.45). Both conventions describe the same physics. In the sketch on this page y is positive upward and the angle shown is α = −ẏ/U.</p>
+<p><b>Equation of motion and net damping.</b></p>
+<div class="eq">m [ ÿ + 2ζω<sub>1</sub>ẏ + ω<sub>1</sub>² y ] = F<sub>y</sub> ≈ −½ ρ U² B · G · ẏ/U,&nbsp; G = (dC<sub>L</sub>/dα + C<sub>D</sub>)<sub>α=0</sub></div>
+<div class="eq">d = 2mω<sub>1</sub>ζ + ½ ρ U B · G</div>
+<p class="src">Simiu &amp; Yeo 2019, Eqs. (20.8), (20.11)–(20.13), p. 298 (PDF p. 324).</p>
+<p><b>Glauert–Den Hartog criterion.</b> The system is unstable when d &lt; 0 (sufficient condition); since ζ &gt; 0 this requires G &lt; 0 (necessary condition). For a circular cylinder dC<sub>L</sub>/dα = 0, so it cannot gallop.</p>
+<p class="src">Simiu &amp; Yeo 2019, Eq. (20.14) and the following paragraph, p. 299 (PDF p. 325); Holmes &amp; Bekele, <i>Wind Loading of Structures</i>, 4th ed., after Eq. (5.45), p. 182 (PDF p. 203); Parkinson &amp; Smith 1964, after Eq. (18), p. 231 (PDF p. 7).</p>
+<p><b>Onset speed and Scruton number.</b> Setting d = 0:</p>
+<div class="eq">U<sub>cr</sub> = −8π ζ n<sub>1</sub> m / (ρ B G),&nbsp; U<sub>cr</sub>/(n<sub>1</sub>B) = 2 Sc / (−G),&nbsp; Sc = 4π ζ m / (ρ B²)</div>
+<p class="src">Holmes &amp; Bekele 4th ed., Eqs. (5.46), (5.47), (5.48), pp. 182–183 (PDF pp. 203–204). Eq. (5.48) is misprinted in the book (π and η are missing); it is restored here from Eqs. (5.46)→(5.47). Equivalent forms: Parkinson &amp; Smith Eq. (19), U<sub>0</sub> = 2β/(nA), p. 231; Naudascher &amp; Rockwell Eqs. (7.22), (7.24), (V<sub>r</sub>)<sub>cr</sub> = 4π Sc/[dC<sub>y</sub>/dα] with Sc = 2mζ/(ρd²), pp. 186–187 (PDF pp. 205–206). Definitions of the Scruton number differ by constant factors between books; this page uses Holmes's.</p>
+<p><b>Nonlinear lateral-force polynomial.</b> The amplitude cannot be obtained from the linearised model; the whole C<sub>Fy</sub> curve is needed:</p>
+<div class="eq">C<sub>Fy</sub> = A<sub>1</sub>(ẏ/U) − A<sub>3</sub>(ẏ/U)³ + A<sub>5</sub>(ẏ/U)⁵ − A<sub>7</sub>(ẏ/U)⁷,&nbsp; A<sub>1</sub> = dC<sub>Fy</sub>/dα|<sub>0</sub> = −G</div>
+<p class="src">Parkinson &amp; Smith 1964, Eq. (2), p. 227 (PDF p. 3), written there with A, B, C, D; square-prism values A = 2.69, B = 168, C = 6270, D = 59900 are in the caption of Fig. 2, p. 228 (PDF p. 4): smooth flow, Re = 22,300, fitted for −16° &lt; α &lt; 16°. Simiu &amp; Yeo Eq. (20.15), p. 300 (PDF p. 326) has the same form (with an extra even term A<sub>2</sub>), taken from Novak 1972 Eq. (2), p. 28 (PDF p. 2).</p>
+<p><b>Averaging (first approximation of Krylov–Bogoliubov).</b> With y = a cos(ω<sub>1</sub>t + φ), a slowly varying, averaged over one cycle:</p>
+<div class="eq">da/dt = a { −ζω<sub>1</sub> + (ρ U B / 4m) [ A<sub>1</sub> − ¾ A<sub>3</sub> q² + ⅝ A<sub>5</sub> q⁴ − (35/64) A<sub>7</sub> q⁶ ] },&nbsp; q = aω<sub>1</sub>/U</div>
+<div class="eq">steady state: A<sub>1</sub>(1 − U<sub>cr</sub>/U) − ¾ A<sub>3</sub> q² + ⅝ A<sub>5</sub> q⁴ − (35/64) A<sub>7</sub> q⁶ = 0</div>
+<p class="src">Parkinson &amp; Smith 1964, Eqs. (9), (10), p. 229 (PDF p. 5); steady state Eq. (20), p. 233 (PDF p. 9); stability from the sign of F′(R), Eqs. (16), (17), p. 230 (PDF p. 6). The factors 1, ¾, ⅝, 35/64 agree with B<sub>r</sub> in Table 1 of Novak 1972 (1.0, 0.75, 0.625, 0.54688), p. 31 (PDF p. 5). The expressions here are the paper's dimensionless equations converted back to dimensional quantities (n = ρh²/2m, β = ζ, U<sub>paper</sub> = U/ω<sub>1</sub>h); the conversion is written out in the README.</p>
+<p><b>Universal curve.</b> Plotting a ω<sub>1</sub>/U<sub>cr</sub> against U/U<sub>cr</sub> gives one curve for all masses and damping levels (Fig. 5 of the paper, p. 236, PDF p. 12; Novak 1972, conclusion 6, p. 37). At high wind speed it approaches an asymptote through the origin; the paper gives Ȳ<sub>s</sub> ≈ 0.3 U (Eq. 25, p. 237), and the coefficients give 0.293.</p>
+
+<h3>2. Sources of the preset coefficients</h3>
+<div class="scrollx"><table class="t">
+<tr><th>Preset</th><th>Values used</th><th>Source or label</th></tr>
+<tr><td>Square (smooth flow)</td><td>A<sub>1</sub> = 2.69, A<sub>3</sub> = 168, A<sub>5</sub> = 6270, A<sub>7</sub> = 59900; St = 0.135</td><td><b>From the literature.</b> Parkinson &amp; Smith 1964, caption of Fig. 2, p. 228 (PDF p. 4); St in the text on the same page.</td></tr>
+<tr><td>Rectangle 2:1 (long side along wind)</td><td>A<sub>1</sub> ≈ 2.33; no higher terms</td><td><b>Derived from a published number.</b> Novak 1972, p. 38 (PDF p. 12): two-dimensional smooth flow (Santosham's data, Re = 20,400), onset Ū<sub>0</sub> = Un/β = 0.429; Eq. (19) then gives A<sub>1</sub> = 1/0.429. The paper used an 11th-degree polynomial but does not list its coefficients, so this page gives only the linear criterion and U<sub>cr</sub>, no amplitude.</td></tr>
+<tr><td>Rectangle 1:2 (broad face to wind)</td><td>A<sub>1</sub> = 0</td><td><b>From the literature (qualitative).</b> Novak 1972, p. 42 (PDF p. 16): in smooth flow A<sub>1</sub> = 0 and the rest position is stable at all wind speeds; a large enough initial disturbance can trigger large-amplitude galloping (hard excitation). No coefficients are available here for that, so it is not modelled.</td></tr>
+<tr><td>D-section (flat face to wind)</td><td>A<sub>1</sub> = −0.1</td><td><b>Illustrative value, no literature basis.</b> The literature gives only the qualitative result: in smooth flow a D-section does not gallop from rest and needs a fairly large amplitude to be triggered; turbulence changes this drastically (Naudascher &amp; Rockwell 1994, p. 207, PDF p. 226).</td></tr>
+<tr><td>Circle</td><td>A<sub>1</sub> = −C<sub>D</sub> = −1.2</td><td>dC<sub>L</sub>/dα = 0 is <b>from the literature</b> (Simiu &amp; Yeo p. 299); C<sub>D</sub> = 1.2 is an <b>illustrative value, no literature basis</b>. The conclusion holds for any C<sub>D</sub> &gt; 0.</td></tr>
+<tr><td>Custom</td><td>typed in</td><td>User input, not literature values.</td></tr>
+</table></div>
+<p class="src">The C<sub>D</sub> used to draw the drag and lift vectors in the sketch (2.0 for square and rectangles, 1.2 for D-section and circle) is illustrative, used for drawing only, and enters no calculation; vector lengths in the sketch are schematic.</p>
+
+<h3>3. When the quasi-steady assumption holds</h3>
+<ul>
+<li>Quasi-steady means the force is in phase with the motion, with no lag. This needs the body velocity to be small compared with the flow velocity, i.e. a large reduced velocity U/(n<sub>1</sub>B). Naudascher &amp; Rockwell give the order of magnitude “say greater than about 20” (§7.2.4, p. 185, PDF p. 204). This page shows a caution when U<sub>cr</sub>/(n<sub>1</sub>B) &lt; 20; the number comes from that sentence and is an order of magnitude, not a sharp limit.</li>
+<li>The reduced velocity should be well above the vortex-resonance value 1/St. For a square, St = 0.135, so U/(n<sub>1</sub>B) ≈ 7.4 (Parkinson &amp; Smith p. 228). At low damping, where onset is close to vortex resonance, the test points depart from the theory and the hysteresis shrinks (same paper, p. 237).</li>
+<li>The derivative dC<sub>Fy</sub>/dα does not depend on the frequency of motion and can be measured on a fixed model; this is what distinguishes galloping from flutter (Simiu &amp; Yeo p. 300, PDF p. 326).</li>
+</ul>
+
+<h3>4. Limitations of this page</h3>
+<ul>
+<li>One transverse degree of freedom, two-dimensional, uniform smooth flow. Turbulence changes the C<sub>Fy</sub> curve markedly: the 2:1 rectangle can stop galloping above about 8.5% turbulence intensity, while the 1:2 rectangle becomes unstable (Novak 1972, pp. 39–43).</li>
+<li>No vortex-induced force and no interaction between vortex shedding and galloping; they interact at low Scruton number.</li>
+<li>The square-prism polynomial is fitted only for |α| &lt; 16°; the high-speed asymptote corresponds to α ≈ 16.3°, at the edge of the fit. The page flags this when it happens.</li>
+<li>Only the square has a complete published polynomial. Other presets use the linear criterion only, and their time history is the linear model (no limit cycle; the run stops at the display limit). Hard-excitation galloping (1:2 rectangle, D-section) is not modelled.</li>
+<li>A background disturbance of 0.002B is kept in the integration so that the motion can start by itself once U exceeds U<sub>cr</sub>. The sketch oscillates at a slowed-down display rate; its amplitude and angle are the live integrated values.</li>
+<li>Coefficients depend on Reynolds number, corner radius, aspect ratio and end conditions. The numbers here belong to the test conditions of the source papers and must not be used directly for design.</li>
+</ul>
+
+<h3>5. References</h3>
+<ul>
+<li>Simiu, E., Yeo, D. (2019). <i>Wind Effects on Structures: Modern Structural Design for Wind</i>, 4th ed., Wiley. Chapter 20.</li>
+<li>Holmes, J. D., Bekele, S. (2021). <i>Wind Loading of Structures</i>, 4th ed., CRC Press. §5.5.2.</li>
+<li>Parkinson, G. V., Smith, J. D. (1964). The square prism as an aeroelastic non-linear oscillator. <i>Quart. J. Mech. Appl. Math.</i> 17(2), 225–239.</li>
+<li>Novak, M. (1972). Galloping oscillations of prismatic structures. <i>J. Eng. Mech. Div. ASCE</i> 98(EM1), 27–46.</li>
+<li>Naudascher, E., Rockwell, D. (1994). <i>Flow-Induced Vibrations: An Engineering Guide</i>, Balkema. §7.2.4, §7.4.</li>
+</ul>
+</div>
+</div>
+</section>
+<footer><span class="zh">AI 教学实验室 · 教材内容只引公式与页码，不贴原文</span><span class="en">AI Teaching Lab · textbooks are cited by equation and page only</span></footer>
+
+<script>
+"use strict";
+//<PHYS>
+/* Pure calculation functions. selftest.js extracts this block and runs it under node. */
+const PHYS = (function () {
+  // Averaging factors (1/pi)∫0^2pi sin^(k+1) dθ for k = 1,3,5,7  (P&S 1964 Eq. 10; Novak 1972 Table 1, B_r)
+  const KB = [1, 3 / 4, 5 / 8, 35 / 64];
+
+  // Section presets. A = [A1, A3, A5, A7] in  C_Fy(s) = A1 s − A3 s^3 + A5 s^5 − A7 s^7,  s = ydot/U.
+  // kind: 'lit' literature value, 'der' derived from a literature number, 'ill' illustrative (no literature basis)
+  const SECTIONS = {
+    square: { A: [2.69, 168, 6270, 59900], kind: "lit", St: 0.135, alphaFit: 16, CDdraw: 2.0 },
+    rect21: { A: [1 / 0.429, 0, 0, 0], kind: "der", St: null, alphaFit: null, CDdraw: 2.0 },
+    rect12: { A: [0, 0, 0, 0], kind: "lit", St: null, alphaFit: null, CDdraw: 2.0 },
+    dsec:   { A: [-0.1, 0, 0, 0], kind: "ill", St: null, alphaFit: null, CDdraw: 1.2 },
+    circle: { A: [-1.2, 0, 0, 0], kind: "ill", St: null, alphaFit: null, CDdraw: 1.2 },
+    custom: { A: [2, 0, 0, 0], kind: "ill", St: null, alphaFit: null, CDdraw: 2.0 }
+  };
+
+  function cfy(A, s) { const s2 = s * s; return s * (A[0] - s2 * (A[1] - s2 * (A[2] - s2 * A[3]))); }
+  function isNonlinear(A) { return A[1] !== 0 || A[2] !== 0 || A[3] !== 0; }
+
+  // Cycle-averaged slope  H(z) = A1 − (3/4)A3 z + (5/8)A5 z^2 − (35/64)A7 z^3,  z = (a ω1 / U)^2
+  function H(A, z) { return KB[0] * A[0] - z * (KB[1] * A[1] - z * (KB[2] * A[2] - z * KB[3] * A[3])); }
+  function dH(A, z) { return -KB[1] * A[1] + 2 * z * KB[2] * A[2] - 3 * z * z * KB[3] * A[3]; }
+
+  // p = {U, zeta, m, n1, B, rho}
+  function derived(p, A) {
+    const w1 = 2 * Math.PI * p.n1, G = -A[0];
+    const d = 2 * p.m * w1 * p.zeta + 0.5 * p.rho * p.U * p.B * G;          // S&Y Eq. 20.13
+    const Ucr = G < 0 ? -4 * p.m * w1 * p.zeta / (p.rho * p.B * G) : Infinity; // d = 0; Holmes Eq. 5.46
+    const Sc = 4 * Math.PI * p.zeta * p.m / (p.rho * p.B * p.B);             // Holmes Eq. 5.48 (restored)
+    return { w1, G, d, Ucr, Sc, Ured: p.U / (p.n1 * p.B), UredCr: Ucr / (p.n1 * p.B), sigma: -d / (2 * p.m) };
+  }
+  // R(U) = 4 m ζ ω1 / (ρ U B): the averaged aerodynamic slope needed to balance structural damping
+  function Rdamp(p) { return 4 * p.m * 2 * Math.PI * p.n1 * p.zeta / (p.rho * p.U * p.B); }
+
+  // Averaged amplitude equation  da/dt = a [ −ζ ω1 + (ρ U B / 4m) H(z) ]
+  function avgRate(p, A, a) {
+    const w1 = 2 * Math.PI * p.n1; if (p.U <= 0) return -p.zeta * w1 * a;
+    const q = a * w1 / p.U; return a * (-p.zeta * w1 + p.rho * p.U * p.B / (4 * p.m) * H(A, q * q));
+  }
+
+  const ZMAX = 0.25;
+  // Non-zero steady amplitudes at wind speed p.U:  H(z) = R(U).  Returns [{a, z, stable}] sorted by a.
+  function steady(p, A) {
+    if (!isNonlinear(A) || p.U <= 0) return [];
+    const R = Rdamp(p), w1 = 2 * Math.PI * p.n1, out = [], N = 5000, f = z => H(A, z) - R;
+    let z0 = 1e-12, f0 = f(z0);
+    for (let i = 1; i <= N; i++) {
+      const z1 = ZMAX * (i / N) * (i / N), f1 = f(z1);
+      if (f0 === 0 || f0 * f1 < 0) {
+        let lo = z0, hi = z1, flo = f0;
+        for (let k = 0; k < 60; k++) { const mid = 0.5 * (lo + hi), fm = f(mid); if (flo * fm <= 0) hi = mid; else { lo = mid; flo = fm; } }
+        const z = 0.5 * (lo + hi); out.push({ a: Math.sqrt(z) * p.U / w1, z, stable: dH(A, z) < 0 });
+      }
+      z0 = z1; f0 = f1;
+    }
+    return out;
+  }
+  // Whole amplitude–speed curve, parametrised by z: U(z) = 4 m ζ ω1 / (ρ B H(z)),  a = sqrt(z) U / ω1.
+  // Returns segments [{stable, pts:[{U,a}]}] for U ≤ Umax.
+  function branch(p, A, Umax, N) {
+    if (!isNonlinear(A)) return [];
+    N = N || 1500; const w1 = 2 * Math.PI * p.n1, K = 4 * p.m * w1 * p.zeta / (p.rho * p.B), segs = []; let cur = null;
+    for (let i = 0; i <= N; i++) {
+      const z = ZMAX * (i / N) * (i / N), h = H(A, z), ok = h > 0 && K / h <= Umax;
+      if (!ok) { cur = null; continue; }
+      const st = dH(A, z) < 0, U = K / h, pt = { U, a: Math.sqrt(z) * U / w1 };
+      if (!cur || cur.stable !== st) { const prev = cur && cur.pts[cur.pts.length - 1]; cur = { stable: st, pts: prev ? [prev] : [] }; segs.push(cur); }
+      cur.pts.push(pt);
+    }
+    return segs;
+  }
+  // Fold (jump) points of the universal curve: dH/dz = 0.  X = U/Ucr, Y = a ω1/Ucr.  Needs A1 > 0.
+  function folds(A) {
+    const out = []; if (!(A[0] > 0) || !isNonlinear(A)) return out;
+    const qa = -3 * KB[3] * A[3], qb = 2 * KB[2] * A[2], qc = -KB[1] * A[1];
+    let zs = [];
+    if (qa === 0) { if (qb !== 0) zs = [-qc / qb]; }
+    else { const disc = qb * qb - 4 * qa * qc; if (disc >= 0) { const s = Math.sqrt(disc); zs = [(-qb + s) / (2 * qa), (-qb - s) / (2 * qa)]; } }
+    for (const z of zs) { if (z > 0) { const h = H(A, z); if (h > 0) { const X = A[0] / h; if (X > 0) out.push({ z, X, Y: X * Math.sqrt(z) }); } } }
+    return out.sort((u, v) => u.X - v.X);
+  }
+  // Slope of the high-speed asymptote  a ω1 / U → sqrt(z∞),  H(z∞) = 0 with dH < 0
+  function asymptote(A) {
+    if (!isNonlinear(A)) return null; let best = null, z0 = 1e-12, f0 = H(A, z0); const N = 5000;
+    for (let i = 1; i <= N; i++) {
+      const z1 = ZMAX * (i / N) * (i / N), f1 = H(A, z1);
+      if (f0 * f1 < 0) { let lo = z0, hi = z1, flo = f0; for (let k = 0; k < 60; k++) { const mid = 0.5 * (lo + hi), fm = H(A, mid); if (flo * fm <= 0) hi = mid; else { lo = mid; flo = fm; } }
+        const z = 0.5 * (lo + hi); if (dH(A, z) < 0) best = Math.sqrt(z); }
+      z0 = z1; f0 = f1;
+    }
+    return best;
+  }
+
+  // Equation of motion  ÿ = −2ζω1 ẏ − ω1² y + (ρ U² B / 2m) C_Fy(ẏ/U)
+  function accel(p, A, w1, y, v) {
+    const aero = p.U > 0 ? p.rho * p.U * p.U * p.B / (2 * p.m) * cfy(A, v / p.U) : 0;
+    return -2 * p.zeta * w1 * v - w1 * w1 * y + aero;
+  }
+  function rk4(p, A, st, dt) {
+    const w1 = 2 * Math.PI * p.n1, y = st.y, v = st.v;
+    const k1y = v, k1v = accel(p, A, w1, y, v);
+    const k2y = v + 0.5 * dt * k1v, k2v = accel(p, A, w1, y + 0.5 * dt * k1y, k2y);
+    const k3y = v + 0.5 * dt * k2v, k3v = accel(p, A, w1, y + 0.5 * dt * k2y, k3y);
+    const k4y = v + dt * k3v, k4v = accel(p, A, w1, y + dt * k3y, k4y);
+    st.y = y + dt / 6 * (k1y + 2 * k2y + 2 * k3y + k4y);
+    st.v = v + dt / 6 * (k1v + 2 * k2v + 2 * k3v + k4v);
+    st.t += dt;
+  }
+  function envelope(p, st) { const w1 = 2 * Math.PI * p.n1; return Math.sqrt(st.y * st.y + (st.v / w1) * (st.v / w1)); }
+  // Integrate for `cycles` natural periods from y(0) = y0, ẏ(0) = 0; returns the final envelope amplitude.
+  function simulate(p, A, y0, cycles, stepsPerCycle) {
+    stepsPerCycle = stepsPerCycle || 40; const dt = 1 / (p.n1 * stepsPerCycle), st = { y: y0, v: 0, t: 0 };
+    const n = Math.round(cycles * stepsPerCycle); for (let i = 0; i < n; i++) rk4(p, A, st, dt);
+    return envelope(p, st);
+  }
+  return { KB, SECTIONS, ZMAX, cfy, isNonlinear, H, dH, derived, Rdamp, avgRate, steady, branch, folds, asymptote, accel, rk4, envelope, simulate };
+})();
+//</PHYS>
+
+/* ------------------------------------------------------------------ UI ------------------------------------------------------------------ */
+(function () {
+  const $ = id => document.getElementById(id);
+  const root = document.documentElement;
+  const hash = Object.fromEntries(location.hash.replace(/^#/, "").split("&").filter(Boolean).map(s => s.split("=")));
+  let lang = hash.lang === "en" ? "en" : hash.lang === "zh" ? "zh" : (((navigator.languages && navigator.languages[0]) || navigator.language || "zh").toLowerCase().startsWith("zh") ? "zh" : "en");
+  let theme = hash.theme || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const L = (zh, en) => lang === "zh" ? zh : en;
+
+  const NAMES = {
+    square: ["方柱", "Square"], rect21: ["矩形 2:1", "Rectangle 2:1"], rect12: ["矩形 1:2", "Rectangle 1:2"],
+    dsec: ["D 形", "D-section"], circle: ["圆形", "Circle"], custom: ["自定义", "Custom"]
+  };
+  const SRC = {
+    square: ['<span class="tag lit">文献值</span>Parkinson &amp; Smith 1964，图 2 图题，第 228 页（PDF 第 4 页）。光滑流，Re = 22 300，拟合范围 |α| &lt; 16°。',
+             '<span class="tag lit">Literature</span>Parkinson &amp; Smith 1964, caption of Fig. 2, p. 228 (PDF p. 4). Smooth flow, Re = 22,300, fitted for |α| &lt; 16°.'],
+    rect21: ['<span class="tag der">文献数值反推</span>A<sub>1</sub> = 1/0.429，来自 Novak 1972 第 38 页（PDF 第 12 页）的起振风速 Ū<sub>0</sub> = 0.429（二维光滑流）。高次系数原文未列，只算线性判据，不画振幅。',
+             '<span class="tag der">Derived</span>A<sub>1</sub> = 1/0.429 from the onset speed Ū<sub>0</sub> = 0.429 in Novak 1972, p. 38 (PDF p. 12), two-dimensional smooth flow. Higher coefficients are not listed in the paper: linear criterion only, no amplitude.'],
+    rect12: ['<span class="tag lit">文献值（定性）</span>Novak 1972 第 42 页（PDF 第 16 页）：光滑流中 A<sub>1</sub> = 0，不会从静止起振；大扰动可触发硬驰振，本页未建模。',
+             '<span class="tag lit">Literature (qualitative)</span>Novak 1972, p. 42 (PDF p. 16): A<sub>1</sub> = 0 in smooth flow, no galloping from rest; a large disturbance can trigger hard galloping, which is not modelled here.'],
+    dsec: ['<span class="tag ill">示意值，无文献依据</span>A<sub>1</sub> = −0.1 是为演示取的数。文献只有定性结论：光滑流中不会从静止起振（Naudascher &amp; Rockwell 1994，书页 207，PDF 第 226 页）。',
+           '<span class="tag ill">Illustrative, no literature basis</span>A<sub>1</sub> = −0.1 is chosen for the demo. The literature gives only the qualitative result: no galloping from rest in smooth flow (Naudascher &amp; Rockwell 1994, p. 207, PDF p. 226).'],
+    circle: ['<span class="tag ill">C<sub>D</sub> 为示意值，无文献依据</span>dC<sub>L</sub>/dα = 0 是文献结论（Simiu &amp; Yeo 2019，书页 299，PDF 第 325 页），所以 G = C<sub>D</sub> &gt; 0；C<sub>D</sub> = 1.2 是示意值。',
+             '<span class="tag ill">C<sub>D</sub> illustrative, no literature basis</span>dC<sub>L</sub>/dα = 0 is from the literature (Simiu &amp; Yeo 2019, p. 299, PDF p. 325), so G = C<sub>D</sub> &gt; 0; C<sub>D</sub> = 1.2 is illustrative.'],
+    custom: ['<span class="tag ill">自定义，非文献值</span>系数由使用者输入。三个高次系数都为 0 时只做线性判据。',
+             '<span class="tag ill">Custom, not literature values</span>Coefficients typed in by the user. With all three higher coefficients zero only the linear criterion is evaluated.']
+  };
+
+  /* ---------- state ---------- */
+  let secKey = "square", A = PHYS.SECTIONS.square.A.slice(), edited = false;
+  const st = { y: 0, v: 0, t: 0 };
+  let speed = 16, paused = false, phase = 0, frozen = false;
+  let hist = [], trail = [], sweep = null, caseNote = "default";
+  const SL = { U: "U", zeta: "z", m: "m", n1: "n", B: "B", rho: "r" };
+  function params() { const p = {}; for (const k in SL) p[k] = +$(SL[k]).value; return p; }
+  function setParams(o) { for (const k in o) $(SL[k]).value = o[k]; }
+
+  /* ---------- helpers ---------- */
+  function fmt(x, k) { if (!isFinite(x)) return "∞"; return x.toFixed(k == null ? 2 : k); }
+  function sig(x, n) { if (!isFinite(x)) return "∞"; if (x === 0) return "0"; const a = Math.abs(x); const d = Math.max(0, (n || 3) - 1 - Math.floor(Math.log10(a))); return x.toFixed(Math.min(d, 6)); }
+  let COL = {};
+  function readColors() { const cs = getComputedStyle(root); for (const k of ["bg", "card", "ink", "muted", "faint", "line", "grid", "accent", "bad", "ok", "amber", "violet", "body", "accent-soft", "bad-soft"]) COL[k] = cs.getPropertyValue("--" + k).trim(); }
+  function prep(cv) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5), w = cv.clientWidth, h = cv.clientHeight;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h); g.lineJoin = "round"; g.lineCap = "round";
+    return { g, w, h };
+  }
+  const FONT = 'system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif';
+  // text with _{sub} support
+  function text(g, s, x, y, opt) {
+    opt = opt || {}; const size = opt.size || 12, parts = s.split(/(_\{[^}]*\})/); g.fillStyle = opt.color || COL.muted;
+    let wsum = 0; const ws = parts.map(pt => { const sub = pt.startsWith("_{"); g.font = (opt.bold ? "600 " : "") + (sub ? size * 0.74 : size) + "px " + FONT; const t = sub ? pt.slice(2, -1) : pt; const w = g.measureText(t).width; wsum += w; return { t, sub, w }; });
+    let x0 = opt.align === "center" ? x - wsum / 2 : opt.align === "right" ? x - wsum : x; g.textAlign = "left"; g.textBaseline = opt.base || "alphabetic";
+    for (const q of ws) { g.font = (opt.bold ? "600 " : "") + (q.sub ? size * 0.74 : size) + "px " + FONT; g.fillText(q.t, x0, y + (q.sub ? size * 0.28 : 0)); x0 += q.w; }
+    return wsum;
+  }
+  function arrow(g, x0, y0, x1, y1, color, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy); if (len < 0.5) return; head = Math.min(head || 7, len * 0.6);
+    const ux = dx / len, uy = dy / len; g.strokeStyle = color; g.fillStyle = color; g.lineWidth = lw || 1.5;
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1 - ux * head * 0.7, y1 - uy * head * 0.7); g.stroke();
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1 - ux * head - uy * head * 0.45, y1 - uy * head + ux * head * 0.45); g.lineTo(x1 - ux * head + uy * head * 0.45, y1 - uy * head - ux * head * 0.45); g.closePath(); g.fill();
+  }
+  function niceStep(span, n) { const raw = span / n, p10 = Math.pow(10, Math.floor(Math.log10(raw))), r = raw / p10; return (r < 1.5 ? 1 : r < 3.5 ? 2 : r < 7.5 ? 5 : 10) * p10; }
+  // plot frame: returns mapping functions
+  function frame(g, w, h, xr, yr, o) {
+    const mL = o.mL || 46, mR = o.mR || 12, mT = o.mT || 12, mB = o.mB || 36, pw = w - mL - mR, ph = h - mT - mB;
+    const X = x => mL + (x - xr[0]) / (xr[1] - xr[0]) * pw, Y = y => mT + ph - (y - yr[0]) / (yr[1] - yr[0]) * ph;
+    g.lineWidth = 1; g.strokeStyle = COL.grid;
+    const xs = o.xstep || niceStep(xr[1] - xr[0], o.nx || 6), ys = o.ystep || niceStep(yr[1] - yr[0], o.ny || 5);
+    const dec = s => Math.max(0, -Math.floor(Math.log10(s) + 1e-9));
+    for (let x = Math.ceil(xr[0] / xs - 1e-9) * xs; x <= xr[1] + 1e-9; x += xs) { g.beginPath(); g.moveTo(X(x), mT); g.lineTo(X(x), mT + ph); g.stroke(); if (!o.noXLabels) text(g, (o.xfmt ? o.xfmt(x) : x.toFixed(dec(xs))), X(x), mT + ph + 14, { align: "center", size: 11, color: COL.faint }); }
+    for (let y = Math.ceil(yr[0] / ys - 1e-9) * ys; y <= yr[1] + 1e-9; y += ys) { g.beginPath(); g.moveTo(mL, Y(y)); g.lineTo(mL + pw, Y(y)); g.stroke(); text(g, (Math.abs(y) < 1e-12 ? 0 : y).toFixed(dec(ys)), mL - 6, Y(y) + 4, { align: "right", size: 11, color: COL.faint }); }
+    g.strokeStyle = COL.line; g.strokeRect(mL, mT, pw, ph);
+    if (o.xlabel) text(g, o.xlabel, mL + pw / 2, h - 5, { align: "center", size: 12 });
+    if (o.ylabel) { g.save(); g.translate(13, mT + ph / 2); g.rotate(-Math.PI / 2); text(g, o.ylabel, 0, 0, { align: "center", size: 12 }); g.restore(); }
+    return { X, Y, mL, mT, pw, ph };
+  }
+  function clipTo(g, f) { g.save(); g.beginPath(); g.rect(f.mL, f.mT, f.pw, f.ph); g.clip(); }
+
+  /* ---------- simulation ---------- */
+  const FLOOR = 0.002;        // background disturbance, in B
+  function capAmp(p) { return (PHYS.isNonlinear(A) ? 60 : 8) * p.B; }
+  function kick(aTarget) { const p = params(); st.y = aTarget; st.v = 0; frozen = false; phase = 0; }
+  function resetRun() { hist = []; trail = []; st.t = 0; frozen = false; }
+  function advance(p, wallDt) {
+    if (frozen) return;
+    const cyc = speed * wallDt * p.n1, steps = Math.max(2, Math.ceil(cyc * 40)), dt = speed * wallDt / steps;
+    let lo = st.y, hi = st.y;
+    for (let i = 0; i < steps; i++) { PHYS.rk4(p, A, st, dt); if (st.y < lo) lo = st.y; if (st.y > hi) hi = st.y; }
+    let a = PHYS.envelope(p, st);
+    if (!isFinite(a)) { st.y = FLOOR * p.B; st.v = 0; a = st.y; }
+    if (a < 0.5 * FLOOR * p.B) { if (a > 0) { const k = FLOOR * p.B / a; st.y *= k; st.v *= k; } else { st.y = FLOOR * p.B; st.v = 0; } a = FLOOR * p.B; }
+    if (a > capAmp(p)) frozen = true;
+    hist.push({ t: st.t, lo, hi, a, wave: cyc < 0.12 }); if (hist.length > 720) hist.shift();
+    if (sweep) trail.push({ U: p.U, a });
+  }
+  function startSweep() {
+    const p = params(), d = PHYS.derived(p, A); if (!isFinite(d.Ucr)) return;
+    const U0 = 0.6 * d.Ucr, U1 = Math.min(2.7 * d.Ucr, 40); if (U1 <= U0) return;
+    const wall = 64, simT = 900 / (p.zeta * d.w1);   // slow enough for the amplitude to follow the steady curve
+    sweep = { U0, U1, wall, t: 0, prevSpeed: speed }; speed = Math.max(16, simT / wall); trail = []; hist = []; frozen = false; paused = false;
+    $("U").value = U0; st.y = FLOOR * p.B; st.v = 0; syncUI();
+  }
+  function stopSweep() { if (!sweep) return; speed = sweep.prevSpeed; sweep = null; syncUI(); }
+  function stepSweep(wallDt) {
+    sweep.t += wallDt; const f = sweep.t / sweep.wall; if (f >= 1) { $("U").value = sweep.U0; stopSweep(); return; }
+    const tri = f < 0.5 ? f * 2 : 2 - f * 2; $("U").value = sweep.U0 + (sweep.U1 - sweep.U0) * tri; sweep.dir = f < 0.5 ? 1 : -1;
+  }
+
+  /* ---------- drawing: scene ---------- */
+  function shapePath(g, key, cx, cy, S) {
+    g.beginPath();
+    if (key === "circle") g.arc(cx, cy, S / 2, 0, 2 * Math.PI);
+    else if (key === "rect21") g.rect(cx - S, cy - S / 2, 2 * S, S);
+    else if (key === "rect12") g.rect(cx - S / 4, cy - S / 2, S / 2, S);
+    else if (key === "dsec") { g.moveTo(cx - S / 4, cy - S / 2); g.arc(cx - S / 4, cy, S / 2, -Math.PI / 2, Math.PI / 2); g.closePath(); }
+    else g.rect(cx - S / 2, cy - S / 2, S, S);
+  }
+  function drawScene(p, d, aEnv) {
+    const { g, w, h } = prep($("cvScene"));
+    const S = Math.min(h * 0.19, w * 0.11, 58), cx = w * 0.6, cy0 = h * 0.56;
+    const maxPx = h * 0.2, rawPx = aEnv / p.B * S, k = rawPx > maxPx ? maxPx / rawPx : 1;
+    const yd = aEnv * Math.cos(phase), vd = -aEnv * d.w1 * Math.sin(phase);
+    const cy = cy0 - yd / p.B * S * k;
+    const s = p.U > 0 ? vd / p.U : 0, th = Math.atan(s), gallop = d.d < 0;
+    // rest line
+    g.setLineDash([3, 4]); g.strokeStyle = COL.line; g.lineWidth = 1; g.beginPath(); g.moveTo(8, cy0); g.lineTo(w - 8, cy0); g.stroke(); g.setLineDash([]);
+    // streamlines
+    const xEnd = cx - S * 3.4, off = (performance.now() / 1000 * Math.min(p.U, 40) * 4) % 22;
+    for (let i = -2; i <= 2; i++) {
+      const yy = cy0 + i * h * 0.15; g.strokeStyle = COL.faint; g.globalAlpha = 0.55; g.lineWidth = 1.3; g.setLineDash([12, 10]); g.lineDashOffset = -off;
+      g.beginPath(); g.moveTo(10, yy); g.lineTo(xEnd - 6, yy); g.stroke(); g.setLineDash([]); g.globalAlpha = 1;
+      arrow(g, xEnd - 16, yy, xEnd, yy, COL.faint, 1.3, 7);
+    }
+    text(g, "U = " + fmt(p.U, 1) + " m/s", 12, 20, { size: 13, color: COL.ink, bold: true });
+    // support: spring + dashpot
+    const top = 10, bt = cy - S / 2, xs = cx - S * 0.24, xd = cx + S * 0.24;
+    g.strokeStyle = COL.muted; g.lineWidth = 1.4; g.beginPath(); g.moveTo(cx - S * 0.9, top); g.lineTo(cx + S * 0.9, top); g.stroke();
+    g.beginPath(); g.moveTo(xs, top); const nz = 9, seg = (bt - top - 12) / nz; g.lineTo(xs, top + 6);
+    for (let i = 0; i < nz; i++) g.lineTo(xs + (i % 2 ? -6 : 6), top + 6 + seg * (i + 0.5)); g.lineTo(xs, bt - 6); g.lineTo(xs, bt); g.stroke();
+    const mid = (top + bt) / 2; g.beginPath(); g.moveTo(xd, top); g.lineTo(xd, mid - 7); g.moveTo(xd - 6, mid - 7); g.lineTo(xd + 6, mid - 7); g.moveTo(xd - 8, mid - 14); g.lineTo(xd - 8, mid + 6); g.lineTo(xd + 8, mid + 6); g.lineTo(xd + 8, mid - 14); g.moveTo(xd, mid + 6); g.lineTo(xd, bt); g.stroke();
+    // body
+    shapePath(g, secKey, cx, cy, S); g.fillStyle = gallop ? COL.bad : COL.body; g.globalAlpha = 0.9; g.fill(); g.globalAlpha = 1; g.lineWidth = 1.5; g.strokeStyle = COL.ink; g.stroke();
+    // velocity arrow of body
+    const vpx = -Math.sign(vd) * Math.min(42, Math.abs(s) * 150);
+    const bx = cx + (secKey === "rect21" ? S : S / 2) + 16;
+    if (Math.abs(vpx) > 2) { arrow(g, bx, cy, bx, cy + vpx, COL.violet, 2, 7); text(g, "ẏ", bx + 6, cy + vpx / 2 + 4, { size: 13, color: COL.violet, bold: true }); }
+    // velocity triangle (wind seen by the body): U horizontal, −ẏ vertical, U_rel resultant
+    const Lu = Math.min(S * 2.4, w * 0.2), ox = cx - (secKey === "rect21" ? S : S / 2) - 14 - Lu, oy = cy;
+    const ex = ox + Lu, ey = oy + Lu * s;            // screen y is down: body moving up (ẏ>0) → relative wind points down
+    arrow(g, ox, oy, ex, oy, COL.muted, 1.5, 7);
+    if (Math.abs(Lu * s) > 1.5) arrow(g, ex, oy, ex, ey, COL.violet, 1.5, 6);
+    arrow(g, ox, oy, ex, ey, COL.accent, 2.2, 8);
+    text(g, "U", ox + Lu * 0.45, oy + (s >= 0 ? -6 : 15), { size: 12 });
+    text(g, "U_{rel}", ox + Lu * 0.4, oy + Lu * s * 0.45 + (s >= 0 ? 17 : -8), { size: 12, color: COL.accent, bold: true });
+    if (Math.abs(Lu * s) > 9) text(g, "−ẏ", ex + 4, oy + Lu * s * 0.55 + 4, { size: 12, color: COL.violet });
+    if (Math.abs(th) > 0.012) { g.strokeStyle = COL.amber; g.lineWidth = 1.4; g.beginPath(); const r = Lu * 0.55; if (th > 0) g.arc(ox, oy, r, 0, th); else g.arc(ox, oy, r, th, 0); g.stroke(); text(g, "α", ox + r + 4, oy + r * Math.sin(th / 2) + 4, { size: 13, color: COL.amber, bold: true }); }
+    // forces at body centre (schematic lengths): D along U_rel, L normal to it, F_y vertical
+    const CD = PHYS.SECTIONS[secKey].CDdraw, cf = PHYS.cfy(A, s), c = Math.cos(th), sn = Math.sin(th);
+    const CL = (cf * c * c + CD * sn) / c, u = S * 0.62;
+    arrow(g, cx, cy, cx + CD * u * c, cy + CD * u * sn, COL.muted, 1.6, 7); text(g, "D", cx + CD * u * c + 5, cy + CD * u * sn + 4, { size: 12 });
+    if (Math.abs(CL * u) > 2) { arrow(g, cx, cy, cx + CL * u * sn, cy - CL * u * c, COL.ok, 1.6, 7); text(g, "L", cx + CL * u * sn + (CL > 0 ? 5 : -12), cy - CL * u * c + (CL > 0 ? -4 : 12), { size: 12, color: COL.ok }); }
+    const fpx = cf * u * 2.4; if (Math.abs(fpx) > 2) { const col = cf * s > 0 ? COL.bad : COL.ok; arrow(g, cx - S * 0.0, cy, cx, cy - fpx, col, 3, 9); text(g, "F_{y}", cx - 26, cy - fpx + (fpx > 0 ? -3 : 12), { size: 13, color: col, bold: true }); }
+    // captions
+    const deg = -th * 180 / Math.PI;
+    text(g, "α = −ẏ/U = " + (deg >= 0 ? "+" : "−") + Math.abs(deg).toFixed(1) + "°", 12, h - 30, { size: 13, color: COL.amber, bold: true });
+    text(g, "C_{Fy} = " + (cf >= 0 ? "+" : "−") + Math.abs(cf).toFixed(3) + (Math.abs(s) < 1e-4 ? "" : (cf * s > 0 ? L("  与运动同向：输入能量", "  along the motion: feeds energy") : L("  与运动反向：耗散能量", "  against the motion: removes energy"))), 12, h - 11, { size: 12.5, color: cf * s > 0 ? COL.bad : COL.ok });
+    text(g, "y", w - 20, cy0 - h * 0.3, { size: 12 }); arrow(g, w - 14, cy0 - 4, w - 14, cy0 - h * 0.26, COL.faint, 1.2, 6);
+    $("sceneNote").textContent = (k < 1 ? L("位移按 ×" + k.toFixed(2) + " 显示；", "displacement drawn ×" + k.toFixed(2) + "; ") : "") + L("摆动节奏放慢显示，力矢量长度为示意", "motion shown slowed down, force lengths schematic");
+  }
+
+  /* ---------- drawing: time history ---------- */
+  function drawTime(p, d, roots) {
+    const { g, w, h } = prep($("cvTime"));
+    let amax = 0; for (const q of hist) amax = Math.max(amax, -q.lo, q.hi); for (const r of roots) amax = Math.max(amax, r.a);
+    let yr = Math.max(amax / p.B * 1.18, 0.05); const stp = niceStep(2 * yr, 6); yr = Math.ceil(yr / stp) * stp;
+    const t1 = hist.length ? hist[hist.length - 1].t : 1, t0 = hist.length ? hist[0].t : 0, span = Math.max(t1 - t0, 1e-6);
+    const f = frame(g, w, h, [t0, t0 + span], [-yr, yr], { ylabel: "y / B", xlabel: L("时间 t (s)", "time t (s)"), mL: 50, mB: 34, ystep: stp, nx: Math.max(3, Math.round(w / 140)), xfmt: x => x.toFixed(span < 20 ? 1 : 0) });
+    clipTo(g, f);
+    for (const r of roots) for (const sgn of [1, -1]) { g.setLineDash(r.stable ? [7, 5] : [2, 4]); g.strokeStyle = r.stable ? COL.ok : COL.bad; g.lineWidth = 1.3; g.beginPath(); g.moveTo(f.mL, f.Y(sgn * r.a / p.B)); g.lineTo(f.mL + f.pw, f.Y(sgn * r.a / p.B)); g.stroke(); }
+    g.setLineDash([]);
+    if (hist.length > 1) {
+      const col = d.d < 0 ? COL.bad : COL.accent;
+      // envelope ±a (always), and the waveform itself when a frame covers only a small part of a cycle
+      g.beginPath(); hist.forEach((q, i) => { const x = f.X(q.t), y = f.Y(q.a / p.B); i ? g.lineTo(x, y) : g.moveTo(x, y); });
+      for (let i = hist.length - 1; i >= 0; i--) g.lineTo(f.X(hist[i].t), f.Y(-hist[i].a / p.B));
+      g.closePath(); g.fillStyle = col; g.globalAlpha = 0.22; g.fill(); g.globalAlpha = 1; g.strokeStyle = col; g.lineWidth = 1.6; g.stroke();
+      if (hist.every(q => q.wave)) { g.beginPath(); hist.forEach((q, i) => { const x = f.X(q.t), y = f.Y(0.5 * (q.lo + q.hi) / p.B); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.lineWidth = 1.4; g.stroke(); }
+      else { g.globalAlpha = 0.5; g.lineWidth = 1; g.beginPath(); for (const q of hist) { const x = f.X(q.t); g.moveTo(x, f.Y(q.lo / p.B)); g.lineTo(x, f.Y(q.hi / p.B)); } g.stroke(); g.globalAlpha = 1; }
+    }
+    g.restore();
+    let lab = L("增长率 σ = −d/(2m) = ", "growth rate σ = −d/(2m) = ") + sig(d.sigma, 3) + " s⁻¹";
+    if (frozen) lab += L("；线性模型没有极限环，已到显示上限，停止", "; the linear model has no limit cycle: display limit reached, stopped");
+    text(g, lab, f.mL + 8, f.mT + 15, { size: 12, color: frozen ? COL.amber : COL.muted });
+    if (roots.length && w > 620) { const x = f.mL + f.pw - 8; text(g, L("- - 稳定极限环   ··· 不稳定极限环", "- - stable limit cycle   ··· unstable limit cycle"), x, f.mT + 15, { size: 11.5, align: "right" }); }
+  }
+
+  /* ---------- drawing: amplitude vs speed ---------- */
+  function drawAmp(p, d, roots, aEnv) {
+    const { g, w, h } = prep($("cvAmp"));
+    if (!isFinite(d.Ucr)) {
+      const f = frame(g, w, h, [0, 40], [0, 1], { xlabel: "U (m/s)", ylabel: "a / B" });
+      g.strokeStyle = COL.ok; g.lineWidth = 3; g.beginPath(); g.moveTo(f.X(0), f.Y(0)); g.lineTo(f.X(40), f.Y(0)); g.stroke();
+      text(g, L("G ≥ 0：U_{cr} = ∞，零位置在任何风速下稳定", "G ≥ 0: U_{cr} = ∞, the rest position is stable at any wind speed"), f.mL + f.pw / 2, f.mT + f.ph * 0.42, { align: "center", size: 13, color: COL.ok, bold: true });
+      if (secKey === "rect12" || secKey === "dsec") text(g, L("文献：足够大的扰动可触发硬驰振（本页未建模）", "Literature: a large enough disturbance can trigger hard galloping (not modelled)"), f.mL + f.pw / 2, f.mT + f.ph * 0.42 + 20, { align: "center", size: 12 });
+      const xm = f.X(Math.min(p.U, 40)); g.fillStyle = COL.accent; g.beginPath(); g.arc(xm, f.Y(Math.min(aEnv / p.B, 1)), 5, 0, 7); g.fill();
+      return;
+    }
+    const Xmax = 3.2, nl = PHYS.isNonlinear(A), segs = PHYS.branch(p, A, Xmax * d.Ucr);
+    let ymax = 0; for (const sg of segs) for (const q of sg.pts) ymax = Math.max(ymax, q.a / p.B);
+    if (!nl || ymax === 0) ymax = Math.max(1, aEnv / p.B); ymax *= 1.08;
+    const f = frame(g, w, h, [0, Xmax], [0, ymax], { xlabel: "U / U_{cr}      (U_{cr} = " + fmt(d.Ucr, 2) + " m/s)", ylabel: "a / B", mB: 38, xstep: 0.5 });
+    clipTo(g, f);
+    // quasi-steady doubtful zone & vortex resonance mark
+    const St = PHYS.SECTIONS[secKey].St; if (St && !edited) { const xv = (p.n1 * p.B / St) / d.Ucr; if (xv < Xmax) { g.fillStyle = COL.amber; g.globalAlpha = 0.13; g.fillRect(f.X(0), f.mT, f.X(Math.min(xv * 1.6, Xmax)) - f.X(0), f.ph); g.globalAlpha = 1; g.strokeStyle = COL.amber; g.lineWidth = 1.2; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(f.X(xv), f.mT); g.lineTo(f.X(xv), f.mT + f.ph); g.stroke(); g.setLineDash([]); text(g, L("涡振 U = n_{1}B/St", "vortex resonance U = n_{1}B/St"), f.X(xv) + 5, f.mT + f.ph - 26, { size: 11, color: COL.amber }); } }
+    // zero solution
+    g.lineWidth = 3; g.strokeStyle = COL.ok; g.beginPath(); g.moveTo(f.X(0), f.Y(0) - 1.5); g.lineTo(f.X(1), f.Y(0) - 1.5); g.stroke();
+    g.strokeStyle = COL.bad; g.setLineDash([4, 5]); g.lineWidth = 2; g.beginPath(); g.moveTo(f.X(1), f.Y(0) - 1.5); g.lineTo(f.X(Xmax), f.Y(0) - 1.5); g.stroke(); g.setLineDash([]);
+    if (nl) {
+      const as = PHYS.asymptote(A); if (as) { g.strokeStyle = COL.faint; g.lineWidth = 1; g.setLineDash([6, 5]); g.beginPath(); g.moveTo(f.X(0), f.Y(0)); g.lineTo(f.X(Xmax), f.Y(as * Xmax * d.Ucr / (d.w1 * p.B))); g.stroke(); g.setLineDash([]); }
+      for (const sg of segs) { g.beginPath(); sg.pts.forEach((q, i) => { const x = f.X(q.U / d.Ucr), y = f.Y(q.a / p.B); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.strokeStyle = sg.stable ? COL.accent : COL.bad; g.lineWidth = sg.stable ? 2.6 : 1.8; g.setLineDash(sg.stable ? [] : [5, 5]); g.stroke(); }
+      g.setLineDash([]);
+      // jumps at folds
+      const fd = PHYS.folds(A), sc = d.Ucr / (d.w1 * p.B);
+      for (let i = 0; i < fd.length; i++) {
+        const q = fd[i], others = PHYS.steady(Object.assign({}, p, { U: q.X * d.Ucr }), A).filter(r => r.stable && Math.abs(r.z - q.z) > 1e-4 * q.z + 1e-9);
+        if (!others.length) continue; const tgt = others[0].a / p.B, x = f.X(q.X);
+        g.setLineDash([2, 3]); arrow(g, x, f.Y(q.Y * sc), x, f.Y(tgt), COL.muted, 1.2, 7); g.setLineDash([]);
+      }
+    }
+    // U_cr marker
+    g.fillStyle = COL.ink; g.beginPath(); g.arc(f.X(1), f.Y(0) - 1.5, 3.5, 0, 7); g.fill();
+    // sweep trail
+    if (trail.length > 1) { g.strokeStyle = COL.violet; g.lineWidth = 1.6; g.globalAlpha = 0.85; g.beginPath(); trail.forEach((q, i) => { const x = f.X(q.U / d.Ucr), y = f.Y(q.a / p.B); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); g.globalAlpha = 1; }
+    // current speed line, steady roots, live dot
+    const xc = Math.min(p.U / d.Ucr, Xmax); g.strokeStyle = COL.ink; g.globalAlpha = 0.35; g.lineWidth = 1; g.beginPath(); g.moveTo(f.X(xc), f.mT); g.lineTo(f.X(xc), f.mT + f.ph); g.stroke(); g.globalAlpha = 1;
+    if (p.U / d.Ucr <= Xmax) for (const r of roots) { g.beginPath(); g.arc(f.X(xc), f.Y(r.a / p.B), 5, 0, 7); g.fillStyle = COL.card; g.fill(); g.lineWidth = 2; g.strokeStyle = r.stable ? COL.accent : COL.bad; g.stroke(); }
+    const yl = f.Y(Math.min(aEnv / p.B, ymax)); g.beginPath(); g.arc(f.X(xc), yl, 9, 0, 7); g.fillStyle = COL.violet; g.globalAlpha = 0.25; g.fill(); g.globalAlpha = 1; g.beginPath(); g.arc(f.X(xc), yl, 4.5, 0, 7); g.fillStyle = COL.violet; g.fill();
+    g.restore();
+    text(g, "U_{cr}", f.X(1), f.mT + f.ph - 9, { align: "center", size: 11.5, color: COL.ink, bold: true });
+    const lx = f.mL + 10; let ly = f.mT + 16;
+    if (nl) {
+      const key = (c, dash, t) => { g.strokeStyle = c; g.lineWidth = 2.2; g.setLineDash(dash); g.beginPath(); g.moveTo(lx, ly - 4); g.lineTo(lx + 22, ly - 4); g.stroke(); g.setLineDash([]); text(g, t, lx + 28, ly, { size: 11.5 }); ly += 16; };
+      key(COL.accent, [], L("稳定极限环", "stable limit cycle")); key(COL.bad, [5, 5], L("不稳定", "unstable")); key(COL.faint, [6, 5], L("渐近线 a ω_{1}/U = ", "asymptote a ω_{1}/U = ") + fmt(PHYS.asymptote(A) || 0, 3));
+      g.fillStyle = COL.violet; g.beginPath(); g.arc(lx + 11, ly - 4, 4, 0, 7); g.fill(); text(g, L("时程积分的当前振幅", "current amplitude (time integration)"), lx + 28, ly, { size: 11.5 });
+    } else {
+      text(g, L("原文未给高次系数：只有线性判据，", "No higher coefficients in the source: linear criterion only,"), f.mL + f.pw / 2, f.mT + f.ph * 0.36, { align: "center", size: 12.5, color: COL.amber, bold: true });
+      text(g, L("U > U_{cr} 时起振，但稳态振幅算不出来", "motion starts for U > U_{cr} but the steady amplitude cannot be computed"), f.mL + f.pw / 2, f.mT + f.ph * 0.36 + 18, { align: "center", size: 12.5, color: COL.amber });
+    }
+    if (p.U / d.Ucr > Xmax) text(g, L("当前 U 超出图框 →", "current U is off the plot →"), f.mL + f.pw - 6, f.mT + f.ph - 9, { align: "right", size: 11.5 });
+  }
+
+  /* ---------- drawing: C_Fy(α) ---------- */
+  function drawCf(p, d, aEnv) {
+    const { g, w, h } = prep($("cvCf"));
+    const nl = PHYS.isNonlinear(A), amaxDeg = 18, N = 180; let lo = 0, hi = 0; const pts = [];
+    for (let i = 0; i <= N; i++) { const a = amaxDeg * i / N, c = PHYS.cfy(A, Math.tan(a * Math.PI / 180)); pts.push([a, c]); if (c < lo) lo = c; if (c > hi) hi = c; }
+    const R = p.U > 0 ? PHYS.Rdamp(p) : Infinity;
+    hi = Math.max(hi, 0.1); lo = Math.max(Math.min(lo, -0.05), -0.6 * Math.max(hi, 0.3)); hi *= 1.15; lo = lo * 1.1;
+    const f = frame(g, w, h, [0, amaxDeg], [lo, hi], { xlabel: L("相对攻角 |α| = arctan(|ẏ|/U) (°)", "relative angle |α| = arctan(|ẏ|/U) (deg)"), ylabel: "C_{Fy}", xstep: 2 });
+    clipTo(g, f);
+    const aNow = p.U > 0 ? Math.atan(aEnv * d.w1 / p.U) * 180 / Math.PI : 0;
+    g.fillStyle = COL.violet; g.globalAlpha = 0.14; g.fillRect(f.X(0), f.mT, f.X(Math.min(aNow, amaxDeg)) - f.X(0), f.ph); g.globalAlpha = 1;
+    const fit = PHYS.SECTIONS[secKey].alphaFit; if (fit && !edited) { g.strokeStyle = COL.amber; g.setLineDash([3, 3]); g.lineWidth = 1.2; g.beginPath(); g.moveTo(f.X(fit), f.mT); g.lineTo(f.X(fit), f.mT + f.ph); g.stroke(); g.setLineDash([]); text(g, L("拟合范围上限", "fit limit"), f.X(fit) - 4, f.mT + f.ph - 8, { size: 11, color: COL.amber, align: "right" }); }
+    g.strokeStyle = COL.faint; g.lineWidth = 1; g.beginPath(); g.moveTo(f.mL, f.Y(0)); g.lineTo(f.mL + f.pw, f.Y(0)); g.stroke();
+    // structural-damping line  C = R · tanα
+    if (isFinite(R)) { g.strokeStyle = COL.ok; g.lineWidth = 1.6; g.setLineDash([7, 5]); g.beginPath(); for (let i = 0; i <= 60; i++) { const a = amaxDeg * i / 60, y = R * Math.tan(a * Math.PI / 180); i ? g.lineTo(f.X(a), f.Y(y)) : g.moveTo(f.X(a), f.Y(y)); } g.stroke(); g.setLineDash([]); }
+    // initial slope A1
+    g.strokeStyle = COL.accent; g.globalAlpha = 0.45; g.lineWidth = 1.2; g.beginPath(); g.moveTo(f.X(0), f.Y(0)); g.lineTo(f.X(amaxDeg), f.Y(A[0] * Math.tan(amaxDeg * Math.PI / 180))); g.stroke(); g.globalAlpha = 1;
+    g.strokeStyle = COL.accent; g.lineWidth = 2.6; g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(f.X(q[0]), f.Y(q[1])) : g.moveTo(f.X(q[0]), f.Y(q[1]))); g.stroke();
+    const sNow = p.U > 0 ? Math.abs(aEnv * d.w1 * Math.sin(phase)) / p.U : 0, aI = Math.atan(sNow) * 180 / Math.PI;
+    g.fillStyle = COL.violet; g.beginPath(); g.arc(f.X(Math.min(aI, amaxDeg)), f.Y(PHYS.cfy(A, sNow)), 4.5, 0, 7); g.fill();
+    g.restore();
+    const lx = f.mL + 10; let ly = f.mT + 16;
+    const key = (c, dash, t, lw, al) => { g.globalAlpha = al || 1; g.strokeStyle = c; g.lineWidth = lw || 2.2; g.setLineDash(dash); g.beginPath(); g.moveTo(lx, ly - 4); g.lineTo(lx + 22, ly - 4); g.stroke(); g.setLineDash([]); g.globalAlpha = 1; text(g, t, lx + 28, ly, { size: 11.5 }); ly += 16; };
+    key(COL.accent, [], nl ? L("C_{Fy} 多项式", "C_{Fy} polynomial") : L("C_{Fy} = A_{1}·tanα（仅线性）", "C_{Fy} = A_{1}·tanα (linear only)"));
+    key(COL.accent, [], L("起始斜率 A_{1} = −G = ", "initial slope A_{1} = −G = ") + fmt(A[0], 2), 1.2, 0.5);
+    key(COL.ok, [7, 5], L("结构阻尼线，斜率 = ", "structural-damping line, slope = ") + (isFinite(R) ? sig(R, 3) : "∞"), 1.6);
+    if (w > 430) text(g, L("起始斜率比阻尼线陡 ⇔ U > U_{cr}", "initial slope steeper than damping line ⇔ U > U_{cr}"), lx, ly + 2, { size: 11.5, color: A[0] > R ? COL.bad : COL.muted });
+  }
+
+  /* ---------- readouts ---------- */
+  let lastRead = 0;
+  function drawRead(p, d, roots, aEnv, force) {
+    const now = performance.now(); if (!force && now - lastRead < 120) return; lastRead = now;
+    const stable = roots.filter(r => r.stable), nl = PHYS.isNonlinear(A), box = $("status");
+    let cls, txt;
+    if (d.G >= 0) { cls = "ok"; txt = L("G ≥ 0：不满足 Den Hartog 必要条件，不会从静止起振", "G ≥ 0: the Den Hartog necessary condition is not met; no galloping from rest"); }
+    else if (d.d >= 0) { cls = "mid"; txt = L("G < 0（必要条件满足），但 U < U<sub>cr</sub>：净阻尼为正，扰动衰减", "G < 0 (necessary condition met) but U < U<sub>cr</sub>: net damping positive, disturbances decay"); }
+    else if (stable.length >= 2) { cls = "bad"; txt = L("驰振，处于滞回区：有两个稳定极限环，落到哪个取决于初始扰动", "Galloping, inside the hysteresis range: two stable limit cycles; the initial disturbance decides which one"); }
+    else { cls = "bad"; txt = L("驰振：净阻尼为负（d < 0），振幅增长", "Galloping: net damping negative (d < 0), amplitude grows") + (nl ? L("到极限环", " to a limit cycle") : ""); }
+    box.className = "status " + cls; $("statusTxt").innerHTML = txt;
+    const cell = (v, lab, c) => '<div class="' + (c || "") + '"><b>' + v + "</b><span>" + lab + "</span></div>";
+    const aTxt = roots.length ? roots.map(r => fmt(r.a / p.B, 2) + (r.stable ? "" : "*")).join(" / ") : (d.d < 0 && !nl ? "—" : "0");
+    const aMaxDeg = p.U > 0 ? Math.atan(aEnv * d.w1 / p.U) * 180 / Math.PI : 0;
+    $("kv").innerHTML =
+      cell(fmt(d.G, 2), "G = dC<sub>L</sub>/dα + C<sub>D</sub> = −A<sub>1</sub>", d.G < 0 ? "neg" : "pos") +
+      cell(sig(d.d, 3) + ' <small style="font-size:12px;font-weight:400">N·s/m²</small>', L("净阻尼", "net damping") + " d = 2mω<sub>1</sub>ζ + ½ρUB·G", d.d < 0 ? "neg" : "pos") +
+      cell(isFinite(d.Ucr) ? fmt(d.Ucr, 2) + ' <small style="font-size:12px;font-weight:400">m/s</small>' : "∞", L("起振风速", "onset speed") + " U<sub>cr</sub> = −8πζn<sub>1</sub>m/(ρBG)") +
+      cell(isFinite(d.Ucr) ? fmt(p.U / d.Ucr, 2) : "—", "U / U<sub>cr</sub>") +
+      cell(fmt(d.Sc, 1), "Scruton " + L("数", "number") + " Sc = 4πζm/(ρB²)") +
+      cell(fmt(d.Ured, 1) + (isFinite(d.UredCr) ? ' <small style="font-size:12px;font-weight:400">/ ' + fmt(d.UredCr, 1) + "</small>" : ""), L("折减风速 U/(n<sub>1</sub>B)；斜杠后为 U<sub>cr</sub>/(n<sub>1</sub>B)", "reduced velocity U/(n<sub>1</sub>B); after the slash U<sub>cr</sub>/(n<sub>1</sub>B)")) +
+      cell(aTxt, L("稳态振幅 a/B（平均法；* 不稳定）", "steady amplitude a/B (averaging; * unstable)")) +
+      cell(fmt(aEnv / p.B, 3) + ' <small style="font-size:12px;font-weight:400">· α<sub>max</sub> ' + fmt(aMaxDeg, 1) + "°</small>", L("当前振幅 a/B（时程积分）", "current amplitude a/B (time integration)"));
+    const m = [];
+    if (isFinite(d.UredCr) && d.UredCr < 20) m.push('<span class="msg warn">' + L("U<sub>cr</sub>/(n<sub>1</sub>B) = " + fmt(d.UredCr, 1) + " &lt; 20：准定常假设要求折减风速足够大（Naudascher &amp; Rockwell 1994 书页 185：约大于 20），此时预测的 U<sub>cr</sub> 可能不可靠，并可能与涡振相互作用，只作定性参考。", "U<sub>cr</sub>/(n<sub>1</sub>B) = " + fmt(d.UredCr, 1) + " &lt; 20: the quasi-steady assumption needs a large reduced velocity (Naudascher &amp; Rockwell 1994, p. 185: greater than about 20). The predicted U<sub>cr</sub> may be unreliable and vortex shedding may interact; treat as qualitative.") + "</span>");
+    const fit = PHYS.SECTIONS[secKey].alphaFit; if (fit && !edited && aMaxDeg > fit) m.push('<span class="msg warn">' + L("α<sub>max</sub> 超过多项式的拟合范围 16°，振幅只作参考。", "α<sub>max</sub> exceeds the 16° range of the polynomial fit; the amplitude is indicative only.") + "</span>");
+    if (!nl && d.G < 0) m.push(L("这个预设只有 A<sub>1</sub>，没有高次系数：能判断是否起振、算 U<sub>cr</sub>，算不出极限环振幅。", "This preset has A<sub>1</sub> only: onset and U<sub>cr</sub> can be evaluated, the limit-cycle amplitude cannot."));
+    $("msg").innerHTML = m.join("<br>");
+  }
+
+  /* ---------- UI sync ---------- */
+  function syncUI() {
+    const p = params();
+    $("oU").textContent = fmt(p.U, 2) + " m/s"; $("oz").textContent = (p.zeta * 100).toFixed(2) + " %"; $("om").textContent = fmt(p.m, 2) + " kg/m";
+    $("on").textContent = fmt(p.n1, 2) + " Hz"; $("oB").textContent = (p.B * 1000).toFixed(1) + " mm"; $("or").textContent = fmt(p.rho, 3) + " kg/m³";
+    $("oS").textContent = (sweep ? L("扫风速中 ", "sweeping ") : "") + Math.round(speed) + "×";
+    for (const b of $("segSpeed").children) b.classList.toggle("on", !sweep && +b.dataset.v === speed);
+    for (const b of $("segLang").children) b.classList.toggle("on", b.dataset.v === lang);
+    for (const b of $("segTheme").children) b.classList.toggle("on", b.dataset.v === theme);
+    for (const b of $("chips").children) { b.classList.toggle("on", b.dataset.k === secKey); b.textContent = NAMES[b.dataset.k][lang === "zh" ? 0 : 1]; }
+    const sb = $("srcbox"); sb.innerHTML = edited ? L('<span class="tag ill">已改动：自定义，非文献值</span>系数被手动修改，不再对应「' + NAMES[secKey][0] + '」的文献值。', '<span class="tag ill">Edited: custom, not literature values</span>The coefficients were changed by hand and no longer correspond to the “' + NAMES[secKey][1] + '” source.') : SRC[secKey][lang === "zh" ? 0 : 1];
+    sb.className = "srcbox" + (edited || PHYS.SECTIONS[secKey].kind === "ill" ? " warn" : "");
+    $("coefHint").innerHTML = L("A<sub>1</sub> &gt; 0 即 G &lt; 0。改任何一个数，预设就变成「自定义」。", "A<sub>1</sub> &gt; 0 means G &lt; 0. Changing any number turns the preset into “custom”.");
+    $("caseHint").innerHTML = caseNote === "ps" ? L("B = 25.4 mm、n<sub>1</sub> = 6.01 Hz、ζ = 0.00196 取自原文第 234–236 页；m = 0.919 kg/m 由原文质量参数 n = 4.3×10⁻⁴ 反推，其中 ρ = 1.225 kg/m³ 是<b>假设</b>。", "B = 25.4 mm, n<sub>1</sub> = 6.01 Hz, ζ = 0.00196 are from pp. 234–236 of the paper; m = 0.919 kg/m is backed out from its mass parameter n = 4.3×10⁻⁴ with ρ = 1.225 kg/m³ <b>assumed</b>.") : "";
+    $("bPause").innerHTML = paused ? L("继续", "Resume") : L("暂停", "Pause");
+    $("bSweep").innerHTML = sweep ? L("停止扫风速", "Stop sweep") : L("自动扫风速", "Sweep wind speed");
+    root.dataset.lang = lang; root.lang = lang; root.dataset.theme = theme; readColors();
+    document.title = L("横风向驰振：Den Hartog 判据与极限环（v2）", "Transverse galloping: Den Hartog criterion and limit cycles (v2)");
+  }
+  function loadPreset(k) {
+    secKey = k; A = PHYS.SECTIONS[k].A.slice(); edited = false;
+    $("A1").value = +A[0].toFixed(4); $("A3").value = A[1]; $("A5").value = A[2]; $("A7").value = A[3];
+    stopSweep(); resetRun(); kick(0.02 * params().B); syncUI();
+  }
+
+  /* ---------- main loop ---------- */
+  let lastT = 0;
+  function tick(wallDt, draw) {
+    const p0 = params(); if (sweep && !paused) stepSweep(wallDt);
+    const p = sweep ? params() : p0, d = PHYS.derived(p, A);
+    if (!paused) { advance(p, wallDt); phase += 2 * Math.PI * Math.min(p.n1, 1.1) * wallDt; }
+    if (!draw) return;
+    const aEnv = PHYS.envelope(p, st), roots = PHYS.steady(p, A);
+    if (sweep) { $("oU").textContent = fmt(p.U, 2) + " m/s"; }
+    drawScene(p, d, aEnv); drawTime(p, d, roots); drawAmp(p, d, roots, aEnv); drawCf(p, d, aEnv); drawRead(p, d, roots, aEnv, false);
+  }
+  function loop(ts) { const dt = lastT ? Math.min((ts - lastT) / 1000, 0.05) : 1 / 60; lastT = ts; tick(dt, true); requestAnimationFrame(loop); }
+
+  /* ---------- wiring ---------- */
+  for (const k of Object.keys(NAMES)) { const b = document.createElement("button"); b.className = "chip"; b.dataset.k = k; b.onclick = () => loadPreset(k); $("chips").appendChild(b); }
+  for (const k in SL) $(SL[k]).addEventListener("input", () => { if (k !== "U") { caseNote = ""; } if (sweep && k === "U") stopSweep(); frozen = false; syncUI(); lastRead = 0; });
+  for (const [id, i] of [["A1", 0], ["A3", 1], ["A5", 2], ["A7", 3]]) $(id).addEventListener("input", () => { const v = parseFloat($(id).value); A[i] = isFinite(v) ? v : 0; edited = true; frozen = false; trail = []; syncUI(); lastRead = 0; });
+  $("segLang").onclick = e => { const b = e.target.closest("button"); if (b) { lang = b.dataset.v; syncUI(); lastRead = 0; } };
+  $("segTheme").onclick = e => { const b = e.target.closest("button"); if (b) { theme = b.dataset.v; syncUI(); } };
+  $("segSpeed").onclick = e => { const b = e.target.closest("button"); if (b) { stopSweep(); speed = +b.dataset.v; syncUI(); } };
+  $("bKick").onclick = () => { const p = params(); kick(0.02 * p.B); };
+  $("bBig").onclick = () => { const p = params(), r = PHYS.steady(p, A), un = r.filter(q => !q.stable); kick(un.length ? un[un.length - 1].a * 1.12 : 2 * p.B); };
+  $("bPause").onclick = () => { paused = !paused; syncUI(); };
+  $("bSweep").onclick = () => { if (sweep) stopSweep(); else startSweep(); syncUI(); };
+  $("bDefault").onclick = () => { stopSweep(); setParams({ U: 12, zeta: 0.005, m: 10, n1: 2, B: 0.1, rho: 1.225 }); caseNote = "default"; resetRun(); kick(0.02 * 0.1); syncUI(); };
+  $("bPS").onclick = () => { stopSweep(); setParams({ zeta: 0.00196, m: 0.919, n1: 6.01, B: 0.0254, rho: 1.225, U: 5.5 }); caseNote = "ps"; if (secKey !== "square" || edited) loadPreset("square"); resetRun(); kick(0.05 * 0.0254); syncUI(); };
+  window.addEventListener("resize", () => { lastRead = 0; });
+
+  // start-up (hash options: lang, theme, sec, U, pre = seconds of simulated time to pre-run, kick = initial amplitude in B)
+  if (hash.sec && PHYS.SECTIONS[hash.sec]) secKey = hash.sec;
+  if (hash.U) $("U").value = +hash.U;
+  syncUI(); loadPreset(secKey);
+  if (hash.kick) kick(+hash.kick * params().B);
+  if (hash.pre) { const n = Math.round(+hash.pre / (speed / 60)); for (let i = 0; i < n; i++) tick(1 / 60, false); }
+  tick(0, true); drawRead(params(), PHYS.derived(params(), A), PHYS.steady(params(), A), PHYS.envelope(params(), st), true);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

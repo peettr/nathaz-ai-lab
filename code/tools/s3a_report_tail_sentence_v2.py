@@ -1,0 +1,4 @@
+"""由 s3a_tail.json 与 s3a_tail_holdout.json 生成网站报告尾部句（留出检验后版）。用法: python3 -I s3a_report_tail_sentence_v2.py <s3a_tail.json> <s3a_tail_holdout.json>"""
+import sys,json;d=json.load(open(sys.argv[1]));h=json.load(open(sys.argv[2]));t=d['TS'];s=d['strata'];f=lambda v:f'{v:.2f}'
+a=s['10-15']['TS'];b=s['20-inf']['TS'];r=h['r4_holdout'];ra=r['10-15']['0.9'];rb=r['20+']['0.9']
+print(f"- 尾部形状另做了超阈值检验（广义帕累托分布，取 90% 分位以上）：雷暴阵风比的形状参数 ξ = {f(t['xi'])}，95% 区间 [{f(t['xi_ci'][0])}, {f(t['xi_ci'][1])}]（ξ>0 表示重尾），但阈值改取 95% 分位时降到 {f(t['xi_by_threshold']['0.95'])}，结果对阈值敏感。按平均风分层后，这批数据的重尾主要来自平均风较低的 10–15 节层（ξ = {f(a['xi'])}，[{f(a['xi_ci'][0])}, {f(a['xi_ci'][1])}]），平均风 ≥20 节层 ξ = {f(b['xi'])}，[{f(b['xi_ci'][0])}, {f(b['xi_ci'][1])}]。这一分层规律是看数据后发现的；在另一批 {r['windows']} 个未用过的雷暴事件窗上，两层点估计方向相同（{f(ra['xi'])}、{f(rb['xi'])}），但区间都跨过判据（[{f(ra['ci'][0])}, {f(ra['ci'][1])}]、[{f(rb['ci'][0])}, {f(rb['ci'][1])}]），样本太少，未能确认也未能否定。")

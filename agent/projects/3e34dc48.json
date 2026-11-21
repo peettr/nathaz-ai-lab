@@ -1,0 +1,78 @@
+{
+  "id": "3e34dc48",
+  "slug": "3e34dc48",
+  "number": "L29",
+  "title": {
+    "zh": "L29.6d4 PINO与网格代理风工程定位",
+    "en": "L29.6d4 positioning of physics-informed neural operators (PINO) and mesh surrogates in wind engineering"
+  },
+  "group": "better",
+  "parent": "b9e31a7b",
+  "depth": 3,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-29 08:47",
+  "end": null,
+  "updated": "2026-10-29 10:54",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-29 08:57",
+      "text": "【告知 · 来自 L29.6d 动力与CFD代理模型 · L29.6d 动力与CFD代理模型】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nGrok 补查已回：（DOI 7/7 存在，内容均为摘要/片段级，未读全文）。Lead 速读要点：①建筑/城市风上未找到 PINO；②唯一 PINO 命中是 Liu 2026 会议论文「Real-time wind field inversion for transmission lines using physics-informed neural operator and elevation data」(10.1145/3817124.3817379)，复杂地形二维 NS 残差+稀疏观测反演——这是“风工程无 PINO 一手证据”的反例，须 取原文核，表里措辞改为“建筑与城市风场上未见；复杂地形风场反演有 1 篇会议论文”；③新增 PINN 近邻 Wang 2025 B&E 街谷 PINN 风压估计 (10.1016/j.buildenv.2025.113616)、Cai 2024 PoF (10.1063/5.0244094)、Rui 2023 EACFM 建筑三维流场 PINN (10.1080/19942060.2023.2238849)，可补入 PINN 一格。按交接书续做。"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-29 08:57",
+      "text": "【委托结果 · 文献检索智能体】取全文 1 篇：Liu 2026 PINO 输电线路地形风场反演（ACM 会议）\n已取全文并入 Zotero 集合 L29.6d；本地 PDF 经核验为该论文，共 7 页。\n- Real-time wind field inversion for transmission lines using physics-informed neural operator and elevation data — DOI 10.1145/3817124.3817379 — 条目 key 8FFNNKTW — 附件 key XVTC8UAT — 本地 PDF → \n\n> 【自动初查：通过】已对照验收清单检查。\n（完整过程见）"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-29 10:03",
+      "text": "【委托 · 来自 L29.6d 动力与CFD代理模型】比较表 v2.1：按 8 张新卡更正\nlitwiki 已为比较表 v2 第 6 节 8 篇建全文卡（前缀 L29_6d4_）。请出 v2.1（只改 下的比较表，不另送审，改动在页头列明）：①#5 作者改 Xue X.（不是 Xiao），并写明其物理项是矩匹配+等变约束、非 PDE 残差（PDF p.10 式(3)，Lead 已核），加速 7.2–530×；第 4 节“GPU-LBM+PINO 已有先例”保留但改为“GPU-LBM + 物理信息神经算子已有 Nat Commun 先例（物理项为动理学结构约束）”；②#4 Wang K.X. 的物理项是符号回归剖面先验、非 PDE 残差，移出“含 PDE 残差”一栏；③#2 Shao 注明无纯数据 GNN 消融、训练比例表述内部不一致；④#23 Pan 2026 用全文卡数字（推断 2.64 ms/样本、最高 26×）；⑤各条证据等级由“摘要”改“全文”并换卡片路径；⑥对外最强说法与建议若因此需改，照实改。完成后 --report 一行：v2.1 路径与改了几处。"
+    },
+    {
+      "role": "bot",
+      "who": "L29.6d 动力与CFD代理模型",
+      "ts": "2026-10-29 10:03",
+      "text": "Fixing one string mismatch in the edit script (trailing punctuation), then applying all v2.1 edits.比较表 v2.1 已经出好，并已上报 L29.6d。委托的五项都按要求改了；按委托不另送审。另外查出一处 v2 说过头的地方，也一并改了。\n\n**按委托改的五项**\n- **#5 改为 Xue 2026**（原写 Xiao）：它的物理项是\"矩匹配 + 格子对称等变\"约束，不是方程残差。比 LB 求解器快 7.2–530 倍。第 4 节的先例句改成\"GPU-LBM + 物理信息神经算子已有 Nat Commun 先例（物理项为动理学结构约束）\"。\n- **#4 Wang K. 2026**：它的\"物理项\"是对符号回归剖面的偏差惩罚，不是方程残差，所以不再算作 PINO。另外注明：作者自己说随机划分时窗口重叠有泄漏，指标可能偏乐观。\n- **#2 PIGNN-CFD**：注明没有和纯数据图网络做消融，所以说不清物理项有没有让它更准；训练比例原文先写\"90%\"又写\"400 个场景\"，前后对不上。\n- **#23 Pan 2026**：改用全文数字。单样本推断 2.64 ms，最高快约 26 倍。同采样率下 FNO 的时程误差反而是三者里最高的，但换了采样率时只有 FNO 还能用。\n- **8 篇的证据等级全部从\"摘要\"改为\"全文\"**，换成新卡片路径。现在整张表没有只读过摘要的条目了。\n\n**额外更正：Gasser 2026 的结论**\n- v2 说它的物理项\"只改善守恒、不提高精度\"，这说过头了。全文表 4–5 显示：\n - 风速误差没有差别\n - 压力误差降了 10–24%\n - 守恒残差降到约三分之一到一半。\n- 第 3、4 节相应改成：数据稀疏时，物理约束明显提高精度（Liu 2026）；数据充足时，它主要改善守恒，压力精度提高 10–24%（Gasser 2026）。\n\n**没变的**\n- 对外最强说法不变：建筑表面风压上，没有检索到训练中含方程残差的算子或网格代理。\n- 仍然建议不要把\"GPU-LBM + PINO\"这个组合本身当作新意。\n\n\n\n## 结论\nv2.1：（v2 备份在同目录）。共改 25 处（正文 17 处，文献清单 8 行），改动列在页头，不另送审。\n- 委托的 ①–⑤ 全部照改：Xue 2026 的作者名、物理项性质和 7.2–530 倍加速；Wang K. 2026 不再算 PINO；PIGNN-CFD 无消融、训练比例前后矛盾；Pan 2026 的推断 2.64 ms、最高约 26 倍；8 篇改为全文级并换卡片路径。\n- 第⑥项实质更正：Gasser 2026 的物理项让压力误差降 10–24%，风速不变；v2\"只改善守恒、不提精度\"已在第 3、4 节改掉。\n- 对外最强说法不变；第 4 节的先例句已改写，\"GPU-LBM + PINO 组合不宜作新意\"的建议保留。\n\n⚠️ L29.6d4-与网格代理风工程定位_比较表.md: 文件在，不在该 agent 可附件的目录内（允许：工作区；共享区；共享区；共享区）。可把文件复制到 下再标记；若这个目录本该允许，请告诉平台 Lead"
+    },
+    {
+      "role": "relay",
+      "who": "美丽新世界实验室 Lead · 转达",
+      "ts": "2026-10-29 10:53",
+      "text": "【平台提醒，非 Liang Hu 指令】L29.6d4 对话已开出 2 小时，还没看到启动方案文件。按规则请先写 （模板）放在本子项目目录，系统会自动登记给 Liang Hu 审批；批准前不能提交超算/Colab、不能派计算类任务，只做文献与准备。"
+    }
+  ],
+  "files": {
+    "self": "3e34dc48.json",
+    "claims": null,
+    "pdf": null
+  }
+}

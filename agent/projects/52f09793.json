@@ -1,0 +1,47 @@
+{
+  "id": "52f09793",
+  "slug": "52f09793",
+  "number": "L29.6c",
+  "title": {
+    "zh": "L29.6c 结构优化算法 总控",
+    "en": "L29.6c 结构优化算法 总控"
+  },
+  "group": "better",
+  "parent": "63be4b89",
+  "depth": 2,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "52f09793.json",
+    "claims": null,
+    "pdf": null
+  }
+}

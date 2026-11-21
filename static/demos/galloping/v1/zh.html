@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>方柱横风向驰振：Glauert–Den Hartog 判据（教学演示 v0.1）</title>
+<style>
+ body{font-family:system-ui,"Microsoft YaHei",sans-serif;margin:0;background:#f6f7f9;color:#222}
+ header{padding:12px 20px;background:#1f3a5f;color:#fff}
+ header h1{font-size:18px;margin:0}
+ header p{margin:4px 0 0;font-size:13px;opacity:.85}
+ main{display:flex;flex-wrap:wrap;gap:16px;padding:16px}
+ .panel{background:#fff;border:1px solid #d8dde3;border-radius:6px;padding:12px 14px}
+ #ctl{width:330px}
+ #viz{flex:1;min-width:480px}
+ label{display:block;font-size:13px;margin-top:10px}
+ input[type=range]{width:100%}
+ .val{float:right;font-variant-numeric:tabular-nums}
+ .out{font-size:14px;line-height:1.7;font-variant-numeric:tabular-nums}
+ .bad{color:#b3261e;font-weight:600}.good{color:#1b6e3a;font-weight:600}
+ canvas{background:#fbfcfd;border:1px solid #e1e5ea;border-radius:4px;width:100%}
+ .how{font-size:12.5px;color:#444;line-height:1.6}
+ .how code{background:#eef1f4;padding:0 3px;border-radius:3px}
+ select{width:100%;margin-top:4px}
+ button{margin-top:10px;padding:5px 10px}
+ #selftest{font-size:12px;white-space:pre-wrap;color:#333}
+</style>
+</head>
+<body>
+<header>
+ <h1>方柱横风向驰振：Glauert–Den Hartog 判据与临界风速（教学演示 v0.1）</h1>
+ <p>单自由度、准定常、线性化（只看起振/衰减）的教学演示，拖动滑块即可看到方柱何时发生驰振；公式出处见页底。 · <a href="./" style="color:#fff">English</a></p>
+</header>
+<main>
+<section class="panel" id="ctl">
+ <label>截面
+  <select id="shape">
+   <option value="square">方柱（气动系数 G 可调）</option>
+   <option value="circle">圆柱（dC<sub>L</sub>/dα = 0）</option>
+  </select></label>
+ <label>风速 U (m/s) <span class="val" id="vU"></span>
+  <input type="range" id="U" min="0" max="40" step="0.1" value="8"></label>
+ <label>结构阻尼比 ζ <span class="val" id="vz"></span>
+  <input type="range" id="z" min="0.001" max="0.05" step="0.001" value="0.005"></label>
+ <label>单位长度质量 m (kg/m) <span class="val" id="vm"></span>
+  <input type="range" id="m" min="1" max="50" step="0.5" value="10"></label>
+ <label>横风向自振频率 n<sub>1</sub> (Hz) <span class="val" id="vn"></span>
+  <input type="range" id="n" min="0.5" max="10" step="0.1" value="2"></label>
+ <label>迎风宽度 B (m) <span class="val" id="vB"></span>
+  <input type="range" id="B" min="0.02" max="0.5" step="0.01" value="0.10"></label>
+ <label id="gl">气动系数 G = (dC<sub>L</sub>/dα + C<sub>D</sub>)|<sub>α=0</sub> <span class="val" id="vG"></span>
+  <input type="range" id="G" min="-4" max="1" step="0.05" value="-2"></label>
+ <p class="how" style="margin-top:4px">G 的默认值 −2 是<b>演示用假设值</b>，不是某一试验的实测值；实际方柱的 G 依截面细节、湍流度而变，需由风洞测得的 C<sub>L</sub>(α)、C<sub>D</sub>(α) 求。</p>
+ <label>空气密度 ρ = 1.225 kg/m³（固定）</label>
+ <button id="kick">给一个小扰动</button>
+ <button id="runtest">运行自检</button>
+ <div id="selftest"></div>
+</section>
+<section class="panel" id="viz">
+ <div class="out" id="out"></div>
+ <canvas id="cv" width="900" height="300"></canvas>
+ <canvas id="tr" width="900" height="200" style="margin-top:8px"></canvas>
+ <div class="how" id="how"></div>
+</section>
+</main>
+<section class="panel how" style="margin:0 16px 16px">
+ <b>这页怎么算的（简化都写在这里）</b><br>
+ 运动方程（Simiu &amp; Yeo 2019 式 20.12）：m[ÿ + 2ζω<sub>1</sub>ẏ + ω<sub>1</sub>²y] = −½ρU²B·G·(ẏ/U)，ω<sub>1</sub> = 2πn<sub>1</sub>。<br>
+ 净阻尼系数（式 20.13）：d = 2mω<sub>1</sub>ζ + ½ρUB·G。d &lt; 0 即失稳（充分条件）；G &lt; 0 是必要条件（式 20.14，Glauert–Den Hartog 判据）。圆柱 dC<sub>L</sub>/dα = 0、C<sub>D</sub> &gt; 0，故 G &gt; 0，不会驰振（同书同页）。页面圆柱取 G = C<sub>D</sub> = 1.2，是<b>示意值</b>，只要 C<sub>D</sub> &gt; 0 结论不变。<br>
+ 临界风速（令 d = 0）：U<sub>cr</sub> = −4mω<sub>1</sub>ζ/(ρB·G) = −8πζn<sub>1</sub>m/(ρB·G)，与 Holmes &amp; Bekele《Wind Loading of Structures》第 4 版式 (5.46) 一致；写成 Scruton 数：U<sub>cr</sub>/(n<sub>1</sub>B) = 2Sc/(−G)，Sc = 4πζm/(ρB²)（式 5.47、5.48）。<br>
+ <b>没有包括</b>：①极限环振幅——需要 C<sub>Fy</sub>(α) 的高次多项式系数（Simiu &amp; Yeo 式 20.15，Parkinson–Smith 型），本地资料未给数值，所以这里只画线性化的起振/衰减，下方曲线超出画框会被裁剪，<b>不代表真实振幅</b>；②涡激共振及其与驰振的耦合（低 Scruton 数时重要）；③来流湍流、三维与端部效应；④准定常假设要求折减风速足够大：若 U<sub>cr</sub>/(n<sub>1</sub>B) = 2Sc/(−G) 偏低，预测的 U<sub>cr</sub> 可能不可靠（可能落入涡振区），仅作定性参考；页面用 20 作提示线，这是<b>示意值，无文献依据</b>。<br>
+ 出处：Simiu &amp; Yeo, <i>Wind Effects on Structures</i>, 4th ed., 2019, §20.1.1，式 20.8–20.14；Holmes &amp; Bekele, <i>Wind Loading of Structures</i>, 4th ed., 2021, §5.5.2，式 5.44–5.48。
+</section>
+<script>
+"use strict";
+const RHO=1.225;
+const $=id=>document.getElementById(id);
+const ids=["U","z","m","n","B","G"];
+function params(){
+  const p={U:+$("U").value,z:+$("z").value,m:+$("m").value,n:+$("n").value,B:+$("B").value,G:+$("G").value,shape:$("shape").value};
+  if(p.shape==="circle"){p.G=1.2;} // 圆柱：dCL/dα=0，G=C_D（取 1.2 作示意，假设值；只要 C_D>0 结论不变）
+  return p;
+}
+function physics(p){
+  const w1=2*Math.PI*p.n;
+  const d=2*p.m*w1*p.z+0.5*RHO*p.U*p.B*p.G;           // 式 20.13
+  const Ucr=(p.G<0)? -4*p.m*w1*p.z/(RHO*p.B*p.G) : Infinity; // d=0
+  const Sc=4*Math.PI*p.z*p.m/(RHO*p.B*p.B);              // 式 5.48
+  const Ured=p.U/(p.n*p.B);
+  return {w1,d,Ucr,Sc,Ured,sigma:-d/(2*p.m)};
+}
+function fmt(x,k=3){return isFinite(x)?x.toFixed(k):"∞（G≥0，不会驰振）";}
+let y=0.002, v=0, hist=[];
+function step(p,ph,dt){ // 线性方程 RK4：ÿ = -(d/m)ẏ - ω1² y
+  const f=(Y,V)=>[V, -(ph.d/p.m)*V - ph.w1*ph.w1*Y];
+  const k1=f(y,v),k2=f(y+dt/2*k1[0],v+dt/2*k1[1]),k3=f(y+dt/2*k2[0],v+dt/2*k2[1]),k4=f(y+dt*k3[0],v+dt*k3[1]);
+  y+=dt/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]); v+=dt/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+  if(Math.abs(y)>10*paramsCache.B){ y=Math.sign(y)*10*paramsCache.B; v=0; clipped=true; }
+}
+let paramsCache=params(), clipped=false;
+function render(){
+  const p=paramsCache, ph=physics(p);
+  for(const k of ids){ const el=$("v"+k); if(el) el.textContent=(+$(k).value).toString(); }
+  $("gl").style.opacity=(p.shape==="circle")?0.4:1;
+  const necessary=p.G<0, unstable=ph.d<0;
+  $("out").innerHTML=
+   `判据 G = dC<sub>L</sub>/dα + C<sub>D</sub> = ${p.G.toFixed(2)}：${necessary?'<span class="bad">满足必要条件 (G&lt;0)</span>':'<span class="good">不满足 (G≥0)，不会驰振</span>'}<br>`+
+   `净阻尼 d = ${ph.d.toFixed(4)} N·s/m²：${unstable?'<span class="bad">d&lt;0，起振（失稳）</span>':'<span class="good">d&gt;0，扰动衰减</span>'}<br>`+
+   `临界风速 U<sub>cr</sub> = ${fmt(ph.Ucr,2)} m/s；当前 U/U<sub>cr</sub> = ${isFinite(ph.Ucr)?(p.U/ph.Ucr).toFixed(2):"—"}<br>`+
+   `Scruton 数 Sc = 4πζm/(ρB²) = ${ph.Sc.toFixed(1)}；折减风速 U/(n<sub>1</sub>B) = ${ph.Ured.toFixed(1)}`+
+   ((isFinite(ph.Ucr)&&ph.Ucr/(p.n*p.B)<20)?'<br><span class="bad">U<sub>cr</sub>/(n<sub>1</sub>B) = '+(ph.Ucr/(p.n*p.B)).toFixed(1)+' 偏低（提示线 20 为示意值）：预测的 U<sub>cr</sub> 可能不可靠，仅作定性参考</span>':'');
+  // 截面动画
+  const c=$("cv"), g=c.getContext("2d"); g.clearRect(0,0,c.width,c.height);
+  g.strokeStyle="#9fb3c8"; for(let i=0;i<6;i++){ const yy=40+i*45; g.beginPath(); g.moveTo(20,yy); g.lineTo(300,yy); g.stroke(); g.beginPath(); g.moveTo(290,yy-5); g.lineTo(300,yy); g.lineTo(290,yy+5); g.stroke(); }
+  g.fillStyle="#333"; g.font="14px sans-serif"; g.fillText("U = "+p.U.toFixed(1)+" m/s",30,25);
+  const scale=100/(10*p.B), cy=150+Math.max(-110,Math.min(110,y*scale*10)), cx=520, s=60;
+  g.fillStyle=unstable?"#d9534f":"#4a7ab0";
+  if(p.shape==="circle"){g.beginPath();g.arc(cx,cy,s/2,0,2*Math.PI);g.fill();} else g.fillRect(cx-s/2,cy-s/2,s,s);
+  g.strokeStyle="#555"; g.beginPath(); g.moveTo(cx,20); g.lineTo(cx,cy-s/2); g.stroke();
+  g.fillStyle="#333"; g.fillText("横风向位移 y（放大显示）",640,40);
+  // 时程
+  const t=$("tr"), h=t.getContext("2d"); h.clearRect(0,0,t.width,t.height);
+  h.strokeStyle="#ccc"; h.beginPath(); h.moveTo(0,100); h.lineTo(t.width,100); h.stroke();
+  h.strokeStyle=unstable?"#d9534f":"#4a7ab0"; h.beginPath();
+  const amp=90/(10*p.B);
+  hist.forEach((yy,i)=>{ const X=i*t.width/600, Y=100-Math.max(-95,Math.min(95,yy*amp*10)); i?h.lineTo(X,Y):h.moveTo(X,Y); }); h.stroke();
+  h.fillStyle="#333"; h.font="12px sans-serif";
+  h.fillText("y(t)：线性化起振/衰减，增长率 σ = −d/(2m) = "+ph.sigma.toFixed(4)+" 1/s"+(clipped?"；已到显示上限，被裁剪（不是真实振幅）":""),8,14);
+}
+function loop(){
+  paramsCache=params(); const ph=physics(paramsCache);
+  const dt=1/(60*Math.max(4,paramsCache.n*8)); const nsub=Math.max(4,Math.round(paramsCache.n*8));
+  for(let i=0;i<nsub;i++) step(paramsCache,ph,dt);
+  hist.push(y); if(hist.length>600) hist.shift();
+  render(); requestAnimationFrame(loop);
+}
+ids.concat(["shape"]).forEach(k=>$(k).addEventListener("input",()=>{clipped=false;}));
+$("kick").onclick=()=>{y=0.002*paramsCache.B*10; v=0; hist=[]; clipped=false;};
+// 自检：两个检验点 + 两条规律
+$("runtest").onclick=()=>{
+  const out=[];
+  const p1={U:0,z:0.005,m:10,n:2,B:0.1,G:-2,shape:"square"}, r1=physics(p1);
+  out.push(`检验点1：U_cr = ${r1.Ucr.toFixed(3)} m/s（手算 10.258），Sc = ${r1.Sc.toFixed(2)}（手算 51.29）`);
+  const p2={U:0,z:0.01,m:25,n:1,B:0.3,G:-3,shape:"square"}, r2=physics(p2);
+  out.push(`检验点2：U_cr = ${r2.Ucr.toFixed(3)} m/s（手算 5.699）`);
+  const s1=physics({...p1,U:r1.Ucr}); out.push(`U=U_cr 时 d = ${s1.d.toExponential(2)}（应≈0）`);
+  const pz=physics({...p1,z:0.01}); out.push(`ζ 加倍：U_cr ${r1.Ucr.toFixed(3)} → ${pz.Ucr.toFixed(3)}（应正好加倍）`);
+  const pc=physics({...p1,G:1.2,U:40}); out.push(`圆柱(G=+1.2, U=40)：d = ${pc.d.toFixed(3)} > 0，U_cr = ${fmt(pc.Ucr)}`);
+  $("selftest").textContent=out.join("\n");
+};
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "id": "a5a77c62",
+  "slug": "a5a77c62",
+  "number": "R23.4",
+  "title": {
+    "zh": "R23.4 雷暴与对流尺度 总控",
+    "en": "R23.4 雷暴与对流尺度 总控"
+  },
+  "group": "wx",
+  "parent": "728a9982",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-26 02:52",
+  "end": null,
+  "updated": "2026-10-26 02:52",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "a5a77c62.json",
+    "claims": null,
+    "pdf": null
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "id": "282df644",
+  "slug": "282df644",
+  "number": "L31",
+  "title": {
+    "zh": "L31.4b4 非平稳检验、刻画与极值",
+    "en": "L31.4b4 Nonstationary Testing, Characterization, and Extremes"
+  },
+  "group": "core",
+  "parent": "4fbc6039",
+  "depth": 3,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-25 11:11",
+  "end": null,
+  "updated": "2026-10-25 16:27",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 开子项目",
+      "ts": "2026-10-25 11:11",
+      "text": "【Liang Hu 让 L31.4b 非高斯风压概率特征与极值 分出的子对话】你是 L31.4b4 工作包节点。状态：待开工（可先写预注册，不计算）。\n①问题：怎样判断一条风压记录非平稳；时变矩和演变谱怎么估；非平稳下的极值怎么算；台风外雨带阵风、雷暴/下击暴流的影响多大。文献：时变跨越率的非平稳极值；三维非平稳非高斯风场；现场 30 s 子段的极值处理（Wang 2020，PDF p.8，卡路径请用 查）；TVAR。缺：台风实测风压非平稳性——litwiki 补卡 在途，结果由上级转你。交付：非平稳处理方法页与数据清单（v1 目标 11-08）。与 L31.4a4（特殊风况）对齐，不重复。\n数据（10-25 决策）：首个非平稳数据源 = TFCA 下击暴流 CC-1010/1011/1012（上部风机 20/30/40%）与 DB+ABL CC-5029，M2 0° 每种 4 配置×8 次重复（单个约 85 MB），1011/1012/5029 的 C02 另有 30/45/60/90°；对照组 = CAARC ABL CC-2050 120 s 的平稳性检查（b1/b3 产物，core 交回后上级转你）。\n④写入范围： 与"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 11:11",
+      "text": "正在读 TFCA 下击暴流配置和文献卡，准备写工作包说明和预注册草稿（不取数、不计算）。正在写 b4 的工作包说明和下击暴流预注册草稿（读完了 TFCA 下击暴流配置和相关文献卡，不取数、不计算）。L31.4b4 的两件不计算的事做完了：工作包说明和下击暴流预注册草稿，已报给上级 L31.4b Lead 审定（对方忙，已排队）。没有取数，没有计算，0 SU，没用 Colab。草稿冻结、上级下令之前，我不开工。\n\n**数据核查**\n以下来自 TFCA 试验大纲和成员清单，只读了文件名和文件大小：\n- 4 个配置 C01–C04 指建筑离射流中心的距离，r/D 分别为 0.8、1.0、1.2、1.4，射流喇叭口直径 D=320 cm。\n- 射流按固定时序释放，各阶段时长写在大纲里（5 s、25 s、15 s、7 s）。\n- M2 模型的下击暴流风压文件共 224 个，约 19 GB，逐个取、算完即删。\n- 每条记录约 60 s、500 Hz，这是按文件大小推出来的，开工第一步先读文件头核实。\n\n**预注册草稿要点**\n- **对齐 8 次重复的时间起点**：主口径用上部气腔的静压，它直接反映射流何时释放。对齐后相互错位要在 0.125 s 以内，做不到就止损，按\"卡住\"上报。这个做法没有文献依据，是根据试验大纲定的。\n- **时变矩**：用 8 次重复合起来估计，作为\"真值\"口径；再用单条记录加平滑估计，这是现场能用的口径。两种分开报。\n- **非平稳判据**：均值、方差、形状（偏度和峰度）三项，每项写了操作定义。比较基准是同一测点的平稳边界层来流记录：把 120 s 记录切成几段当作\"伪重复\"，取它的 95% 分位作门槛。\n- **单条记录检验**：检验现场常用的逆序检验，报检出率和误报率。\n- **非平稳极值**：比较四种方法：\n - 平稳方法\n - 均匀调制\n - 时变跨越率（卡 MSAR755A，PDF 第 2–3 页）\n - 子段块极值。\n \n 另外用 8 次重复实测峰值之间的离散作噪声地板。验证用 8 折留一法，误差取各折的中位数，置信区间按重复和立面分组重抽样。审查 指出的\"两半里只要一半过就算过\"的计分方式不再用。\n- 文章没给的参数都标了\"假设\"，写在参数来源表里。\n\n**需要上级定的 4 件事**\n1. 主对齐信号是否用上部气腔静压。\n2. 用边界层来流作平稳对照是否可比，要不要加无尖劈来流 CC-2051 一组。\n3. 三个假设值：时变矩窗长 0.5 s、活动时窗按峰值 20% 截取、\"平稳方法偏离超过 10%\"的门槛。\n4. 第一批对齐合格后，第二批是否自动做。第一批是 CC-1011、r/D=1.0、0°，约 0.7 GB。\n\n**缺口**\n- 台风外雨带阵风的风压数据，目前找不到来源。\n- 文献补卡 还在途，结果要由上级转过来。\n\n和 L31.4a4（特殊风况）的分工：本包只做统计方法，系综统计结果交 a4 只读引用；\"下击暴流比边界层风更危险\"这类风况结论归 a4。\n\n我只写了本包的两个目录。决策记录、项目页和线况表由上级维护，我没有动。\n\n\n\n\n\n- 等 Liang Hu 批/定：无（上面 4 件由上级定）\n- 卡住（待 PI）：无\n- 建议结题（待 Liang Hu）：无\n\n（附件：L31.4b4_工作包说明.md）\n\n（附件：预注册_b4_下击暴流_草稿v0.md）\n\n（附件：b4_数据清单_v0.tsv）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 11:22",
+      "text": "【委托 · 来自 核心构想】L31.4b4 开工：预注册已审定冻结，L31.4b4 状态改为在做。\n预注册已审定并冻结：我在你的草稿末尾加了 §13「上级审定」（覆盖前文冲突处），sha256 与时间见，冻结副本。冻结后不再改该文件（文件名里的'草稿v0'不改，以 FREEZE.txt 为准）；任何改动写。\n对你四个问题的答复（详见 §13）：①同意 Upper Plenum Static；但对齐质量检验信号须与主对齐信号独立——若迎风面平均 Cp 升为主口径，改用屋顶面积平均 Cp 检验。②零分布用 CC-2050 与 CC-2051 两组，取较大的 q95；伪重复数 n<8 时，下击暴流一侧从 8 次重复随机抽 n 次（200 组取中位）再比，保证每窗样本数相同。③w=0.5 s、20%、10% 都同意，活动时窗阈加 10%、30% 敏感性。④第二批在'对齐合格'且'实现自检通过'后自动做；另外'达到噪声地板'改用与 b3 一致的定义（方法 |e_i| 中位 ≤ E4 中位的 95% 区间上界），不用 1.25 倍。\n执行：第一批 CC-1011 C02 A000 R01–R08（约 0.7 GB），先只读文件头核通道/时长/采样率，再按冻结预注册做；工作站 逐个取-算-删，0 SU、0 Colab。计算你自己跑小脚本或派 core 均可（派 core 时任务书附冻结路径，写入范围限）。CC-2050/2051 A000 C08 的 MAT 若 core 已删，按清单重取。第一批出结果即 --report 我（结论草案 + 路径）；对齐不合格按卡住模板报。litwiki 结果回来我转你。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 11:22",
+      "text": "Venv found; now probing the headers of the downburst files (read-only).Headers check out (60 s, 500 Hz, upper plenum channel present). Now writing the stage‑1 script: fetch the 8 runs, compute Cp, align, set the active window.Stage 1 is running in the background; meanwhile I'm writing the shared library and the ABL‑null fetch.Fixed a face‑name parsing bug; rerunning stage 1 (alignment) in the background with caching.Estimators validated against Monte Carlo (median and 90% peaks within 1%). Waiting for stage 1 to finish fetching.Stage 1 is still fetching the 8 runs. Meanwhile I'm starting the deviation log for implementation details the frozen preregistration left open.Deviation log is started. Waiting for the stage‑1 monitor to report.All 8 runs are cached; the background job was killed at the default 10‑min limit during the computation step. Rerunning in the foreground from cache.Stage 2 (statistics) and stage 3 (extremes) are running in parallel; fold 1 of 8 done. Waiting.ABL \"18/344 above\" is just the 95% quantile by construction, not bad taps. Writing the figure script while stage 3 runs.Figures look physically sensible: strong time‑varying kurtosis on the lower parts of the side faces. Updating the deviation log while the smoothing run finishes.Report written. Reporting to the parent node now.L31.4b4 第一批（CC‑1011，r/D=1.0，0°，8 次重复）已按冻结预注册跑完，结论分两半：非平稳判据这部分可用；极值比较这部分实现自检没过，按 §8、§13.5 停在第一批，第二批没做。已上报你。在 工作站 上跑，0 SU、0 Colab，原始 MAT 逐个取-算-删，临时数组已全部删掉。\n\n**对齐**\n- 上腔静压做主对齐不合格：各次重复错位的标准差 0.235 s，最大 0.448 s。原因是上腔升压节奏和射流到达不同步，上腔前沿在 3.9–4.3 s，射流到达在 12.1–13.1 s。\n- 按 §13.1 改用迎风面平均 Cp 前沿做主口径，用屋顶平均 Cp 做独立检验，8 次滞后全为 0，合格，所以不属于卡住。\n\n**非平稳判据（初步，未送审）**\n- 主口径（活动时窗 20%、w=0.5 s）下，345 个测点的均值和方差全部判为非平稳。活动时窗阈值 20%/30%、w 取 0.2–1.0 s 时结论都一样。\n- 形状（时变峰度）非平稳占 25%，集中在两个侧面：East 59%，West 53%，迎风的 North 0%。侧面下部的时变峰度可达 15 左右。\n- 10% 阈值的敏感性退化成了整条记录，因为射流到达前迎风面 |Cp| 就已超过峰值的 10%。已记进偏离记录。\n- 现场常用的单条记录逆序检验能检出 93.6%（95% 区间 87.1%–98.2%），但在平稳 ABL 记录上误报 11%–20%，是名义 5% 的 2–4 倍。\n\n**极值（只能作诊断）**\n- 实现自检没过：平稳基线 E0 在 ABL 伪重复上就高估约 20%（CC‑2050 +0.210，CC‑2051 +0.199，阈值 ±0.05）。按预注册做的 0.05 s 平滑敏感性也没过（+0.074 / +0.200）。\n- 查因结果是估计量口径问题，代码没有错：\n - 近高斯测点上峰值公式基本无偏，误差 +2%～+4%\n - Winterstein Hermite 在强非高斯测点上高估 24%–31%\n - 跨零率 ν0 的谱矩里 97% 来自 50 Hz 以上。\n- 所以 H3、H4 不作结论。各方法两两比较全部\"不判\"；H4 的 R0=1.087 里混着估计量自身的偏差，分不出非平稳的贡献。\n- 预注册指标本身还有两个问题：\n - 噪声地板 E4 的单测点误差按构造接近 0，所以\"噪声地板\"实际是由 bootstrap 重抽决定的，衡量的是偏差，不是各次重复之间的离散。\n - 主导侧按偏度符号定，0.05 s 平滑后有 429/2760 个测点×折的峰值 ≤0，只能剔除。\n\n**等你定（三选一）**\n- **A（建议）**：写预注册增补后重跑，先在 ABL 上过自检，过了再进第二批。0 SU，约半天。增补内容：\n - E0 换成 b3 规程 v0 选定的平稳峰值方法\n - ν0 改用零上穿计数，或按测压管路频响定截止频率\n - 单测点误差改为各折 |e| 的中位，让噪声地板衡量离散\n - 主导侧改为按 |峰值| 较大的一侧。\n- **B**：保留原 E0，自检只算近高斯测点（这部分已通过），强非高斯测点单列。代价最小，但属于事后放宽，要标\"事后补定\"。\n- **C**：判据部分先交 b 级整合、供 a4 引用，极值部分等 b3 规程 v0 出来再做。\n\n文件：\n\n\n\n\n\n\n- 等 Liang Hu 批/定：无（上面三选一由你定）\n- 卡住（待 PI）：无\n- 建议结题（待 Liang Hu）：无\n\n## 结论\nL31.4b4 第一批 CC‑1011 C02 A000（8 次重复）已按冻结预注册跑完，0 SU、0 Colab，原始 MAT 逐个取-算-删。报告：；偏离记录：；结果目录：。\n1. **对齐合格**：上腔静压主口径不合格（错位标准差 0.235 s，最大 0.448 s）。按 §13.1 改用迎风面前沿、屋顶检验，合格（滞后全 0），不属卡住。\n2. **判据（初步，限本配置）**：345 个测点的均值、方差 100% 非平稳；形状非平稳 25%（East 59%、West 53%、North 0%）。单条逆序检验检出 93.6%（87.1%–98.2%），但平稳 ABL 上误报 11%–20%（名义 5%）。\n3. **极值**：§8 自检未过（ABL 上 +0.210 / +0.199，0.05 s 平滑后 +0.074 / +0.200）。原因是 E0 估计量口径：Winterstein Hermite 在强非高斯测点高估 24%–31%，ν0 的 97% 来自 50 Hz 以上；代码无误。按 §8、§13.5 停在第一批，第二批未做；H3、H4 只作诊断（全部\"不判\"）。\n4. **请定**：A（建议）写增补，E0 换 b3 规程方法、ν0 改口径、误差指标和主导侧规则一并修，先过 ABL 自检再重跑并进第二批；B 自检只限近高斯测点（事后补定）；C 判据部分先交 b 级与 a4，极值等 b3 规程 v0。\n\n（附件：L31.4b4_第一批初步报告.md）\n\n（附件：偏离记录.md）\n\n（附件：fig1_ensemble_moments.png）\n\n（附件：fig2_Sshape_map.png）\n\n（附件：fig3_peak_error.png）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 12:34",
+      "text": "【告知 · 来自 核心构想】（仅告知，不需要回复，也不会因此开始一轮；你下次处理这个对话时参考）\nlitwiki 已回（索引）。非平稳组可用：Wang 2022 足尺台风屋面压力时变均值与演化谱（PDF p.14–15）；Li 2022 雷暴式风洞 5:1 矩形柱时变偏度/峰度与非平稳极值模型（L31_4b_li_2022_thunderstorm_extremes.md，PDF p.12 Fig.13–15、p.14 Fig.16；注意是矩形柱不是建筑）；Li & Hu 2012 足尺台风各阶段屋面峰压（L31_4b_li_hu_2012_typhoon_roof.md，PDF p.9–10、13）；Zhang & Li 2018 600 m 高楼台风实测峰因子基线，未检验非平稳（L31_4b_zhang_li_2018_pafc.md，PDF p.11–12）。台风实测原始时程仍无数据来源。"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 12:34",
+      "text": "【委托 · 来自 核心构想】L31.4b4：选 A——写增补 §14、过 ABL 自检后重跑第一批并进第二批\n裁定全文，要点：\n1) E0 两个候选：Sadek–Simiu 原文版（week4）与 Hermite（ν0 用下条口径），先在 ABL 伪重复上过 ±0.05 自检者才可用；都过以 Sadek–Simiu 为主；都不过停、报我。E1、E2 也必须过同一 ABL 自检。\n2) ν0 主口径 = 30 Hz（模型）零相位低通后零上穿计数；原始与 40 Hz 作敏感性（TFCA 无管路频响修正记录，b2 在查）。\n3) 噪声地板 e_i = 各折 |e| 中位（有符号中位另报）；主导侧按训练重复 |峰值| 较大侧定。\n4) 第一批重跑标'非盲'，H3/H4 只以第二批（1010、1012、5029 C02 0°）判定；增补自检通过后第二批自动做。\n做法：把以上写成增补 §14，存，开算前算 sha256 追加到 （注明'按 L31.4b Lead 10-25 裁定写定'）；然后自检→重跑第一批→第二批。0 SU、0 Colab，工作站 逐个取-算-删。判据部分（T2、T3）现在就可作为内部初步交 a4 只读引用（经我转），单条逆序检验误报 11–20% 写进方法页。第二批出结果即 --report 我。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 12:34",
+      "text": "Ruling read. First I'm writing addendum §14 and freezing it before touching any code or data.Addendum §14 frozen (sha256 …). Now speeding up the alignment step and starting the data fetch for all four CCs in the background.Fetch chain running (1011 → 1010 → 1012 → 5029). Now refetching ABL, then writing the §14 extremes script.SS fits cost ~10 ms each, so I'm refactoring: fit once per sample and reuse across ν modes, and parallelize the H4 bootstrap across cores.Script fixed. While batch data fetches, writing the method page v0 (judgment part plus the single‑record false‑alarm caveat) for a4.Stage 1 rerun reproduces the earlier alignment exactly, so the FFT cross‑correlation is verified. Launching stage 2 and the §14 extremes run (self‑check first) for 1011.~35 s per fold now. Meanwhile 1010 data are in; checking its alignment.5029 stage 1 failed. Checking why.5029's zero‑wind runs are numbered R04–R05 in the DB+ABL folder. Fixing the loop; I'll start 5029 once 1011's temp files are freed, to keep [local path omitted] under 1 GB.Runs are slower in parallel (~75 s per fold); roughly an hour left. Looking at the finished 1012 raw result.All runs done. Writing the §14 report, updating the method page and logs, cleaning [local path omitted], then reporting up.Numbers in the narrative cross‑checked against the tables. Updating the method page, logs and status, then clearing [local path omitted] A 已执行完：增补 §14 写定冻结后，第一批重跑、第二批（CC‑1010、1012、5029）全部跑完。0 SU、0 Colab，原始 MAT 逐个取‑算‑删，临时文件已清。按 §14.1 判定：H3 只在 1010 支持，H4 在 1010、1012 成立，5029 两项都不可判。这两项\"支持\"都不能读成\"非平稳方法更好\"或\"低估由非平稳造成\"，理由见第 4 条。已上报。\n\n**1. 冻结**\n增补写在，sha256 …，12:35 写定，已按你的要求追加到 FREEZE.txt，注明\"按 L31.4b Lead 10‑25 裁定写定\"。写定时没有读过 1010、1012、5029 的任何数据。\n\n**2. 对齐**\n1010、1011、1012 三组，上腔静压做主对齐都不合格，按 §13.1 改用迎风面前沿，三组都合格。5029 用上腔静压直接合格。\n\n**3. 非平稳判据**（活动时窗 20%、w=0.5 s；三个纯下击暴流工况结论一致）\n- 均值、方差：100% 测点非平稳。\n- 形状（时变峰度）：1010 为 40%，1011 为 25%，1012 为 49%，集中在侧面和背风面，迎风面约 0。\n- 单条逆序检验：检出率 77%–99%，但在平稳 ABL 上误报 8%–22%（名义 5%），三组都复现。已写进方法页 v0，判据部分可以交给 a4 只读引用。\n\n**4. 极值**（ν0 = 30 Hz 低通后零上穿计数）\n- ABL 自检：1011、1010 四种方法都过，按规则 Sadek–Simiu 为主；1012 的 Sadek–Simiu 在 CC‑2051 上为 −0.055，没过，改用 Hermite 为主。\n- 判定读法要收紧：\n - **H3**：我看过结果后补算了\"非平稳方法对平稳 Hermite\"的同口径比较（不算预注册判定），五组全部\"不判\"。1010 的\"支持\"只是因为 Sadek–Simiu 在下击暴流里偏低 20%–32%；1012 换成 Hermite 为主后就\"不支持\"。所以在本数据、本指标下，非平稳方法没有显示出比平稳 Hermite 更准。\n - **H4**：两种非平稳方法（E1 均匀调制、E2 时变跨越率）的峰值比也只有 0.83–0.89，和 Hermite 的 R0 几乎一样，说明低估是所有依赖 ν0 的方法共有的。不滤波计数时偏差接近 0，30 Hz 截止时为 −10%～−17%。所以低估更像是 30 Hz 截止对下击暴流偏小，这是假说、没做区分实验，等 b2 的管路结论，不能归因于\"忽略非平稳\"。\n - 子段 BLUE 法不依赖 ν0，在本配置下基本无偏。\n - 0.05 s 平滑敏感性下结论有变，例如 1010 的 H4 平滑后不成立，所以只按原始数据判定。\n- **5029（下击暴流 + ABL）**：背景 ABL 让迎风面 |Cp| 全程都超过峰值的 20%，活动时窗覆盖了整条 59 s 记录。ABL 伪重复只切出 1 段，自检做不了，按 §14.3 该组极值不出结果；判据结果主要反映背景 ABL，不宜引用。\n\n**5. 过程中修掉的问题**（都记在偏离记录里）\n- 1010 第一次运行因窗长为偶数时整窗求和越界而崩溃，已修正后重跑；修正对 1011、1012 结果没有影响。\n- 5029 的零风测量编号是 R04、R05，脚本已改为遍历查找。\n- 为提速改了反变换实现，与原实现结果相同（最大相对差 1e‑6 量级）。\n\n**6. 需要你定**\n1. 5029 的时窗：建议补一条增补，DB+ABL 工况改按\"扣除射流前 ABL 均值后的 |Cp| 达到峰值 20%\"定时窗并重跑，0 SU，约 1 小时；也可以接受本轮不可判。\n2. \"本配置下非平稳方法没有优于平稳 Hermite\"\"ν0 类方法在 30 Hz 截止下低估 10%–17%\"这两条，如果要写成结论，需要先送 \n\n文件：\n\n\n\n\n\n- 等 Liang Hu 批/定：无（上面两件由上级定）\n- 卡住（待 PI）：无\n- 建议结题（待 Liang Hu）：无\n\n## 结论\nL31.4b4 已按选 A 执行完：增补 §14 冻结（sha …，已追加 FREEZE.txt），第一批重跑（非盲）、第二批 1010/1012/5029 全部跑完。0 SU、0 Colab，原始 MAT 逐个取‑算‑删，临时文件已清。报告。\n1. **判据（可交 a4，内部初步）**：三个纯下击暴流工况的均值、方差 100% 非平稳；形状非平稳 25%–49%，集中在侧面和背风面。单条逆序检验检出 77%–99%，平稳 ABL 上误报 8%–22%（名义 5%），已写进方法页。\n2. **极值（按 §14.1）**：H3 部分支持（只有 1010），H4 部分支持（1010、1012），5029 不可判。但事后同口径比较显示，E1、E2 对平稳 Hermite 全部\"不判\"。所有依赖 ν0 的方法在 30 Hz 截止下低估 10%–17%，不滤波时接近无偏，所以低估不能归因于非平稳，更像截止频率问题（假说，待 b2）。子段 BLUE 在本配置下接近无偏。\n3. **5029**：20% 活动时窗覆盖整条 59 s 记录（背景 ABL），ABL 自检做不了，极值不出结果。\n4. **请定**：5029 时窗改为\"扣除射流前 ABL 均值后 |Cp| 20%\"并重跑（0 SU，约 1 小时），或接受不可判；上述两条读法若要写成结论，需送 \n\n（附件：L31.4b4_增补14结果报告.md）\n\n（附件：预注册_b4_增补14.md）\n\n（附件：L31.4b4_非平稳处理方法页_v0.md）\n\n（附件：偏离记录.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 15:11",
+      "text": "【委托 · 来自 核心构想】L31.4b4 增补 §15：5029 时窗改定义重跑 + ν0 截止频率敏感性\n已读 L31.4b4_增补14结果报告.md，抽核 H4 R0=0.800（0.746–0.839）与 E1/E2 对比表一致。我的裁定：\n(1) 5029：写增补 §15 并冻结（sha 追加 FREEZE.txt）后重跑——活动时窗按“扣除射流前 ABL 均值后的 |Cp| 20%”定义；标明是看过第一次结果后的事后补定，结论里并列原定义的读法（不可判）。0 SU，工作站 逐个取-算-删。\n(2) ν0 截止频率只做描述性敏感性，不改判定：在 §15 里同时报 30/50/80 Hz 与不滤波四档下 E0-SS、E0-H、E1、E2 的 R 中位，并以子段 BLUE 作不依赖 ν0 的参照。TFCA 有 177.5 Hz 采集链/管路共振（>50 Hz 方差占 18–29%，见），所以“不滤波≈无偏”也可能是噪声抬高 ν0 抵消，不得写成哪档为真。\n(3) 方法页 v0 的判据部分可以先交 a4（注明内部、未送审）；“非平稳方法未优于平稳 Hermite”“ν0 法在 30 Hz 下低估”两条结论暂只作内部读法，11-08 方法页 v1 时连同 §15 结果一并 \n交回：§15 冻结 sha、5029 新判定、四档截止的 R 表路径；结论句限定本数据本配置。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 15:11",
+      "text": "Writing §15 and freezing it before any data is touched.§15 frozen (sha256 …). Now adding the §15.1 window rule to stage 1 and launching the refetch (ABL, 5029, then 1011/1010/1012 for the ν0 table).While data fetches, writing the §15.2 cutoff‑sensitivity script. It reuses the §14 estimator functions unchanged and adds the 50 and 80 Hz settings.5029's new window is 11.04–20.46 s (9.42 s; jet front at 12.08 s, ABL baseline Cp 0.31). Launching its judgment and extremes runs.Old logs moved so the wait chain can't fire early. Writing the R‑table generator meanwhile.Fetches are fast now; the 1011 cutoff table is done. Checking it against the §14 H4 numbers for consistency.Exact match with §14 H4. Waiting for the 5029 self‑check.All §15 runs are done. Writing the §15 report from the generated tables, then cleanup and report up.Cross‑checked the narrative against the JSON; correcting three ranges: ABL 0.96–1.02 and unfiltered 1.08–1.13, plus the downburst‑vs‑ABL gap at 30 Hz and 80 Hz.§15 已执行完：增补冻结后，5029 按新时窗重跑，四档截止频率的敏感性表也已交付，已上报。0 SU、0 Colab，原始数据逐个取‑算‑删，临时文件已清。\n\n**冻结**\n增补 §15 的 sha256 为 079ca0a2ced2290df4e7cd39e15922e84ff92502357842683a85acaac1897bdb，已追加到 FREEZE.txt，注明\"按 L31.4b Lead 10‑25 裁定写定\"。新时窗那一条标为\"事后补定\"。§14 第一次的 5029 结果留在，没有删。\n\n**5029（下击暴流 + ABL）新判定**\n- 新时窗：射流前沿在 12.08 s，扣除射流前 ABL 基线（Cp 0.306）后，20% 时窗为 11.04–20.46 s，长 9.42 s。ABL 伪重复够 8 段，可以判了。\n- 判据：\n - 均值、方差非平稳 98%，形状 19%（集中在 West 面，63%）\n - 单条逆序检验只检出 1.9%：叠加 ABL 背景后，这个检验基本认不出非平稳。\n- 自检：Sadek–Simiu 在 CC‑2051 上为 −0.053，没过，改用 Hermite 为主。\n- **H3 支持**：E1、E2 比 Hermite 好一点，测点误差中位差分别为 −0.009、−0.025，区间都不含 0。这是四组里唯一一组非平稳方法胜过平稳 Hermite。\n- **H4 成立**：R0 = 0.802，|R0−1| = 0.198（区间 0.119–0.254）。但 E1、E2 的峰值比也只有 0.824、0.851，所以低估不能归因于忽略非平稳。\n- 0.05 s 平滑下 H3 不可判、H4 不成立，结论对平滑敏感。\n- 按原定义的读法：不可判。\n\n**按 §14.1 汇总（两种读法并列）**\n- 用 5029 新时窗：H3 部分支持（1010、5029），H4 三组都成立。\n- 按原定义（5029 不可判）：H3 部分支持（只有 1010），H4 部分支持（1010、1012）。\n\n**截止频率敏感性（描述性，不判哪档为真）**\n\n| 数据 | 方法 | 30 Hz | 80 Hz | 不滤波 |\n| --- | --- | --- | --- | --- |\n| 平稳 ABL | Hermite、E1、E2 | 0.96–1.02（30–80 Hz 都在此范围） | 同左 | 1.08–1.13 |\n| 下击暴流 | Hermite、E1、E2 | 0.80–0.90 | 0.88–0.97 | 0.98–1.14 |\n| 下击暴流 | Sadek–Simiu | 0.68–0.95（各档） | | |\n| 下击暴流 | 子段 BLUE（不依赖 ν0） | 0.96–1.21 | — | — |\n\n下击暴流的 R 随截止频率单调上升。采集链在 177.5 Hz 有共振，\"不滤波时 R≈1\"可能是噪声抬高 ν0 后和方法偏差相抵，没做区分实验。\n\n**交给 a4 与送审**\n方法页 v0 的判据部分已注明\"内部、未送审\"，由你转给 a4。下面两条暂时只作内部读法，11‑08 方法页 v1 时连同 §15 结果一起送 `\n- 本配置下非平稳方法没有普遍优于平稳 Hermite\n- 依赖 ν0 的方法在 30 Hz 截止下低估峰值。\n\n文件：\n\n\n\n\n- 等 Liang Hu 批/定：无\n- 卡住（待 PI）：无\n- 建议结题（待 Liang Hu）：无\n\n## 结论\n1. **§15 冻结**：sha256 079ca0a2ced2290df4e7cd39e15922e84ff92502357842683a85acaac1897bdb，已追加 FREEZE.txt；新时窗定义标为事后补定。\n2. **5029 新判定**（限 TFCA 冲击射流、CAARC M2、r/D=1.0、0°、本口径）：\n - 新时窗 11.04–20.46 s；均值、方差非平稳 98%，形状 19%；单条逆序检验检出 1.9%。\n - 主用法为 Hermite（Sadek–Simiu 自检 −0.053 未过）。\n - H3 支持：E1、E2 小幅优于 Hermite，误差中位差 −0.009、−0.025，区间不含 0。\n - H4 成立：R0 = 0.802，|R0−1| = 0.198（0.119–0.254）；E1、E2 也低于 1（0.824、0.851），低估不归因于忽略非平稳。\n - 0.05 s 平滑下 H3 不可判、H4 不成立。并列原定义读法：不可判。\n - 汇总：新时窗读法 H3 部分支持（1010、5029），H4 三组都成立；原定义读法 H3 部分支持（1010），H4 部分支持（1010、1012）。\n3. **四档截止的 R 表**：。\n - ABL：30–80 Hz 时 R 约 0.96–1.02，不滤波 1.08–1.13。\n - 下击暴流（Hermite、E1、E2）：30 Hz 约 0.80–0.90，80 Hz 约 0.88–0.97，不滤波约 0.98–1.14，随截止频率单调上升。\n - Sadek–Simiu 0.68–0.95；子段 BLUE 0.96–1.21。\n - 177.5 Hz 共振使哪一档为真无法判定，本节只作描述。\n4. 方法页 v0 判据部分（内部、未送审）可由你转给 a4；11‑08 v1 送审包由我准备。\n\n（附件：L31.4b4_增补15结果报告.md）\n\n（附件：nu0_cutoff_R_table.md）\n\n（附件：预注册_b4_增补15.md）"
+    },
+    {
+      "role": "relay",
+      "who": "核心实验室 Lead · 转达",
+      "ts": "2026-10-25 16:26",
+      "text": "【自动初查 · 未通过】你交回的结果还缺下面几项（按派活方的验收清单）：\n- 在正文和文件 、L31.4b4_增补15结果报告.md、nu0_cutoff_R_table.md、预注册_b4_增补15.md 中都没找到：偏离记录已追加的行\n\n验收清单：\n增补 §15 文件路径与冻结 sha256\n5029 按新时窗的判据与极值判定（含原定义并列读法）\n30/50/80 Hz/不滤波四档 R 中位表路径（含子段 BLUE 参照）\n偏离记录已追加的行\n\n请补齐后重新给出完整的结论（包括已经做好的部分）；确实做不到的，写明原因和已经尝试过什么。"
+    },
+    {
+      "role": "bot",
+      "who": "核心构想",
+      "ts": "2026-10-25 16:26",
+      "text": "The deviation‑log lines exist but weren't quoted in the report or the answer. Adding them to the §15 report.这是补齐后的完整结论。上一版缺\"偏离记录已追加的行\"：这些行当时已写进偏离记录，但交回时没引用。现已原文照录在 §15 报告末尾，也列在下面第 4 条。\n\n## 结论\n1. **增补 §15**\n - 文件：\n - 冻结副本：\n - sha256：079ca0a2ced2290df4e7cd39e15922e84ff92502357842683a85acaac1897bdb，10‑25 15:11 写定，已追加到 FREEZE.txt，注明\"按 L31.4b Lead 10‑25 裁定写定\"。\n - 新时窗定义（§15.1）标为\"事后补定\"。\n\n2. **5029 按新时窗的判定**（限 TFCA 冲击射流、CAARC M2、r/D=1.0、0°、本口径；0 SU、0 Colab）\n - 新时窗：射流前沿在 12.08 s，扣除射流前 ABL 基线 Cp 0.306 后，20% 时窗为 11.04–20.46 s（长 9.42 s），ABL 伪重复有 8 段。\n - 判据：均值非平稳 97.7%，方差 98.0%，形状 18.9%（West 面 63%）。单条逆序检验只检出 1.9%（区间 0.3%–4.3%），ABL 上误报 9.9%–19.4%。\n - 自检：Sadek–Simiu 在 CC‑2051 上为 −0.053，没过，改以 Hermite 为主。\n - H3 支持：E1、E2 都比 Hermite 好，但差距很小，测点误差中位差为 −0.009 和 −0.025，区间都不含 0。\n - H4 成立：R0 = 0.802（0.746–0.881），|R0−1| = 0.198（0.119–0.254）。但 E1、E2 的 R 也只有 0.824、0.851，所以这个低估不能归因于\"忽略非平稳\"。\n - 敏感性：做 0.05 s 平滑后，H3 不可判，H4 不成立。\n - **并列原定义的读法：5029 不可判。**\n - 按 §14.1 汇总：\n - 用新时窗：H3 部分支持（1010、5029），H4 三组都成立\n - 按原定义：H3 部分支持（只有 1010），H4 部分支持（1010、1012）。\n\n3. **四档 R 中位表**\n - 路径，程序生成，含不依赖 ν0 的子段 BLUE 参照和 ABL 对照。\n - ABL 上：30–80 Hz 时 R 约 0.96–1.02，不滤波约 1.08–1.13。\n - 下击暴流（Hermite、E1、E2）：\n\n| 截止 | 30 Hz | 80 Hz | 不滤波 |\n| --- | --- | --- | --- |\n| R 中位 | 约 0.80–0.90 | 约 0.88–0.97 | 约 0.98–1.14 |\n\n R 随截止频率单调上升。\n - Sadek–Simiu 各档在 0.68–0.95；子段 BLUE 在 0.96–1.21。\n - 采集链在 177.5 Hz 有共振，所以不判定哪一档为真。\n\n4. **偏离记录已追加的行**（「10‑25 增补 §15 执行记录」一节，共 5 行，已原文照录在 §15 报告末尾）：\n - **15:1x｜按 §15.3**：§14 第一次的 5029 结果移到 （含当时的 s1、s2 日志），不删。\n - **15:1x｜实现补定**：5029 新时窗的实现方式。射流前沿 t_f 用系综迎风面平均 Cp、按 §4 备选 1 规则找；基线取 [0, t_f−1 s]。实测：\n - t_f = 12.08 s，基线 Cp = 0.306\n - 20% 时窗 11.04–20.46 s（9.42 s）；10% 时窗长 17.01 s；30% 时窗长 8.83 s。\n - **15:2x｜实现补定**： 从 s3v2_extremes.py 逐字复制，只把 ν0 档位扩为 30/50/80/不滤波。CC‑1011 的 30 Hz 档 R 与 §14 H4 的点估计逐位一致（0.751 / 0.854 / 0.845 / 0.845）。为此 1011、1010、1012 重新取数，算完即删。\n - **15:3x｜按 §14.3 执行**：5029 的 ABL 自检中，Sadek–Simiu 在 2051 上为 −0.053，未过；Hermite、E1、E2 均过，所以 5029 以 Hermite 为主。\n - **16:2x｜实现补定**：[local path omitted] 临时数组已全部删除。报告里的叙述区间与 nu0_cutoff_R.json 逐格复核过，并修正了初稿两处：ABL 在 30–80 Hz 的区间应为 0.96–1.02，不滤波应为 1.08–1.13。\n\n5. **交付与下一步**\n - 报告：\n - 方法页 v0 的判据部分已注明\"内部、未送审\"，可由你转给 a4。\n - 11‑08 方法页 v1 并入 §14、§15 结果，送审包（`\n\n\n\n\n\n\n（附件：L31.4b4_增补15结果报告.md）\n\n（附件：nu0_cutoff_R_table.md）\n\n（附件：预注册_b4_增补15.md）\n\n（附件：偏离记录.md）"
+    }
+  ],
+  "files": {
+    "self": "282df644.json",
+    "claims": null,
+    "pdf": null
+  }
+}

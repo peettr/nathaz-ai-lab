@@ -1,0 +1,47 @@
+{
+  "id": "d269d490",
+  "slug": "d269d490",
+  "number": "L26.17",
+  "title": {
+    "zh": "L26.17 不公开子项目",
+    "en": "L26.17 Non-public sub-project"
+  },
+  "group": "qtl",
+  "parent": "bd040db3",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-11-07 19:38",
+  "end": null,
+  "updated": "2026-11-10 12:10",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "d269d490.json",
+    "claims": null,
+    "pdf": null
+  }
+}

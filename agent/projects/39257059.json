@@ -1,0 +1,47 @@
+{
+  "id": "39257059",
+  "slug": "39257059",
+  "number": null,
+  "title": {
+    "zh": "日常运维与平台总线",
+    "en": "Daily Operations & Platform mainline"
+  },
+  "group": "plat",
+  "parent": null,
+  "depth": 0,
+  "status": {
+    "zh": "进行中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-12 20:13",
+  "end": null,
+  "updated": "2026-11-21 05:28",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "39257059.json",
+    "claims": null,
+    "pdf": null
+  }
+}
