@@ -1,0 +1,11 @@
+import pathlib, subprocess, sys, os
+r=pathlib.Path('/content/r234c_gc37_E2E3')
+assert r.is_dir()
+assert not (r/'infer_crc_inputs_resume_v3.log').exists()
+assert not (r/'infer_crc_inputs_resume_v3.done').exists()
+assert not (r/'infer_crc_inputs_resume_v3.failed').exists()
+p=pathlib.Path('/content/infer_gc37_e2e3_crc_inputs_resume_v3.py')
+assert p.exists()
+f=(r/'worker_resume_v3.stdout.log').open('x')
+proc=subprocess.Popen([sys.executable,'-u',str(p)],stdin=subprocess.DEVNULL,stdout=f,stderr=subprocess.STDOUT,start_new_session=True,cwd='/content')
+print('STARTED_PID',proc.pid, 'SCRIPT',p,flush=True)

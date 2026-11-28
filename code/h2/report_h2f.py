@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+"""Render H2f extension and provenance from computed metrics."""
+import json
+from pathlib import Path
+R=Path(__file__).resolve().parent
+m=json.loads((R/'metrics_h2f.json').read_text());main=m['main'];strong=m['strong'];meta=m['metadata']
+def row(label,v):
+ a=v['baseline_metrics'];b=v['fusion_metrics'];gain=v['gain'];wins=v['station_wins'];n=v['stations']
+ return f"|{label}|{n}|{v['baseline']} / {v['best_fusion']}|{a['rmse']:.3f} / {b['rmse']:.3f}|{gain*100:.2f}%|{wins}/{n}|{v['verdict']}|" if gain is not None else f'|{label}|{n}|—|—|—|—|不可评|'
+lines=['# H2f：Francine 与 B v1 复用口径勘误','',
+'本轮只新增 Francine 2024（登陆 2024-09-11 22:00 UTC、观测窗 ±12 h，按小时 25 个 UTC 时点）；先前 H2d 清洗陆地站逐站留一峰值表只读重评分，不覆盖旧结果。纯插值和融合各从固定 75 km / 逐目标逐小时拟合的 OK 及 IDW 候选中，按当前检验子集峰值 RMSE 取优，故选模存在乐观性。峰值是在该站有观测的小时内各自取最大，持续风与阵风不混。','',
+'## 主判据：事件峰值持续风','',
+'|事件或合计|陆地合格站|最佳纯插值 / 融合|峰值 RMSE (m/s)|降幅|胜站|判定|','|---|---:|---|---:|---:|---:|---|']
+for e in ['FRANCINE','TEN','TEN_PLUS_FRANCINE']:
+ lines.append(row({'TEN':'原十事件','TEN_PLUS_FRANCINE':'十事件＋Francine'}.get(e,e),main[e]))
+lines+=['','主判据：峰值 RMSE 降幅 ≥20% 且 ≥2/3 站峰值绝对误差减小判“值得”；10–20% 或只达胜站门槛判“有条件”；不足 10% 判“插值够用”。Francine 单事件虽降幅跨 20%，胜站未过 2/3，仍“有条件”；合计未跨档。',
+'','## 强风副判据：实测峰值持续风 ≥12 m/s','',
+'|事件或合计|强风合格站|最佳纯插值 / 融合|峰值 RMSE (m/s)|降幅|胜站|判定|','|---|---:|---|---:|---:|---:|---|']
+for e in ['FRANCINE','NINE_INDEPENDENT','TEN_INDEPENDENT_PLUS_FRANCINE']:
+ lines.append(row({'NINE_INDEPENDENT':'原独立九事件','TEN_INDEPENDENT_PLUS_FRANCINE':'独立九事件＋Francine'}.get(e,e),strong[e]))
+lines+=['','强风副判据沿 `prereg_h2b.md`：≥20% 且 ≥2/3 胜站判“强风站值得融合”；10–20% 或只达其一判“有条件”；<10% 判“插值够用”；不足 8 站不可评。Francine 单事件达到“值得”，但独立合计仍为“有条件”，没有跨档。Beryl/Nicholas 已见过数据，不入独立强风合计。',
+'','## Francine 覆盖与站池','',
+f"76 个候选站：陆地 {meta['francine_land_sites']}、水体/平台 {meta['francine_platform_sites']}、WorldCover 无有效分类 {meta['francine_unknown_cover_sites']}、其他排除 {meta['francine_excluded_sites']}；陆地 {main['FRANCINE']['stations']} 站满足 ≥75% 有效小时且 H08 模型峰时 ±2 h 有报，陆地另 {len(meta['francine_coverage_missing'])} 站不满足。平台独立池合格 {m['francine_water_platform']['qualified_by_coverage']} 站，不与陆地同池留一；未知覆盖不参与输入或评分。新出现的 ANR、ETO、GLX、MKQ、OYE 为平台／水体，MPE 为陆地；与原站表均无 <2 km 新近邻。清洗表 `station_clean_h2f.csv`。", 
+'','## 与 B 事件集、溯源和限制','',
+'B v1/run2 有合格站的事件为 Delta、Zeta、Nicholas、Ian、Nicole、Beryl、Debby、Francine、Helene、Milton；H2 原十事件按自建 300 km 小时站网另用了 Ida、Idalia，且把 Beryl 单列、不纳入十事件合计。H2f “十事件＋Francine”仍沿 H2 十事件口径，包括 Ida/Idalia/Nicholas、不含 Beryl，不能当作 B v1 十事件复现。B 的 150 km/HAS1MIN 分钟站网和本试验 300 km/小时站网不是同一集合。',
+'旧 `results_h2_v1batch.md` 第 494 行已勘误为只指 `22_Lab/06_Logs/b_tc/v1/run2/station_rows_v1.csv`；H2 各版数值从本地 IEM/ARCO/Holland 预测网格与本站评分脚本取得，未从 B `v1/` 根目录 `summary_v1.json`、逐事件表或 station_rows 表取值。`run_h2_expanded.py` 只借 `chain_a_v1.py` 的 `build_track`/`predict`，Francine 同样借用函数、不执行该链的汇总入口；原十事件评分从 `peaks_clean_h2d.csv` 复核与 `metrics_clean_h2d.json` 完全一致。',
+'B 链 500 m 参考高度中性常通量对数层、1 min→METAR 约 2 min 的 ×0.97、1 min→5 s 阵风的海 ×1.20／陆 ×1.30，均是开跑前的假设（`b_tc/v1/PREREG_v1.md`），不是文献直接实测或通用系数；凡引用 Holland 链误差须带此限定。Francine 的 Holland 结果亦受此影响。NHC 最佳路径/b-deck 为事后资料，ERA5 地面站同化独立性待核。靠近风眼的站更易断报，合格样本偏外围，属于幸存者偏差；不能外推到断站真峰值。',
+'','## 参数来源表','',
+'|参数|来源／性质|','|---|---|',
+'|事件及登陆时刻|`b_tc/events_verified.csv` 第 11 行；±12 h、300 km 为原 H2 任务书与脚本口径|',
+'|平均风/阵风、整点配对/QC|IEM `sknt`／`gust`，最近整点 ±30 min、0–120/0–150 kt、gust<sknt 剔除；H2 原脚本假设，UTC|',
+'|Holland／粗糙度与时距|`b_tc/v1/chain_a_v1.py`、`PREREG_v1.md`、`ERRATA_v1.md`；500 m 与 2 min/5 s 因子为开跑前假设，系数未调|',
+'|ERA5|ARCO ERA5 10 m u/v；双线性插站后模长，独立性待核|',
+'|WorldCover 与近邻|2021 v200 周边 1 km 主类；<2 km 重复站留一，沿 H2d 原站表，本轮六新站单独核查|',
+'|克里金/IDW|指数协方差 75 km、nugget .08、逐小时拟合范围 20–300 km、IDW 幂次 2；均为 H2d 原假设，不是文献给定值|',
+'|覆盖/峰值|≥75% 小时且 H08 峰时 ±2 h 有报；原 H2d 假设；强风 ≥12 m/s 和副判据来自 `prereg_h2b.md`|',
+'','本轮复用既有外部数据源（IEM、NHC、ARCO、WorldCover、Natural Earth、CLIMADA），无新增来源；引用见 `22_Lab/PUBLIC_CITATIONS.md`。详数 `metrics_h2f.json`；脚本 `fetch_francine_h2f.py`、`audit_francine_h2f.py`、`evaluate_francine_h2f.py`、`report_h2f.py`。']
+(R/'results_h2f.md').open('x').write('\n'.join(lines)+'\n')
+print('report',R/'results_h2f.md')

@@ -1,0 +1,47 @@
+{
+  "id": "5e4fe783",
+  "slug": "5e4fe783",
+  "number": "P20",
+  "title": {
+    "zh": "P20 平台 总控（存档至11-25）",
+    "en": "P20 平台 总控（存档至11-25）"
+  },
+  "group": "plat",
+  "parent": "39257059",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-10-12 20:13",
+  "end": null,
+  "updated": "2026-11-25 18:21",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [],
+  "files": {
+    "self": "5e4fe783.json",
+    "claims": null,
+    "pdf": null
+  }
+}

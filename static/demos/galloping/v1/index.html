@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Across-wind galloping of a square prism: the Glauert–Den Hartog criterion (teaching demo v0.1)</title>
+<style>
+ body{font-family:system-ui,"Microsoft YaHei",sans-serif;margin:0;background:#f6f7f9;color:#222}
+ header{padding:12px 20px;background:#1f3a5f;color:#fff}
+ header h1{font-size:18px;margin:0}
+ header p{margin:4px 0 0;font-size:13px;opacity:.85}
+ main{display:flex;flex-wrap:wrap;gap:16px;padding:16px}
+ .panel{background:#fff;border:1px solid #d8dde3;border-radius:6px;padding:12px 14px}
+ #ctl{width:330px}
+ #viz{flex:1;min-width:480px}
+ label{display:block;font-size:13px;margin-top:10px}
+ input[type=range]{width:100%}
+ .val{float:right;font-variant-numeric:tabular-nums}
+ .out{font-size:14px;line-height:1.7;font-variant-numeric:tabular-nums}
+ .bad{color:#b3261e;font-weight:600}.good{color:#1b6e3a;font-weight:600}
+ canvas{background:#fbfcfd;border:1px solid #e1e5ea;border-radius:4px;width:100%}
+ .how{font-size:12.5px;color:#444;line-height:1.6}
+ .how code{background:#eef1f4;padding:0 3px;border-radius:3px}
+ select{width:100%;margin-top:4px}
+ button{margin-top:10px;padding:5px 10px}
+ #selftest{font-size:12px;white-space:pre-wrap;color:#333}
+</style>
+</head>
+<body>
+<header>
+ <h1>Across-wind galloping of a square prism: the Glauert–Den Hartog criterion and critical wind speed (teaching demo v0.1)</h1>
+ <p>An interactive teaching demo: single degree of freedom, quasi-steady, linearized (onset or decay only). Move the sliders to see when a square prism gallops; formula sources are at the bottom of the page. · <a href="zh.html" style="color:#fff">中文</a></p>
+</header>
+<main>
+<section class="panel" id="ctl">
+ <label>Cross-section
+  <select id="shape">
+   <option value="square">Square prism (aerodynamic coefficient G adjustable)</option>
+   <option value="circle">Circular cylinder (dC<sub>L</sub>/dα = 0)</option>
+  </select></label>
+ <label>Wind speed U (m/s) <span class="val" id="vU"></span>
+  <input type="range" id="U" min="0" max="40" step="0.1" value="8"></label>
+ <label>Structural damping ratio ζ <span class="val" id="vz"></span>
+  <input type="range" id="z" min="0.001" max="0.05" step="0.001" value="0.005"></label>
+ <label>Mass per unit length m (kg/m) <span class="val" id="vm"></span>
+  <input type="range" id="m" min="1" max="50" step="0.5" value="10"></label>
+ <label>Across-wind natural frequency n<sub>1</sub> (Hz) <span class="val" id="vn"></span>
+  <input type="range" id="n" min="0.5" max="10" step="0.1" value="2"></label>
+ <label>Windward width B (m) <span class="val" id="vB"></span>
+  <input type="range" id="B" min="0.02" max="0.5" step="0.01" value="0.10"></label>
+ <label id="gl">Aerodynamic coefficient G = (dC<sub>L</sub>/dα + C<sub>D</sub>)|<sub>α=0</sub> <span class="val" id="vG"></span>
+  <input type="range" id="G" min="-4" max="1" step="0.05" value="-2"></label>
+ <p class="how" style="margin-top:4px">The default G = −2 is an <b>assumed value for the demo</b>, not a measurement from any particular test; for a real square prism G depends on section details and turbulence intensity and must be obtained from wind-tunnel C<sub>L</sub>(α) and C<sub>D</sub>(α).</p>
+ <label>Air density ρ = 1.225 kg/m³ (fixed)</label>
+ <button id="kick">Apply a small disturbance</button>
+ <button id="runtest">Run self-check</button>
+ <div id="selftest"></div>
+</section>
+<section class="panel" id="viz">
+ <div class="out" id="out"></div>
+ <canvas id="cv" width="900" height="300"></canvas>
+ <canvas id="tr" width="900" height="200" style="margin-top:8px"></canvas>
+ <div class="how" id="how"></div>
+</section>
+</main>
+<section class="panel how" style="margin:0 16px 16px">
+ <b>How this page computes (all simplifications are listed here)</b><br>
+ Equation of motion (Simiu &amp; Yeo 2019, Eq. 20.12): m[ÿ + 2ζω<sub>1</sub>ẏ + ω<sub>1</sub>²y] = −½ρU²B·G·(ẏ/U), ω<sub>1</sub> = 2πn<sub>1</sub>.<br>
+ Net damping coefficient (Eq. 20.13): d = 2mω<sub>1</sub>ζ + ½ρUB·G. d &lt; 0 means instability (sufficient condition); G &lt; 0 is the necessary condition (Eq. 20.14, the Glauert–Den Hartog criterion). For a circular cylinder dC<sub>L</sub>/dα = 0 and C<sub>D</sub> &gt; 0, so G &gt; 0 and it cannot gallop (same book, same page). The page uses G = C<sub>D</sub> = 1.2 for the cylinder as an <b>illustrative value</b>; the conclusion holds for any C<sub>D</sub> &gt; 0.<br>
+ Critical wind speed (setting d = 0): U<sub>cr</sub> = −4mω<sub>1</sub>ζ/(ρB·G) = −8πζn<sub>1</sub>m/(ρB·G), consistent with Holmes &amp; Bekele, <i>Wind Loading of Structures</i>, 4th ed., Eq. (5.46); in terms of the Scruton number: U<sub>cr</sub>/(n<sub>1</sub>B) = 2Sc/(−G), Sc = 4πζm/(ρB²) (Eqs. 5.47, 5.48).<br>
+ <b>Not included</b>: (1) limit-cycle amplitude, which needs higher-order polynomial coefficients of C<sub>Fy</sub>(α) (Simiu &amp; Yeo Eq. 20.15, Parkinson–Smith type) that the sources used here do not give, so only linearized onset/decay is drawn and the curve below is clipped at the frame — <b>it is not a real amplitude</b>; (2) vortex-induced resonance and its coupling with galloping (important at low Scruton numbers); (3) oncoming turbulence, three-dimensional and end effects; (4) the quasi-steady assumption needs a large enough reduced velocity: if U<sub>cr</sub>/(n<sub>1</sub>B) = 2Sc/(−G) is low, the predicted U<sub>cr</sub> may be unreliable (it may fall in the vortex-shedding range) and is only qualitative; the page uses 20 as a warning line, an <b>illustrative value with no literature basis</b>.<br>
+ Sources: Simiu &amp; Yeo, <i>Wind Effects on Structures</i>, 4th ed., 2019, §20.1.1, Eqs. 20.8–20.14; Holmes &amp; Bekele, <i>Wind Loading of Structures</i>, 4th ed., 2021, §5.5.2, Eqs. 5.44–5.48.
+</section>
+<script>
+"use strict";
+const RHO=1.225;
+const $=id=>document.getElementById(id);
+const ids=["U","z","m","n","B","G"];
+function params(){
+  const p={U:+$("U").value,z:+$("z").value,m:+$("m").value,n:+$("n").value,B:+$("B").value,G:+$("G").value,shape:$("shape").value};
+  if(p.shape==="circle"){p.G=1.2;} 
+  return p;
+}
+function physics(p){
+  const w1=2*Math.PI*p.n;
+  const d=2*p.m*w1*p.z+0.5*RHO*p.U*p.B*p.G;           
+  const Ucr=(p.G<0)? -4*p.m*w1*p.z/(RHO*p.B*p.G) : Infinity; // d=0
+  const Sc=4*Math.PI*p.z*p.m/(RHO*p.B*p.B);              
+  const Ured=p.U/(p.n*p.B);
+  return {w1,d,Ucr,Sc,Ured,sigma:-d/(2*p.m)};
+}
+function fmt(x,k=3){return isFinite(x)?x.toFixed(k):"∞ (G ≥ 0, no galloping)";}
+let y=0.002, v=0, hist=[];
+function step(p,ph,dt){ 
+  const f=(Y,V)=>[V, -(ph.d/p.m)*V - ph.w1*ph.w1*Y];
+  const k1=f(y,v),k2=f(y+dt/2*k1[0],v+dt/2*k1[1]),k3=f(y+dt/2*k2[0],v+dt/2*k2[1]),k4=f(y+dt*k3[0],v+dt*k3[1]);
+  y+=dt/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]); v+=dt/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+  if(Math.abs(y)>10*paramsCache.B){ y=Math.sign(y)*10*paramsCache.B; v=0; clipped=true; }
+}
+let paramsCache=params(), clipped=false;
+function render(){
+  const p=paramsCache, ph=physics(p);
+  for(const k of ids){ const el=$("v"+k); if(el) el.textContent=(+$(k).value).toString(); }
+  $("gl").style.opacity=(p.shape==="circle")?0.4:1;
+  const necessary=p.G<0, unstable=ph.d<0;
+  $("out").innerHTML=
+   `Criterion G = dC<sub>L</sub>/dα + C<sub>D</sub> = ${p.G.toFixed(2)}: ${necessary?'<span class="bad">necessary condition met (G&lt;0)</span>':'<span class="good">not met (G≥0), no galloping</span>'}<br>`+
+   `Net damping d = ${ph.d.toFixed(4)} N·s/m²: ${unstable?'<span class="bad">d&lt;0, oscillation grows (unstable)</span>':'<span class="good">d&gt;0, disturbance decays</span>'}<br>`+
+   `Critical wind speed U<sub>cr</sub> = ${fmt(ph.Ucr,2)} m/s; current U/U<sub>cr</sub> = ${isFinite(ph.Ucr)?(p.U/ph.Ucr).toFixed(2):"—"}<br>`+
+   `Scruton number Sc = 4πζm/(ρB²) = ${ph.Sc.toFixed(1)}; reduced velocity U/(n<sub>1</sub>B) = ${ph.Ured.toFixed(1)}`+
+   ((isFinite(ph.Ucr)&&ph.Ucr/(p.n*p.B)<20)?'<br><span class="bad">U<sub>cr</sub>/(n<sub>1</sub>B) = '+(ph.Ucr/(p.n*p.B)).toFixed(1)+' is low (warning line 20 is illustrative): the predicted U<sub>cr</sub> may be unreliable; qualitative only</span>':'');
+  
+  const c=$("cv"), g=c.getContext("2d"); g.clearRect(0,0,c.width,c.height);
+  g.strokeStyle="#9fb3c8"; for(let i=0;i<6;i++){ const yy=40+i*45; g.beginPath(); g.moveTo(20,yy); g.lineTo(300,yy); g.stroke(); g.beginPath(); g.moveTo(290,yy-5); g.lineTo(300,yy); g.lineTo(290,yy+5); g.stroke(); }
+  g.fillStyle="#333"; g.font="14px sans-serif"; g.fillText("U = "+p.U.toFixed(1)+" m/s",30,25);
+  const scale=100/(10*p.B), cy=150+Math.max(-110,Math.min(110,y*scale*10)), cx=520, s=60;
+  g.fillStyle=unstable?"#d9534f":"#4a7ab0";
+  if(p.shape==="circle"){g.beginPath();g.arc(cx,cy,s/2,0,2*Math.PI);g.fill();} else g.fillRect(cx-s/2,cy-s/2,s,s);
+  g.strokeStyle="#555"; g.beginPath(); g.moveTo(cx,20); g.lineTo(cx,cy-s/2); g.stroke();
+  g.fillStyle="#333"; g.fillText("Across-wind displacement y (magnified)",640,40);
+  
+  const t=$("tr"), h=t.getContext("2d"); h.clearRect(0,0,t.width,t.height);
+  h.strokeStyle="#ccc"; h.beginPath(); h.moveTo(0,100); h.lineTo(t.width,100); h.stroke();
+  h.strokeStyle=unstable?"#d9534f":"#4a7ab0"; h.beginPath();
+  const amp=90/(10*p.B);
+  hist.forEach((yy,i)=>{ const X=i*t.width/600, Y=100-Math.max(-95,Math.min(95,yy*amp*10)); i?h.lineTo(X,Y):h.moveTo(X,Y); }); h.stroke();
+  h.fillStyle="#333"; h.font="12px sans-serif";
+  h.fillText("y(t): linearized onset/decay, growth rate σ = −d/(2m) = "+ph.sigma.toFixed(4)+" 1/s"+(clipped?"; display limit reached, clipped (not a real amplitude)":""),8,14);
+}
+function loop(){
+  paramsCache=params(); const ph=physics(paramsCache);
+  const dt=1/(60*Math.max(4,paramsCache.n*8)); const nsub=Math.max(4,Math.round(paramsCache.n*8));
+  for(let i=0;i<nsub;i++) step(paramsCache,ph,dt);
+  hist.push(y); if(hist.length>600) hist.shift();
+  render(); requestAnimationFrame(loop);
+}
+ids.concat(["shape"]).forEach(k=>$(k).addEventListener("input",()=>{clipped=false;}));
+$("kick").onclick=()=>{y=0.002*paramsCache.B*10; v=0; hist=[]; clipped=false;};
+
+$("runtest").onclick=()=>{
+  const out=[];
+  const p1={U:0,z:0.005,m:10,n:2,B:0.1,G:-2,shape:"square"}, r1=physics(p1);
+  out.push(`Check 1: U_cr = ${r1.Ucr.toFixed(3)} m/s (hand calc 10.258), Sc = ${r1.Sc.toFixed(2)} (hand calc 51.29)`);
+  const p2={U:0,z:0.01,m:25,n:1,B:0.3,G:-3,shape:"square"}, r2=physics(p2);
+  out.push(`Check 2: U_cr = ${r2.Ucr.toFixed(3)} m/s (hand calc 5.699)`);
+  const s1=physics({...p1,U:r1.Ucr}); out.push(`At U = U_cr, d = ${s1.d.toExponential(2)} (should be ≈ 0)`);
+  const pz=physics({...p1,z:0.01}); out.push(`Doubling ζ: U_cr ${r1.Ucr.toFixed(3)} → ${pz.Ucr.toFixed(3)} (should exactly double)`);
+  const pc=physics({...p1,G:1.2,U:40}); out.push(`Circular cylinder (G = +1.2, U = 40): d = ${pc.d.toFixed(3)} > 0, U_cr = ${fmt(pc.Ucr)}`);
+  $("selftest").textContent=out.join("\n");
+};
+loop();
+</script>
+</body>
+</html>

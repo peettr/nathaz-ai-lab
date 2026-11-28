@@ -1,0 +1,72 @@
+{
+ "_note": "L22.0 3D showcase (P0, A851, PI 11-27). Every scene must carry all three labels (source, data time, use) in zh and en; the build drops any scene missing one. External requests must be 0.",
+ "scenes": [
+  {
+   "id": "wind-tunnel",
+   "code": "L30.1",
+   "title": {
+    "zh": "风洞自动化试验：三维虚拟流程",
+    "en": "Automated wind-tunnel testing: a virtual 3D workflow"
+   },
+   "src": "../demos/wind-tunnel/",
+   "src_zh": "../demos/wind-tunnel/zh.html",
+   "views": {
+    "overview": {
+     "view": "axon"
+    },
+    "follow": {
+     "view": "arm",
+     "step": 3,
+     "name": {
+      "zh": "机械臂换模",
+      "en": "Robot model exchange"
+     }
+    },
+    "section": {
+     "view": "front",
+     "cut": true
+    },
+    "top": {
+     "view": "top"
+    },
+    "probe": {
+     "view": "probe",
+     "name": {
+      "zh": "探头视角",
+      "en": "Probe view"
+     }
+    },
+    "extra": [
+     {
+      "id": "seat",
+      "view": "seat",
+      "step": 3,
+      "name": {
+       "zh": "模型落座",
+       "en": "Model seating"
+      }
+     }
+    ]
+   },
+   "labels": {
+    "source": {
+     "zh": "几何参照：美国佛罗里达大学 NHERI 边界层风洞的公开文献（Catarelli 等 2020；Shields 等 2023；Whiteman 等 2018、2022；Mokhtar 等 2024）；机械臂网格：ROS-Industrial universal_robot（BSD-3-Clause）；场景由本实验室 L30.1 制作；三维引擎 three.js（MIT）。",
+     "en": "Geometry follows published literature on the University of Florida NHERI Boundary Layer Wind Tunnel (Catarelli et al. 2020; Shields et al. 2023; Whiteman et al. 2018, 2022; Mokhtar et al. 2024); robot-arm meshes from ROS-Industrial universal_robot (BSD-3-Clause); scene built by this lab (L30.1); 3D engine three.js (MIT)."
+    },
+    "time": {
+     "zh": "示意：非实测、非实时；机械臂换模工作站为虚拟设计、未建造；场景版本 2026-11-14。",
+     "en": "Illustrative: not measured, not live; the robotic model-exchange workstation is a virtual design, not built; scene version 2026-11-14."
+    },
+    "use": {
+     "zh": "探索性科研展示，未经同行评审；不代表该设施的实际系统、计划或认可，不作运行、安全或设计依据。",
+     "en": "Exploratory research display, not peer reviewed; it does not represent the facility's actual systems, plans or endorsement, and is not for operation, safety or design."
+    }
+   },
+   "confirmed": "wtauto-claude 11-27",
+   "poster": {
+    "en": "posters/wind-tunnel_en.jpg",
+    "zh": "posters/wind-tunnel_zh.jpg"
+   }
+  }
+ ]
+}

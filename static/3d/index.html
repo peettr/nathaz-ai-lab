@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D showcase · NatHaz AI Lab</title>
+<!-- L22.0 3D showcase P0 (A851, PI 11-27): one viewer for every 3D scene. Five standard views, and three labels that are
+     always visible (source, data time, use). No external requests: scenes are same-origin pages under ../demos/. -->
+<style>
+ :root{--ink:#1d2330;--mute:#5b6472;--line:#d8dde3;--bg:#f6f7f9;--accent:#1f5fbf}
+ *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink)}
+ header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line)}
+ header h1{font-size:17px;margin:0} header .r{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+ select,button{font:inherit;font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}
+ button.on{background:var(--accent);border-color:var(--accent);color:#fff} button:disabled{opacity:.4;cursor:default}
+ .views{display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px;background:#fff;border-bottom:1px solid var(--line)}
+ .stage{position:relative;height:calc(100vh - 250px);min-height:360px;background:#0f141b}
+ .stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+ .labels{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:#fff;border-top:1px solid var(--line);font-size:12.5px;line-height:1.5}
+ .labels div{padding:8px 14px;border-right:1px solid var(--line)} .labels div:last-child{border-right:0}
+ .labels b{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin-bottom:2px}
+ .poster{position:absolute;inset:0;z-index:2;background:#0f141b;transition:opacity .6s} .poster img{width:100%;height:100%;object-fit:cover;display:block} .poster span{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;padding:4px 8px;border-radius:4px}
+ .missing{padding:40px;color:#fff;text-align:center}
+ a{color:var(--accent)} footer{padding:8px 16px;font-size:12px;color:var(--mute)}
+ @media (max-width:760px){.stage{height:50vh}
+  /* 11-27 #908c3aa0: on phones all three labels must be visible on the first screen. One line each, pinned to the bottom of
+     the screen; tap a label to read it in full. */
+  .labels{grid-template-columns:1fr;position:sticky;bottom:0;z-index:5;font-size:12px;box-shadow:0 -2px 8px rgba(0,0,0,.12)}
+  .labels div{border-right:0;border-bottom:1px solid var(--line);padding:5px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+  .labels div.open{white-space:normal}
+  .labels b{display:inline;margin:0 6px 0 0}}
+</style>
+</head>
+<body>
+<header>
+ <h1 id="h1">3D showcase</h1>
+ <div class="r"><select id="scene" aria-label="Scene"></select><button id="lang">中文</button><a id="home" href="../../">NatHaz AI Lab</a></div>
+</header>
+<div class="views" id="views"></div>
+<div class="stage" id="stage"></div>
+<div class="labels" id="labels"></div>
+<footer id="foot"></footer>
+<script>
+"use strict";
+const T = {
+  en: {h1: "3D showcase", views: {overview: "Overview", follow: "Follow", section: "Section", top: "Top", probe: "Probe point"},
+       source: "Source", time: "Data time", use: "Use", missing: "This scene is missing a required label and is not shown.", loading: "Pre-rendered view · the interactive 3D scene is loading…",
+       foot: "Each view can be rotated and zoomed. Labels stay visible in every view.", other: "中文"},
+  zh: {h1: "三维展示", views: {overview: "总览", follow: "跟随", section: "剖面", top: "俯视", probe: "测点视角"},
+       source: "来源", time: "数据时刻", use: "用途", missing: "这个场景缺少必需的标注，不予显示。", loading: "预渲染图 · 交互三维场景加载中……",
+       foot: "每个视角下都可以拖动旋转、滚轮缩放；三项标注在所有视角下始终可见。", other: "English"}
+};
+const ORDER = ["overview", "follow", "section", "top", "probe"];
+const q = new URLSearchParams(location.search);
+let lang = q.get("lang") === "zh" || (!q.get("lang") && /^zh/i.test(navigator.language || "")) ? "zh" : "en";
+let S = [], cur = null, view = "overview";
+const $ = id => document.getElementById(id);
+const ok = s => s && s.labels && ["source", "time", "use"].every(k => s.labels[k] && s.labels[k].zh && s.labels[k].en);
+function api() { try { return $("frame").contentWindow.__api || null; } catch (e) { return null; } }
+function vdef(v) { const d = cur.views[v]; return d ? (typeof d === "string" ? {view: d} : d) : (cur.views.extra || []).find(x => x.id === v); }
+function vname(v) { const d = vdef(v); return d && d.name ? d.name[lang] : T[lang].views[v]; }
+function setView(v) {
+  view = v; const a = api(); const d = vdef(v);
+  if (a && d) { try { if (a.cut) a.cut(!!d.cut); if (d.step !== undefined && a.setStep) a.setStep(d.step); a.setView(d.view); if (d.time && a.setTime) a.setTime(d.time); if (a.skip) a.skip(2); }
+    catch (e) { console.error("scene view failed:", v, e); } }  // a scene error must not freeze the viewer
+  [...$("views").children].forEach(b => b.classList.toggle("on", b.dataset.v === v));
+}
+function draw() {
+  const t = T[lang]; document.documentElement.lang = lang; $("h1").textContent = t.h1; $("lang").textContent = t.other; $("foot").textContent = t.foot;
+  $("scene").innerHTML = S.map(s => `<option value="${s.id}"${cur && s.id === cur.id ? " selected" : ""}>${s.code} · ${s.title[lang]}</option>`).join("");
+  if (!cur) return;
+  const ids = ORDER.concat((cur.views.extra || []).map(x => x.id));
+  $("views").innerHTML = ids.map(v => `<button data-v="${v}"${vdef(v) ? "" : " disabled"}>${vname(v)}</button>`).join("");
+  [...$("views").children].forEach(b => b.onclick = () => setView(b.dataset.v));
+  if (!ok(cur)) { $("stage").innerHTML = `<div class="missing">${t.missing}</div>`; $("labels").innerHTML = ""; return; }
+  $("labels").innerHTML = ["source", "time", "use"].map(k => `<div><b>${t[k]}</b>${cur.labels[k][lang]}</div>`).join("");
+  [...$("labels").children].forEach(d => d.onclick = () => d.classList.toggle("open"));
+  const src = lang === "zh" && cur.src_zh ? cur.src_zh : cur.src;
+  // Fallback (plan §5): a pre-rendered overview image is shown at once and lifted when the 3D scene is ready.
+  const pst = cur.poster && cur.poster[lang] && !q.get("noposter") ? `<div class="poster" id="poster"><img alt="" src="${cur.poster[lang]}" onload="window.__t_poster=performance.now()"><span>${t.loading}</span></div>` : "";
+  $("stage").innerHTML = `${pst}<iframe id="frame" title="${cur.title[lang]}" src="${src}"></iframe>`;
+  $("frame").onload = () => { let n = 0; const w = setInterval(() => { if (api() || ++n > 240) { clearInterval(w); setView(view); window.__t_3d = performance.now();
+    const ps = $("poster"); if (ps) setTimeout(() => { ps.style.opacity = 0; setTimeout(() => ps.remove(), 700); }, 800); } }, 250); };
+  history.replaceState(null, "", `?scene=${cur.id}&lang=${lang}`);
+}
+$("lang").onclick = () => { lang = lang === "zh" ? "en" : "zh"; draw(); };
+$("scene").onchange = e => { cur = S.find(s => s.id === e.target.value); view = "overview"; draw(); };
+fetch("scenes.json", {cache: "no-cache"}).then(r => r.json()).then(j => {
+  S = (j.scenes || []).filter(ok);  // three labels or the scene does not appear at all
+  cur = S.find(s => s.id === q.get("scene")) || S[0] || null; draw();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+"""网站报告尾部句（第三批留出后版）。用法: python3 -I s3a_report_tail_sentence_v3.py <s3a_tail.json> <s3a_tail_holdout.json> <s3a_tail_holdout_r5.json>"""
+import sys,json;d=json.load(open(sys.argv[1]));h2=json.load(open(sys.argv[2]))['r4_holdout'];h3=json.load(open(sys.argv[3]))['holdout'];t=d['TS'];s=d['strata'];f=lambda v:f'{v:.2f}'
+a=s['10-15']['TS'];b=s['20-inf']['TS'];c=h3['10-15']['0.9'];e=h3['20+']['0.9'];c5=h3['10-15']['0.95'];e5=h3['20+']['0.95']
+print(f"- 尾部形状另做了超阈值检验（广义帕累托分布）：第一批数据里雷暴阵风比的形状参数 ξ = {f(t['xi'])}（ξ>0 表示重尾），按平均风分层后重尾集中在 10–15 节层（ξ = {f(a['xi'])}），≥20 节层 ξ = {f(b['xi'])}（有界尾）。这一分层规律是看数据后发现的，随后在两批未用过的事件上检验：第二批 {h2['windows']} 个窗样本太少、未能判定；第三批（从 NOAA 风暴事件库自建清单）{h3['windows']} 个窗上，10–15 节层 ξ = {f(c['xi'])}，95% 区间 [{f(c['ci'][0])}, {f(c['ci'][1])}]，≥20 节层 ξ = {f(e['xi'])}，[{f(e['ci'][0])}, {f(e['ci'][1])}]，取 90% 与 95% 两档阈值结论一致（95% 档：{f(c5['xi'])}、{f(e5['xi'])}），分层规律成立。该结论尚未经外部审稿。")

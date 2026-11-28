@@ -1,0 +1,54 @@
+{
+  "id": "cab38724",
+  "slug": "cab38724",
+  "number": null,
+  "title": {
+    "zh": "（作废·继承前文）L26.34 RC-T1-r1",
+    "en": "（作废·继承前文）L26.34 RC-T1-r1"
+  },
+  "group": "qtl",
+  "parent": "bd040db3",
+  "depth": 1,
+  "status": {
+    "zh": "探索中",
+    "en": "Exploring"
+  },
+  "status_class": "run",
+  "done": false,
+  "start": "2026-11-27 14:41",
+  "end": null,
+  "updated": "2026-11-27 14:41",
+  "conclusion": {
+    "zh": "",
+    "en": ""
+  },
+  "schema_version": "1.0.0",
+  "task": {
+    "zh": "",
+    "en": "",
+    "goal_zh": "",
+    "goal_en": ""
+  },
+  "report": {
+    "zh": "",
+    "en": ""
+  },
+  "decisions": [],
+  "reviews": [],
+  "results": [],
+  "figures": [],
+  "code": [],
+  "timeline": [
+    {
+      "role": "relay",
+      "who": "快试实验室 Lead · 转达",
+      "ts": "2026-11-27 14:42",
+      "text": "【停止令 · 来自 快试】本对话已被打断，你当时的回合已停止。\n原因：L26.34 RC 臂作废： 继承了根对话前文（含 L26.34 设计、封存与评分细节），不再是独立测评。请立即停止，不要派 bot，不要写任何交付物。\n在上级另行交代之前：不要继续原来的任务，不要重跑被停下的脚本/算例，不要另起新的计算；已写的文件保留原样；仍在后台的进程保持原状，是否结束由上级决定。下次开口先回报你停在哪里、写过哪些文件、还有哪些后台进程。"
+    }
+  ],
+  "files": {
+    "self": "cab38724.json",
+    "claims": null,
+    "pdf": null
+  }
+}
